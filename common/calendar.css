@@ -1,0 +1,81 @@
+.fc-event a{
+		font-size: 11px;
+		background-color: #ccd;
+		color: #000;
+		white-space: nowrap;
+	}
+	.status-430 a{ 
+		background-color: orange;
+	}
+	.status-420 a{ 
+		background-color: red;
+		color: white;
+	}
+	.status-520 a{
+		background-color: #A9F5F2;
+		
+	}
+	.status-540 a, .status-550 a{
+		background-color: #81BEF7;
+		color: black;
+	}
+	.status-560 a, .status-570 a{
+		background-color: #ddd;
+		color: #222;
+	}
+	.status-hol-1 a{
+		background-color: #fdd;
+		color:#500;
+	}
+	.status-hol-0 a{
+		background-color: #444;
+		color:white;
+	}
+	.status-910 a, .status-920 a{
+		background-color: #CFCFCF;
+		color: red;
+	}
+	.status-980 a{
+	background-color: #E8E8E8;
+	color: red;
+	text-decoration: line-through;
+}
+	.status-930 a{
+		background-color: white;
+		color: red;
+	}
+	.status-1030 a,.status-1040 a,.status-1050 a,.status-1060 a,.status-1070 a,.status-1080 a{
+		background-color: #FF6600;
+		color: black;
+	}
+	.status-1010 a,.status-1020 a{
+	background-color: #FFC39B;
+	color: black;
+}
+.event-birthday a{
+	background-color: yellow;
+	color: maroon;
+}
+.event-probation a{
+	background-color: #C7FFC5;
+	color: olive;
+}
+	.overdue a{
+		color: red;
+		background-position:0 -7057px;
+		background-image:url("/common/images/sprites/sprites.png");
+		background-repeat:no-repeat;
+		height:20px;
+		padding: 2px 18px;
+		line-height: 20px;
+	}
+	
+	.calendar-event a{
+	background-color: #00CC33;
+	color: #00390F;
+}
+
+.fc-sat, .fc-sun{
+	color:maroon;
+	background-color: pink;
+}

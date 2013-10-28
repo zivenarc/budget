@@ -1,0 +1,29 @@
+html, body 	{
+	background:url(foo) fixed;
+	}
+/*#header, #footer {
+ position:absolute;
+ z-index:10;
+}
+ #header {
+ top:expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollTop : document.body.scrollTop)
+ }
+ #wrap, #toc_wrap, #pane_wrap {
+ 	height:100%;
+ }
+#toc, #pane {
+ 	padding:72px 10px;
+	}
+#footer {
+ 	top:expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollTop +(documentElement.clientHeight-this.clientHeight) : document.body.scrollTop +(document.body.clientHeight-this.clientHeight));
+}
+*/
+#menubar {
+ top:expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollTop : document.body.scrollTop)
+ }
+ .invoice{
+ 	//height: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.clientHeight-100 : document.body.clientHeight-100);
+ }
+ div#loader{
+ 	filter: alpha(opacity = 80);
+ }

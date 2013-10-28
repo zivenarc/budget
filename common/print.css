@@ -1,0 +1,28 @@
+.auth_matrix table{
+	border: 1px solid black;
+
+}
+.auth_matrix td{
+	border: 1px solid black;
+		font-size: 90%;
+}
+.auth_matrix th{
+	border: 1px solid black;
+	background-color: #ADD8E6;
+	color: black;
+	padding: 0.1em 0.3em 0.1em 0.3em;
+	font-size: 90%;
+}
+.auth_matrix ul{
+	margin: 0 0 0 0;
+	list-style: none;
+	text-indent: 0;
+	padding: 0 0 0 0;
+}
+.auth_matrix li{
+	margin-left: 0.1em;
+
+}
+iframe{
+	width: inherit;
+}

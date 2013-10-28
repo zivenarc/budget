@@ -1,0 +1,79 @@
+#corner_logo {
+		background-image:url(/common/images/yusen-logo.gif);
+		background-repeat:no-repeat;
+		height:70px;
+		width:162px;
+		font-size:0;
+		float:left;
+		margin-right:40px;
+		}
+
+		#app_title {
+		font:bold 18px Arial;
+		color:#005;
+		text-transform:uppercase;
+		letter-spacing:5px;
+		padding:10px 10px 3px;
+		}
+
+		#login_info {
+		font:11px Arial;
+		color:#444;
+		}
+
+		#login_info a:link {
+		color:#444;
+		text-decoration:underline;
+		}
+
+		#login_info a:visited {
+		color:#444;
+		}
+
+		#login_info a:hover {
+		color:#d00;
+		}
+
+#search_form{
+	float:right;
+}
+#languages{
+	position:absolute;
+	top: 0;
+	left: 100%;
+	margin-left: -90px;
+
+}
+#languages ul{
+		list-style: none;
+		text-indent: 0;
+}
+#languages li{
+		height: 18px;
+		text-indent: 0;
+		display:inline-block;
+}
+#languages li a{
+	padding-left: 18px;
+}
+#languages a:link{
+	text-decoration: none;
+}
+#languages a:visited{
+	text-decoration: none;
+	color: inherit;
+}
+#languages a:hover{
+	text-decoration: underline;
+	color: blue;
+}
+#languages a:active{
+	text-decoration: none;
+	color: red;
+}
+.lang-ru {
+	background: url(/common/images/flags/png/ru.png) no-repeat;
+}
+.lang-en {
+	background: url(/common/images/flags/png/gb.png) no-repeat;
+}
