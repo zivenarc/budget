@@ -34,8 +34,8 @@ class Location_costs extends Document{
 		
 		$sqlWhere = $this->getSqlWhere($id);
 		
-		$sql = "SELECT LCO.*, usrTitle FROM tbl_location_costs LCO
-				LEFT JOIN stbl_user ON usrID=lcoEditBy
+		$sql = "SELECT ".self::Prefix.".*, `usrTitle` FROM `".self::Table."` ".self::Prefix."
+				LEFT JOIN `stbl_user` ON `usrID`=`".self::Prefix."EditBy`
 				WHERE $sqlWhere";
 		
 		parent::refresh($sql);
@@ -150,7 +150,7 @@ class Location_costs extends Document{
 			'title'=>$month
 			,'field'=>strtolower($month)
 			,'class'=>'budget-month'
-			,'type'=>'int'
+			,'type'=>'decimal'
 			, 'mandatory' => true
 			, 'disabled'=>false
 			,'totals'=>true
@@ -159,7 +159,7 @@ class Location_costs extends Document{
 		$grid->Columns[] =Array(
 			'title'=>'Total'
 			,'field'=>'YTD'
-			,'type'=>'integer'
+			,'type'=>'decimal'
 			,'totals'=>true
 			,'disabled'=>true
 		);
@@ -383,7 +383,7 @@ class costs_record{
 
 		for($m=1;$m<13;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
-			$arrRes[] = "`$month`=".(integer)$this->{$month};
+			$arrRes[] = "`$month`=".(double)$this->{$month};
 		}
 			
 			//$oProduct = $Products->getByCode($this->product);
