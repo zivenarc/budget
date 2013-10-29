@@ -408,7 +408,7 @@ class sales_record{
 			$arrRes[] = "`source`='".$this->source."'";
 			$arrRes[] = "`scenario`='".$this->scenario."'";
 			$arrRes[] = "`customer`='".$this->customer."'";
-			$arrRes[] = "`comment`='".$this->customer."'";
+			$arrRes[] = "`comment`='".$this->comment."'";
 			$arrRes[] = "`product`='".$this->product."'";
 			$arrRes[] = "`selling_rate`='".$this->selling_rate."'";
 			$arrRes[] = "`selling_curr`='".$this->selling_curr."'";
