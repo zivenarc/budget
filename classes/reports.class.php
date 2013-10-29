@@ -303,6 +303,7 @@ class Reports{
 			
 			$group = '';
 			$subtotal = Array();
+			$grandTotal = Array();
 			$rs = $oSQL->q($sql);
 			while ($rw=$oSQL->f($rs)){
 				
@@ -322,11 +323,15 @@ class Reports{
 				$local_subtotal = 0;
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
-					$subtotal[$rw['Group']][$month]+=$rw[$month];
+					$subtotal[$rw['Group']][$month]+=$rw[$month];					
 					$local_subtotal += $rw[$month];
+					$grandTotal[$month] += $rw[$month];
 				}
 				$subtotal[$rw['Group']]['Total'] += $local_subtotal;
 				$subtotal[$rw['Group']]['estimate'] += $rw['estimate'];
+				
+				$grandTotal['Total'] += $local_subtotal;
+				$grandTotal['estimate'] += $rw['estimate'];
 				
 				self::echoBudgetItemString($rw,$tr_class);				
 				$group = $rw['Group'];
@@ -335,6 +340,10 @@ class Reports{
 			$data = $subtotal[$group];
 			$data['Budget item']=$group;
 			self::echoBudgetItemString($data,'budget-subtotal');
+			//Grand total
+			$data = $grandTotal;
+			$data['Budget item']='Grand total';
+			self::echoBudgetItemString($data,'budget-grandtotal');
 			?>
 			</tbody>
 			</table>

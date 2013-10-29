@@ -80,6 +80,17 @@ class Sales extends Document{
 			,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit'
 			,'default'=>$arrUsrData['usrProfitID']
 		);
+		
+		$this->Columns[] = Array(
+			'title'=>'Customer'
+			,'field'=>self::Prefix.'CustomerID'
+			,'type'=>'ajax'
+			,'table'=>'vw_customer'
+			,'prefix'=>'cnt'
+			,'sql'=>'vw_customer'
+			,'default'=>9022
+		);
+		
 		$this->Columns[] = Array(
 			'title'=>'Product folder'
 			,'field'=>self::Prefix.'ProductFolderID'
@@ -116,7 +127,9 @@ class Sales extends Document{
 			,'type'=>'row_id'
 		);
 		
-		$grid->Columns[] = parent::getCustomerEG();
+		if (!$this->data[self::Prefix.'CustomerID']){
+			$grid->Columns[] = parent::getCustomerEG();
+		}
 		
 		$grid->Columns[] = Array(
 			'title'=>'Product'
@@ -217,9 +230,10 @@ class Sales extends Document{
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		
-		$this->profit = $_POST['salProfitID'];
-		$this->product_folder = $_POST['salProductFolderID'];
-		$this->comment = $_POST['salComment'];
+		$this->profit = $_POST[self::Prefix.'ProfitID'];
+		$this->product_folder = $_POST[self::Prefix.'ProductFolderID'];
+		$this->comment = $_POST[self::Prefix.'Comment'];
+		$this->customer = $_POST[self::Prefix.'CustomerID'];
 		
 		//-------------------Updating grid records---------------------------------
 		$arrUpdated = $_POST['inp_'.$this->gridName.'_updated'];
@@ -234,7 +248,7 @@ class Sales extends Document{
 						$row->flagUpdated = true;				
 						$row->profit = $_POST['salProfitID'];
 						$row->product = $_POST['product'][$id];				
-						$row->customer = $_POST['customer'][$id];				
+						$row->customer = $_POST['customer'][$id]?$_POST['customer'][$id]:$this->customer;				
 						$row->comment = $_POST['comment'][$id];				
 						$row->selling_rate = str_replace(',','',$_POST['selling_rate'][$id]);				
 						$row->selling_curr = $_POST['selling_curr'][$id];				
@@ -262,6 +276,7 @@ class Sales extends Document{
 		$sql[] = "UPDATE `tbl_sales` 
 				SET salProfitID=".(integer)$this->profit."
 				,salProductFolderID=".(integer)$this->product_folder."
+				,salCustomerID=".(integer)$this->customer."
 				,salComment=".$this->oSQL->e($this->comment)."
 				,salScenario='".$this->scenario."'
 				,salEditBy='".$arrUsrData['usrID']."'

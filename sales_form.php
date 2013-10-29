@@ -2,6 +2,7 @@
 //$flagNoAuth = true;
 require ('common/auth.php');
 include ('classes/sales.class.php');
+$arrJS[] = 'js/ef_common.js';
 $arrJS[] = 'js/input_form.js';
 
 $salID=$_GET['salID']?$_GET['salID']:$_POST['salID'];
