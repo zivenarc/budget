@@ -216,7 +216,7 @@ class Location_costs extends Document{
 						$row->comment = $_POST['comment'][$id];				
 						for ($m=1;$m<13;$m++){
 							$month = date('M',mktime(0,0,0,$m,15));
-							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
+							$row->{$month} = (double)$_POST[strtolower($month)][$id];
 						}					
 					} else {
 						$row->flagUpdated = false;
