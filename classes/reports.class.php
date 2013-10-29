@@ -82,7 +82,7 @@ class Reports{
 	public function headcountByJob($sqlWhere=''){
 		GLOBAL $oSQL;
 		ob_start();
-			$sql = "SELECT prtRHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle , ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
+			$sql = "SELECT prtRHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal , ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
 					FROM `reg_headcount`
 					LEFT JOIN vw_function ON funGUID=function
 					LEFT JOIN vw_product_type ON prtID=activity
@@ -106,7 +106,7 @@ class Reports{
 				echo '<tr>';
 				echo '<td>',$rw['Location'],'</td>';
 				echo '<td>',$rw['Activity'],'</td>';
-				echo '<td>',$rw['funTitle'],'</td>';
+				echo '<td>',$rw['funTitle'],' (',$rw['funTitleLocal'],')</td>';
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month'>",$rw[$month],'</td>';

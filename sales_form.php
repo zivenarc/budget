@@ -65,6 +65,23 @@ require ('includes/inc_document_header.php');
 $(document).ready(function(){
 	eiseGridInitialize();
 	rowTotalsInitialize();
+	
+	var grid=eiseGrid_find(doc.gridName);
+    if (grid!=null){  
+		grid.change ("product[]", function(oTr, input){ 
+			console.log(oTr);
+			$.post("ajax_details.php"
+				, {table:'vw_product',prdID:oTr.find("[name='product[]']").val()}
+				, function(data, textStatus){
+					console.log(data);
+					oTr.find("[name='unit[]']").val(data.prtUnit);
+					oTr.find("[name='comment[]']").val(data.prdExternalID);
+				}
+				,'json'
+			);
+		})
+    }
+	
 });
 function save(arg){
 	arg=arg||'update';
