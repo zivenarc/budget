@@ -165,7 +165,7 @@ class master_record{
 		$arrRes[] = "`source`='".$this->source."'";
 		$arrRes[] = "`scenario`='".$this->scenario."'";
 		$arrRes[] = "`customer`=".($this->customer?(integer)$this->customer:'NULL');
-		$arrRes[] = "`activity`='".$this->activity."'";
+		$arrRes[] = "`activity`=".($this->activity?(integer)$this->activity:'NULL');
 		$arrRes[] = "`particulars`=".(is_object($this->particulars['obj'])?"'".$this->particulars['obj']->id."'":'NULL');
 		//$arrRes[] = "`part_type`=".(is_object($this->particulars['obj'])?"'".$this->particulars['obj']->TYPE."'":'NULL');
 		$res = "INSERT INTO `reg_master` SET ". implode(',',$arrRes).';';
