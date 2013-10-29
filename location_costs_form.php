@@ -23,7 +23,7 @@ if ($_POST['DataAction']){
 		$oDocument->arrActions = $arrActions;
 		$oDocument->status = 'success';
 		header("Content-type: application/json");
-		echo json_encode($oDocument);
+		$oDocument->getJSON();
 	}
 	die();
 }

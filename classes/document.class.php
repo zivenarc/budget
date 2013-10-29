@@ -179,5 +179,15 @@ class Document extends easyForm{
 		);
 		return ($res);
 	}
+	
+	public function getJSON(){
+		$jsonData  = (array)$this;
+		foreach ($jsonData as $key=>$value){
+			if (is_a($value,'sql')){
+				$jsonData[$key] = null;
+			} 
+		}
+	}
+	
 }
 ?>

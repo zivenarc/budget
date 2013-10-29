@@ -8,15 +8,9 @@ if ($oDocument->ID){
 echo '</h1>';
 echo '<p id="timestamp">',$oDocument->timestamp,'</p>';
 
-$jsonData  = (array)$oDocument;
-foreach ($jsonData as $key=>$value){
-	if (is_a($value,'sql')){
-		$jsonData[$key] = null;
-	} 
-}
 ?>
 <script>
-	var doc = <?php echo json_encode($jsonData);?>
+	var doc = <?php $oDocument->getJSON(); ?>
 </script>
 <div>
 <?php 
