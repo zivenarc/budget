@@ -1,9 +1,22 @@
 <?php
-echo '<h1>',$oBudget->title,' :: ',$arrUsrData["pagTitle"],' #',$oDocument->ID,'</h1>';
+echo '<h1>',$oBudget->title,' :: ';
+if ($oDocument->ID){
+ echo $arrUsrData["pagTitle"],' #',$oDocument->ID;
+} else {
+ echo 'New ',$arrUsrData["pagTitle"];
+}
+echo '</h1>';
 echo '<p id="timestamp">',$oDocument->timestamp,'</p>';
+
+$jsonData  = (array)$oDocument;
+foreach ($jsonData as $key=>$value){
+	if (is_a($value,'sql')){
+		$jsonData[$key] = null;
+	} 
+}
 ?>
 <script>
-	var doc = <?php echo json_encode($oDocument);?>
+	var doc = <?php echo json_encode($jsonData);?>
 </script>
 <div>
 <?php 

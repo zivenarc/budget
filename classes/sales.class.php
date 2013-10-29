@@ -319,7 +319,7 @@ class Sales extends Document{
 						$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
 					}
 					
-				}
+					}
 				$oMaster->save();
 				$this->markPosted();
 			}

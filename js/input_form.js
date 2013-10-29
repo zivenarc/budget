@@ -27,7 +27,7 @@ function rowTotalsInitialize(){
 	if (doc!=undefined){
 		for (m=0;m<months.length;m++){
 			styles.push('.'+doc.gridName+'_'+months[m]);	
-		}; console.log(styles);
+		};
 		$(styles.join()).each(function(){
 			$(this).change(function(){
 				recalcYTD($(this));

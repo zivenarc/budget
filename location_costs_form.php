@@ -75,7 +75,10 @@ function save(arg){
 		console.log(responseText);
 		
 		if (responseText.status=='success'){
-		
+			
+			$('#inp_'+doc.gridName+'_updated[]').val();
+			$('#inp_'+doc.gridName+'_deleted').val();
+			
 			$('#timestamp').text(responseText.timestamp);
 			$menu = $('ul.menu-h');
 			$menu.children('li').detach();
