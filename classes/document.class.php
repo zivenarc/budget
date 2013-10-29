@@ -187,7 +187,7 @@ class Document extends easyForm{
 				$jsonData[$key] = null;
 			} 
 		}
-		echo json_decode($jsonData);
+		echo json_encode($jsonData);
 	}
 	
 }
