@@ -371,6 +371,7 @@ class sales_record{
 			$this->profit = $data['profit'];
 			$this->activity = $data['activity'];
 			$this->customer = $data['customer'];
+			$this->comment = $data['comment'];
 			$this->unit = $data['unit'];
 			$this->selling_curr = $data['selling_curr'];
 			$this->buying_curr = $data['buying_curr'];
@@ -407,6 +408,7 @@ class sales_record{
 			$arrRes[] = "`source`='".$this->source."'";
 			$arrRes[] = "`scenario`='".$this->scenario."'";
 			$arrRes[] = "`customer`='".$this->customer."'";
+			$arrRes[] = "`comment`='".$this->customer."'";
 			$arrRes[] = "`product`='".$this->product."'";
 			$arrRes[] = "`selling_rate`='".$this->selling_rate."'";
 			$arrRes[] = "`selling_curr`='".$this->selling_curr."'";
