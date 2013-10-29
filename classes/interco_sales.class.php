@@ -15,12 +15,12 @@ $YACT = new YACT_COA();
 $arrJS[] = '../common/eiseGrid/eiseGrid.js';
 $arrCSS[] = '../common/eiseGrid/eiseGrid.css';
 
-class Sales extends Document{
+class Interco_sales extends Document{
 
 	const Register='reg_sales';
-	const GridName = 'sales';
-	const Prefix = 'sal';
-	const Table = 'tbl_sales';
+	const GridName = 'interco_sales';
+	const Prefix = 'ics';
+	const Table = 'tbl_interco_sales';
 	
 	function __construct($id=''){
 		GLOBAL $strLocal;
@@ -38,9 +38,9 @@ class Sales extends Document{
 		
 		$sqlWhere = $this->getSqlWhere($id);
 				
-		$sql = "SELECT SAL.*, prdIdxLeft, prdIdxRight, usrTitle FROM tbl_sales SAL
-				LEFT JOIN vw_product ON prdID=salProductFolderID
-				LEFT JOIN stbl_user ON usrID=salEditBy
+		$sql = "SELECT ICS.*, prdIdxLeft, prdIdxRight, usrTitle FROM tbl_interco_sales ICS
+				LEFT JOIN vw_product ON prdID=icsProductFolderID
+				LEFT JOIN stbl_user ON usrID=icsEditBy
 				WHERE $sqlWhere";
 		
 		parent::refresh($sql);
@@ -83,14 +83,14 @@ class Sales extends Document{
 			,'default'=>$arrUsrData['usrProfitID']
 		);
 		
-		$this->Columns[] = Array(
+		$this->Columns[] = Array( //------------SPECIAL CASE, Customer is another profit center
 			'title'=>'Customer'
 			,'field'=>self::Prefix.'CustomerID'
-			,'type'=>'ajax'
-			,'table'=>'vw_customer'
-			,'prefix'=>'cnt'
-			,'sql'=>'vw_customer'
-			,'default'=>9022
+			,'type'=>'combobox'
+			,'table'=>'vw_profit'
+			,'prefix'=>'pcc'
+			,'sql'=>'vw_profit'
+			,'default'=>6
 		);
 		
 		$this->Columns[] = Array(
@@ -129,10 +129,8 @@ class Sales extends Document{
 			,'type'=>'row_id'
 		);
 		
-		if (!$this->data[self::Prefix.'CustomerID']){
-			$grid->Columns[] = parent::getCustomerEG();
-		}
-		
+		$grid->Columns[] = parent::getCustomerEG();
+				
 		$grid->Columns[] = Array(
 			'title'=>'Product'
 			,'field'=>'product'
@@ -248,9 +246,9 @@ class Sales extends Document{
 				if ($row){
 					if ($arrUpdated[$id]){				
 						$row->flagUpdated = true;				
-						$row->profit = $_POST['salProfitID'];
+						$row->profit = $_POST[$this->prefix.'ProfitID'];
 						$row->product = $_POST['product'][$id];				
-						$row->customer = $_POST['customer'][$id]?$_POST['customer'][$id]:$this->customer;				
+						$row->customer = $_POST['customer'][$id];				
 						$row->comment = $_POST['comment'][$id];				
 						$row->selling_rate = str_replace(',','',$_POST['selling_rate'][$id]);				
 						$row->selling_curr = $_POST['selling_curr'][$id];				
@@ -275,15 +273,15 @@ class Sales extends Document{
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
 		$sql[] = "START TRANSACTION;";
-		$sql[] = "UPDATE `tbl_sales` 
-				SET salProfitID=".(integer)$this->profit."
-				,salProductFolderID=".(integer)$this->product_folder."
-				,salCustomerID=".(integer)$this->customer."
-				,salComment=".$this->oSQL->e($this->comment)."
-				,salScenario='".$this->scenario."'
-				,salEditBy='".$arrUsrData['usrID']."'
-				,salEditDate=NOW()
-				WHERE salID={$this->ID};";
+		$sql[] = "UPDATE `{$this->table}` 
+				SET {$this->prefix}ProfitID=".(integer)$this->profit."
+				,{$this->prefix}ProductFolderID=".(integer)$this->product_folder."
+				,{$this->prefix}CustomerID=".(integer)$this->customer."
+				,{$this->prefix}Comment=".$this->oSQL->e($this->comment)."
+				,{$this->prefix}Scenario='".$this->scenario."'
+				,{$this->prefix}EditBy='".$arrUsrData['usrID']."'
+				,{$this->prefix}EditDate=NOW()
+				WHERE {$this->prefix}ID={$this->ID};";
 		if(is_array($this->records[$this->gridName])){			
 			foreach ($this->records[$this->gridName] as $i=>$row){				
 				if ($row->flagUpdated || $row->flagDeleted){
@@ -307,21 +305,21 @@ class Sales extends Document{
 			
 			if(is_array($this->records[$this->gridName])){
 				foreach($this->records[$this->gridName] as $id=>$record){
+					//-------------------------------------- Income for supplier --------------------------------------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
 					$master_row->activity = $record->activity;
-					$master_row->customer = $record->customer;				
-					
+					$master_row->customer = $record->customer;							
 					$activity = $Activities->getByCode($record->activity);
-					$account = $YACT->getByCode($activity->YACT);
-					
+					$account = $YACT->getByCode('J00400');			
 					$master_row->account = $account;
-					$master_row->item = $activity->item_income;
+					$master_row->item = Items::INTERCOMPANY_REVENUE;
 					for($m=1;$m<13;$m++){
 						$month = date('M',mktime(0,0,0,$m,15));
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}				
 					
+					//-------------------------------------- Cost for supplier --------------------------------------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
 					$master_row->activity = $record->activity;
@@ -337,7 +335,70 @@ class Sales extends Document{
 						$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
 					}
 					
+					//-------------------------------------- Intercompany cost for department --------------------------------------------------
+					$master_row = $oMaster->add_master();
+					$master_row->profit = $this->customer;
+					$master_row->activity = $record->activity;
+					$master_row->customer = $record->customer;				
+					
+					$activity = $Activities->getByCode($record->activity);
+					$account = $YACT->getByCode('J00802');
+					
+					$master_row->account = $account;
+					$master_row->item = Items::INTERCOMPANY_COSTS;
+					for($m=1;$m<13;$m++){
+						$month = date('M',mktime(0,0,0,$m,15));
+						$master_row->{$month} = -($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
+					
+					//-------------------------------------- Elimination of revenue --------------------------------------------------
+					$master_row = $oMaster->add_master();
+					$master_row->profit = 99;
+					$master_row->activity = $record->activity;
+					$master_row->customer = $record->customer;				
+					
+					$activity = $Activities->getByCode($record->activity);
+					$account = $YACT->getByCode('J00400');
+					
+					$master_row->account = $account;
+					$master_row->item = Items::INTERCOMPANY_REVENUE;
+					for($m=1;$m<13;$m++){
+						$month = date('M',mktime(0,0,0,$m,15));
+						$master_row->{$month} = -($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
+					}
+					
+					//-------------------------------------- Elimination of revenue --------------------------------------------------
+					$master_row = $oMaster->add_master();
+					$master_row->profit = 99;
+					$master_row->activity = $record->activity;
+					$master_row->customer = $record->customer;				
+					
+					$activity = $Activities->getByCode($record->activity);
+					$account = $YACT->getByCode('J00802');
+					
+					$master_row->account = $account;
+					$master_row->item = Items::INTERCOMPANY_COSTS;
+					for($m=1;$m<13;$m++){
+						$month = date('M',mktime(0,0,0,$m,15));
+						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
+					}
+					
+					//-------------------------------------- Replacement of direct costs in customer department--------------------------
+					$master_row = $oMaster->add_master();
+					$master_row->profit = $this->customer;
+					$master_row->activity = $record->activity;
+					$master_row->customer = $record->customer;				
+					
+					$activity = $Activities->getByCode($record->activity);
+					$account = $YACT->getByCode('J00802');
+					
+					$master_row->account = $account;
+					$master_row->item = $activity->item_cost;
+					for($m=1;$m<13;$m++){
+						$month = date('M',mktime(0,0,0,$m,15));
+						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
+					}
+				}
 				$oMaster->save();
 				$this->markPosted();
 			}
@@ -350,6 +411,4 @@ class Sales extends Document{
 }
 
 
-
 ?>
-

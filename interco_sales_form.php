@@ -1,7 +1,7 @@
 <?php
 //$flagNoAuth = true;
 require ('common/auth.php');
-include ('classes/sales.class.php');
+include ('classes/interco_sales.class.php');
 $arrJS[] = 'js/ef_common.js';
 $arrJS[] = 'js/input_form.js';
 
