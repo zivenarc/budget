@@ -3,51 +3,48 @@ include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
 include_once ('../common/eiseGrid/inc_eiseGrid.php');
 include_once ('classes/reference.class.php');
-include_once ('classes/product.class.php');
 include_once ('classes/yact_coa.class.php');
 
-$Products = new Products ();
-$Activities = new Activities ();
+//$Activities = new Activities ();
 $YACT = new YACT_COA();
 
 $arrJS[] = '../common/eiseGrid/eiseGrid.js';
 $arrCSS[] = '../common/eiseGrid/eiseGrid.css';
 
-class Sales extends Document{
+class Location_costs extends Document{
 
-	const Register='reg_sales';
-	const GridName = 'sales';
-	const Prefix = 'sal';
-	const Table = 'tbl_sales';
+	const Register='reg_costs';
+	const GridName = 'location_costs';
+	const Prefix = 'lco';
+	const Table = 'tbl_location_costs';
 	
 	function __construct($id=''){
 		GLOBAL $strLocal;
-		GLOBAL $arrUsrData;
+		//GLOBAL $arrUsrData;
 		
 		$this->gridName = self::GridName;
 		$this->table = self::Table;
 		$this->prefix = self::Prefix;
 		$this->register = self::Register;
 		
-		parent::__construct($id);
-		
+		parent::__construct($id);	
+
 	}
 	public function refresh($id){
 		
 		$sqlWhere = $this->getSqlWhere($id);
-				
-		$sql = "SELECT SAL.*, prdIdxLeft, prdIdxRight, usrTitle FROM tbl_sales SAL
-				LEFT JOIN vw_product ON prdID=salProductFolderID
-				LEFT JOIN stbl_user ON usrID=salEditBy
+		
+		$sql = "SELECT LCO.*, usrTitle FROM tbl_location_costs LCO
+				LEFT JOIN stbl_user ON usrID=lcoEditBy
 				WHERE $sqlWhere";
 		
 		parent::refresh($sql);
 		
 		if($this->GUID){
-			$sql = "SELECT * FROM `".self::Register."` WHERE `source`='".$this->GUID."';";
+			$sql = "SELECT * FROM `".$this->register."` WHERE `source`='".$this->GUID."';";
 			$rs = $this->oSQL->q($sql);			
 			while($rw = $this->oSQL->f($rs)){
-				$this->records[$this->gridName][$rw['id']] = new sales_record($this->GUID, $this->scenario, $rw['id'], $rw);
+				$this->records[$this->gridName][$rw['id']] = new costs_record($this->GUID, $this->scenario, $rw['id'], $rw);
 			}		
 		}
 	}
@@ -74,25 +71,11 @@ class Sales extends Document{
 			,'default'=>$budget_scenario			
 		);
 		$this->Columns[] = Array(
-			'title'=>'Profit center'
-			,'field'=>self::Prefix.'ProfitID'
+			'title'=>'Location'
+			,'field'=>self::Prefix.'LocationID'
 			,'type'=>'combobox'
-			,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit'
-			,'default'=>$arrUsrData['usrProfitID']
-		);
-		$this->Columns[] = Array(
-			'title'=>'Product folder'
-			,'field'=>self::Prefix.'ProductFolderID'
-			,'type'=>'combobox'
-			,'sql'=>'
-				SELECT 
-				PRD1.prdID AS optValue, PRD1.prdTitle AS optText, PRD1.prdParentID
-				, COUNT(DISTINCT PRD2.prdID) as prdLevelInside     
-				FROM vw_product PRD1 INNER JOIN vw_product PRD2 ON PRD2.prdIdxLeft<=PRD1.prdIdxLeft AND PRD2.prdIdxRight>=PRD1.prdIdxRight
-				WHERE PRD1.prdIdxRight-PRD1.prdIdxLeft>1
-				GROUP BY PRD1.prdID
-				HAVING prdLevelInside=1'
-			,'default'=>22
+			,'sql'=>'SELECT locID as optValue, locTitle as optText FROM vw_location'
+			,'default'=>$arrUsrData['empLocationID']
 		);
 		$this->Columns[] = Array(
 			'title'=>'Comments'
@@ -115,29 +98,25 @@ class Sales extends Document{
 			'field'=>"id"
 			,'type'=>'row_id'
 		);
-		
-		$grid->Columns[] = parent::getCustomerEG();
-		
 		$grid->Columns[] = Array(
-			'title'=>'Product'
-			,'field'=>'product'
+			'title'=>'Supplier'
+			,'field'=>'supplier'
+			,'type'=>'ajax_dropdown'
+			,'table'=>'vw_supplier'
+			,'source'=>'vw_supplier'
+			,'prefix'=>'cnt'
+			,'sql'=>"SELECT cntID as optValue, cntTitle as optText FROM vw_supplier"
+			, 'mandatory' => true
+			, 'disabled'=>false
+			, 'default'=>0
+			, 'class'=>'costs_supplier'
+		);		
+
+		$grid->Columns[] = Array(
+			'title'=>'Item'
+			,'field'=>'item'
 			,'type'=>'combobox'
-			,'sql'=>"SELECT PRD.prdID as optValue
-				".
-				   (!empty($this->data["prdIdxLeft"]) 
-				   ? "
-					, GROUP_CONCAT(PRD_P.prdTitle SEPARATOR ' / ') as optText
-					FROM vw_product PRD 
-					INNER JOIN vw_product PRD_P ON PRD_P.prdIdxLeft<=PRD.prdIdxLeft 
-						AND PRD_P.prdIdxRight>=PRD.prdIdxRight AND PRD_P.prdParentID >0 
-					WHERE PRD.prdIdxLeft BETWEEN  '{$this->data["prdIdxLeft"]}' AND '{$this->data["prdIdxRight"]}'
-						AND PRD.prdFlagFolder=0
-					GROUP BY PRD.prdID
-					ORDER BY PRD.prdParentID"
-				   : "
-				   , prdTitle as optText, prdFlagDeleted as optDeleted
-				   FROM vw_product PRD")."      
-				"
+			,'sql'=>"SELECT itmGUID as optValue, itmTitle as optText, itmFlagDeleted as optDeleted FROM vw_item;"
 			, 'mandatory' => true
 			, 'disabled'=>false
 		);
@@ -155,23 +134,14 @@ class Sales extends Document{
 		);
 
 		$grid->Columns[] =Array(
-			'title'=>'Selling rate'
-			,'field'=>'selling_rate'
-			,'type'=>'money'
-			,'mandatory'=>true
-		);
-		
-		$grid->Columns[] = parent::getCurrencyEG('selling_curr');
-		
-		$grid->Columns[] =Array(
-			'title'=>'Buying rate'
+			'title'=>'Rate'
 			,'field'=>'buying_rate'
 			,'type'=>'money'
 			,'mandatory'=>true
 			
 		);
 		
-		$grid->Columns[] = parent::getCurrencyEG('buying_curr');		
+		$grid->Columns[] = parent::getCurrencyEG('buying_curr');
 		
 		for ($m=1;$m<13;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
@@ -198,8 +168,9 @@ class Sales extends Document{
 	}
 	
 
+	
 	public function add_record(){		
-		$oBR = new sales_record($this->GUID,$this->scenario);
+		$oBR = new costs_record($this->GUID,$this->scenario);
 		$this->records[$this->gridName][] = $oBR;
 		return ($oBR);	
 	}
@@ -217,9 +188,9 @@ class Sales extends Document{
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		
-		$this->profit = $_POST['salProfitID'];
-		$this->product_folder = $_POST['salProductFolderID'];
-		$this->comment = $_POST['salComment'];
+		$this->location = $_POST[self::Prefix.'LocationID'];
+		$this->comment = $_POST[self::Prefix.'Comment'];
+		$this->scenario = $_POST[self::Prefix.'Scenario'];
 		
 		//-------------------Updating grid records---------------------------------
 		$arrUpdated = $_POST['inp_'.$this->gridName.'_updated'];
@@ -232,13 +203,17 @@ class Sales extends Document{
 				if ($row){
 					if ($arrUpdated[$id]){				
 						$row->flagUpdated = true;				
-						$row->profit = $_POST['salProfitID'];
-						$row->product = $_POST['product'][$id];				
-						$row->customer = $_POST['customer'][$id];				
-						$row->selling_rate = str_replace(',','',$_POST['selling_rate'][$id]);				
-						$row->selling_curr = $_POST['selling_curr'][$id];				
+						// $row->profit = $_POST['salProfitID'];
+						// $row->product = $_POST['product'][$id];				
+						$row->item = $_POST['item'][$id];				
+						$row->supplier = $_POST['supplier'][$id];				
+						$row->agreement = $_POST['agreement'][$id];				
+						// $row->selling_rate = str_replace(',','',$_POST['selling_rate'][$id]);				
+						// $row->selling_curr = $_POST['selling_curr'][$id];				
 						$row->buying_rate = str_replace(',','',$_POST['buying_rate'][$id]);				
 						$row->buying_curr = $_POST['buying_curr'][$id];				
+						$row->unit = $_POST['unit'][$id];				
+						$row->comment = $_POST['comment'][$id];				
 						for ($m=1;$m<13;$m++){
 							$month = date('M',mktime(0,0,0,$m,15));
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
@@ -253,19 +228,18 @@ class Sales extends Document{
 		$this->deleteGridRecords();
 		
 		$settings = Budget::getSettings($this->oSQL,$this->scenario);
-		// echo '<pre>';print_r($settings);echo '</pre>';	
+		// echo '<pre>';print_r($settings);echo '</pre>';			
 		
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
 		$sql[] = "START TRANSACTION;";
-		$sql[] = "UPDATE `tbl_sales` 
-				SET salProfitID=".(integer)$this->profit."
-				,salProductFolderID=".(integer)$this->product_folder."
-				,salComment=".$this->oSQL->e($this->comment)."
-				,salScenario='".$this->scenario."'
-				,salEditBy='".$arrUsrData['usrID']."'
-				,salEditDate=NOW()
-				WHERE salID={$this->ID};";
+		$sql[] = "UPDATE `tbl_location_costs` 
+				SET lcoLocationID=".(integer)$this->location."				
+				,lcoComment=".$this->oSQL->e($this->comment)."
+				,lcoScenario='".$this->scenario."'
+				,lcoEditBy='".$arrUsrData['usrID']."'
+				,lcoEditDate=NOW()
+				WHERE lcoID={$this->ID};";
 		if(is_array($this->records[$this->gridName])){			
 			foreach ($this->records[$this->gridName] as $i=>$row){				
 				if ($row->flagUpdated || $row->flagDeleted){
@@ -276,7 +250,7 @@ class Sales extends Document{
 		
 		$sql[] = "SET AUTOCOMMIT = 1;";
 		$sql[] = 'COMMIT;';				
-
+		//echo '<pre>';print_r($sql);echo '</pre>';die();
 		$sqlSuccess = $this->doSQL($sql);
 		
 		if ($mode=='unpost'){
@@ -284,41 +258,46 @@ class Sales extends Document{
 		}
 		
 		if($mode=='post'){
-			$this->refresh($this->ID);
+			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new budget_session($this->scenario, $this->GUID);
 			
+			$sql = "SELECT pc, ".Budget::getMonthlySumSQL()." FROM reg_headcount 
+						WHERE scenario='{$this->scenario}' AND location=".(integer)$this->location." 
+						GROUP BY pc";//добавить фильтр по воротничкам
+			
+			// echo '<pre>';print($sql);echo '</pre>';						
+			
+			$rs = $this->oSQL->q($sql);	
+			$headcount = array();
+			while ($rw = $this->oSQL->f($rs)){
+				$arrLoc[] = $rw;
+				for($m=1;$m<13;$m++){
+					$month = date('M',mktime(0,0,0,$m,15));
+					$headcount[$month] += $rw[$month];
+				}
+			}
+			
 			if(is_array($this->records[$this->gridName])){
+			
 				foreach($this->records[$this->gridName] as $id=>$record){
-					$master_row = $oMaster->add_master();
-					$master_row->profit = $this->profit;
-					$master_row->activity = $record->activity;
-					$master_row->customer = $record->customer;				
-					
-					$activity = $Activities->getByCode($record->activity);
-					$account = $YACT->getByCode($activity->YACT);
-					
-					$master_row->account = $account;
-					$master_row->item = $activity->item_income;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
-						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
-					}				
-					
-					$master_row = $oMaster->add_master();
-					$master_row->profit = $this->profit;
-					$master_row->activity = $record->activity;
-					$master_row->customer = $record->customer;				
-					
-					$activity = $Activities->getByCode($record->activity);
-					$account = $YACT->getByCode('J00802');
-					
-					$master_row->account = $account;
-					$master_row->item = $activity->item_cost;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
-						$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
+					foreach($arrLoc as $loc=>$hc_data){
+						$master_row = $oMaster->add_master();
+						$master_row->profit = $hc_data['pc'];
+						$master_row->activity = $record->activity;
+						$master_row->customer = $record->customer;										
+						//$activity = $Activities->getByCode($record->activity);
+						//$account = $YACT->getByCode($activity->YACT);
+						
+						//$master_row->account = $account;
+						$master_row->item = $record->item;
+						for($m=1;$m<13;$m++){
+							$month = date('M',mktime(0,0,0,$m,15));
+							$master_row->{$month} = -$hc_data[$month]*($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)]/$headcount[$month];
+						}				
+												
+						
+						//echo '<pre>';print_r($master_row);echo '</pre>';
 					}
-					
 				}
 				$oMaster->save();
 				$this->markPosted();
@@ -331,7 +310,7 @@ class Sales extends Document{
 	
 }
 
-class sales_record{
+class costs_record{
 	public $Jan;
 	public $Feb;
 	public $Mar;
@@ -349,8 +328,13 @@ class sales_record{
 	public $flagDeleted;
 	public $id;
 	
+	private $oSQL;
+	
 	function __construct($session, $scenario, $id='', $data=Array()){
 		//GLOBAL $Products;
+		
+		GLOBAL $oSQL;
+		
 		for($m=1;$m<13;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
 			$this->{$month} = 0;
@@ -359,6 +343,7 @@ class sales_record{
 		$this->source = $session;
 		$this->scenario = $scenario;
 		//$this->product_ref = $Products;
+		$this->oSQL = $oSQL;
 		
 		if (count($data)){
 			for($m=1;$m<13;$m++){
@@ -366,14 +351,16 @@ class sales_record{
 				$this->{$month} = $data[strtolower($month)];			
 			}
 			$this->product = $data['product'];
+			$this->item = $data['item'];
 			$this->company = $data['company'];
 			$this->profit = $data['profit'];
 			$this->activity = $data['activity'];
 			$this->customer = $data['customer'];
-			$this->unit = $data['unit'];
-			$this->selling_curr = $data['selling_curr'];
-			$this->buying_curr = $data['buying_curr'];
-			$this->selling_rate = $data['selling_rate'];
+			$this->supplier = $data['supplier'];
+			$this->agreement = $data['agreement'];
+			$this->comment = $data['comment'];
+			$this->unit = $data['unit'];			
+			$this->buying_curr = $data['buying_curr'];			
 			$this->buying_rate= $data['buying_rate'];	
 		}		
 		return (true);
@@ -388,7 +375,7 @@ class sales_record{
 	public function getSQLstring(){
 		
 		if ($this->flagDeleted && $this->id){
-			$res = "DELETE FROM `reg_sales` WHERE id={$this->id} LIMIT 1;";	
+			$res = "DELETE FROM `reg_costs` WHERE id={$this->id} LIMIT 1;";	
 			return ($res);
 		}
 		
@@ -399,24 +386,26 @@ class sales_record{
 			$arrRes[] = "`$month`=".(integer)$this->{$month};
 		}
 			
-			$oProduct = $Products->getByCode($this->product);
+			//$oProduct = $Products->getByCode($this->product);
 			
 			$arrRes[] = "`company`='OOO'";
-			$arrRes[] = "`pc`=".$this->profit;
+			$arrRes[] = "`pc`=".(integer)$this->profit;
 			$arrRes[] = "`source`='".$this->source."'";
 			$arrRes[] = "`scenario`='".$this->scenario."'";
-			$arrRes[] = "`customer`='".$this->customer."'";
-			$arrRes[] = "`product`='".$this->product."'";
-			$arrRes[] = "`selling_rate`='".$this->selling_rate."'";
-			$arrRes[] = "`selling_curr`='".$this->selling_curr."'";
-			$arrRes[] = "`buying_rate`='".$this->buying_rate."'";
+			//$arrRes[] = "`customer`='".$this->customer."'";
+			$arrRes[] = "`supplier`=".(integer)$this->supplier;
+			$arrRes[] = "`item`='".$this->item."'";
+			//$arrRes[] = "`product`='".$this->product."'";
+			$arrRes[] = "`agreement`=".(integer)$this->agreement;			
+			$arrRes[] = "`buying_rate`=".(double)$this->buying_rate;
 			$arrRes[] = "`buying_curr`='".$this->buying_curr."'";
-			$arrRes[] = "`activity`='".$oProduct->activity."'";
-			$arrRes[] = "`unit`='".$oProduct->unit."'";
+			$arrRes[] = "`activity`=".(integer)$oProduct->activity;
+			$arrRes[] = "`comment`=".$this->oSQL->e($this->comment);
+			$arrRes[] = "`unit`='".$this->unit."'";
 			if ($this->id){
-				$res = "UPDATE `reg_sales` SET ". implode(',',$arrRes)." WHERE id=".$this->id;
+				$res = "UPDATE `reg_costs` SET ". implode(',',$arrRes)." WHERE id=".$this->id;
 			} else {
-				$res = "INSERT INTO `reg_sales` SET ". implode(',',$arrRes);
+				$res = "INSERT INTO `reg_costs` SET ". implode(',',$arrRes);
 			}
 			//echo '<pre>',$res,'</pre>';
 			return $res;

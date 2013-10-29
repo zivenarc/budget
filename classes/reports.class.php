@@ -27,7 +27,46 @@ class Reports{
 				echo '<td>',$rw['Activity'],'</td>';
 				echo '<td>',$rw['Unit'],'</td>';
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m));
+					$month = date('M',mktime(0,0,0,$m,15));
+					echo "<td class='budget-decimal budget-$month'>",$rw[$month],'</td>';
+				}
+				echo '<td class=\'budget-decimal budget-ytd\'>',$rw['Total'],'</td>';
+				echo "</tr>\r\n";
+			}
+			?>
+			</tbody>
+			</table>
+			<?php
+			ob_flush();
+	}
+	
+	public function costsBySupplier($sqlWhere=''){
+		GLOBAL $oSQL;
+		ob_start();
+			$sql = "SELECT cntTitle as 'Supplier', unit as 'Unit', ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total FROM `reg_costs`
+					LEFT JOIN vw_supplier ON cntID=supplier
+					LEFT JOIN vw_item ON itmGUID=item
+					$sqlWhere
+					GROUP BY `reg_costs`.`supplier`, `reg_costs`.`item`
+					ORDER BY supplier";
+			$rs = $oSQL->q($sql);
+			if (!$oSQL->num_rows($rs)){
+				echo "<div class='warning'>No data found</div>";
+				return (false);
+			}			
+			?>
+			<table class='budget'>
+			<thead>
+				<tr><th>Supplier</th><th>Unit</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
+			</thead>			
+			<tbody>
+			<?php
+			while ($rw=$oSQL->f($rs)){
+				echo '<tr>';
+				echo '<td>',$rw['Supplier'],'</td>';
+				echo '<td>',$rw['Unit'],'</td>';
+				for ($m=1;$m<13;$m++){
+					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month'>",$rw[$month],'</td>';
 				}
 				echo '<td class=\'budget-decimal budget-ytd\'>',$rw['Total'],'</td>';
@@ -67,7 +106,7 @@ class Reports{
 				echo '<td>',$rw['Activity'],'</td>';
 				echo '<td>',$rw['funTitle'],'</td>';
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m));
+					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month'>",$rw[$month],'</td>';
 				}
 				echo '<td class=\'budget-decimal budget-ytd\'>',$rw['Total'],'</td>';
@@ -77,6 +116,69 @@ class Reports{
 			</tbody>
 			</table>
 			<?php
+			ob_flush();
+	}
+	
+	public function masterByProfit($sqlWhere=''){
+		global $oSQL;
+		
+		ob_start();
+			$sql = "SELECT Profit as 'Profit', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total FROM `vw_master`
+			$sqlWhere
+			GROUP BY `vw_master`.Profit, `vw_master`.item
+			ORDER BY `vw_master`.Profit,`vw_master`.item DESC
+			
+			";
+			$rs = $oSQL->q($sql);
+			if (!$oSQL->num_rows($rs)){
+				echo "<div class='warning'>No data found</div>";
+				//echo "<pre>$sql</pre>";
+				return (false);
+			}
+			?>
+			<table class='budget'>
+			<thead>
+				<tr><th>Profit center</th><th>Account</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
+			</thead>			
+			<tbody>
+			<?php
+			$profit = '';
+			while ($rw=$oSQL->f($rs)){
+				if($profit && $profit!=$rw['Profit']){
+					echo '<tr class=\'budget-subtotal\'>';
+					echo '<td colspan=\'2\'>',$rw['Group'],'</td>';
+					for ($m=1;$m<13;$m++){
+						$month = date('M',mktime(0,0,0,$m,15));
+						echo "<td class='budget-decimal budget-$month ".($subtotal[$profit][$month]<0?'budget-negative':'')."'>",number_format($subtotal[$profit][$month]),'</td>';
+					}
+					echo "<td class='budget-decimal budget-$month ".(array_sum($subtotal[$profit])<0?'budget-negative':'')."'>",number_format(array_sum($subtotal[$profit])),'</td>'; 
+					echo '</tr>';
+				}
+				echo '<tr>';
+				echo '<td>',($profit!=$rw['Profit']?$rw['Profit']:''),'</td>';
+				echo '<td>',$rw['Budget item'],'</td>';
+				for ($m=1;$m<13;$m++){
+					$month = date('M',mktime(0,0,0,$m,15));
+					echo "<td class='budget-decimal budget-$month ".($rw[$month]<0?'budget-negative':'')."'>",number_format($rw[$month]),'</td>';
+					$subtotal[$rw['Profit']][$month]+=$rw[$month];
+				}
+				echo "<td class='budget-decimal budget-ytd ".($rw['Total']<0?'budget-negative':'')."'>",number_format($rw['Total']),'</td>';
+				echo "</tr>\r\n";
+				$profit = $rw['Profit'];
+				$group = $rw['Group'];
+			}
+			echo '<tr class=\'budget-subtotal\'>';
+			echo '<td colspan=\'2\'>',$group,'</td>';
+			for ($m=1;$m<13;$m++){
+				$month = date('M',mktime(0,0,0,$m,15));
+				echo "<td class='budget-decimal budget-$month ".($subtotal[$profit][$month]<0?'budget-negative':'')."'>",number_format($subtotal[$profit][$month]),'</td>';
+			}
+			echo "<td class='budget-decimal budget-$month ".(array_sum($subtotal[$profit])<0?'budget-negative':'')."'>",number_format(array_sum($subtotal[$profit])),'</td>'; 
+			echo '</tr>';
+			?>
+			</tbody>
+			</table>
+			<?php			
 			ob_flush();
 	}
 	
@@ -109,7 +211,7 @@ class Reports{
 					echo '<tr class=\'budget-subtotal\'>';
 					echo '<td colspan=\'2\'>',$rw['Group'],'</td>';
 					for ($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m));
+						$month = date('M',mktime(0,0,0,$m,15));
 						echo "<td class='budget-decimal budget-$month ".($subtotal[$customer][$month]<0?'budget-negative':'')."'>",number_format($subtotal[$customer][$month]),'</td>';
 					}
 					echo "<td class='budget-decimal budget-$month ".(array_sum($subtotal[$customer])<0?'budget-negative':'')."'>",number_format(array_sum($subtotal[$customer])),'</td>'; 
@@ -119,7 +221,7 @@ class Reports{
 				echo '<td>',($customer!=$rw['Customer']?$rw['Customer']:''),'</td>';
 				echo '<td>',$rw['Budget item'],'</td>';
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m));
+					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month ".($rw[$month]<0?'budget-negative':'')."'>",number_format($rw[$month]),'</td>';
 					$subtotal[$rw['Customer']][$month]+=$rw[$month];
 				}
@@ -131,7 +233,7 @@ class Reports{
 			echo '<tr class=\'budget-subtotal\'>';
 			echo '<td colspan=\'2\'>',$group,'</td>';
 			for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m));
+				$month = date('M',mktime(0,0,0,$m,15));
 				echo "<td class='budget-decimal budget-$month ".($subtotal[$customer][$month]<0?'budget-negative':'')."'>",number_format($subtotal[$customer][$month]),'</td>';
 			}
 			echo "<td class='budget-decimal budget-$month ".(array_sum($subtotal[$customer])<0?'budget-negative':'')."'>",number_format(array_sum($subtotal[$customer])),'</td>'; 
@@ -175,7 +277,7 @@ class Reports{
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
 					for ($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$subtotal[$rw['Customer']][$month]+=$rw[$month];
 						$local_subtotal += $rw[$month];
 					}
@@ -219,7 +321,7 @@ class Reports{
 				//------------------------Collecting subtotals---------------------------------------
 				$local_subtotal = 0;
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m));
+					$month = date('M',mktime(0,0,0,$m,15));
 					$subtotal[$rw['Group']][$month]+=$rw[$month];
 					$local_subtotal += $rw[$month];
 				}
@@ -255,7 +357,7 @@ class Reports{
 			}
 				$local_subtotal = 0;
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m));
+					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month ".($data[$month]<0?'budget-negative':'')."'>",number_format($data[$month]),'</td>';					
 				}
 			?>

@@ -1,13 +1,13 @@
 <?php
 //$flagNoAuth = true;
 require ('common/auth.php');
-include ('classes/sales.class.php');
+include ('classes/costs.class.php');
 $arrJS[] = 'js/input_form.js';
 
-$salID=$_GET['salID']?$_GET['salID']:$_POST['salID'];
+$lcoID=$_GET['lcoID']?$_GET['lcoID']:$_POST['lcoID'];
 
 $oBudget = new Budget($budget_scenario);
-$oDocument = new Sales ($salID);
+$oDocument = new Location_costs ($lcoID);
 $oDocument->defineEF();
 $grid = $oDocument->defineGrid();
 
@@ -33,13 +33,13 @@ if ($_GET['tab']){
 		case 'kpi':
 			require_once ('classes/reports.class.php');
 			$sqlWhere = "WHERE source='".$oDocument->GUID."'";
-			Reports::salesByActivity($sqlWhere);
+			Reports::costsBySupplier($sqlWhere);
 			die();
 			break;
 		case 'financials':
 			require_once ('classes/reports.class.php');
 			$sqlWhere= "WHERE source='".$oDocument->GUID."'";			
-			Reports::masterByCustomer($sqlWhere);
+			Reports::masterByProfit($sqlWhere);
 			die();
 			break;
 		default:
@@ -71,7 +71,7 @@ function save(arg){
 	var data = $( "input, textarea, select" ).serialize();
 	//console.log(data);
 	$('#loader').show();
-	$.post('sales_form.php',data, function(responseText){
+	$.post('location_costs_form.php',data, function(responseText){
 		console.log(responseText);
 		
 		if (responseText.status=='success'){
@@ -81,7 +81,7 @@ function save(arg){
 			$menu.children('li').detach();
 		
 			if(doc.flagPosted!=responseText.flagPosted || doc.ID!=responseText.ID){
-				location.href='sales_form.php?salID='+responseText.ID;
+				location.href='location_costs_form.php?lcoID='+responseText.ID;
 			}
 			
 			for(i=0;i<responseText.arrActions.length;i++){
@@ -93,6 +93,7 @@ function save(arg){
 		$('#loader').hide();
 	});
 }
+
 
 </script>
 <?php

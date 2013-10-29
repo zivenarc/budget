@@ -263,12 +263,33 @@ class Entity {
 		$rs = $this->oSQL->q($sqlTabs);
 		return ($this->fillTabs($rs));
 	}
-	
+	public function getLocationTabs($sqlWhere){/*------------------- Tabsheets for Location selection ----------------------*/
+		
+		$this->tabKey = $this->prefix.'LocationID';
+		
+		if(!$sqlWhere){
+			if ($this->type=='ENT'){
+				$sqlWhere = $this->prefix."StateID=".(integer)$_GET[$this->prefix."StateID"];
+			} else {
+				$sqlWhere = '1=1';
+			}
+			//$sqlWhere = $this->prefix."StateID=".(integer)$_GET["StateID"];
+		} 	
+		
+		$sqlTabs = "SELECT `locID` as optValue, CONCAT(`locTitle".$this->strLocal."`,' (', count(`".$this->prefix."ID`),')') as optText, count(`".$this->prefix."ID`) as nCount
+				FROM `".$this->table."`
+				INNER JOIN `vw_location` on `locID`=`".$this->prefix."LocationID`
+				WHERE $sqlWhere
+				GROUP BY locID
+				ORDER BY locID";
+		$rs = $this->oSQL->q($sqlTabs);
+		return ($this->fillTabs($rs));
+	}
 	public function getStatusTabs($sqlWhere){
 				
 		$this->tabKey = $this->prefix.'StateID';
 		
-		/*------------------- Tabsheets for Profit selection ----------------------*/
+		/*------------------- Tabsheets for Status selection ----------------------*/
 		$sqlTabs = "SELECT `staID` as optValue, CONCAT(`staTitle".$this->strLocal."`,' (', count(`".$this->prefix."ID`),')') as optText, count(`".$this->prefix."ID`) as nCount
 				FROM `".$this->table."`
 				LEFT JOIN `stbl_status` on `staID`=`".$this->prefix."StateID`

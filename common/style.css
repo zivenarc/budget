@@ -1742,7 +1742,10 @@ td.sales_product{
 	min-width:20em;
 }
 td.sales_customer{
-	min-width:20em;
+	min-width:18em;
+}
+td.costs_supplier{
+	min-width:18em;
 }
 .budget-subtotal td{
 	border-bottom:3px double black;

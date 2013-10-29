@@ -67,7 +67,7 @@ class budget_session {
 	public function read(){
 	
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrSqlMonth[] = "SUM(`$month`) as '$month'";
 			$arrHeader[] = $month;			
 		}
@@ -96,7 +96,7 @@ class budget_session {
 					echo '<tr>';
 					echo '<td>',$values['Profit'],'</td>';
 					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$ytd += $values[$month];
 						echo '<td class="budget-decimal '.($values[$month]<0?'budget-negative':'').'">',number_format($values[$month],0,'.',','),'</td>';
 					}
@@ -135,7 +135,7 @@ class master_record{
 	
 	function __construct($session, $scenario){
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$this->{$month} = 0;
 		}
 		
@@ -146,14 +146,14 @@ class master_record{
 	}	
 		
 	public function set_month_value($i, $value){
-		$month = date('M',mktime(0,0,0,(integer)$i));
+		$month = date('M',mktime(0,0,0,(integer)$i,15));
 		$this->{$month} =(double)$value;
 		return(true);
 	}
 	
 	public function getSQLstring(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`=".$this->{$month};
 		}
 		
@@ -164,7 +164,7 @@ class master_record{
 		$arrRes[] = "`pc`=".$this->profit;
 		$arrRes[] = "`source`='".$this->source."'";
 		$arrRes[] = "`scenario`='".$this->scenario."'";
-		$arrRes[] = "`customer`='".$this->customer."'";
+		$arrRes[] = "`customer`=".($this->customer?(integer)$this->customer:'NULL');
 		$arrRes[] = "`activity`='".$this->activity."'";
 		$arrRes[] = "`particulars`=".(is_object($this->particulars['obj'])?"'".$this->particulars['obj']->id."'":'NULL');
 		//$arrRes[] = "`part_type`=".(is_object($this->particulars['obj'])?"'".$this->particulars['obj']->TYPE."'":'NULL');
@@ -174,7 +174,7 @@ class master_record{
 	
 	public function total(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
 		return ($res);
@@ -206,7 +206,7 @@ class headcount_record{
 	
 	function __construct($session, $scenario){
 		for($m=1;$m<12;$m++){
-			$month = date('M',mktime(0,0,0,$m));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$this->{$month} = 0;
 		}
 		
@@ -217,14 +217,14 @@ class headcount_record{
 	}	
 		
 	public function set_month_value($i, $value){
-		$month = date('M',mktime(0,0,0,(integer)$i));
+		$month = date('M',mktime(0,0,0,(integer)$i,15));
 		$this->{$month} =(double)$value;
 		return(true);
 	}
 	
 	public function getSQLstring(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`=".(integer)$this->{$month};
 		}
 		
@@ -249,7 +249,7 @@ class headcount_record{
 	
 	public function total(){
 		for($m=1;$m<12;$m++){
-			$month = date('M',mktime(0,0,0,$m));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
 		return ($res);
@@ -309,7 +309,7 @@ class Budget{
 	
 	public function getYTDSQL(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`";
 		}
 		$res = implode('+',$arrRes);
@@ -318,7 +318,7 @@ class Budget{
 		
 	public function getMonthlySQL(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`";
 		}
 		$res = implode(',',$arrRes);
@@ -326,7 +326,7 @@ class Budget{
 	}
 	public function getMonthlySumSQL(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "SUM(`$month`) as '$month'";
 		}
 		$res = implode(',',$arrRes);
@@ -334,7 +334,7 @@ class Budget{
 	}
 	public function getTableHeader(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = $month;
 		}
 		$res = '<th>'.implode('</th><th>',$arrRes).'</th>';

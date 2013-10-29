@@ -21,3 +21,33 @@ function spinner_div(){
 $(document).ready(function(){
 	$('#tabs').tabs(tabs_options);
 });
+
+function rowTotalsInitialize(){
+	var styles = new Array();
+	if (doc!=undefined){
+		for (m=0;m<months.length;m++){
+			styles.push('.'+doc.gridName+'_'+months[m]);	
+		}; console.log(styles);
+		$(styles.join()).each(function(){
+			$(this).change(function(){
+				recalcYTD($(this));
+			})
+		});
+		$('form').submit(function(){
+			event.preventDefault();
+		});
+	}
+}
+
+function recalcYTD($o){
+	var $row = $o.parent('tr');
+	if(doc!=undefined){
+		var $ytd = $row.find('td.'+doc.gridName+'_YTD div');
+		
+		var res = 0;
+		for (m=0;m<months.length;m++){
+			res += parseFloat($row.find('td.'+doc.gridName+'_'+months[m]+' input').val());
+		}
+		$ytd.text(res);
+	}
+}
