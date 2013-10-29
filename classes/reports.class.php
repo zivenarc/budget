@@ -82,12 +82,13 @@ class Reports{
 	public function headcountByJob($sqlWhere=''){
 		GLOBAL $oSQL;
 		ob_start();
-			$sql = "SELECT prtRHQ, prtTitle as 'Activity', funTitle , ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
+			$sql = "SELECT prtRHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle , ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
 					FROM `reg_headcount`
 					LEFT JOIN vw_function ON funGUID=function
 					LEFT JOIN vw_product_type ON prtID=activity
+					LEFT JOIN vw_location ON locID=location
 					$sqlWhere
-					GROUP BY `activity`, `function`
+					GROUP BY `activity`, `location`, `function` 
 					ORDER BY prtRHQ";
 			$rs = $oSQL->q($sql);			
 			if (!$oSQL->num_rows($rs)){
@@ -97,12 +98,13 @@ class Reports{
 			?>
 			<table class='budget'>
 			<thead>
-				<tr><th>Activity</th><th>Function</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Average</th></tr>
+				<tr><th>Location</th><th>Activity</th><th>Function</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Average</th></tr>
 			</thead>			
 			<tbody>
 			<?php
 			while ($rw=$oSQL->f($rs)){
 				echo '<tr>';
+				echo '<td>',$rw['Location'],'</td>';
 				echo '<td>',$rw['Activity'],'</td>';
 				echo '<td>',$rw['funTitle'],'</td>';
 				for ($m=1;$m<13;$m++){
