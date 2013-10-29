@@ -235,6 +235,7 @@ class Sales extends Document{
 						$row->profit = $_POST['salProfitID'];
 						$row->product = $_POST['product'][$id];				
 						$row->customer = $_POST['customer'][$id];				
+						$row->comment = $_POST['comment'][$id];				
 						$row->selling_rate = str_replace(',','',$_POST['selling_rate'][$id]);				
 						$row->selling_curr = $_POST['selling_curr'][$id];				
 						$row->buying_rate = str_replace(',','',$_POST['buying_rate'][$id]);				
