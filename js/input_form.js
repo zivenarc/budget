@@ -51,3 +51,35 @@ function recalcYTD($o){
 		$ytd.text(res);
 	}
 }
+
+function save(arg){
+	arg=arg||'update';
+	$('#DataAction').val(arg);
+	var data = $( "input, textarea, select" ).serialize();
+	//console.log(data);
+	$('#loader').show();
+	$.post(location.pathname,data, function(responseText){
+		console.log(responseText);
+		
+		if (responseText.status=='success'){
+			
+			$("input[name='inp_"+doc.gridName+"_updated[]']").val();
+			$("input[name='inp_"+doc.gridName+"_deleted']").val();
+			
+			$('#timestamp').text(responseText.timestamp);
+			$menu = $('ul.menu-h');
+			$menu.children('li').detach();
+		
+			if(doc.flagPosted!=responseText.flagPosted || doc.ID!=responseText.ID){
+				location.href = location.pathname+'?'+responseText.prefix+'ID='+responseText.ID;
+			}
+			
+			for(i=0;i<responseText.arrActions.length;i++){
+				console.log(responseText.arrActions[i]);
+				var $li = $('<li>').append($('<a>',{'class':responseText.arrActions[i].class,'href':responseText.arrActions[i].action,'text':responseText.arrActions[i].title}))
+				$menu.append($li);
+			}
+		}
+		$('#loader').hide();
+	});
+}

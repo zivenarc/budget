@@ -65,39 +65,23 @@ require ('includes/inc_document_header.php');
 $(document).ready(function(){
 	eiseGridInitialize();
 	rowTotalsInitialize();
+		
+	var grid=eiseGrid_find(doc.gridName);
+    if (grid!=null){  
+		grid.change ("product[]", function(oTr, input){ 
+			console.log(oTr);
+			$.post("ajax_details.php"
+				, {table:'vw_product',prdID:oTr.find("[name='product[]']").val()}
+				, function(data, textStatus){
+					console.log(data);
+					oTr.find("[name='unit[]']").val(data.prtUnit);
+					oTr.find("[name='comment[]']").val(data.prdExternalID);
+				}
+				,'json'
+			);
+		})
+    }
 });
-function save(arg){
-	arg=arg||'update';
-	$('#DataAction').val(arg);
-	var data = $( "input, textarea, select" ).serialize();
-	//console.log(data);
-	$('#loader').show();
-	$.post('interco_sales_form.php',data, function(responseText){
-		console.log(responseText);
-		
-		if (responseText.status=='success'){
-			
-			$('#inp_'+doc.gridName+'_updated[]').val();
-			$('#inp_'+doc.gridName+'_deleted').val();
-			
-			$('#timestamp').text(responseText.timestamp);
-			$menu = $('ul.menu-h');
-			$menu.children('li').detach();
-		
-			if(doc.flagPosted!=responseText.flagPosted || doc.ID!=responseText.ID){
-				location.href='interco_sales_form.php?icsID='+responseText.ID;
-			}
-			
-			for(i=0;i<responseText.arrActions.length;i++){
-				console.log(responseText.arrActions[i]);
-				var $li = $('<li>').append($('<a>',{'class':responseText.arrActions[i].class,'href':responseText.arrActions[i].action,'text':responseText.arrActions[i].title}))
-				$menu.append($li);
-			}
-		}
-		$('#loader').hide();
-	});
-}
-
 </script>
 <?php
 require ('includes/inc-frame_bottom.php');

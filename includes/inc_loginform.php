@@ -170,7 +170,7 @@ if ($flagShowHost) {?>
 	<dt>&nbsp;</dt>
 	<dd><input type="submit" id="btnsubmit" name="btnsubmit" value="Login"></dd>
 </dl>
-<p id='tip'>Please enter your <strong><?php echo ($binding ? "CITRIX" : "database"); ?></strong> login/password.</p>
+<p id='tip' class='warning'>Please enter your Windows(Outlook) login/password.</p>
 </form>
 </div>
 </div>
