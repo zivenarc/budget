@@ -12,6 +12,7 @@ class EntityList extends eiseList {
 		$this->entID = $params['entID'];
 		$this->entTable = $params['table'];
 		$this->tabKey = $params['strTabKey'];
+		$this->showTabField = $params['showTabField'];
 		$this->getEntityData();
 		$this->sqlWhere=$params['sqlWhere'];		
 		
@@ -130,7 +131,7 @@ class EntityList extends eiseList {
 		}
 		
 		
-		if (isset($_GET[$arrInput['atrFieldName']]) || $this->tabKey==$arrInput['atrFieldName']){
+		if (isset($_GET[$arrInput['atrFieldName']]) || ($this->tabKey==$arrInput['atrFieldName'] && !$this->showTabField)){
 			$title = '';
 		}
 		
@@ -263,6 +264,30 @@ class Entity {
 		$rs = $this->oSQL->q($sqlTabs);
 		return ($this->fillTabs($rs));
 	}
+	
+	public function getItemTabs($sqlWhere){/*------------------- Tabsheets for Profit selection ----------------------*/
+		
+		$this->tabKey = $this->prefix.'ItemGUID';
+		
+		if(!$sqlWhere){
+			if ($this->type=='ENT'){
+				$sqlWhere = $this->prefix."StateID=".(integer)$_GET[$this->prefix."StateID"];
+			} else {
+				$sqlWhere = '1=1';
+			}
+			//$sqlWhere = $this->prefix."StateID=".(integer)$_GET["StateID"];
+		} 	
+		
+		$sqlTabs = "SELECT `itmGUID` as optValue, CONCAT(`itmTitle".$this->strLocal."`,' (', count(`".$this->prefix."ID`),')') as optText, count(`".$this->prefix."ID`) as nCount
+				FROM `".$this->table."`
+				INNER JOIN `vw_item` on `itmGUID`=`".$this->prefix."ItemGUID`
+				WHERE $sqlWhere
+				GROUP BY itmGUID
+				ORDER BY itmOrder";
+		$rs = $this->oSQL->q($sqlTabs);
+		return ($this->fillTabs($rs));
+	}
+	
 	public function getLocationTabs($sqlWhere){/*------------------- Tabsheets for Location selection ----------------------*/
 		
 		$this->tabKey = $this->prefix.'LocationID';

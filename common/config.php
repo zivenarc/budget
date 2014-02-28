@@ -30,6 +30,7 @@ $arrJS[] = '/common/jquery/jquery-1.7.1.min.js';
 $arrJS[] = '/common/jquery/ui/js/jquery-ui-1.10.1.custom.min.js';
 //$arrJS[] = 'js/ef_common.js';
 $arrCSS[] = "common/style.css";
+$arrCSS[] = Array('file'=>"common/print.css",'media'=>'print');
 $arrCSS[] = "/common/jquery/ui/css/redmond/jquery-ui-1.10.2.custom.min.css";
 
 // function __autoload($class_name) {

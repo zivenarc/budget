@@ -13,7 +13,11 @@ if(!isset($_GET['tab'])){
 	include ('includes/inc-frame_bottom.php');
 } else {
 	require ('classes/reports.class.php');
-	$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).")";
+	if ($_GET['tab']=='all') {
+		$sqlWhere = "WHERE scenario='$budget_scenario'";
+	} else {
+		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") AND scenario='$budget_scenario'";
+	}
 	Reports::headcountByJob($sqlWhere);
 }
 

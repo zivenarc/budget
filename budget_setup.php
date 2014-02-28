@@ -2,10 +2,9 @@
 require ('common/auth.php');
 include ('classes/budget.class.php');
 
-$oBudget = new Budget($budget_scenario);
+if ($_GET['tab']){
+$oBudget = new Budget($_GET['tab']);
 
-include ('includes/inc-frame_top.php');
-echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
 echo '<h2>',$oBudget->title,'</h2>';
 $arrData = $oBudget->getSettings();
 ?>
@@ -23,7 +22,13 @@ $arrData = $oBudget->getSettings();
 ?>
 </table>
 
-<?
-include ('includes/inc-frame_bottom.php');
+<?php
+} else {
+	$arrJS[] = 'js/journal.js';
+	include ('includes/inc-frame_top.php');
+	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
+	Budget::getScenarioTabs();
+	include ('includes/inc-frame_bottom.php');
+}
 
 ?>

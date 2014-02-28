@@ -152,6 +152,9 @@ class master_record{
 	}
 	
 	public function getSQLstring(){
+		
+		GLOBAL $oSQL;
+	
 		for($m=1;$m<13;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`=".$this->{$month};
@@ -159,14 +162,15 @@ class master_record{
 		
 		//========= Быдлокод
 		$arrRes[] = "`company`='OOO'";
-		$arrRes[] = "`account`='".$this->account->code."'";
+		$arrRes[] = "`account`='".$this->account."'";
 		$arrRes[] = "`item`='".$this->item."'";
 		$arrRes[] = "`pc`=".$this->profit;
 		$arrRes[] = "`source`='".$this->source."'";
 		$arrRes[] = "`scenario`='".$this->scenario."'";
 		$arrRes[] = "`customer`=".($this->customer?(integer)$this->customer:'NULL');
 		$arrRes[] = "`activity`=".($this->activity?(integer)$this->activity:'NULL');
-		$arrRes[] = "`particulars`=".(is_object($this->particulars['obj'])?"'".$this->particulars['obj']->id."'":'NULL');
+		$arrRes[] = "`part_type`=".($this->part_type?$oSQL->e($this->part_type):'NULL');
+		$arrRes[] = "`particulars`=".$oSQL->e($this->particulars);
 		//$arrRes[] = "`part_type`=".(is_object($this->particulars['obj'])?"'".$this->particulars['obj']->TYPE."'":'NULL');
 		$res = "INSERT INTO `reg_master` SET ". implode(',',$arrRes).';';
 		return $res;
@@ -174,81 +178,6 @@ class master_record{
 	
 	public function total(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$res += $this->{$month};
-		}
-		return ($res);
-	}
-}
-
-class headcount_record{
-	public $Jan;
-	public $Feb;
-	public $Mar;
-	public $Apr;
-	public $May;
-	public $Jun;
-	public $Jul;
-	public $Aug;
-	public $Sep;
-	public $Oct;
-	public $Nov;
-	public $Dec;
-	public $company;
-	public $account;
-	public $item;
-	public $customer;
-	public $activity;
-	public $source;
-	public $particulars;
-	public $salary;
-	//private $session_id;
-	
-	function __construct($session, $scenario){
-		for($m=1;$m<12;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$this->{$month} = 0;
-		}
-		
-		$this->source = $session;
-		$this->scenario = $scenario;
-		
-		return (true);
-	}	
-		
-	public function set_month_value($i, $value){
-		$month = date('M',mktime(0,0,0,(integer)$i,15));
-		$this->{$month} =(double)$value;
-		return(true);
-	}
-	
-	public function getSQLstring(){
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$arrRes[] = "`$month`=".(integer)$this->{$month};
-		}
-		
-		if($this->salary){
-			$arrRes[] = "`company`='OOO'";
-			$arrRes[] = "`account`='".$this->account->code."'";
-			$arrRes[] = "`item`='453d8da7-963b-4c4f-85ca-99e26d9fc7a2'";
-			$arrRes[] = "`pc`=".$this->profit;
-			$arrRes[] = "`source`='".$this->source."'";
-			$arrRes[] = "`scenario`='".$this->scenario."'";
-			$arrRes[] = "`function`='".$this->function."'";
-			$arrRes[] = "`salary`='".$this->salary."'";
-			$arrRes[] = "`particulars`=".(is_object($this->particulars['obj'])?"'".$this->particulars['obj']->id."'":'NULL');
-			//$arrRes[] = "`part_type`=".(is_object($this->particulars['obj'])?"'".$this->particulars['obj']->TYPE."'":'NULL');
-			$res = "REPLACE INTO `tbl_headcount` SET ". implode(',',$arrRes);
-			//echo '<pre>',$res,'</pre>';
-			return $res;
-		} else{
-			return false;
-		}
-	}
-	
-	public function total(){
-		for($m=1;$m<12;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
@@ -267,7 +196,10 @@ class Budget{
 		global $oSQL;
 		$this->oSQL = $oSQL;
 		
-		$sql = "SELECT * FROM `tbl_scenario` WHERE scnID='$scenario'";
+		$sql = "SELECT * FROM `tbl_scenario` 
+				LEFT JOIN stbl_user ON usrID=scnEditBy
+				LEFT JOIN vw_journal ON guid=scnLastSource
+				WHERE scnID='$scenario'";
 		$rs = $this->oSQL->q($sql);
 		$rw = $this->oSQL->f($rs);
 				
@@ -275,6 +207,10 @@ class Budget{
 		$this->title = $rw["scnTitle$strLocal"];
 		$this->total = $rw['scnTotal'];
 		$this->id = $scenario;
+		$this->timestamp = "Updated by ".$rw['usrTitle']." on ".date('d.m.Y H:i',strtotime($rw['scnEditDate'])).", <a href='{$rw['script']}?{$rw['prefix']}ID={$rw['id']}'>".$rw['title']." #".$rw['id']."</a>";
+		
+		
+		$this->flagUpdate = !$rw['scnFlagReadOnly'];
 		
 		$this->getSettings($this->oSQL, $this-id);
 		
@@ -332,18 +268,39 @@ class Budget{
 		$res = implode(',',$arrRes);
 		return($res);
 	}
-	public function getTableHeader(){
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$arrRes[] = $month;
+	
+	public function getQuarterlySumSQL(){
+			for($m=1;$m<5;$m++){
+			$arrRes[] = "SUM(`Q$m`) as 'Q$m'";
 		}
-		$res = '<th>'.implode('</th><th>',$arrRes).'</th>';
+		$res = implode(',',$arrRes);
 		return($res);
+	}
+	
+	public function getTableHeader($type='monthly'){
+		switch($type){
+			case 'quarterly':
+				for($m=1;$m<5;$m++){
+					$arrRes[] = 'Q'.$m;
+				}
+				$res = '<th class="budget-quarterly">'.implode('</th><th class="budget-quarterly">',$arrRes).'</th>';
+				return($res);
+				break;
+			default:
+				for($m=1;$m<13;$m++){
+					$month = date('M',mktime(0,0,0,$m,15));
+					$arrRes[] = $month;
+				}
+				$res = '<th class="budget-monthly">'.implode('</th><th class="budget-monthly">',$arrRes).'</th>';
+				return($res);
+				break;
+		}
 	}
 	
 	public function getProfitTabs($register='', $acl = false){
 		GLOBAL $oSQL;
 		GLOBAL $arrUsrData;
+		GLOBAL $budget_scenario;
 		
 		if ($acl){
 			$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
@@ -352,7 +309,7 @@ class Budget{
 		
 		ob_start();
 		?>
-		<div id='tabs'>
+		<div id='tabs' class='tabs'>
 			<ul>
 			<?php
 			if (!$register){
@@ -367,13 +324,112 @@ class Budget{
 			}
 			$rs = $oSQL->q($sql);
 			while ($rw=$oSQL->f($rs)){
-				echo "<li><a href='",$_SERVER['PHP_SELF'],"?tab=",$rw['pccGUID'],"'>",$rw['pccTitle'],"</a></li>\r\r";
+				echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=",$rw['pccGUID'],"'>",$rw['pccTitle'],"</a></li>\r\n";
 			}
+			echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=all'>All</a></li>\r\n";
 			?>
 			</ul>
 		</div>
 		<?php
 		ob_flush();
+	}
+	
+	public function getGHQTabs($register='', $acl = false){
+		GLOBAL $oSQL;
+		GLOBAL $arrUsrData;
+		GLOBAL $budget_scenario;
+			
+		ob_start();
+		?>
+		<div id='tabs' class='tabs'>
+			<ul>
+			<?php
+			if (!$register){
+				$sql = "SELECT DISTINCT prtGHQ FROM vw_product_type";
+			} else {
+				$sql = "SELECT DISTINCT prtGHQ 
+						FROM `$register`
+						JOIN vw_product_type ON prtID=activity						
+						 $sqlWhere
+						";
+				
+			}
+			$rs = $oSQL->q($sql);
+			while ($rw=$oSQL->f($rs)){
+				echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=",$rw['prtGHQ'],"'>",$rw['prtGHQ'],"</a></li>\r\n";
+			}
+			echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=all'>All</a></li>\r\n";
+			?>
+			</ul>
+		</div>
+		<?php
+		ob_flush();
+	}
+	
+	public function getScenarioTabs(){
+		GLOBAL $oSQL;
+		GLOBAL $arrUsrData;
+		GLOBAL $budget_scenario;
+						
+		ob_start();
+		?>
+		<div id='tabs' class='tabs'>
+			<ul>
+			<?php
+			$sql = "SELECT * FROM tbl_scenario";			
+			$rs = $oSQL->q($sql);
+			while ($rw=$oSQL->f($rs)){
+				echo "<li><a href='",$_SERVER['PHP_SELF'],"?tab=",$rw['scnID'],"'>",$rw['scnTitle'],"</a></li>\r\n";
+			}
+			// echo "<li><a href='",$_SERVER['PHP_SELF'],"?tab=all'>All</a></li>\r\n";
+			?>
+			</ul>
+		</div>
+		<?php
+		ob_flush();
+	}
+	
+	public function getProfitAlias($rw){
+		if ($rw['pccFlagProd']){
+			switch ($rw['Profit']){
+				case 'TMMR':
+				case 'ICD':
+					$keyProfit = 'Toyota';
+					break;
+				case 'Forwarding':
+				case 'STP office':
+				case 'NOVO':
+				case 'Krekshino':
+					$keyProfit = 'FWD';
+					break;						
+				default:
+					$keyProfit = $rw['Profit'];
+			}
+		} else {
+			$keyProfit = 'Corporate';
+		}
+		return ($keyProfit);
+	}
+	
+	public function getScenarioSelect(){
+		GLOBAL $budget_scenario;
+		GLOBAL $oSQL;
+		GLOBAL $strLocal;
+		
+		$sql = "SELECT * FROM tbl_scenario";
+		$rs = $oSQL->q($sql);
+		ob_start();
+		?>
+		<select name='budget_scenario' id='budget_scenario'>
+		<?php
+		while ($rw=$oSQL->f($rs)){
+			echo "<option ".($budget_scenario==$rw['scnID']?'SELECTED':'')." value='{$rw['scnID']}'>{$rw["scnTitle$strLocal"]}</option>";
+		}
+		?>
+		</select>
+		<?
+		$res = ob_get_clean();
+		return($res);
 	}
 }
 

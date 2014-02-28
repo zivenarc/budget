@@ -1,3 +1,36 @@
+body {
+font-family: Calibri,Arial,sans-serif;
+font-size:10pt;
+color:windowtext;
+margin:0;
+padding:0;
+}
+
+h1 {
+font-size:2em;
+font-weight:500;
+margin-top:0.7em;
+margin-bottom:0.7em;
+text-shadow:-1px -1px 1px rgba(255,255,255,0.2), /* наверх и влево */
+    1px 1px 1px rgba(255,255,255,0.2), /* вниз и вправо */
+    1px 1px 1px rgba(0,0,0,0.7); /* тёмная тень */
+
+}
+
+table {
+border-collapse:collapse;
+
+font-size:1em;
+}
+
+#loader, #menubar, #tabs ul{
+	display:none;
+}
+
+#tabs ul li.ui-tabs-active{
+	display:block !important;
+}
+
 .auth_matrix table{
 	border: 1px solid black;
 
@@ -25,4 +58,137 @@
 }
 iframe{
 	width: inherit;
+}
+
+
+
+.budget{
+	font-family:Calibri;
+	font-size:9pt;
+	border:1px solid gray;
+	width:100%;
+}
+.budget td{
+	border-right: 1px solid gray;
+	border-left: 1px solid gray;
+	border-top: 1px dotted gray;
+}
+.budget th{
+	border: 1px solid gray;
+}
+.budget-decimal{
+	text-align:right;
+}
+.budget-negative{
+	color:red;
+}
+.budget-ytd{
+	background-color:#fffee4;
+	font-weight:bold;
+}
+.budget-month th{
+	background-color:navy;
+}
+th.sales_YTD {
+	background-color:navy !important;
+	color: white !important;
+}
+td.sales_YTD{
+	background-color:#ddd !important;
+}
+th.sales_product, th.interco_sales_product{
+	min-width:40em;
+}
+td.sales_customer, td.interco_sales_customer{
+	min-width:18em;
+}
+
+.interco_sales_product div, .sales_product div{
+	width: 40em !important;
+	white-space: normal !important;
+}
+
+td.costs_supplier{
+	min-width:18em;
+}
+.budget-subtotal td{
+	border-bottom:3px double black;
+	border-top:2px solid black;
+	font-weight:bold;
+	background-color: white;
+}
+.budget-total td{
+	background-color: #eee;
+	font-weight: 600;
+}
+.budget-tdh{
+	background-color: gray;
+	color:white;
+}
+
+.budget-dependent input{
+	color: blue;
+}
+
+.eiseGrid tfoot td{
+	font-weight: bold;
+	border-bottom:1px solid #333;
+	border-top:3px double #333;
+}
+
+#doc_status{
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin-right: 30px;
+	font-family: stencil;
+	border: 3px solid;
+	border-radius: 5px;
+	padding: 10px;
+	font-size: 20pt;
+}
+.budget-doc-deleted{
+	color:red;
+}
+.budget-doc-posted{
+	color:darkgreen;
+}	
+
+.budget-ratio td{
+	font-style: italic;
+	color: navy;
+}
+
+.report-selected td{
+	background-color:orange !important;
+	color: white;
+}
+
+.report-radio{
+	padding: 5px;
+	display:block;
+}
+
+.report-radio span{
+	margin-right: 5px;
+}
+
+.report-radio label{
+	width: auto;
+}
+
+#report{
+	margin-top:15px;
+}
+
+.button-delete{
+	
+}
+
+.code-9802 {
+	background-color: maroon !important;
+}
+
+.code-9907 {
+	background-color: yellow !important;
 }

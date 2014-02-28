@@ -1,7 +1,7 @@
 <?php
 //$flagNoAuth = true;
 require ('common/auth.php');
-include ('classes/costs.class.php');
+include ('classes/location_costs.class.php');
 $arrJS[] = 'js/input_form.js';
 
 $lcoID=$_GET['lcoID']?$_GET['lcoID']:$_POST['lcoID'];
@@ -9,7 +9,7 @@ $lcoID=$_GET['lcoID']?$_GET['lcoID']:$_POST['lcoID'];
 $oBudget = new Budget($budget_scenario);
 $oDocument = new Location_costs ($lcoID);
 $oDocument->defineEF();
-$grid = $oDocument->defineGrid();
+$oDocument->defineGrid();
 
 
 if ($_POST['DataAction']){
@@ -40,6 +40,7 @@ if ($_GET['tab']){
 			require_once ('classes/reports.class.php');
 			$sqlWhere= "WHERE source='".$oDocument->GUID."'";			
 			Reports::masterByProfit($sqlWhere);
+			Reports::masterByYACT($sqlWhere);
 			die();
 			break;
 		default:
@@ -54,7 +55,7 @@ include ('includes/inc_document_menu.php');
 
 //============================== Main form definition ==============================
 
-$oDocument->fillGrid($grid);
+$oDocument->fillGrid($oDocument->grid);
 
 require ('includes/inc-frame_top.php');
 require ('includes/inc_document_header.php');

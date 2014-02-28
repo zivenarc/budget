@@ -1,31 +1,46 @@
 <?php
 include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
+include_once ('classes/costs_record.class.php');
 include_once ('../common/eiseGrid/inc_eiseGrid.php');
-include_once ('classes/reference.class.php');
 include_once ('classes/yact_coa.class.php');
+include_once ('classes/item.class.php');
+include_once ('classes/product.class.php');
 
 //$Activities = new Activities ();
 $YACT = new YACT_COA();
+$Items = new Items();
 
 $arrJS[] = '../common/eiseGrid/eiseGrid.js';
 $arrCSS[] = '../common/eiseGrid/eiseGrid.css';
 
-class Location_costs extends Document{
-
-	const Register='reg_costs';
-	const GridName = 'location_costs';
-	const Prefix = 'lco';
-	const Table = 'tbl_location_costs';
+class Indirect_costs extends Document{
 	
-	function __construct($id=''){
+	function __construct($id='',$type='indirect'){
 		GLOBAL $strLocal;
 		//GLOBAL $arrUsrData;
 		
-		$this->gridName = self::GridName;
-		$this->table = self::Table;
-		$this->prefix = self::Prefix;
-		$this->register = self::Register;
+		$this->register = 'reg_costs';
+		$this->type = $type;
+		switch($this->type){
+		case 'general':
+			$this->gridName = 'general_costs';
+			$this->table = 'tbl_general_costs';
+			$this->prefix = 'gen';
+			break;
+		case 'kaizen':
+			$this->gridName = 'kaizen';
+			$this->table = 'tbl_kaizen';
+			$this->prefix = 'kzn';
+			$this->period = 'monthly';
+			$this->currency = 'RUB';
+			break;
+		default:
+			$this->gridName = 'indirect_costs';
+			$this->table = 'tbl_indirect_costs';
+			$this->prefix = 'ico';
+			break;
+		}
 		
 		parent::__construct($id);	
 
@@ -34,11 +49,22 @@ class Location_costs extends Document{
 		
 		$sqlWhere = $this->getSqlWhere($id);
 		
-		$sql = "SELECT ".self::Prefix.".*, `usrTitle` FROM `".self::Table."` ".self::Prefix."
-				LEFT JOIN `stbl_user` ON `usrID`=`".self::Prefix."EditBy`
+		$sql = "SELECT ".$this->prefix.".*, `usrTitle` FROM `".$this->table."` ".$this->prefix."
+				LEFT JOIN `stbl_user` ON `usrID`=`".$this->prefix."EditBy`
 				WHERE $sqlWhere";
 		
-		parent::refresh($sql);
+		parent::refresh($sql);		
+		
+		if ($this->type=='general'){
+			$this->period = $this->data[$this->prefix."Period"];
+			$this->rate = $this->data[$this->prefix."Rate"];
+			$this->currency = $this->data[$this->prefix."CurrencyID"];
+			$this->item = $this->data[$this->prefix."ItemGUID"];
+		}
+		if ($this->type=='kaizen'){			
+			$this->rate = $this->data[$this->prefix."Rate"];			
+			$this->item = $this->data[$this->prefix."ItemGUID"];
+		}
 		
 		if($this->GUID){
 			$sql = "SELECT * FROM `".$this->register."` WHERE `source`='".$this->GUID."';";
@@ -53,38 +79,81 @@ class Location_costs extends Document{
 	
 		global $arrUsrData;
 		global $budget_scenario;
+		global $Items;
 	
 		$this->Columns = Array();
 		
 		$this->Columns[] = Array(
-			'field'=>self::Prefix.'ID'	
+			'field'=>$this->prefix.'ID'	
 		);
 		$this->Columns[] = Array(
-			'field'=>self::Prefix.'GUID'
+			'field'=>$this->prefix.'GUID'
 			,'type'=>'guid'
 		);
 		$this->Columns[] = Array(
 			'title'=>'Scenario'
-			,'field'=>self::Prefix.'Scenario'
+			,'field'=>$this->prefix.'Scenario'
 			,'type'=>'combobox'
 			,'sql'=>'SELECT scnID as optValue, scnTitle as optText FROM tbl_scenario'
-			,'default'=>$budget_scenario			
+			,'default'=>$budget_scenario	
+			, 'disabled'=>!$this->flagUpdate
 		);
-		$this->Columns[] = Array(
-			'title'=>'Location'
-			,'field'=>self::Prefix.'LocationID'
-			,'type'=>'combobox'
-			,'sql'=>'SELECT locID as optValue, locTitle as optText FROM vw_location'
-			,'default'=>$arrUsrData['empLocationID']
-		);
+		
+		switch ($this->type) {
+			case 'general':
+				$this->Columns[] = parent::getSupplierEG();
+				$this->Columns[] = Array(
+					'title'=>'Item'
+					,'field'=>$this->prefix.'ItemGUID'
+					,'type'=>'combobox'
+					,'sql'=>$Items->getStructuredRef()
+					, 'mandatory' => true
+					, 'disabled'=>!$this->flagUpdate
+				);
+				$this->Columns[] =Array(
+					'title'=>'Rate'
+					,'field'=>$this->prefix."Rate"
+					,'type'=>'decimal'
+					,'mandatory'=>true
+					, 'disabled'=>!$this->flagUpdate
+				);
+				$this->Columns[] = parent::getCurrencyEG($this->prefix."CurrencyID");
+				$this->Columns[] = parent::getPeriodEG($this->prefix."Period");
+				break;
+			case 'kaizen':
+				$this->Columns[] = Array(
+					'title'=>'Item'
+					,'field'=>$this->prefix.'ItemGUID'
+					,'type'=>'combobox'
+					,'sql'=>$Items->getStructuredRef()
+					, 'mandatory' => true
+					, 'disabled'=>!$this->flagUpdate
+				);
+				$this->Columns[] =Array(
+					'title'=>'Rate'
+					,'field'=>$this->prefix."Rate"
+					,'type'=>'decimal'
+					,'mandatory'=>true
+					, 'disabled'=>!$this->flagUpdate
+				);
+				break;
+			default:
+				$this->Columns[] = parent::getProfitEG();
+				break;
+		}
+	
 		$this->Columns[] = Array(
 			'title'=>'Comments'
-			,'field'=>self::Prefix.'Comment'
+			,'field'=>$this->prefix.'Comment'
 			,'type'=>'text'
+			, 'disabled'=>!$this->flagUpdate
 		);
 	}
 	
 	public function defineGrid(){
+		
+		GLOBAL $Items;
+	
 		$grid = new eiseGrid($this->oSQL
                     ,$this->gridName
                     , Array(
@@ -98,28 +167,44 @@ class Location_costs extends Document{
 			'field'=>"id"
 			,'type'=>'row_id'
 		);
-		$grid->Columns[] = Array(
-			'title'=>'Supplier'
-			,'field'=>'supplier'
-			,'type'=>'ajax_dropdown'
-			,'table'=>'vw_supplier'
-			,'source'=>'vw_supplier'
-			,'prefix'=>'cnt'
-			,'sql'=>"SELECT cntID as optValue, cntTitle as optText FROM vw_supplier"
-			, 'mandatory' => true
-			, 'disabled'=>false
-			, 'default'=>0
-			, 'class'=>'costs_supplier'
-		);		
-
-		$grid->Columns[] = Array(
-			'title'=>'Item'
-			,'field'=>'item'
-			,'type'=>'combobox'
-			,'sql'=>"SELECT itmGUID as optValue, itmTitle as optText, itmFlagDeleted as optDeleted FROM vw_item;"
-			, 'mandatory' => true
-			, 'disabled'=>false
-		);
+		
+		if ($this->type=='indirect'){
+			$grid->Columns[] = Array(
+				'title'=>'Supplier'
+				,'field'=>'supplier'
+				,'type'=>'ajax_dropdown'
+				,'table'=>'vw_supplier'
+				,'source'=>'vw_supplier'
+				,'prefix'=>'cnt'
+				,'sql'=>"SELECT cntID as optValue, cntTitle as optText FROM vw_supplier"
+				, 'mandatory' => true
+				, 'disabled'=>false
+				, 'default'=>0
+				, 'class'=>'costs_supplier'
+			);		
+			
+			$grid->Columns[] = Array(
+				'title'=>'Item'
+				,'field'=>'item'
+				,'type'=>'combobox'
+				,'arrValues'=>$Items->getStructuredRef()
+				, 'mandatory' => true
+				, 'disabled'=>false
+			);
+		} else {
+			
+			$grid->Columns[] = Array(
+				'title'=>'Profit center'
+				,'field'=>'pc'
+				,'type'=>'combobox'
+				,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit'
+				,'default'=>$arrUsrData['empProfitID']
+			);
+		}
+		
+		$grid->Columns[] = parent::getActivityEG();
+		
+		
 		$grid->Columns[] = Array(
 			'title'=>'Description'
 			,'field'=>'comment'
@@ -132,17 +217,20 @@ class Location_costs extends Document{
 			,'type'=>'text'
 			,'mandatory'=>true
 		);
-
-		$grid->Columns[] =Array(
-			'title'=>'Rate'
-			,'field'=>'buying_rate'
-			,'type'=>'money'
-			,'mandatory'=>true
+		
+		if ($this->type=='indirect'){
+			$grid->Columns[] =Array(
+				'title'=>'Rate'
+				,'field'=>'buying_rate'
+				,'type'=>'decimal'
+				,'mandatory'=>true
+				
+			);
 			
-		);
-		
-		$grid->Columns[] = parent::getCurrencyEG('buying_curr');
-		
+			$grid->Columns[] = parent::getCurrencyEG('buying_curr');
+			
+			$grid->Columns[] = parent::getPeriodEG();
+		}				
 		for ($m=1;$m<13;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
 					
@@ -164,6 +252,7 @@ class Location_costs extends Document{
 			,'disabled'=>true
 		);
 		
+		$this->grid = $grid;
 		return ($grid);
 	}
 	
@@ -180,6 +269,7 @@ class Location_costs extends Document{
 		GLOBAL $arrUsrData;
 		GLOBAL $Activities;
 		GLOBAL $YACT;
+		GLOBAL $Items;
 		
 		if (!$this->ID){
 			$this->Update();
@@ -187,11 +277,26 @@ class Location_costs extends Document{
 		}
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
-		
-		$this->location = $_POST[self::Prefix.'LocationID'];
-		$this->comment = $_POST[self::Prefix.'Comment'];
-		$this->scenario = $_POST[self::Prefix.'Scenario'];
-		
+		if($mode=='update' || $mode=='post'){			
+			$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
+			$this->scenario = isset($_POST[$this->prefix.'Scenario'])?$_POST[$this->prefix.'Scenario']:$this->scenario;
+			switch ($this->type){
+				case 'indirect':
+					$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
+					break;
+				case 'general':
+					$this->supplier = isset($_POST[$this->prefix.'SupplierID'])?$_POST[$this->prefix.'SupplierID']:$this->supplier;
+					$this->item = isset($_POST[$this->prefix.'ItemGUID'])?$_POST[$this->prefix.'ItemGUID']:$this->item;
+					$this->rate = isset($_POST[$this->prefix.'Rate'])?$_POST[$this->prefix.'Rate']:$this->rate;
+					$this->currency = isset($_POST[$this->prefix.'CurrencyID'])?$_POST[$this->prefix.'CurrencyID']:$this->currency;
+					$this->period = isset($_POST[$this->prefix.'Period'])?$_POST[$this->prefix.'Period']:$this->period;
+					break;
+				case 'kaizen':
+					$this->item = isset($_POST[$this->prefix.'ItemGUID'])?$_POST[$this->prefix.'ItemGUID']:$this->item;
+					$this->rate = isset($_POST[$this->prefix.'Rate'])?$_POST[$this->prefix.'Rate']:$this->rate;
+					$this->period = 'monthly';
+			}	
+		}
 		//-------------------Updating grid records---------------------------------
 		$arrUpdated = $_POST['inp_'.$this->gridName.'_updated'];
 		if(is_array($arrUpdated)){
@@ -203,16 +308,15 @@ class Location_costs extends Document{
 				if ($row){
 					if ($arrUpdated[$id]){				
 						$row->flagUpdated = true;				
-						// $row->profit = $_POST['salProfitID'];
-						// $row->product = $_POST['product'][$id];				
-						$row->item = $_POST['item'][$id];				
-						$row->supplier = $_POST['supplier'][$id];				
-						$row->agreement = $_POST['agreement'][$id];				
-						// $row->selling_rate = str_replace(',','',$_POST['selling_rate'][$id]);				
-						// $row->selling_curr = $_POST['selling_curr'][$id];				
-						$row->buying_rate = str_replace(',','',$_POST['buying_rate'][$id]);				
-						$row->buying_curr = $_POST['buying_curr'][$id];				
+						$row->profit = isset($_POST['pc'][$id]) ? $_POST['pc'][$id] : $this->profit;	
+						$row->item = isset($_POST['item'][$id]) ? $_POST['item'][$id] : $this->item;				
+						$row->supplier = isset($_POST['supplier'][$id]) ? $_POST['supplier'][$id] : $this->supplier;				
+						$row->agreement = $_POST['agreement'][$id];						
+						$row->buying_rate = isset($_POST['buying_rate'][$id]) ? str_replace(',','',$_POST['buying_rate'][$id]) : $this->rate;				
+						$row->buying_curr = isset($_POST['buying_curr'][$id]) ? $_POST['buying_curr'][$id] : $this->currency;				
 						$row->unit = $_POST['unit'][$id];				
+						$row->activity = $_POST['activity'][$id];				
+						$row->period = isset($_POST['period'][$id])?$_POST['period'][$id]:$this->period;				
 						$row->comment = $_POST['comment'][$id];				
 						for ($m=1;$m<13;$m++){
 							$month = date('M',mktime(0,0,0,$m,15));
@@ -233,13 +337,42 @@ class Location_costs extends Document{
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
 		$sql[] = "START TRANSACTION;";
-		$sql[] = "UPDATE `tbl_location_costs` 
-				SET lcoLocationID=".(integer)$this->location."				
-				,lcoComment=".$this->oSQL->e($this->comment)."
-				,lcoScenario='".$this->scenario."'
-				,lcoEditBy='".$arrUsrData['usrID']."'
-				,lcoEditDate=NOW()
-				WHERE lcoID={$this->ID};";
+		switch ($this->type){
+			case 'general':
+				$sql[] = "UPDATE `".$this->table."` 
+						SET ".$this->prefix."SupplierID=".(integer)$this->supplier."				
+						,".$this->prefix."ItemGUID=".$this->oSQL->e($this->item)."
+						,".$this->prefix."Rate=".(double)$this->rate."
+						,".$this->prefix."CurrencyID=".$this->oSQL->e($this->currency)."
+						,".$this->prefix."Period=".$this->oSQL->e($this->period)."
+						,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
+						,".$this->prefix."Scenario='".$this->scenario."'
+						,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
+						,".$this->prefix."EditDate=NOW()
+						WHERE ".$this->prefix."ID={$this->ID};";
+			
+				break;
+			case 'kaizen':
+				$sql[] = "UPDATE `".$this->table."` 
+						SET ".$this->prefix."ItemGUID=".$this->oSQL->e($this->item)."
+						,".$this->prefix."Rate=".(double)$this->rate."						
+						,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
+						,".$this->prefix."Scenario='".$this->scenario."'
+						,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
+						,".$this->prefix."EditDate=NOW()
+						WHERE ".$this->prefix."ID={$this->ID};";
+			
+				break;
+			default:
+				$sql[] = "UPDATE `".$this->table."` 
+						SET ".$this->prefix."ProfitID=".(integer)$this->profit."				
+						,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
+						,".$this->prefix."Scenario='".$this->scenario."'
+						,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
+						,".$this->prefix."EditDate=NOW()
+						WHERE ".$this->prefix."ID={$this->ID};";
+				break;
+		}
 		if(is_array($this->records[$this->gridName])){			
 			foreach ($this->records[$this->gridName] as $i=>$row){				
 				if ($row->flagUpdated || $row->flagDeleted){
@@ -253,6 +386,10 @@ class Location_costs extends Document{
 		//echo '<pre>';print_r($sql);echo '</pre>';die();
 		$sqlSuccess = $this->doSQL($sql);
 		
+		if ($mode=='delete'){
+			$this->delete();
+		}
+		
 		if ($mode=='unpost'){
 			$this->unpost();
 		}
@@ -260,44 +397,27 @@ class Location_costs extends Document{
 		if($mode=='post'){
 			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new budget_session($this->scenario, $this->GUID);
-			
-			$sql = "SELECT pc, ".Budget::getMonthlySumSQL()." FROM reg_headcount 
-						WHERE scenario='{$this->scenario}' AND location=".(integer)$this->location." 
-						GROUP BY pc";//добавить фильтр по воротничкам
-			
-			// echo '<pre>';print($sql);echo '</pre>';						
-			
-			$rs = $this->oSQL->q($sql);	
-			$headcount = array();
-			while ($rw = $this->oSQL->f($rs)){
-				$arrLoc[] = $rw;
-				for($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
-					$headcount[$month] += $rw[$month];
-				}
-			}
-			
+					
 			if(is_array($this->records[$this->gridName])){
 			
 				foreach($this->records[$this->gridName] as $id=>$record){
-					foreach($arrLoc as $loc=>$hc_data){
+
 						$master_row = $oMaster->add_master();
-						$master_row->profit = $hc_data['pc'];
+						$master_row->profit = $record->profit;
 						$master_row->activity = $record->activity;
-						$master_row->customer = $record->customer;										
-						//$activity = $Activities->getByCode($record->activity);
-						//$account = $YACT->getByCode($activity->YACT);
-						
-						//$master_row->account = $account;
+						$master_row->customer = $record->customer;					
+						$item = $Items->getById($record->item);
+						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $record->item;
 						for($m=1;$m<13;$m++){
 							$month = date('M',mktime(0,0,0,$m,15));
-							$master_row->{$month} = -$hc_data[$month]*($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)]/$headcount[$month];
+							$denominator = $record->period=='annual'?$record->{$month}/$record->total():1;
+							$master_row->{$month} = -$record->{$month}*$record->buying_rate*$settings[strtolower($record->buying_curr)]*$denominator;
 						}				
 												
 						
 						//echo '<pre>';print_r($master_row);echo '</pre>';
-					}
+	
 				}
 				$oMaster->save();
 				$this->markPosted();
@@ -308,116 +428,77 @@ class Location_costs extends Document{
 				
 	}
 	
-}
-
-class costs_record{
-	public $Jan;
-	public $Feb;
-	public $Mar;
-	public $Apr;
-	public $May;
-	public $Jun;
-	public $Jul;
-	public $Aug;
-	public $Sep;
-	public $Oct;
-	public $Nov;
-	public $Dec;
-	
-	public $flagUpdated;
-	public $flagDeleted;
-	public $id;
-	
-	private $oSQL;
-	
-	function __construct($session, $scenario, $id='', $data=Array()){
-		//GLOBAL $Products;
+	public function fill_general_costs($oBudget,$type='all',$params=Array()){
 		
-		GLOBAL $oSQL;
-		
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$this->{$month} = 0;
+		if (is_array($this->records[$this->gridName])){
+			foreach($this->records[$this->gridName] as $id=>$record){
+				$record->flagDeleted = true;
+			}
 		}
-		$this->id = $id;
-		$this->source = $session;
-		$this->scenario = $scenario;
-		//$this->product_ref = $Products;
-		$this->oSQL = $oSQL;
 		
-		if (count($data)){
-			for($m=1;$m<13;$m++){
+		$dateEstStart = ($oBudget->year-2).'-10-01';
+		$dateEstEnd = ($oBudget->year-1).'-09-30';
+		
+		switch ($type) {
+			case 'all':
+				$sql = "SELECT pc, wc, activity, 'fte' as unit, ".Budget::getMonthlySumSQL()." FROM reg_headcount WHERE scenario='".$oBudget->id."' AND active=1 GROUP BY pc, activity";
+				break;
+			case 'users':
+				$sql = "SELECT pc, wc, activity, 'user' as unit, ".Budget::getMonthlySumSQL()." FROM reg_headcount 
+					WHERE scenario='".$oBudget->id."' AND posted=1 AND wc=1 GROUP BY pc, activity";
+				break;
+			case 'bc':
+				$sql = "SELECT pc, wc, activity, funTitleLocal as comment, 'fte' as unit, ".Budget::getMonthlySumSQL()." FROM reg_headcount 
+					LEFT JOIN vw_function ON funGUID=function
+					WHERE scenario='".$oBudget->id."' AND posted=1 AND wc=0 GROUP BY pc, function, activity";
+				break;				
+			case 'teu':
+				$sql =  "SELECT pc, activity, customer, cntTitle as comment, unit, ".Budget::getMonthlySumSQL()." FROM reg_sales 
+					JOIN vw_product ON product=prdID
+					LEFT JOIN vw_customer ON customer=cntID
+					WHERE scenario='".$oBudget->id."' AND posted=1 AND prdGDS='OFT' GROUP BY pc, activity, customer";
+				break;
+			case 'revenue':
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".Budget::getMonthlySumSQL()." FROM reg_master 
+					LEFT JOIN vw_customer ON customer=cntID
+					WHERE scenario='".$oBudget->id."' AND item='".Items::REVENUE."' AND source<>'estimate' 
+					GROUP BY pc, activity";
+				break;
+			case 'kaizen':
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".Budget::getMonthlySumSQL()." FROM reg_master
+					JOIN vw_product_type ON prtID=activity AND prtGHQ='{$params['prtGHQ']}'
+					WHERE scenario='".$oBudget->id."' AND item='".Items::DIRECT_COSTS."' AND source<>'estimate'
+					GROUP BY pc, activity";
+				break;
+			case 'kaizen_revenue':
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".Budget::getMonthlySumSQL()." FROM reg_master
+					JOIN vw_product_type ON prtID=activity AND prtGHQ='{$params['prtGHQ']}'
+					WHERE scenario='".$oBudget->id."' AND item IN('".Items::REVENUE."','".Items::INTERCOMPANY_REVENUE."') AND source<>'estimate'
+					GROUP BY pc, activity";
+				break;
+		}
+		 	
+		$rs = $this->oSQL->q($sql);
+		while ($rw=$this->oSQL->f($rs)){
+			$row = $this->add_record();
+			$row->flagUpdated = true;				
+			$row->profit = $rw['pc'];
+			$row->unit = $rw['unit'];
+			$row->customer = $rw['customer'];
+			$row->comment = $rw['comment'];
+			$row->activity = $rw['activity'];
+			$row->period = $this->period;
+			$row->buying_rate = $this->data[$this->prefix."Rate"];
+			$row->buying_curr = $this->currency;
+			$row->item = $this->data[$this->prefix."ItemGUID"];
+			$row->supplier = $this->data[$this->prefix."SupplierID"];
+			for ($m=1;$m<13;$m++){
 				$month = date('M',mktime(0,0,0,$m,15));
-				$this->{$month} = $data[strtolower($month)];			
+				$row->{$month} = $rw[$month];
 			}
-			$this->product = $data['product'];
-			$this->item = $data['item'];
-			$this->company = $data['company'];
-			$this->profit = $data['profit'];
-			$this->activity = $data['activity'];
-			$this->customer = $data['customer'];
-			$this->supplier = $data['supplier'];
-			$this->agreement = $data['agreement'];
-			$this->comment = $data['comment'];
-			$this->unit = $data['unit'];			
-			$this->buying_curr = $data['buying_curr'];			
-			$this->buying_rate= $data['buying_rate'];	
-		}		
-		return (true);
-	}	
-		
-	public function set_month_value($i, $value){
-		$month = date('M',mktime(0,0,0,(integer)$i,15));
-		$this->{$month} =(double)$value;
-		return(true);
+		}	
 	}
 	
-	public function getSQLstring(){
-		
-		if ($this->flagDeleted && $this->id){
-			$res = "DELETE FROM `reg_costs` WHERE id={$this->id} LIMIT 1;";	
-			return ($res);
-		}
-		
-		GLOBAL $Products;
-
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$arrRes[] = "`$month`=".(double)$this->{$month};
-		}
-			
-			//$oProduct = $Products->getByCode($this->product);
-			
-			$arrRes[] = "`company`='OOO'";
-			$arrRes[] = "`pc`=".(integer)$this->profit;
-			$arrRes[] = "`source`='".$this->source."'";
-			$arrRes[] = "`scenario`='".$this->scenario."'";
-			//$arrRes[] = "`customer`='".$this->customer."'";
-			$arrRes[] = "`supplier`=".(integer)$this->supplier;
-			$arrRes[] = "`item`='".$this->item."'";
-			//$arrRes[] = "`product`='".$this->product."'";
-			$arrRes[] = "`agreement`=".(integer)$this->agreement;			
-			$arrRes[] = "`buying_rate`=".(double)$this->buying_rate;
-			$arrRes[] = "`buying_curr`='".$this->buying_curr."'";
-			$arrRes[] = "`activity`=".(integer)$oProduct->activity;
-			$arrRes[] = "`comment`=".$this->oSQL->e($this->comment);
-			$arrRes[] = "`unit`='".$this->unit."'";
-			if ($this->id){
-				$res = "UPDATE `reg_costs` SET ". implode(',',$arrRes)." WHERE id=".$this->id;
-			} else {
-				$res = "INSERT INTO `reg_costs` SET ". implode(',',$arrRes);
-			}
-			//echo '<pre>',$res,'</pre>';
-			return $res;
-	}
-	
-	public function total(){
-		for($m=1;$m<12;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$res += $this->{$month};
-		}
-		return ($res);
-	}
 }
 
 ?>

@@ -70,5 +70,14 @@ $arrCurr = Array('EUR'=> 'EUR', 'LOC'=>$arrSetup['stpLocalCurrencyName'],'USD'=>
 define ('UPLOAD_DIR',$arrSetup['stpUploadPath']);
 ini_set("SMTP",$arrSetup['stpSMTPAddress']);
 
+//===============Fill the profit array=========================
+$sql = "SELECT * FROM vw_profit";
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	$arrProfitConfig[$rw['pccID']] = $rw;
+}
+// echo '<pre>';print_r($arrProfitConfig);echo '</pre>';
+
 //require ("lang_en.php");
+$budget_scenario = $arrSetup['stpScenarioID'];
 ?>

@@ -44,6 +44,7 @@ class sales_record{
 			$this->buying_curr = $data['buying_curr'];
 			$this->selling_rate = $data['selling_rate'];
 			$this->buying_rate= $data['buying_rate'];	
+			$this->formula= $data['formula'];	
 		}		
 		return (true);
 	}	
@@ -55,6 +56,8 @@ class sales_record{
 	}
 	
 	public function getSQLstring(){
+		
+		GLOBAL $oSQL;
 		
 		if ($this->flagDeleted && $this->id){
 			$res = "DELETE FROM `reg_sales` WHERE id={$this->id} LIMIT 1;";	
@@ -74,15 +77,16 @@ class sales_record{
 			$arrRes[] = "`pc`=".$this->profit;
 			$arrRes[] = "`source`='".$this->source."'";
 			$arrRes[] = "`scenario`='".$this->scenario."'";
-			$arrRes[] = "`customer`='".$this->customer."'";
-			$arrRes[] = "`comment`='".$this->comment."'";
-			$arrRes[] = "`product`='".$this->product."'";
+			$arrRes[] = "`customer`=".(integer)$this->customer;
+			$arrRes[] = "`comment`=".$oSQL->e($this->comment);
+			$arrRes[] = "`product`=".(integer)$this->product;
 			$arrRes[] = "`selling_rate`='".$this->selling_rate."'";
 			$arrRes[] = "`selling_curr`='".$this->selling_curr."'";
 			$arrRes[] = "`buying_rate`='".$this->buying_rate."'";
 			$arrRes[] = "`buying_curr`='".$this->buying_curr."'";
-			$arrRes[] = "`activity`='".$oProduct->activity."'";
+			$arrRes[] = "`activity`=".(integer)$oProduct->activity;
 			$arrRes[] = "`unit`='".$oProduct->unit."'";
+			$arrRes[] = "`formula`=".$oSQL->e($this->formula);
 			if ($this->id){
 				$res = "UPDATE `reg_sales` SET ". implode(',',$arrRes)." WHERE id=".$this->id;
 			} else {

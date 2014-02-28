@@ -43,7 +43,7 @@ class Sales extends Document{
 				LEFT JOIN stbl_user ON usrID=salEditBy
 				WHERE $sqlWhere";
 		
-		parent::refresh($sql);
+		parent::refresh($sql);		
 		
 		if($this->GUID){
 			$sql = "SELECT * FROM `".self::Register."` WHERE `source`='".$this->GUID."';";
@@ -51,37 +51,15 @@ class Sales extends Document{
 			while($rw = $this->oSQL->f($rs)){
 				$this->records[$this->gridName][$rw['id']] = new sales_record($this->GUID, $this->scenario, $rw['id'], $rw);
 			}		
-		}
+		}		
+		
 	}
 	
 	public function defineEF(){
 	
-		global $arrUsrData;
-		global $budget_scenario;
+		global $arrUsrData;		
 	
-		$this->Columns = Array();
-		
-		$this->Columns[] = Array(
-			'field'=>self::Prefix.'ID'	
-		);
-		$this->Columns[] = Array(
-			'field'=>self::Prefix.'GUID'
-			,'type'=>'guid'
-		);
-		$this->Columns[] = Array(
-			'title'=>'Scenario'
-			,'field'=>self::Prefix.'Scenario'
-			,'type'=>'combobox'
-			,'sql'=>'SELECT scnID as optValue, scnTitle as optText FROM tbl_scenario'
-			,'default'=>$budget_scenario			
-		);
-		$this->Columns[] = Array(
-			'title'=>'Profit center'
-			,'field'=>self::Prefix.'ProfitID'
-			,'type'=>'combobox'
-			,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit'
-			,'default'=>$arrUsrData['usrProfitID']
-		);
+		parent::defineEF();
 		
 		$this->Columns[] = Array(
 			'title'=>'Customer'
@@ -91,6 +69,7 @@ class Sales extends Document{
 			,'prefix'=>'cnt'
 			,'sql'=>'vw_customer'
 			,'default'=>9022
+			,'disabled'=>!$this->flagUpdate
 		);
 		
 		$this->Columns[] = Array(
@@ -106,20 +85,26 @@ class Sales extends Document{
 				GROUP BY PRD1.prdID
 				HAVING prdLevelInside=1'
 			,'default'=>22
+			,'disabled'=>!$this->flagUpdate
 		);
 		$this->Columns[] = Array(
 			'title'=>'Comments'
 			,'field'=>self::Prefix.'Comment'
 			,'type'=>'text'
+			,'disabled'=>!$this->flagUpdate
 		);
 	}
 	
+	//==========================================Definition of document GRID ===================================================
 	public function defineGrid(){
+		
+		GLOBAL $Products;
+	
 		$grid = new eiseGrid($this->oSQL
                     ,$this->gridName
                     , Array(
                             'flagKeepLastRow' => false
-                            , 'arrPermissions' => Array("FlagWrite" => !$this->flagPosted)
+                            , 'arrPermissions' => Array("FlagWrite" => $this->flagUpdate)
                             , 'flagStandAlone' => true
 							, 'controlBarButtons' => "add"
                             )
@@ -134,28 +119,14 @@ class Sales extends Document{
 		}
 		
 		$grid->Columns[] = Array(
-			'title'=>'Product'
-			,'field'=>'product'
-			,'type'=>'combobox'
-			,'sql'=>"SELECT PRD.prdID as optValue
-				".
-				   (!empty($this->data["prdIdxLeft"]) 
-				   ? "
-					, GROUP_CONCAT(PRD_P.prdTitle SEPARATOR ' / ') as optText
-					FROM vw_product PRD 
-					INNER JOIN vw_product PRD_P ON PRD_P.prdIdxLeft<=PRD.prdIdxLeft 
-						AND PRD_P.prdIdxRight>=PRD.prdIdxRight AND PRD_P.prdParentID >0 
-					WHERE PRD.prdIdxLeft BETWEEN  '{$this->data["prdIdxLeft"]}' AND '{$this->data["prdIdxRight"]}'
-						AND PRD.prdFlagFolder=0
-					GROUP BY PRD.prdID
-					ORDER BY PRD.prdParentID"
-				   : "
-				   , prdTitle as optText, prdFlagDeleted as optDeleted
-				   FROM vw_product PRD")."      
-				"
-			, 'mandatory' => true
-			, 'disabled'=>false
+			'title'=>'Code'
+			,'field'=>'prdExternalID'
+			,'type'=>'text'
+			,'disabled'=>true
 		);
+		
+		$grid->Columns[] = parent::getProductEG();
+		
 		$grid->Columns[] = Array(
 			'title'=>'Description'
 			,'field'=>'comment'
@@ -188,19 +159,31 @@ class Sales extends Document{
 		
 		$grid->Columns[] = parent::getCurrencyEG('buying_curr');		
 		
-		for ($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-					
-			$grid->Columns[] = Array(
-			'title'=>$month
-			,'field'=>strtolower($month)
-			,'class'=>'budget-month'
-			,'type'=>'int'
-			, 'mandatory' => true
-			, 'disabled'=>false
-			,'totals'=>true
-		);
+		if (!$this->flagPosted){		
+			$grid->Columns[] =Array(
+				'title'=>"Formula"
+				,'field'=>'formula'
+				,'type'=>'text'
+				,'mandatory'=>false
+				
+			);		
+			for ($m=1;$m<13;$m++){
+				$month = date('M',mktime(0,0,0,$m,15));
+						
+				$grid->Columns[] = Array(
+					'title'=>$month
+					,'field'=>strtolower($month)
+					,'class'=>'budget-month'
+					,'type'=>'int'
+					, 'mandatory' => true
+					, 'disabled'=>false
+					,'totals'=>true
+				);
+			}
+		} else {
+			$grid->Columns[] = parent::getActivityEG();
 		}
+		
 		$grid->Columns[] =Array(
 			'title'=>'Total'
 			,'field'=>'YTD'
@@ -209,10 +192,14 @@ class Sales extends Document{
 			,'disabled'=>true
 		);
 		
+		$this->grid = $grid;
 		return ($grid);
 	}
 	
-
+	public function fillGrid(){
+		parent::fillGrid($this->grid,Array('prdExternalID'),'reg_sales LEFT JOIN vw_product ON prdID=product');
+	}
+	
 	public function add_record(){		
 		$oBR = new sales_record($this->GUID,$this->scenario);
 		$this->records[$this->gridName][] = $oBR;
@@ -231,11 +218,12 @@ class Sales extends Document{
 		}
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
-		
-		$this->profit = $_POST[self::Prefix.'ProfitID'];
-		$this->product_folder = $_POST[self::Prefix.'ProductFolderID'];
-		$this->comment = $_POST[self::Prefix.'Comment'];
-		$this->customer = $_POST[self::Prefix.'CustomerID'];
+		if ($mode=='update' || $mode=='post'){
+			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
+			$this->product_folder = isset($_POST[$this->prefix.'ProductFolderID'])?$_POST[$this->prefix.'ProductFolderID']:$this->product_folder;
+			$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
+			$this->customer = isset($_POST[$this->prefix.'CustomerID'])?$_POST[$this->prefix.'CustomerID']:$this->customer;
+		}
 		
 		//-------------------Updating grid records---------------------------------
 		$arrUpdated = $_POST['inp_'.$this->gridName.'_updated'];
@@ -250,12 +238,14 @@ class Sales extends Document{
 						$row->flagUpdated = true;				
 						$row->profit = $_POST['salProfitID'];
 						$row->product = $_POST['product'][$id];				
+						$row->activity = $_POST['activity'][$id];				
 						$row->customer = $_POST['customer'][$id]?$_POST['customer'][$id]:$this->customer;				
 						$row->comment = $_POST['comment'][$id];				
 						$row->selling_rate = str_replace(',','',$_POST['selling_rate'][$id]);				
 						$row->selling_curr = $_POST['selling_curr'][$id];				
 						$row->buying_rate = str_replace(',','',$_POST['buying_rate'][$id]);				
 						$row->buying_curr = $_POST['buying_curr'][$id];				
+						$row->formula = $_POST['formula'][$id];				
 						for ($m=1;$m<13;$m++){
 							$month = date('M',mktime(0,0,0,$m,15));
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
@@ -297,6 +287,10 @@ class Sales extends Document{
 
 		$sqlSuccess = $this->doSQL($sql);
 		
+		if ($mode=='delete'){
+			$this->delete();
+		}
+		
 		if ($mode=='unpost'){
 			$this->unpost();
 		}
@@ -313,7 +307,7 @@ class Sales extends Document{
 					$master_row->customer = $record->customer;				
 					
 					$activity = $Activities->getByCode($record->activity);
-					$account = $YACT->getByCode($activity->YACT);
+					$account = $activity->YACT;
 					
 					$master_row->account = $account;
 					$master_row->item = $activity->item_income;
@@ -322,22 +316,23 @@ class Sales extends Document{
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}				
 					
-					$master_row = $oMaster->add_master();
-					$master_row->profit = $this->profit;
-					$master_row->activity = $record->activity;
-					$master_row->customer = $record->customer;				
-					
-					$activity = $Activities->getByCode($record->activity);
-					$account = $YACT->getByCode('J00802');
-					
-					$master_row->account = $account;
-					$master_row->item = $activity->item_cost;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
-						$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
+					if ($record->buying_rate!=0){
+						$master_row = $oMaster->add_master();
+						$master_row->profit = $this->profit;
+						$master_row->activity = $record->activity;
+						$master_row->customer = $record->customer;				
+						
+						$activity = $Activities->getByCode($record->activity);
+						$account = 'J00802';
+						
+						$master_row->account = $account;
+						$master_row->item = $activity->item_cost;
+						for($m=1;$m<13;$m++){
+							$month = date('M',mktime(0,0,0,$m,15));
+							$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
+						}
 					}
-					
-					}
+				}
 				$oMaster->save();
 				$this->markPosted();
 			}

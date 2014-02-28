@@ -10,7 +10,7 @@ $icsID=$_GET['icsID']?$_GET['icsID']:$_POST['icsID'];
 $oBudget = new Budget($budget_scenario);
 $oDocument = new Interco_sales ($icsID);
 $oDocument->defineEF();
-$grid = $oDocument->defineGrid();
+$oDocument->defineGrid();
 
 
 if ($_POST['DataAction']){
@@ -40,7 +40,7 @@ if ($_GET['tab']){
 		case 'financials':
 			require_once ('classes/reports.class.php');
 			$sqlWhere= "WHERE source='".$oDocument->GUID."'";			
-			Reports::masterByCustomer($sqlWhere);
+			Reports::masterByProfit($sqlWhere);
 			die();
 			break;
 		default:
@@ -55,7 +55,7 @@ include ('includes/inc_document_menu.php');
 
 //============================== Main form definition ==============================
 
-$oDocument->fillGrid($grid);
+$oDocument->fillGrid();
 
 require ('includes/inc-frame_top.php');
 require ('includes/inc_document_header.php');

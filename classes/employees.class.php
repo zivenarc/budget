@@ -1,4 +1,6 @@
 <?php
+require_once ('classes/reference.class.php');
+
 class Employees extends Reference{
 	// public $oSQL;	
 	// private $data;

@@ -3,7 +3,6 @@ include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
 include_once ('classes/sales_record.class.php');
 include_once ('../common/eiseGrid/inc_eiseGrid.php');
-include_once ('classes/reference.class.php');
 include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
 include_once ('classes/yact_coa.class.php');
@@ -59,29 +58,30 @@ class Interco_sales extends Document{
 		global $arrUsrData;
 		global $budget_scenario;
 	
-		$this->Columns = Array();
+		parent::defineEF();
+		// $this->Columns = Array();
 		
-		$this->Columns[] = Array(
-			'field'=>self::Prefix.'ID'	
-		);
-		$this->Columns[] = Array(
-			'field'=>self::Prefix.'GUID'
-			,'type'=>'guid'
-		);
-		$this->Columns[] = Array(
-			'title'=>'Scenario'
-			,'field'=>self::Prefix.'Scenario'
-			,'type'=>'combobox'
-			,'sql'=>'SELECT scnID as optValue, scnTitle as optText FROM tbl_scenario'
-			,'default'=>$budget_scenario			
-		);
-		$this->Columns[] = Array(
-			'title'=>'Profit center'
-			,'field'=>self::Prefix.'ProfitID'
-			,'type'=>'combobox'
-			,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit'
-			,'default'=>$arrUsrData['usrProfitID']
-		);
+		// $this->Columns[] = Array(
+			// 'field'=>self::Prefix.'ID'	
+		// );
+		// $this->Columns[] = Array(
+			// 'field'=>self::Prefix.'GUID'
+			// ,'type'=>'guid'
+		// );
+		// $this->Columns[] = Array(
+			// 'title'=>'Scenario'
+			// ,'field'=>self::Prefix.'Scenario'
+			// ,'type'=>'combobox'
+			// ,'sql'=>'SELECT scnID as optValue, scnTitle as optText FROM tbl_scenario'
+			// ,'default'=>$budget_scenario			
+		// );
+		// $this->Columns[] = Array(
+			// 'title'=>'Profit center'
+			// ,'field'=>self::Prefix.'ProfitID'
+			// ,'type'=>'combobox'
+			// ,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit'
+			// ,'default'=>$arrUsrData['usrProfitID']
+		// );
 		
 		$this->Columns[] = Array( //------------SPECIAL CASE, Customer is another profit center
 			'title'=>'Customer'
@@ -91,6 +91,7 @@ class Interco_sales extends Document{
 			,'prefix'=>'pcc'
 			,'sql'=>'vw_profit'
 			,'default'=>6
+			, 'disabled'=>!$this->flagUpdate
 		);
 		
 		$this->Columns[] = Array(
@@ -106,11 +107,13 @@ class Interco_sales extends Document{
 				GROUP BY PRD1.prdID
 				HAVING prdLevelInside=1'
 			,'default'=>22
+			, 'disabled'=>!$this->flagUpdate
 		);
 		$this->Columns[] = Array(
 			'title'=>'Comments'
 			,'field'=>self::Prefix.'Comment'
 			,'type'=>'text'
+			, 'disabled'=>!$this->flagUpdate
 		);
 	}
 	
@@ -130,30 +133,16 @@ class Interco_sales extends Document{
 		);
 		
 		$grid->Columns[] = parent::getCustomerEG();
-				
+		
 		$grid->Columns[] = Array(
-			'title'=>'Product'
-			,'field'=>'product'
-			,'type'=>'combobox'
-			,'sql'=>"SELECT PRD.prdID as optValue
-				".
-				   (!empty($this->data["prdIdxLeft"]) 
-				   ? "
-					, GROUP_CONCAT(PRD_P.prdTitle SEPARATOR ' / ') as optText
-					FROM vw_product PRD 
-					INNER JOIN vw_product PRD_P ON PRD_P.prdIdxLeft<=PRD.prdIdxLeft 
-						AND PRD_P.prdIdxRight>=PRD.prdIdxRight AND PRD_P.prdParentID >0 
-					WHERE PRD.prdIdxLeft BETWEEN  '{$this->data["prdIdxLeft"]}' AND '{$this->data["prdIdxRight"]}'
-						AND PRD.prdFlagFolder=0
-					GROUP BY PRD.prdID
-					ORDER BY PRD.prdParentID"
-				   : "
-				   , prdTitle as optText, prdFlagDeleted as optDeleted
-				   FROM vw_product PRD")."      
-				"
-			, 'mandatory' => true
-			, 'disabled'=>false
+			'title'=>'Code'
+			,'field'=>'prdExternalID'
+			,'type'=>'text'
+			,'disabled'=>true
 		);
+		
+		$grid->Columns[] = parent::getProductEG();
+		
 		$grid->Columns[] = Array(
 			'title'=>'Description'
 			,'field'=>'comment'
@@ -186,19 +175,31 @@ class Interco_sales extends Document{
 		
 		$grid->Columns[] = parent::getCurrencyEG('buying_curr');		
 		
-		for ($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-					
-			$grid->Columns[] = Array(
-			'title'=>$month
-			,'field'=>strtolower($month)
-			,'class'=>'budget-month'
-			,'type'=>'int'
-			, 'mandatory' => true
-			, 'disabled'=>false
-			,'totals'=>true
-		);
+		if (!$this->flagPosted){		
+			$grid->Columns[] =Array(
+				'title'=>"Formula"
+				,'field'=>'formula'
+				,'type'=>'text'
+				,'mandatory'=>false
+				
+			);		
+			for ($m=1;$m<13;$m++){
+				$month = date('M',mktime(0,0,0,$m,15));
+						
+				$grid->Columns[] = Array(
+					'title'=>$month
+					,'field'=>strtolower($month)
+					,'class'=>'budget-month'
+					,'type'=>'int'
+					, 'mandatory' => true
+					, 'disabled'=>false
+					,'totals'=>true
+				);
+			}
+		} else {
+			$grid->Columns[] = parent::getActivityEG();
 		}
+		
 		$grid->Columns[] =Array(
 			'title'=>'Total'
 			,'field'=>'YTD'
@@ -206,11 +207,14 @@ class Interco_sales extends Document{
 			,'totals'=>true
 			,'disabled'=>true
 		);
-		
+		$this->grid = $grid;
 		return ($grid);
 	}
 	
-
+	public function fillGrid(){
+		parent::fillGrid($this->grid,Array('prdExternalID'),'reg_sales LEFT JOIN vw_product ON prdID=product');
+	}
+	
 	public function add_record(){		
 		$oBR = new sales_record($this->GUID,$this->scenario);
 		$this->records[$this->gridName][] = $oBR;
@@ -229,11 +233,12 @@ class Interco_sales extends Document{
 		}
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
-		
-		$this->profit = $_POST[self::Prefix.'ProfitID'];
-		$this->product_folder = $_POST[self::Prefix.'ProductFolderID'];
-		$this->comment = $_POST[self::Prefix.'Comment'];
-		$this->customer = $_POST[self::Prefix.'CustomerID'];
+		if ($mode=='update' || $mode=='post'){
+			$this->profit = $_POST[self::Prefix.'ProfitID'];
+			$this->product_folder = $_POST[self::Prefix.'ProductFolderID'];
+			$this->comment = $_POST[self::Prefix.'Comment'];
+			$this->customer = $_POST[self::Prefix.'CustomerID'];
+		}
 		
 		//-------------------Updating grid records---------------------------------
 		$arrUpdated = $_POST['inp_'.$this->gridName.'_updated'];
@@ -311,7 +316,7 @@ class Interco_sales extends Document{
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;							
 					$activity = $Activities->getByCode($record->activity);
-					$account = $YACT->getByCode('J00400');			
+					$account = 'J00400';			
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_REVENUE;
 					for($m=1;$m<13;$m++){
@@ -326,7 +331,7 @@ class Interco_sales extends Document{
 					$master_row->customer = $record->customer;				
 					
 					$activity = $Activities->getByCode($record->activity);
-					$account = $YACT->getByCode('J00802');
+					$account = 'J00802';
 					
 					$master_row->account = $account;
 					$master_row->item = $activity->item_cost;
@@ -342,7 +347,7 @@ class Interco_sales extends Document{
 					$master_row->customer = $record->customer;				
 					
 					$activity = $Activities->getByCode($record->activity);
-					$account = $YACT->getByCode('J00802');
+					$account = 'J00802';
 					
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_COSTS;
@@ -358,7 +363,7 @@ class Interco_sales extends Document{
 					$master_row->customer = $record->customer;				
 					
 					$activity = $Activities->getByCode($record->activity);
-					$account = $YACT->getByCode('J00400');
+					$account = 'J00400';
 					
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_REVENUE;
@@ -374,7 +379,7 @@ class Interco_sales extends Document{
 					$master_row->customer = $record->customer;				
 					
 					$activity = $Activities->getByCode($record->activity);
-					$account = $YACT->getByCode('J00802');
+					$account = 'J00802';
 					
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_COSTS;
@@ -390,7 +395,7 @@ class Interco_sales extends Document{
 					$master_row->customer = $record->customer;				
 					
 					$activity = $Activities->getByCode($record->activity);
-					$account = $YACT->getByCode('J00802');
+					$account = 'J00802';
 					
 					$master_row->account = $account;
 					$master_row->item = $activity->item_cost;

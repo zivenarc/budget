@@ -1,4 +1,6 @@
 <?php
+require_once ('classes/reference.class.php');
+
 class Products extends Reference{
 	
 	// public $oSQL;	
@@ -22,6 +24,39 @@ class Products extends Reference{
 			$this->codes[$rw['prdID']] = $rw['prdGUID'];
 			$this->pointer = 0;
 		}
+	}
+	
+	public function getStructuredRef($prdIdxLeft, $prdIdxRight){
+		$sql = "SELECT PRD.*, PRD_P.prdTitleLocal as prdParentTitle
+					FROM vw_product PRD 
+					INNER JOIN vw_product PRD_P ON PRD_P.prdIdxLeft<=PRD.prdIdxLeft 
+						AND PRD_P.prdIdxRight>=PRD.prdIdxRight AND PRD_P.prdParentID >0 
+					WHERE PRD.prdIdxLeft BETWEEN  '{$prdIdxLeft}' AND '{$prdIdxRight}'
+						##AND PRD.prdFlagFolder=0
+					GROUP BY PRD.prdID
+					ORDER BY PRD.prdIdxLeft, PRD.prdIdxRight
+				";
+		$rs = $this->oSQL->q($sql);
+		
+		$group = '';		
+		
+		while ($rw=$this->oSQL->f($rs)){
+			 		
+			if ($group!='' && $group<>$rw['prdParentID'] && $flagGroupOpen[$group]){
+				$arrRes['##optgroupclose##'.$group] = '';
+				$flagGroupOpen[$group] = false;
+			}
+			
+			if ($rw['prdFlagFolder']){
+				$arrRes['##optgroupopen##'.$rw['prdID']] = $rw['prdTitle'];
+				$flagGroupOpen[$rw['prdID']] = true;
+			} else {
+				$arrRes[$rw['prdID']] = mb_strlen($rw['prdTitleLocal'],'UTF-8')>200?mb_substr($rw['prdTitleLocal'],0,200,'UTF-8').'[...]':$rw['prdTitleLocal'];
+				$group = $rw['prdParentID'];
+			}
+		}
+		// echo '<pre>';print_r($arrRes); echo '</pre>';
+		return($arrRes);
 	}
 	
 }
@@ -56,6 +91,23 @@ class Activities extends Reference{
 			$this->codes[$rw['prtID']] = $rw['prtGUID'];
 			$this->pointer = 0;
 		}
+	}
+	
+	function getStructuredRef(){
+		GLOBAL $oSQL;
+		$sql = "SELECT * FROM vw_product_type WHERE prtFlagDeleted=0 ORDER BY prtRHQ";
+		$rs = $oSQL->q($sql);
+		$rhq='';
+		while ($rw=$oSQL->f($rs)){
+			if ($rw['prtRHQ']!=$rhq){
+				$arrRes['##optgroupopen##'.$rw['prtRHQ']] = $rw['prtRHQ'];
+			}
+			$arrRes[$rw['prtID']] = $rw['prtTitle'];
+			$rhq = $rw['prtRHQ'];
+		}
+		$arrRes['##optgroupclose##'.$rhq] = '';
+		$arrRes[0] = '[None]';
+		return($arrRes);
 	}
 }
 

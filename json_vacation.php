@@ -16,7 +16,7 @@ $i=0;
 while ($rw=$oSQL->fetch_array($rs)){
 	
 	$res[] = Array("id"=>$i
-				,"title"=>$rw["title$strLocal"]
+				,"title"=>$rw["title"]
 				,"start"=>$rw['start']
 				,"end"=>$rw['end']
 				,"url"=>'calendar_form.php?calID='.$rw['calID']

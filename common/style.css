@@ -1066,6 +1066,30 @@ background-repeat:no-repeat;
 background-position:0px -1889px;
 }
 
+.user_blue {
+background-image:url(/common/images/sprites/sprites.png);
+background-repeat:no-repeat;
+background-position:0px -17173px;
+}
+
+.user_suit {
+background-image:url(/common/images/sprites/sprites.png);
+background-repeat:no-repeat;
+background-position:0px -17371px;
+}
+
+.bricks {
+background-image:url(/common/images/sprites/sprites.png);
+background-repeat:no-repeat;
+background-position:0px -2017px;
+}
+
+.car{
+background-image:url(/common/images/sprites/sprites.png);
+background-repeat:no-repeat;
+background-position:0px -3205px;
+}
+
 .archive{
 	background-image:url(/common/images/sprites/sprites.png);
 	background-repeat:no-repeat;
@@ -1717,6 +1741,7 @@ display: block;
 }
 .budget th{
 	border: 1px solid gray;
+	background-color: #d0e5f5;
 }
 .budget-decimal{
 	text-align:right;
@@ -1724,9 +1749,12 @@ display: block;
 .budget-negative{
 	color:red;
 }
-.budget-ytd{
+td.budget-ytd{
 	background-color:#fffee4;
 	font-weight:bold;
+}
+th.budget-ytd{
+	background-color:#5c9ccc
 }
 .budget-month th{
 	background-color:navy;
@@ -1738,12 +1766,18 @@ th.sales_YTD {
 td.sales_YTD{
 	background-color:#ddd !important;
 }
-td.sales_product{
-	min-width:20em;
+th.sales_product, th.interco_sales_product{
+	min-width:40em;
 }
-td.sales_customer{
+td.sales_customer, td.interco_sales_customer{
 	min-width:18em;
 }
+
+.interco_sales_product div, .sales_product div{
+	width: 40em !important;
+	white-space: normal !important;
+}
+
 td.costs_supplier{
 	min-width:18em;
 }
@@ -1761,8 +1795,88 @@ td.costs_supplier{
 	background-color: gray;
 	color:white;
 }
+
+.budget-dependent input{
+	color: blue;
+}
+
 .eiseGrid tfoot td{
 	font-weight: bold;
 	border-bottom:1px solid #333;
 	border-top:3px double #333;
+}
+
+#doc_status{
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin-right: 30px;
+	font-family: stencil;
+	border: 3px solid;
+	border-radius: 5px;
+	padding: 10px;
+	font-size: 20pt;
+}
+.budget-doc-deleted{
+	color:red;
+}
+.budget-doc-posted{
+	color:darkgreen;
+}	
+
+.budget-ratio td{
+	font-style: italic;
+	color: navy;
+	background-color: #eef;
+	border-bottom: 1px solid navy;
+}
+
+.report-selected td{
+	background-color:orange !important;
+	color: white;
+}
+
+.report-radio{
+	padding: 5px;
+	display:block;
+}
+
+.report-radio span{
+	margin-right: 5px;
+}
+
+.report-radio label{
+	width: auto;
+}
+
+#report{
+	margin-top:15px;
+}
+
+.button-delete{
+	
+}
+
+.code-9802 {
+	background-color: maroon !important;
+}
+
+.code-9907 {
+	background-color: yellow !important;
+}
+
+.investment_comment {
+	white-space: normal;
+	width: 40% !important;
+}
+.investment_comment  input{
+	width: 100% !important;
+}
+
+.budget-icon-posted{
+	background: url(/common/images/icons/page_green.png) no-repeat;
+}
+
+.budget-icon-deleted{
+	background: url(/common/images/icons/page_white_delete.png) no-repeat;
 }

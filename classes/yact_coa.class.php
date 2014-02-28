@@ -1,4 +1,6 @@
 <?php
+require_once ('classes/reference.class.php');
+
 class YACT_COA extends Reference{
 	
 	// public $oSQL;	

@@ -10,11 +10,61 @@ $salID=$_GET['salID']?$_GET['salID']:$_POST['salID'];
 $oBudget = new Budget($budget_scenario);
 $oDocument = new Sales ($salID);
 $oDocument->defineEF();
-$grid = $oDocument->defineGrid();
+$oDocument->defineGrid();
 
 
 if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
+	
+	if($_POST['DataAction']=='fill'){		
+		
+		$sql = "SELECT jitProductID, jitEstIncomeCurr, COUNT(jitProductID),AVG(jitEstIncome) as IncomeRate,jitEstCostCurr, AVG(jitEstCost) as CostRate FROM nlogjc.tbl_job_item
+				JOIN nlogjc.tbl_job ON jobID=jitJobID
+				JOIN nlogjc.tbl_jobtemplate ON jteGUID=jobTemplateID
+				WHERE jteProductFolderID='".$oDocument->data['salProductFolderID']."' 
+					AND jobCustomerID=".(integer)$oDocument->data['salCustomerID']."
+					AND jobProfitID=".(integer)$oDocument->data['salProfitID']." AND DATEDIFF(NOW(), jobInsertDate)<=365
+				GROUP BY jitProductID, jitQtdIncomeCurr
+				HAVING COUNT(jitProductID)>1
+				ORDER BY	jitProductID, COUNT(jitProductID) DESC";//die($sql);
+				
+		$oDocument->fillGridSQL = $sql;
+		
+		$rs = $oSQL->q($sql);
+		while ($rw=$oSQL->f($rs)){
+			$row = $oDocument->add_record();
+			$row->flagUpdated = true;				
+			$row->profit = $oDocument->profit;
+			$row->product = $rw['jitProductID'];				
+			$row->customer = $oDocument->customer;				
+			//$row->comment = $_POST['comment'][$id];				
+			$row->selling_rate = (double)$rw['IncomeRate'];				
+			switch($rw['jitEstIncomeCurr']){
+				case 'LOC':
+				case 'none':
+				case '':
+					$selling_curr = 'RUB';
+					break;
+				default:
+					$selling_curr = $rw['jitEstIncomeCurr'];
+					break;
+			}
+				
+			$row->selling_curr = $selling_curr;				
+			$row->buying_rate = (double)$rw['CostRate'];
+			switch($rw['jitEstCostCurr']){
+				case 'LOC':
+				case 'none':
+				case '':
+					$buying_curr = 'RUB';
+					break;
+				default:
+					$buying_curr = $rw['jitEstCostCurr'];
+					break;
+			}			
+			$row->buying_curr = $buying_curr;	
+		}		
+	}
 	
 	if ($oDocument->save($_POST['DataAction'])){
 		$oDocument->refresh($oDocument->ID);
@@ -41,6 +91,7 @@ if ($_GET['tab']){
 			require_once ('classes/reports.class.php');
 			$sqlWhere= "WHERE source='".$oDocument->GUID."'";			
 			Reports::masterByCustomer($sqlWhere);
+			Reports::masterByYACT($sqlWhere);
 			die();
 			break;
 		default:
@@ -51,11 +102,13 @@ if ($_GET['tab']){
 
 
 include ('includes/inc_document_menu.php');
-
+if ($oDocument->customer && $oDocument->flagUpdate ){
+	$arrActions[] = Array ('title'=>'Fill grid','action'=>'javascript:fillGrid();','class'=>'brick');
+}
 
 //============================== Main form definition ==============================
 
-$oDocument->fillGrid($grid);
+$oDocument->fillGrid();
 
 require ('includes/inc-frame_top.php');
 require ('includes/inc_document_header.php');
@@ -65,6 +118,7 @@ require ('includes/inc_document_header.php');
 $(document).ready(function(){
 	eiseGridInitialize();
 	rowTotalsInitialize();
+	formulaInitialize();
 	
 	var grid=eiseGrid_find(doc.gridName);
     if (grid!=null){  
@@ -75,7 +129,8 @@ $(document).ready(function(){
 				, function(data, textStatus){
 					console.log(data);
 					oTr.find("[name='unit[]']").val(data.prtUnit);
-					oTr.find("[name='comment[]']").val(data.prdExternalID);
+					oTr.find("[name='prdExternalID[]']").val(data.prdExternalID);
+					oTr.find("div").text(data.prdExternalID);
 				}
 				,'json'
 			);
@@ -83,8 +138,8 @@ $(document).ready(function(){
     }
 	
 });
-
 </script>
+
 <?php
 require ('includes/inc-frame_bottom.php');
 ?>

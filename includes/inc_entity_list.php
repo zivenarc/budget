@@ -36,7 +36,10 @@ if (!$_GET['tab'] && !$_GET['DataAction']){
 	$sqlWhere .= ($sqlWhere && $sqlTabFilter?" AND ":"").$sqlTabFilter;
 	$sqlWhere .= ($sqlWhere && $sqlMyFilter?" AND ":"").$sqlMyFilter;
 	
-	$lst = new EntityList(Array('entID'=>$entID,'strTabKey'=>$entity->tabKey,'sqlWhere'=>$sqlWhere));
+	$lst = new EntityList(Array('entID'=>$entID,
+								'strTabKey'=>$entity->tabKey,
+								'sqlWhere'=>$sqlWhere,
+								'showTabField'=>($_GET['tab']=='all')));
 	$lst->debug = $_DEBUG;	
 	$lst->handleDataRequest();
 	
