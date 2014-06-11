@@ -7,7 +7,8 @@ class budget_session {
 		GLOBAL $oSQL;
 		$this->oSQL = $oSQL;
 		$this->id = $source;
-		$this->scenario = $scenario;
+		$this->scenario = $scenario;		
+		$this->budget = new Budget($scenario);
 	}
 	
 	public function add_master(){
@@ -37,7 +38,7 @@ class budget_session {
 		$sql[] = "DELETE FROM `reg_master` WHERE `source`='".$this->id."'";
 		
 		for ($i=0;$i<count($this->records['master']);$i++){
-			$sql[] = $this->records['master'][$i]->getSQLstring();
+			$sql[] = $this->records['master'][$i]->getSQLstring(date('m',$this->budget->date_start));
 		}
 		
 		// $sql[] = "DELETE FROM `tbl_headcount` WHERE `source`='".$this->id."'";
@@ -54,7 +55,8 @@ class budget_session {
 		
 		$sql[] = "COMMIT;";
 		
-		//echo '<pre>',implode(";\r\n",$sql),'</pre>';
+				
+		// echo '<pre>',implode(";\r\n",$sql),'</pre>';
 		for($i=0;$i<count($sql);$i++){
 			if ($sql[$i]) $this->oSQL->q($sql[$i]);
 		}
@@ -151,11 +153,11 @@ class master_record{
 		return(true);
 	}
 	
-	public function getSQLstring(){
+	public function getSQLstring($mStart=1, $mEnd=12){
 		
 		GLOBAL $oSQL;
 	
-		for($m=1;$m<13;$m++){
+		for($m=$mStart;$m<=$mEnd;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`=".$this->{$month};
 		}
@@ -204,6 +206,7 @@ class Budget{
 		$rw = $this->oSQL->f($rs);
 				
 		$this->year = $rw['scnYear'];
+		$this->date_start = strtotime($rw['scnDateStart']);
 		$this->title = $rw["scnTitle$strLocal"];
 		$this->total = $rw['scnTotal'];
 		$this->id = $scenario;
@@ -243,8 +246,8 @@ class Budget{
 		return($this->settings);
 	}
 	
-	public function getYTDSQL(){
-		for($m=1;$m<13;$m++){
+	public function getYTDSQL($mStart=1, $mEnd=12){
+		for($m=$mStart;$m<=$mEnd;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`";
 		}
@@ -376,7 +379,7 @@ class Budget{
 		<div id='tabs' class='tabs'>
 			<ul>
 			<?php
-			$sql = "SELECT * FROM tbl_scenario";			
+			$sql = "SELECT * FROM tbl_scenario WHERE scnFlagDeleted=0";			
 			$rs = $oSQL->q($sql);
 			while ($rw=$oSQL->f($rs)){
 				echo "<li><a href='",$_SERVER['PHP_SELF'],"?tab=",$rw['scnID'],"'>",$rw['scnTitle'],"</a></li>\r\n";

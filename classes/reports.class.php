@@ -4,7 +4,7 @@ class Reports{
 	public function salesByActivity($sqlWhere=''){
 		GLOBAL $oSQL;
 		ob_start();
-			$sql = "SELECT prtRHQ, prtTitle as 'Activity', vw_product_type.prtUnit as 'Unit', ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total FROM `reg_sales`
+			$sql = "SELECT prtRHQ, pc, prtID, prtTitle as 'Activity', vw_product_type.prtUnit as 'Unit', ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total FROM `reg_sales`
 					LEFT JOIN vw_product ON prdID=product
 					LEFT JOIN vw_product_type ON prtID=prdCategoryID
 					$sqlWhere AND posted=1
@@ -29,8 +29,65 @@ class Reports{
 			<?php
 			while ($rw=$oSQL->f($rs)){
 				echo '<tr>';
-				echo '<td>',$rw['Activity'],'</td>';
+				echo "<td><a href='javascript:getCustomerKPI({activity:{$rw['prtID']}});'>",$rw['Activity'],'</a></td>';
 				echo '<td>',$rw['Unit'],'</td>';
+				for ($m=1;$m<13;$m++){
+					$month = date('M',mktime(0,0,0,$m,15));
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",number_format($rw[$month],0,'.',','),'</td>';
+				}
+				$arrQuarter = Array('Q1'=>$rw['Jan']+$rw['Feb']+$rw['Mar'],
+									'Q2'=>$rw['Apr']+$rw['May']+$rw['Jun'],
+									'Q3'=>$rw['Jul']+$rw['Aug']+$rw['Sep'],
+									'Q4'=>$rw['Oct']+$rw['Nov']+$rw['Dec']);
+				
+				for ($q=1;$q<5;$q++){		
+					$quarter = 'Q'.$q;
+					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
+				}				
+									
+				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';
+				echo "</tr>\r\n";
+			}
+			?>
+			</tbody>
+			</table>
+			<?php
+			ob_flush();
+	}
+	
+	public function salesByCustomer($sqlWhere=''){
+		GLOBAL $oSQL;
+		GLOBAL $budget_scenario;
+		
+		ob_start();
+			$sql = "SELECT unit, cntTitle as 'Customer', ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total FROM `reg_sales`
+					LEFT JOIN vw_customer ON customer=cntID					
+					LEFT JOIN vw_profit ON pc=pccID					
+					WHERE posted=1 AND scenario='{$budget_scenario}' $sqlWhere
+					GROUP BY `reg_sales`.`customer`
+					ORDER BY Total DESC"; 
+					echo $sql;
+			$rs = $oSQL->q($sql);
+			if (!$oSQL->num_rows($rs)){
+				echo "<div class='warning'>No data found</div>";
+				return (false);
+			}			
+			?>
+			<table id='report' class='budget'>
+			<thead>
+				<tr><th>Customer</th><th>Unit</th>
+					<?php 
+					echo Budget::getTableHeader(); 
+					echo Budget::getTableHeader('quarterly'); 
+					?>
+				<th class='budget-ytd'>Total</th></tr>
+			</thead>			
+			<tbody>
+			<?php
+			while ($rw=$oSQL->f($rs)){
+				echo '<tr>';
+				echo "<td>",$rw['Customer'],'</td>';
+				echo '<td>',$rw['unit'],'</td>';
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",number_format($rw[$month],0,'.',','),'</td>';
