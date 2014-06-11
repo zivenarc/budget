@@ -39,7 +39,7 @@ $sql[] = "DELETE FROM `reg_headcount` WHERE `scenario`='{$new_budget}';";
 
 $sql [] = "DELETE FROM reg_master WHERE scenario='{$new_budget}';";
 $sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item, source, estimate, scenario, active)
-			SELECT company, pc, activity, customer, account, item, 'Estimate', SUM(".Budget::getYTDSQL().") as YTD, '{$new_budget}', active
+			SELECT company, pc, activity, customer, account, item, 'Estimate', SUM(".Budget::getYTDSQL(date('m',$oNewBudget->date_start)).") as YTD, '{$new_budget}', active
 				FROM reg_master WHERE scenario='{$old_budget}' AND active=1 AND estimate=0
 				GROUP BY company, pc, activity, customer, account, item
 				HAVING YTD<>0;";
@@ -49,6 +49,9 @@ $sql [] = "INSERT INTO tbl_scenario_variable (scvVariableID, scvScenarioID, scvV
 			SELECT scvVariableID, '{$new_budget}', scvValue, scvEditBy, scvEditDate, scvInsertBy, scvInsertDate, scvFlagDeleted, UUID()
 				FROM tbl_scenario_variable WHERE scvScenarioID='{$old_budget}';";
 
+$sql[] = "update tbl_scenario_variable, vw_currency set scvValue=IFNULL(curRate,1) where
+			scvVariableID=curTitle and scvScenarioID='{$new_budget}';";
+				
 foreach ($arrEntity as $entity=>$entity_data){
 	
 	echo '<h1>',$entity_data['entTitle'],'</h1>';

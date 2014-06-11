@@ -136,3 +136,23 @@ function getSource(data){
 	console.log(data);
 				
 }
+
+function getCustomerKPI(data){
+	data.pccGUID = localStorage.pccGUID;	
+	
+	$('#sources').detach();
+	$('<div>',{id:'sources'}).load('rep_customer_kpi.php #report',data, function(){
+		$(this).dialog({
+			'title':'Customer KPI',
+			'modal':true,
+			'width':'auto'
+		});
+	});
+	
+	// $('<div>').dialog({
+		// create:function(event, ui){
+			// $(this).html('Lorem ipsum');
+		// }
+	// });
+	console.log(data);
+}
