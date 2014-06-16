@@ -403,10 +403,10 @@ class Headcount extends Document{
 			if(is_array($this->records[$this->gridName])){
 				foreach($this->records[$this->gridName] as $id=>$record){
 				
-					$eligible_date = mktime(0,0,0,10,1,$oBudget->year-1);
+					$eligible_date = mktime(0,0,0,10,1,$oMaster->budget->year-1);
 					$start_date = strtotime($record->start_date);
 					$probation = $start_date + 91*24*60*60;
-					$eligible = $start_date < $eligible_date;
+					$eligible = ($start_date < $eligible_date) && ($settings['salary_review_month']>date('m',$oMaster->budget->date_start));
 
 					//-----------------------------------------------------------------Salary, gross
 					$master_row = $oMaster->add_master();
