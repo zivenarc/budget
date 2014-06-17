@@ -22,8 +22,8 @@ if ($_POST['DataAction']){
 			}
 		}
 		
-		$dateBudgetStart = $oBudget->year.'-01-01';
-		$dateBudgetEnd = ($oBudget->year+1).'-01-01';
+		$dateBudgetStart = date('Y-m-d',$oDocument->budget->date_start);
+		$dateBudgetEnd = ($oDocument->budget->year+1).'-01-01';
 		
 		$sql = "SELECT *, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart)) AS months,
 				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValuePrimo,
