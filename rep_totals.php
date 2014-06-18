@@ -2,6 +2,7 @@
 // $flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
+require ('classes/reports.class.php');
 require ('classes/item.class.php');
 
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
@@ -28,30 +29,7 @@ $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 
-	if ($rw['pccFlagProd']){
-		switch ($rw['Profit']){
-			case 'TMMR':
-			case 'ICD':
-				$keyProfit = 'Toyota';
-				break;
-			case 'Forwarding':
-			case 'STP office':
-			case 'NOVO':
-			case 'Krekshino':
-				$keyProfit = 'FWD';
-				break;						
-			default:
-				$keyProfit = $rw['Profit'];
-		}
-	} else {
-		switch ($rw['Profit']){
-			case 'Sales':
-				$keyProfit = $rw['Profit'];	
-				break;
-			default:
-			$keyProfit = 'Corporate';
-		}
-	}
+	$keyProfit = Budget::getProfitAlias($rw);
 	
 	if ($rw['item']==Items::REVENUE || $rw['item']==Items::INTERCOMPANY_REVENUE){
 		$arrRevenue[$keyProfit] += $rw['Total'];
@@ -61,6 +39,7 @@ while ($rw=$oSQL->f($rs)){
 	$arrReport[$rw['Group']][$rw['Budget item']][$keyProfit] += $rw['Total'];
 	$arrTotal[$rw['Group']][$keyProfit] += $rw['Total'];
 	$arrGrandTotal[$keyProfit] += $rw['Total'];
+	$arrGrandTotalEstimate[$keyProfit] += $rw['Estimate'];
 	$arrEstimate[$rw['Group']][$rw['Budget item']] += $rw['Estimate'];
 	$arrProfit[$keyProfit] = $rw['pccFlagProd'];
 }
@@ -74,7 +53,7 @@ while ($rw=$oSQL->f($rs)){
 					echo '<th>',$pc,'</th>';
 		};?>
 		<th class='budget-ytd'>Total</th>
-		<th>Estimate</th>
+		<th>Last</th>
 		<th>Diff</th>
 	</tr>
 </thead>
@@ -82,78 +61,99 @@ while ($rw=$oSQL->f($rs)){
 <?php
 foreach($arrReport as $group=>$arrItem){
 	foreach($arrItem as $item=>$values){
-		echo '<tr>';
-		echo '<td>',$item,'</td>';
-		foreach($arrProfit as $pc=>$flag){
-			$strClass = $values[$pc]<0?"budget-negative":"";
-			echo "<td class='budget-decimal $strClass'>",number_format($values[$pc],0,'.',','),'</td>';
-		}
-		
-		$strClass = array_sum($values)<0?"budget-negative":"";
-		echo "<td class='budget-decimal budget-ytd $strClass'>",number_format(array_sum($values),0,'.',','),'</td>';
-		
-		$strClass = $arrEstimate[$group][$item]<0?"budget-negative":"";
-		echo "<td class='budget-decimal $strClass'>",number_format($arrEstimate[$group][$item],0,'.',','),'</td>';
-		
-		$strClass = (array_sum($values) - $arrEstimate[$group][$item])<0?"budget-negative":"";
-		echo "<td class='budget-decimal $strClass'>",number_format(array_sum($values) - $arrEstimate[$group][$item],0,'.',','),'</td>';
-		
-		echo '</tr>';
+		?>
+		<tr>
+			<td><?php echo $item;?></td>
+		<?php
+		foreach($arrProfit as $pc=>$flag){			
+			?>
+			<td class='budget-decimal'><?php Reports::render($values[$pc]);?></td>
+			<?php
+		}				
+		?>
+			<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($values));?></td>		
+			<td class='budget-decimal'><?php Reports::render($arrEstimate[$group][$item]);?></td>
+			<td class='budget-decimal'><?php Reports::render(array_sum($values) - $arrEstimate[$group][$item]);?></td>
+		</tr>
+		<?php
 	}
 	
-	echo '<tr class="budget-subtotal">';
-	echo '<td>',$group,'</td>';
+	//---Group subtotal
+	?>
+	<tr class="budget-subtotal">
+		<td><?php echo $group;?></td>
+	<?php
 	foreach($arrProfit as $pc=>$flag){
-		$strClass = $arrTotal[$group][$pc]<0?"budget-negative":"";
-		echo "<td class='budget-decimal $strClass'>",number_format($arrTotal[$group][$pc],0,'.',','),'</td>';
+		?>
+			<td class='budget-decimal'><?php Reports::render($arrTotal[$group][$pc]);?></td>
+		<?php
 	}
-	$strClass = array_sum($arrTotal[$group])<0?"budget-negative":"";
-	echo "<td class='budget-decimal budget-ytd $strClass'>",number_format(array_sum($arrTotal[$group]),0,'.',','),'</td>';
-	
-	$strClass = array_sum($arrEstimate[$group])<0?"budget-negative":"";
-	echo "<td class='budget-decimal $strClass'>",number_format(array_sum($arrEstimate[$group]),0,'.',','),'</td>';
-	
-	$strClass = (array_sum($arrTotal[$group]) - array_sum($arrEstimate[$group]))<0?"budget-negative":"";
-	echo "<td class='budget-decimal $strClass'>",number_format(array_sum($arrTotal[$group]) - array_sum($arrEstimate[$group]),0,'.',','),'</td>';
-	
-	echo '</tr>';
-
+	?>
+		<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrTotal[$group]));?></td>
+		<td class='budget-decimal'><?php Reports::render(array_sum($arrEstimate[$group]));?></td>
+		<td class='budget-decimal'><?php Reports::render(array_sum($arrTotal[$group]) - array_sum($arrEstimate[$group]));?></td>
+	</tr>
+	<?php
+	//------ Ratios for gross margin
 	if ($group == '01.Gross Margin'){
-		echo '<tr class="budget-ratio">';
-		echo '<td>GP, %</td>';
-		foreach($arrProfit as $pc=>$flag){
-			$strClass = $arrTotal[$group][$pc]<0?"budget-negative":"";
-			
-			echo "<td class='budget-decimal $strClass'>",($arrRevenue[$pc]?number_format($arrTotal[$group][$pc]/$arrRevenue[$pc]*100,1,'.',','):'n/a'),'</td>';
+		?>
+		<tr class="budget-ratio">
+			<td>GP, %</td>
+			<?php
+			foreach($arrProfit as $pc=>$flag){
+			?>
+			<td class='budget-decimal'><?php Reports::render_ratio($arrTotal[$group][$pc],$arrRevenue[$pc]);?></td>
+			<?php
 		}
-		$strClass = array_sum($arrTotal[$group])<0?"budget-negative":"";
-		echo "<td class='budget-decimal budget-ytd $strClass'>",number_format(array_sum($arrTotal[$group])/array_sum($arrRevenue)*100,1,'.',','),'</td>';
-		
-		$strClass = array_sum($arrEstimate[$group])<0?"budget-negative":"";
-		echo "<td class='budget-decimal $strClass'>",number_format(array_sum($arrEstimate[$group])/$arrRevenueEst*100,1,'.',','),'</td>';
-		
-		$strClass = (array_sum($arrTotal[$group]) - array_sum($arrEstimate[$group]))<0?"budget-negative":"";
-		echo "<td class='budget-decimal $strClass'>",number_format((array_sum($arrTotal[$group])/array_sum($arrRevenue)-array_sum($arrEstimate[$group])/$arrRevenueEst)*100,1,'.',','),'</td>';
-		
-		echo '</tr>';
+		?>
+		<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrTotal[$group]),array_sum($arrRevenue));?></td>
+		<td class='budget-decimal'><?php Reports::render_ratio(array_sum($arrEstimate[$group]),$arrRevenueEst);?></td>				
+		</tr>
+		<?php
 	}
 	
 }
-echo '<tr class="budget-total">';
-echo '<td>Total result</td>';
+?>
+</tbody>
+<tfoot>
+	<tr class="budget-total">
+		<td>Total result</td>
+<?php
 foreach($arrProfit as $pc=>$flag){
-	$strClass = $arrGrandTotal[$pc]<0?"budget-negative":"";
-	echo "<td class='budget-decimal $strClass'>",number_format($arrGrandTotal[$pc],0,'.',','),'</td>';
+	?>
+	<td class='budget-decimal'><?php Reports::render($arrGrandTotal[$pc]);?></td>
+	<?php
 }
-$strClass = array_sum($arrGrandTotal)<0?"budget-negative":"";
-echo "<td class='budget-decimal budget-ytd $strClass'>",number_format(array_sum($arrGrandTotal),0,'.',','),'</td>';
-echo '</tr>';
-
-echo '<tr class="budget-ratio">';
-echo '<td>% of revenue</td>';
-
-// echo '<pre>';print_r($arrReport);
-
+?>
+	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrandTotal));?></td>
+	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotalEstimate));?></td>
+	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotal)-array_sum($arrGrandTotalEstimate));?></td>
+</tr>
+<tr>
+		<td>Last</td>
+<?php
+foreach($arrProfit as $pc=>$flag){
+	?>
+	<td class='budget-decimal'><?php Reports::render($arrGrandTotalEstimate[$pc]);?></td>
+	<?php
+}
+?>
+	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrandTotalEstimate));?></td>
+</tr>
+<tr>
+		<td>Diff</td>
+<?php
+foreach($arrProfit as $pc=>$flag){
+	?>
+	<td class='budget-decimal'><?php Reports::render($arrGrandTotal[$pc]-$arrGrandTotalEstimate[$pc]);?></td>
+	<?php
+}
+?>
+	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrandTotal)-array_sum($arrGrandTotalEstimate));?></td>
+</tr>
+<tr class="budget-ratio">
+	<td>% of revenue</td>
+<?php
 foreach($arrProfit as $pc=>$flag){
 	if ($arrReport['01.Gross Margin']['Revenue'][$pc]){
 		$arrCostRatio[$pc] = $arrGrandTotal[$pc]/$arrReport['01.Gross Margin']['Revenue'][$pc]*100;	
@@ -162,13 +162,14 @@ foreach($arrProfit as $pc=>$flag){
 	}
 	$arrCostRatio['Corporate'] = - $arrGrandTotal['Corporate']/array_sum($arrReport['01.Gross Margin']['Revenue'])*100;
 	$arrCostRatio['Sales'] = - $arrGrandTotal['Sales']/array_sum($arrReport['01.Gross Margin']['Revenue'])*100;
-	$strClass = $arrCostRatio[$pc]<0?"budget-negative":"";
-	echo "<td class='budget-decimal $strClass'>",number_format($arrCostRatio[$pc],1,'.',','),'</td>';
+	?>
+	<td class='budget-decimal'><?php Reports::render($arrCostRatio[$pc],1);?></td>
+	<?php
 }
-echo "<td class='budget-decimal $strClass'>",number_format(array_sum($arrGrandTotal)/array_sum($arrReport['01.Gross Margin']['Revenue']),1,'.',','),'</td>';
-echo '</tr>';
 ?>
-</tbody>
+	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotal)/array_sum($arrReport['01.Gross Margin']['Revenue']),1);?></td>
+</tr>
+</tfoot>
 </table>
 	<ul class='link-footer'>
 		<li><a href='javascript:SelectContent("report");'>Select table</a></li>

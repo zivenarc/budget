@@ -1789,7 +1789,9 @@ td.costs_supplier{
 }
 .budget-total td{
 	background-color: #eee;
-	font-weight: 600;
+	font-weight: bold;
+	font-size: 1.1em;
+	border-bottom:2px solid black;
 }
 .budget-tdh{
 	background-color: gray;

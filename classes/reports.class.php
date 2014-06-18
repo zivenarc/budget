@@ -764,6 +764,29 @@ class Reports{
 		<?php
 	}
 	
+	function render($number, $decimals=0, $dec_separator='.',$thousand_separator=',',$negative='budget-negative'){
+		if (!$number) {
+			echo '';
+			return;
+		}
+		
+		if ($number<0){
+			echo "<span class='{$negative}'>",number_format($number,$decimals,$dec_separator,$thousand_separator),"</span>";
+		} else {
+			echo "<span>",number_format($number,$decimals,$dec_separator,$thousand_separator),"</span>";
+		}
+		
+	}
+	
+	function render_ratio ($n1, $n2){
+		if (!$n2){
+			echo 'n/a';
+			return;			
+		} else {
+			self::render($n1/$n2*100,1);
+		}
+	}
+	
 }
 
 ?>
