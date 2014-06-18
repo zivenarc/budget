@@ -7,7 +7,7 @@ $sql = "UPDATE reg_master, vw_profit
 		WHERE customer=".(integer)$_POST['customer']." 
 		AND pc=pccID
 		AND pccGUID=".$oSQL->e($_POST['pccGUID'])." 
-		AND source='estimate' 
+		AND source IN 'estimate','Actual'
 		AND scenario='$budget_scenario'";
 echo '<pre>',$sql, '</pre>';
 $oSQL->q($sql);
