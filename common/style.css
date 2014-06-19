@@ -1756,6 +1756,12 @@ td.budget-ytd{
 th.budget-ytd{
 	background-color:#5c9ccc
 }
+th.budget-quarterly{
+	background-color:#0099FF;	
+}
+td.budget-quarterly{
+	background-color:#D6EBFF;	
+}
 .budget-month th{
 	background-color:navy;
 }

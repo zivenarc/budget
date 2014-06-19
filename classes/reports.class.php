@@ -232,9 +232,13 @@ class Reports{
 				echo '<th>',$rw['Title'],'</th>';
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
-					echo '<td class="budget-decimal">',number_format($rw[$month],0,'.',','),'</td>';
+					?>
+					<td class="budget-decimal"><?php self::render($rw[$month],0);?></td>
+					<?php
 				}
-				echo '<td class="budget-decimal budget-ytd">',number_format($rw['Total'],0,'.',','),'</td>';
+				?>
+				<td class="budget-decimal budget-ytd"><?php self::render($rw['Total'],0);?></td>
+				<?php
 			}
 			?>
 			</tbody>
@@ -672,30 +676,27 @@ class Reports{
 				$local_subtotal = 0;
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
-					echo "<td class='budget-decimal budget-monthly budget-$month ".($data[$month]<0?'budget-negative':'')."'>",number_format($data[$month]),'</td>';					
+					?>
+					<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
+					<?php
 				}
 				
 				//--------------------- quarterly data -----------------------
 				if(isset($data['Q1'])){
 					for ($m=1;$m<5;$m++){
-						echo "<td class='budget-decimal budget-quarterly budget-q$m ".($data['Q'.$m]<0?'budget-negative':'')."'>",number_format($data['Q'.$m]),'</td>';					
+						?>
+						<td class='budget-decimal budget-quarterly budget-<?php echo 'q'.$m;?>'><?php self::render($data['Q'.$m],0);?></td>
+						<?php
 					}
 				}
 			?>
-			<td class='budget-decimal budget-ytd <?php echo $data['Total']<0?'budget-negative':'';?>'><?php echo number_format($data['Total']);?></td>			
+			<td class='budget-decimal budget-ytd'><?php self::render($data['Total'],0);?></td>			
 			<?php 
 			if (isset($data['estimate'])){
 			?>
-			<td class='budget-decimal <?php echo $data['estimate']<0?'budget-negative':'';?>'><?php echo number_format($data['estimate']);?></td>
-			<td class='budget-decimal <?php echo ($data['Total']-$data['estimate'])<0?'budget-negative':'';?>'><?php echo number_format($data['Total']-$data['estimate']);?></td>
-			<?php
-				if ((integer)$data['estimate']!=0){
-					$ratio = $data['Total']/$data['estimate']*100;
-				} else {
-					$ratio = 'n/a';
-				}
-			?>
-			<td class='budget-decimal <?php echo ($ratio<0?'budget-negative':'');?>'><em><?php echo number_format($ratio);?></em></td>
+			<td class='budget-decimal'><?php self::render($data['estimate'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['Total']-$data['estimate'],0);?></td>
+			<td class='budget-decimal'><em><?php self::render_ratio($data['Total'],$data['estimate']);?></em></td>
 			<?php
 			}
 			?>
@@ -717,18 +718,20 @@ class Reports{
 		for($i=0;$i<count($data);$i++){
 		
 				$total += $data[$i]['amount'];	
-				echo '<tr id="tr_',$data[$i]['guid'],'">';
-				echo '<td>',$data[$i]['title'],'</td>';
-				echo '<td>',$data[$i]['id'],'</td>';
-				echo '<td>','<a class="budget-document-link" target="_blank" href="',$data[$i]['script'],'?',$data[$i]['prefix'],'ID=',$data[$i]['id'],'">',$data[$i]['guid'],'</a></td>';
-				echo '<td class="td-posted ',($data[$i]['posted']?'budget-icon-posted':''),'">&nbsp;</td>';
-				echo '<td class="td-deleted ',($data[$i]['deleted']?'budget-icon-deleted':''),'">&nbsp;</td>';
-				echo '<td id="amount_',$data[$i]['guid'],'" class="budget-decimal ',($data[$i]['amount']<0?'budget-negative':''),'">',number_format($data[$i]['amount'],2,'.',','),'</td>';
-				echo '<td>',$data[$i]['pccTitle'],'</td>';
-				echo '<td>',$data[$i]['comment'],'</td>';
-				echo '<td id="usrTitle_',$data[$i]['guid'],'">',$data[$i]['usrTitle'],'</td>';
-				echo '<td id="timestamp_',$data[$i]['guid'],'">',date('d.m.Y H:i',strtotime($data[$i]['timestamp'])),'</td>';
-				echo '</tr>';
+				?>
+				<tr id="tr_<?php echo $data[$i]['guid'];?>">
+					<td><?php echo $data[$i]['title'];?></td>
+					<td><?php echo $data[$i]['id'];?></td>
+					<td><a class="budget-document-link" target="_blank" href="<?php echo $data[$i]['script'].'?'.$data[$i]['prefix'].'ID='.$data[$i]['id'];?>"><?php echo $data[$i]['guid'];?></a></td>
+					<td class="td-posted <?php echo ($data[$i]['posted']?'budget-icon-posted':'');?>">&nbsp;</td>
+					<td class="td-deleted <?php echo ($data[$i]['deleted']?'budget-icon-deleted':'');?>">&nbsp;</td>
+					<td id="amount_<?php echo $data[$i]['guid'];?>" class="budget-decimal"><?php self::render($data[$i]['amount']);?></td>
+					<td><?php echo $data[$i]['pccTitle'];?></td>
+					<td><?php echo $data[$i]['comment'];?></td>
+					<td id="usrTitle_<?php echo $data[$i]['guid'];?>"><?php echo $data[$i]['usrTitle'];?></td>
+					<td id="timestamp_<?php echo $data[$i]['guid'];?>"><?php echo date('d.m.Y H:i',strtotime($data[$i]['timestamp']));?></td>
+				</tr>
+				<?php
 		}
 		
 		// ob_flush();
@@ -754,7 +757,7 @@ class Reports{
 				<tfoot>
 					<tr class="budget-subtotal">
 						<td colspan="5">Total:</td>
-						<td><?php echo number_format($total,2,'.',',');?></td>
+						<td><?php self::render($total);?></td>
 					</tr>
 				</tfoot>
 				<tbody>
@@ -779,7 +782,7 @@ class Reports{
 	}
 	
 	function render_ratio ($n1, $n2){
-		if (!$n2){
+		if ((integer)$n2==0){
 			echo 'n/a';
 			return;			
 		} else {
