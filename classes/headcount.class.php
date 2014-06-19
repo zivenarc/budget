@@ -63,6 +63,8 @@ class Headcount extends Document{
 		$this->pc = $ProfitCenters->getByCode($this->profit);
 		$this->overtime = $this->data[$this->prefix.'Overtime'];
 		$this->turnover = $this->data[$this->prefix.'Turnover'];
+		$this->bonus_corporate = $this->data[$this->prefix.'BonusCorporate'];
+		$this->bonus_department = $this->data[$this->prefix.'BonusDepartment'];
 		
 		if($this->GUID){
 			$sql = "SELECT * FROM `".self::Register."` WHERE `source`='".$this->GUID."';";
@@ -90,6 +92,18 @@ class Headcount extends Document{
 			$this->Columns[] = Array(
 				'title'=>'Overtime ratio, %'
 				,'field'=>$this->prefix.'Overtime'			
+				,'type'=>'int'
+				, 'disabled'=>!$this->flagUpdate
+			);
+			$this->Columns[] = Array(
+				'title'=>'Corporate bonus, %'
+				,'field'=>$this->prefix.'BonusDepartment'			
+				,'type'=>'int'
+				, 'disabled'=>!$this->flagUpdate
+			);
+			$this->Columns[] = Array(
+				'title'=>'Department bonus, %'
+				,'field'=>$this->prefix.'BonusDepartment'			
 				,'type'=>'int'
 				, 'disabled'=>!$this->flagUpdate
 			);
@@ -296,6 +310,8 @@ class Headcount extends Document{
 			$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
 			$this->overtime = isset($_POST[$this->prefix.'Overtime'])?$_POST[$this->prefix.'Overtime']:$this->overtime;
 			$this->turnover = isset($_POST[$this->prefix.'Turnover'])?$_POST[$this->prefix.'Turnover']:$this->turnover;
+			$this->bonus_corporate = isset($_POST[$this->prefix.'BonusCorporate'])?$_POST[$this->prefix.'BonusCorporate']:$this->bonus_corporate;
+			$this->bonus_department = isset($_POST[$this->prefix.'BonusDepartment'])?$_POST[$this->prefix.'BonusDepartment']:$this->bonus_department;
 		}
 		//-------------------Updating grid records---------------------------------
 		$arrUpdated = $_POST['inp_'.$this->gridName.'_updated'];
@@ -373,6 +389,8 @@ class Headcount extends Document{
 			$sql[] = "UPDATE `{$this->table}` 
 				SET {$this->prefix}Turnover=".(integer)$this->turnover."
 				,{$this->prefix}Overtime=".(integer)$this->overtime."				
+				,{$this->prefix}BonusCorporate=".(integer)$this->bonus_corporate."				
+				,{$this->prefix}BonusDepartment=".(integer)$this->bonus_department."				
 				WHERE {$this->prefix}ID={$this->ID};";
 		}
 		if(is_array($this->records[$this->gridName])){			
@@ -549,7 +567,9 @@ class Headcount extends Document{
 					for($m=1;$m<13;$m++){
 						$month = date('M',mktime(0,0,0,$m,15));
 						$master_row->{$month} = - 	$salary[$month]
-													*$settings['regular_bonus_avg']/100
+													*(0.5*$settings['regular_bonus_avg']/100 
+														+$this->bonus_corporate/100
+														+$this->bonus_department/100)
 													*$settings['regular_bonus_base']/100/3;
 					}
 					
