@@ -97,7 +97,7 @@ class Headcount extends Document{
 			);
 			$this->Columns[] = Array(
 				'title'=>'Corporate bonus, %'
-				,'field'=>$this->prefix.'BonusDepartment'			
+				,'field'=>$this->prefix.'BonusCorporate'			
 				,'type'=>'int'
 				, 'disabled'=>!$this->flagUpdate
 			);
