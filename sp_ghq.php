@@ -4,6 +4,7 @@ require ('common/auth.php');
 require ('classes/reference.class.php');
 require ('classes/item.class.php');
 require ('classes/budget.class.php');
+require ('classes/reports.class.php');
 
 $oBudget = new Budget($budget_scenario);
 
@@ -243,30 +244,43 @@ foreach ($arrReport as $ghq=>$arrItems){
 	echo "</tr>\r\n";
 	
 	foreach ($arrItems as $item=>$values){
-		echo '<tr>';
-		echo '<td>',$item,'</td>';
+		?>
+		<tr>
+			<td><?php echo $item;?></td>
+			<?php
 			for ($m=1;$m<13;$m++){
 				$month = (date('M',mktime(0,0,0,$m,15)));
-				echo '<td class="budget-decimal">',number_format($values[$month],0,'.',','),'</td>';
+				?>
+				<td class="budget-decimal"><?php Reports::render($values[$month],0);?></td>
+				<?php
 			}
-		echo '<td class="budget-ytd budget-decimal">',number_format(array_sum($values),0,'.',','),'</td>';
-		echo "</tr>\r\n";
+		?>
+			<td class="budget-ytd budget-decimal"><?php Reports::render(array_sum($values),0);?></td>
+		</tr>
+		<?php
 	}
 }
-
-echo '<tr>';
-echo '<th colspan="14">Grand total</th>';
-echo "</tr>\r\n";
+?>
+<tr>
+	<th colspan="14">Grand total</th>
+</tr>
+<?php
 foreach ($arrGrandTotal as $item=>$values){
-		echo '<tr>';
-		echo '<td>',$item,'</td>';
+		?>
+		<tr>
+			<td><?php echo $item;?></td>
+			<?php
 			for ($m=1;$m<13;$m++){
 				$month = (date('M',mktime(0,0,0,$m,15)));
-				echo '<td class="budget-decimal">',number_format($values[$month],0,'.',','),'</td>';
+				?>
+				<td class="budget-decimal"><?php Reports::render($values[$month],0);?></td>
+				<?php
 				$arrNRBT[$month] += $values[$month];
 			}
-		echo '<td class="budget-ytd budget-decimal">',number_format(array_sum($values),0,'.',','),'</td>';
-		echo "</tr>\r\n";
+		?>
+		<td class="budget-ytd budget-decimal"><?php Reports::render(array_sum($values),0);?></td>
+		</tr>
+		<?php
 }
 ?>
 <tr class="budget-total">
@@ -274,10 +288,12 @@ foreach ($arrGrandTotal as $item=>$values){
 <?php
 for ($m=1;$m<13;$m++){
 				$month = (date('M',mktime(0,0,0,$m,15)));
-				echo '<td class="budget-decimal">',number_format($arrNRBT[$month],0,'.',','),'</td>';				
+				?>
+				<td class="budget-decimal"><?php Reports::render($arrNRBT[$month],0);?></td>
+				<?php
 }
-echo '<td class="budget-decimal budget-ytd">',number_format(array_sum($arrNRBT),0,'.',','),'</td>';
 ?>
+	<td class="budget-decimal budget-ytd"><?php Reports::render(array_sum($arrNRBT),0);?></td>
 </tr>
 </tbody>
 </table>
@@ -302,7 +318,9 @@ foreach($arrGHQSubtotal as $ghq=>$revenue){
 <tr>
 <?php
 	foreach($arrGHQSubtotal as $ghq=>$revenue){
-		echo '<td>',number_format(array_sum($revenue)/array_sum($arrRevenue)*100,1,'.',','),'</td>';
+		?>
+		<td><?php Reports::render_ratio(array_sum($revenue),array_sum($arrRevenue));?></td>
+		<?php
 	}
 ?>
 <td>100</td>
