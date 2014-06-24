@@ -21,13 +21,14 @@ if(!isset($_GET['tab'])){
 	include ('includes/inc_report_buttons.php');
 	if ($_GET['tab']=='all'){
 		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-		$sqlWhere = "WHERE pc in (SELECT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles))";
+		$sqlWhere = "WHERE pc in (SELECT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles)) AND pcrFlagRead=1";
 	} else {
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).")";
 	}
 	switch ($_GET['tab']){
 		case 'f865db6b-d328-102e-9d25-5de97ba9df63':
 		case 'f865e1de-d328-102e-9d25-5de97ba9df63':
+		case '48b5ae6c-e650-11de-959c-00188bc729d2':
 		case 'all':
 			echo "<input type='hidden' id='group' value='activity'/>";
 			Reports::masterByActivityEst($sqlWhere." AND scenario='$budget_scenario'");	
