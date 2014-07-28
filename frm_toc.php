@@ -4,7 +4,7 @@ header("Pragma: public");
 header("Cache-Control: maxage=".$expires);
 header('Expires: ' . gmdate('D, d M Y H:i:s', time()+$expires) . ' GMT');
 require ('common/auth.php');
-$arrJS[] = "/common/jquery/jquery.simple.tree.js";
+$arrJS[] = "../common/jquery/jquery.simple.tree.js";
 ob_start();
 ?>
  <script>
