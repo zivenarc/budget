@@ -316,7 +316,7 @@ class Reports{
 		global $oSQL;
 		
 		ob_start();
-			$sql = "SELECT CONCAT(Activity_title,' (',Activity_title_local,')') as 'GroupLevel1', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total 
+			$sql = "SELECT CONCAT(Activity_title,' (',Activity_title_local,')') as 'GroupLevel1', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total
 			FROM `vw_master`
 			$sqlWhere
 			GROUP BY `vw_master`.activity, `vw_master`.item
@@ -332,7 +332,9 @@ class Reports{
 			?>
 			<table id='report' class='budget'>
 			<thead>
-				<tr><th>Activity</th><th>Account</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
+				<tr>
+					<th>Activity</th><th>Account</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th>
+				</tr>
 			</thead>			
 			<tbody>
 			<?php
@@ -440,16 +442,27 @@ class Reports{
 	
 	public function masterbyCustomerEst($sqlWhere){
 		
+		GLOBAL $budget_scenario;
+		$Budget = new Budget($budget_scenario);
 		
 		ob_start();
 			$sql = "SELECT Customer_name as 'GroupLevel1', customer as 'level1_code', `Budget item`, `Group`, `item`, ".Budget::getMonthlySumSQL().", ".
-					Budget::getQuarterlySumSQL().", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate
-			FROM `vw_master` $sqlWhere AND Group_code=94 ## Gross margin only
+					Budget::getQuarterlySumSQL().", 
+					SUM(".Budget::getYTDSQL().") as Total, 
+					SUM(estimate) as estimate, 
+					SUM(".Budget::getYTDSQL(1, 11-date('n',$Budget->date_start)).") as YTD_A, 
+					SUM(YTD) as YTD, 
+					SUM(".Budget::getYTDSQL(date('n',$Budget->date_start),12).") as ROY_A, 
+					SUM(ROY) as ROY, 
+					scnType
+			FROM `vw_master` 
+			LEFT JOIN tbl_scenario ON scnID=scenario
+			$sqlWhere AND Group_code=94 ## Gross margin only
 			GROUP BY `vw_master`.customer, `vw_master`.item
 			ORDER BY `vw_master`.customer, `Group`, `vw_master`.itmOrder ASC			
 			";
 			
-			self::firstLevelReport($sql, 'Customer');
+			self::firstLevelReport($sql, 'Customer', $Budget);
 			//==========================================================================================================================Non-customer-related data
 			self::noFirstLevelReport($sqlWhere);
 			?>
@@ -461,11 +474,20 @@ class Reports{
 	
 	public function masterbyProfitEst($sqlWhere){
 		
+		GLOBAL $budget_scenario;
+		$Budget = new Budget($budget_scenario);
 		
 		ob_start();
 			$sql = "SELECT `Budget item` as 'GroupLevel1', `item` as 'level1_code', `Profit` as 'Budget item', `Group`, `pc` as 'item', ".Budget::getMonthlySumSQL().", ".
-					Budget::getQuarterlySumSQL().", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate
-			FROM `vw_master` $sqlWhere 
+					Budget::getQuarterlySumSQL().", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate, 
+					SUM(".Budget::getYTDSQL(1, 11-date('n',$Budget->date_start)).") as YTD_A, 
+					SUM(YTD) as YTD, 
+					SUM(".Budget::getYTDSQL(date('n',$Budget->date_start),12).") as ROY_A, 
+					SUM(ROY) as ROY,
+					scnType
+			FROM `vw_master` 
+			LEFT JOIN tbl_scenario ON scnID=scenario
+			$sqlWhere 
 			GROUP BY `item`, `pc`
 			ORDER BY `Group`, level1_code, item
 			";
@@ -480,19 +502,28 @@ class Reports{
 	}
 	
 	public function masterbyActivityEst($sqlWhere){
-		global $oSQL;
+		
+		GLOBAL $budget_scenario;
+		$Budget = new Budget($budget_scenario);
 		
 		ob_start();
 			$sql = "SELECT Activity_title as 'GroupLevel1', activity as 'level1_code', `Budget item`, `Group`, `item`,".
 					Budget::getMonthlySumSQL().", ".
 					Budget::getQuarterlySumSQL().
-					", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate
-			FROM `vw_master` $sqlWhere AND Group_code=94 ## Gross margin only
+					", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate,  
+					SUM(".Budget::getYTDSQL(1, 11-date('n',$Budget->date_start)).") as YTD_A, 
+					SUM(YTD) as YTD, 
+					SUM(".Budget::getYTDSQL(date('n',$Budget->date_start),12).") as ROY_A, 
+					SUM(ROY) as ROY,
+					scnType
+			FROM `vw_master` 
+			LEFT JOIN tbl_scenario ON scnID=scenario
+			$sqlWhere AND Group_code=94 ## Gross margin only
 			GROUP BY `vw_master`.activity, `vw_master`.item
 			ORDER BY prtRHQ, prtGHQ,`vw_master`.activity, `Group`, `vw_master`.itmOrder ASC			
 			";
 			
-			self::firstLevelReport($sql, 'Activity');
+			self::firstLevelReport($sql, 'Activity', $Budget);
 			//==========================================================================================================================Non-customer-related data
 			self::noFirstLevelReport($sqlWhere);
 			?>
@@ -525,8 +556,8 @@ class Reports{
 			ob_flush();
 	}
 	
-	private function firstLevelReport($sql, $firstLevelTitle){
-		global $oSQL;
+	private function firstLevelReport($sql, $firstLevelTitle, $Budget=null){
+		global $oSQL;				
 		
 		if (!$rs = $oSQL->q($sql)){
 				echo "<div class='error'>SQL error:</div>";
@@ -542,9 +573,17 @@ class Reports{
 					<?php echo Budget::getTableHeader(); 
 							echo Budget::getTableHeader('quarterly');
 					?>
-					<th class='budget-ytd'>Total</th>
-					<th>Estimate</th>
+					<th class='budget-ytd'><?php echo $Budget->type=='Budget'?'Budget':'FYE';?></th>
+					<th><?php echo $Budget->type=='Budget'?'Estimate':'Budget';?></th>
 					<th>Diff</th>
+					<th>%</th>
+					<th class='budget-ytd FYE_analysis'>YTD Actual</th>
+					<th class='FYE_analysis'>YTD Budget</th>
+					<th class='FYE_analysis'>Diff</th>
+					<th class='FYE_analysis'>%</th>
+					<th class='budget-ytd FYE_analysis'>ROY Est</th>
+					<th class='FYE_analysis'>ROY Budget</th>
+					<th class='FYE_analysis'>Diff</th>
 					<th>%</th>
 				</tr>
 			</thead>			
@@ -556,7 +595,7 @@ class Reports{
 					if($GroupLevel1 && $GroupLevel1!=$rw['GroupLevel1']){
 						$data = $subtotal[$GroupLevel1];
 						$data['Budget item']=$group;
-						self::echoBudgetItemString($data,'budget-subtotal');
+						self::echoBudgetItemString($data,'budget-subtotal', $Budget);
 					}
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
@@ -567,34 +606,51 @@ class Reports{
 						$local_subtotal += $rw[$month];
 						
 					}
+						
+					$subtotal[$rw['GroupLevel1']]['YTD_A'] += $rw['YTD_A'];
+					$subtotal[$rw['GroupLevel1']]['YTD'] += $rw['YTD'];
+					$subtotal[$rw['GroupLevel1']]['ROY_A'] += $rw['ROY_A'];
+					$subtotal[$rw['GroupLevel1']]['ROY'] += $rw['ROY'];
+					
 					$subtotal[$rw['GroupLevel1']]['Total'] += $local_subtotal;
 					$subtotal[$rw['GroupLevel1']]['estimate'] += $rw['estimate'];
 														
 					
 					$data = $rw;
 					if ($data['GroupLevel1']==$GroupLevel1 && $GroupLevel1) $data['GroupLevel1']="&nbsp;";
-					self::echoBudgetItemString($data,$tr_class);
+					self::echoBudgetItemString($data,$tr_class, $Budget);
 					
 					$GroupLevel1 = $rw['GroupLevel1'];
 					$group = $rw['Group'];
 				}
 				$data = $subtotal[$GroupLevel1];
 				$data['Budget item']=$group;
-				self::echoBudgetItemString($data,'budget-subtotal');
+				self::echoBudgetItemString($data,'budget-subtotal', $Budget);
 				
 				
 			}
 	}
 	
 	private function noFirstLevelReport($sqlWhere){
-		
-		global $oSQL;
+				
+		global $oSQL, $budget_scenario;
+	
+		$Budget = new Budget($budget_scenario);
 	
 		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`, ".Budget::getMonthlySumSQL().", ".
-					Budget::getQuarterlySumSQL().", SUM(".Budget::getYTDSQL().") as Total ,SUM(estimate) as estimate
-			FROM `vw_master` $sqlWhere 
+					Budget::getQuarterlySumSQL().", SUM(".Budget::getYTDSQL().") as Total ,SUM(estimate) as estimate, 
+					SUM(".Budget::getYTDSQL(1, 11-(integer)date('n',$Budget->date_start)).") as YTD_A, 
+					SUM(YTD) as YTD, 
+					SUM(".Budget::getYTDSQL((integer)date('n',$Budget->date_start),12).") as ROY_A, 
+					SUM(ROY) as ROY, 
+					scnType
+			FROM `vw_master`
+			LEFT JOIN tbl_scenario ON scnID=scenario
+			$sqlWhere 
 			GROUP BY `Group`, `Budget item`
 			ORDER BY `Group`, `itmOrder` ASC";
+			
+			// echo '<pre>',$sql,'</pre>';
 			
 			$group = '';
 			$subtotal = Array();
@@ -626,9 +682,17 @@ class Reports{
 				}
 				$subtotal[$rw['Group']]['Total'] += $local_subtotal;
 				$subtotal[$rw['Group']]['estimate'] += $rw['estimate'];
+				$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
+				$subtotal[$rw['Group']]['YTD'] += $rw['YTD'];
+				$subtotal[$rw['Group']]['ROY_A'] += $rw['ROY_A'];
+				$subtotal[$rw['Group']]['ROY'] += $rw['ROY'];
 				
 				$grandTotal['Total'] += $local_subtotal;
 				$grandTotal['estimate'] += $rw['estimate'];
+				$grandTotal['YTD_A'] += $rw['YTD_A'];
+				$grandTotal['YTD'] += $rw['YTD'];
+				$grandTotal['ROY_A'] += $rw['ROY_A'];
+				$grandTotal['ROY'] += $rw['ROY'];
 				
 				self::echoBudgetItemString($rw,$tr_class);				
 				$group = $rw['Group'];
@@ -643,7 +707,8 @@ class Reports{
 			self::echoBudgetItemString($data,'budget-grandtotal');
 	}
 	
-	private function echoBudgetItemString($data, $strClass='' ){		
+	private function echoBudgetItemString($data, $strClass=''){					
+		
 		ob_start();
 		static $GroupLevel1;
 		?>
@@ -674,8 +739,11 @@ class Reports{
 			<?php
 			}
 				$local_subtotal = 0;
+				$ytd = 0;
+				$roy = 0;
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
+					
 					?>
 					<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
 					<?php
@@ -697,6 +765,16 @@ class Reports{
 			<td class='budget-decimal'><?php self::render($data['estimate'],0);?></td>
 			<td class='budget-decimal'><?php self::render($data['Total']-$data['estimate'],0);?></td>
 			<td class='budget-decimal'><em><?php self::render_ratio($data['Total'],$data['estimate']);?></em></td>
+			<!--Data for YTD actual-->
+			<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['YTD'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD'],0);?></td>
+			<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD']);?></em></td>
+			<!--Data for rest-of-year-->
+			<td class='budget-decimal budget-ytd'><?php self::render($data['ROY_A'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['ROY'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['ROY_A']-$data['ROY'],0);?></td>
+			<td class='budget-decimal'><em><?php self::render_ratio($data['ROY_A'],$data['ROY']);?></em></td>
 			<?php
 			}
 			?>
