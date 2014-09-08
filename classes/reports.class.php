@@ -450,7 +450,7 @@ class Reports{
 					Budget::getQuarterlySumSQL().", 
 					SUM(".Budget::getYTDSQL().") as Total, 
 					SUM(estimate) as estimate, 
-					SUM(".Budget::getYTDSQL(1, 11-date('n',$Budget->date_start)).") as YTD_A, 
+					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
 					SUM(YTD) as YTD, 
 					SUM(".Budget::getYTDSQL(date('n',$Budget->date_start),12).") as ROY_A, 
 					SUM(ROY) as ROY, 
@@ -480,7 +480,7 @@ class Reports{
 		ob_start();
 			$sql = "SELECT `Budget item` as 'GroupLevel1', `item` as 'level1_code', `Profit` as 'Budget item', `Group`, `pc` as 'item', ".Budget::getMonthlySumSQL().", ".
 					Budget::getQuarterlySumSQL().", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate, 
-					SUM(".Budget::getYTDSQL(1, 11-date('n',$Budget->date_start)).") as YTD_A, 
+					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
 					SUM(YTD) as YTD, 
 					SUM(".Budget::getYTDSQL(date('n',$Budget->date_start),12).") as ROY_A, 
 					SUM(ROY) as ROY,
@@ -511,7 +511,7 @@ class Reports{
 					Budget::getMonthlySumSQL().", ".
 					Budget::getQuarterlySumSQL().
 					", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate,  
-					SUM(".Budget::getYTDSQL(1, 11-date('n',$Budget->date_start)).") as YTD_A, 
+					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
 					SUM(YTD) as YTD, 
 					SUM(".Budget::getYTDSQL(date('n',$Budget->date_start),12).") as ROY_A, 
 					SUM(ROY) as ROY,
@@ -639,7 +639,7 @@ class Reports{
 	
 		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`, ".Budget::getMonthlySumSQL().", ".
 					Budget::getQuarterlySumSQL().", SUM(".Budget::getYTDSQL().") as Total ,SUM(estimate) as estimate, 
-					SUM(".Budget::getYTDSQL(1, 11-(integer)date('n',$Budget->date_start)).") as YTD_A, 
+					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
 					SUM(YTD) as YTD, 
 					SUM(".Budget::getYTDSQL((integer)date('n',$Budget->date_start),12).") as ROY_A, 
 					SUM(ROY) as ROY, 
@@ -650,7 +650,7 @@ class Reports{
 			GROUP BY `Group`, `Budget item`
 			ORDER BY `Group`, `itmOrder` ASC";
 			
-			// echo '<pre>',$sql,'</pre>';
+			echo '<pre>',$sql,'</pre>';
 			
 			$group = '';
 			$subtotal = Array();
