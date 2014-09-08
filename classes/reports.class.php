@@ -535,20 +535,26 @@ class Reports{
 	
 	public function masterYactbyActivityEst($sqlWhere){
 		global $oSQL;
+		GLOBAL $budget_scenario;
+		$Budget = new Budget($budget_scenario);
 		
 		ob_start();
 			$sql = "SELECT prtGHQ as 'GroupLevel1', activity as 'level1_code', CONCAT(`account`,': ',`Title`) as `Budget item`, Yact_group as `Group`, account as `item`,".
 					Budget::getMonthlySumSQL().", ".
-					Budget::getQuarterlySumSQL().
-					", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate
-			FROM `vw_master` $sqlWhere AND Group_code=94 ## Gross margin only
+					Budget::getQuarterlySumSQL().					
+					", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate,
+					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
+					SUM(YTD) as YTD, 
+					SUM(".Budget::getYTDSQL(date('n',$Budget->date_start),12).") as ROY_A, 
+					SUM(ROY) as ROY					
+			FROM `vw_master` $sqlWhere AND yact_group_code IN ('450000','400000') ## Gross margin only
 			GROUP BY `vw_master`.prtGHQ, `vw_master`.account
 			ORDER BY prtGHQ,`vw_master`.activity, `Yact_group`, `vw_master`.account ASC			
 			";
 			
 			self::firstLevelReport($sql, 'Activity');
 			//==========================================================================================================================Non-customer-related data
-			self::noFirstLevelReport($sqlWhere);
+			self::noFirstLevelReport_YACT($sqlWhere);
 			?>
 			</tbody>
 			</table>
@@ -631,6 +637,82 @@ class Reports{
 			}
 	}
 	
+	private function noFirstLevelReport_YACT($sqlWhere){
+				
+		global $oSQL, $budget_scenario;
+	
+		$Budget = new Budget($budget_scenario);
+	
+		$sql = "SELECT CONCAT(`account`,': ',`Title`) as `Budget item`, `item`, yact_group as `Group`, yact_group_code as `Group_code`, ".Budget::getMonthlySumSQL().", ".
+					Budget::getQuarterlySumSQL().", SUM(".Budget::getYTDSQL().") as Total ,SUM(estimate) as estimate, 
+					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
+					SUM(YTD) as YTD, 
+					SUM(".Budget::getYTDSQL((integer)date('n',$Budget->date_start),12).") as ROY_A, 
+					SUM(ROY) as ROY, 
+					scnType
+			FROM `vw_master`
+			LEFT JOIN tbl_scenario ON scnID=scenario
+			$sqlWhere 
+			GROUP BY `yact_group`, `account`
+			ORDER BY `yact_group`, `account` ASC";
+			
+			// echo '<pre>',$sql,'</pre>';
+			
+			$group = '';
+			$subtotal = Array();
+			$grandTotal = Array();
+			$rs = $oSQL->q($sql);
+			while ($rw=$oSQL->f($rs)){
+				
+				if ($rw['Group_code']==94){
+					$tr_class = "budget-total";
+				} else {
+					$tr_class = 'budget-item';
+				}
+				
+				if($group && $group!=$rw['Group']){
+					$data = $subtotal[$group];
+					$data['Budget item']=$group;
+					self::echoBudgetItemString($data,'budget-subtotal');
+				}
+				
+				//------------------------Collecting subtotals---------------------------------------
+				$local_subtotal = 0;
+				for ($m=1;$m<13;$m++){
+					$month = date('M',mktime(0,0,0,$m,15));
+					$subtotal[$rw['Group']][$month]+=$rw[$month];					
+					$subtotal[$rw['Group']]['Q'.$m]+=$rw['Q'.$m];					
+					$local_subtotal += $rw[$month];
+					$grandTotal[$month] += $rw[$month];
+					$grandTotal['Q'.$m] += $rw['Q'.$m];
+				}
+				$subtotal[$rw['Group']]['Total'] += $local_subtotal;
+				$subtotal[$rw['Group']]['estimate'] += $rw['estimate'];
+				$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
+				$subtotal[$rw['Group']]['YTD'] += $rw['YTD'];
+				$subtotal[$rw['Group']]['ROY_A'] += $rw['ROY_A'];
+				$subtotal[$rw['Group']]['ROY'] += $rw['ROY'];
+				
+				$grandTotal['Total'] += $local_subtotal;
+				$grandTotal['estimate'] += $rw['estimate'];
+				$grandTotal['YTD_A'] += $rw['YTD_A'];
+				$grandTotal['YTD'] += $rw['YTD'];
+				$grandTotal['ROY_A'] += $rw['ROY_A'];
+				$grandTotal['ROY'] += $rw['ROY'];
+				
+				self::echoBudgetItemString($rw,$tr_class);				
+				$group = $rw['Group'];
+			}
+			//last group subtotal
+			$data = $subtotal[$group];
+			$data['Budget item']=$group;
+			self::echoBudgetItemString($data,'budget-subtotal');
+			//Grand total
+			$data = $grandTotal;
+			$data['Budget item']='Grand total';
+			self::echoBudgetItemString($data,'budget-grandtotal');
+	}
+	
 	private function noFirstLevelReport($sqlWhere){
 				
 		global $oSQL, $budget_scenario;
@@ -650,7 +732,7 @@ class Reports{
 			GROUP BY `Group`, `Budget item`
 			ORDER BY `Group`, `itmOrder` ASC";
 			
-			echo '<pre>',$sql,'</pre>';
+			// echo '<pre>',$sql,'</pre>';
 			
 			$group = '';
 			$subtotal = Array();
