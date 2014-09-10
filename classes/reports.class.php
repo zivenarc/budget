@@ -207,11 +207,11 @@ class Reports{
 		global $oSQL;
 		
 		ob_start();
-			$sql = "SELECT account, Title, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total 
+			$sql = "SELECT prtGHQ, account, Title, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total 
 			FROM `vw_master`
 			$sqlWhere
-			GROUP BY account
-			ORDER BY account			
+			GROUP BY prtGHQ, account
+			ORDER BY prtGHQ, account			
 			";
 		$rs = $oSQL->q($sql);
 			if (!$oSQL->num_rows($rs)){
@@ -222,12 +222,13 @@ class Reports{
 			?>
 			<table id='report' class='budget'>
 			<thead>
-				<tr><th>Account</th><th>Title</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
+				<tr><th>Activity</th><th>Account</th><th>Title</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
 			</thead>			
 			<tbody>
 			<?php			
 			while ($rw=$oSQL->f($rs)){
 				echo '<tr>';
+				echo '<th>',$rw['prtGHQ'],'</th>';
 				echo '<th>',$rw['account'],'</th>';
 				echo '<th>',$rw['Title'],'</th>';
 				for ($m=1;$m<13;$m++){
