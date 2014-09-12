@@ -7,6 +7,8 @@ require ('classes/item.class.php');
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 $oBudget = new Budget($budget_scenario);
 
+$startMonth = date('n',$oBudget->date_start);
+
 if($_GET['DataAction']=='update'){
 	$sql = Array();
 	$sql[] = "DELETE FROM reg_profit_ghq WHERE scenario = '$budget_scenario'";
@@ -16,7 +18,7 @@ if($_GET['DataAction']=='update'){
 				LEFT JOIN vw_product_type ON prtID = activity
 				##WHERE item =  '".Items::REVENUE."'
 				WHERE account='J00400'
-				AND scenario =  '$budget_scenario'
+				AND scenario =  '$budget_scenario' AND source NOT IN ('Estimate','Actual')
 				GROUP BY pc, prtGHQ";
 	for ($i=0;$i<count($sql);$i++){
 		// echo '<pre>',$sql[$i],'</pre>';
@@ -68,7 +70,7 @@ if (!isset($_GET['tab'])){
 					<th>Activity</th>
 					<th>PC</th>
 					<?php
-					echo Budget::getTableHeader();
+					echo Budget::getTableHeader('monthly',$startMonth);
 					?>
 					<th>Total</th>
 				</tr>
@@ -76,7 +78,7 @@ if (!isset($_GET['tab'])){
 			<tbody>
 			<?php
 			while ($rw=$oSQL->f($rs)){	
-				for ($m=1;$m<13;$m++) {
+				for ($m=$startMonth;$m<13;$m++) {
 					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
 					$arrGHQ[$rw['prtGHQ']][$rw['pccTitle']][$month] = $rw[$month];
 					$arrSubtotal[$rw['prtGHQ']][$month] += $rw[$month];
@@ -89,7 +91,7 @@ if (!isset($_GET['tab'])){
 
 			foreach ($arrGHQ as $ghq=>$arrPC){
 				
-				for ($m=1;$m<13;$m++) {
+				for ($m=$startMonth;$m<13;$m++) {
 					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
 					if ($arrGrandTotal[$month]) {
 							$arrRatio[$ghq][$month] = $arrSubtotal[$ghq][$month]/$arrGrandTotal[$month]*100;
@@ -147,7 +149,7 @@ if (!isset($_GET['tab'])){
 					<th>PC</th>
 					<th>Activity</th>
 					<?php
-					echo Budget::getTableHeader();
+					echo Budget::getTableHeader('monthly',$startMonth);
 					?>
 					<th>Total</th>
 				</tr>
@@ -155,7 +157,7 @@ if (!isset($_GET['tab'])){
 			<tbody>
 			<?php
 			while ($rw=$oSQL->f($rs)){	
-				for ($m=1;$m<13;$m++) {
+				for ($m=$startMonth;$m<13;$m++) {
 					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
 					$arrPC[$rw['pccTitle']][$rw['prtGHQ']][$month] = $rw[$month];
 					$arrSubtotal[$rw['pccTitle']][$month] += $rw[$month];
@@ -168,7 +170,7 @@ if (!isset($_GET['tab'])){
 
 			foreach ($arrPC as $pc=>$arrGHQ){
 				
-				for ($m=1;$m<13;$m++) {
+				for ($m=$startMonth;$m<13;$m++) {
 					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
 					if ($arrGrandTotal[$month]) {
 							$arrRatio[$pc][$month] = $arrSubtotal[$pc][$month]/$arrGrandTotal[$month]*100;
@@ -216,7 +218,10 @@ if (!isset($_GET['tab'])){
 }
 
 function echoMonthlyTR($data,$class='', $decimal_places=0){
-	for ($m=1;$m<13;$m++) {
+
+	GLOBAL $startMonth;
+
+	for ($m=$startMonth;$m<13;$m++) {
 			$month = strtolower(date('M',mktime(0,0,0,$m,15)));
 			echo '<td class="budget-decimal">',number_format($data[$month],$decimal_places,'.',','),'</td>';
 	}

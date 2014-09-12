@@ -467,7 +467,7 @@ class Indirect_costs extends Document{
 			case 'kaizen':
 				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".Budget::getMonthlySumSQL()." FROM reg_master
 					JOIN vw_product_type ON prtID=activity AND prtGHQ='{$params['prtGHQ']}'
-					WHERE scenario='".$oBudget->id."' AND item='".Items::DIRECT_COSTS."' AND source<>'estimate'
+					WHERE scenario='".$this->budget->id."' AND item='".Items::DIRECT_COSTS."' AND source NOT IN ('estimate','Actual')
 					GROUP BY pc, activity";
 				break;
 			case 'kaizen_revenue':
@@ -494,7 +494,7 @@ class Indirect_costs extends Document{
 			$row->supplier = $this->data[$this->prefix."SupplierID"];
 			for ($m=1;$m<13;$m++){
 				$month = date('M',mktime(0,0,0,$m,15));
-				$row->{$month} = $rw[$month];
+				$row->{$month} = abs($rw[$month]);
 			}
 		}	
 	}
