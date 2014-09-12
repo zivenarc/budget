@@ -256,16 +256,16 @@ class Budget{
 		return($res);
 	}
 		
-	public function getMonthlySQL(){
-		for($m=1;$m<13;$m++){
+	public function getMonthlySQL($start=1, $end=12){
+		for($m=$start;$m<=$end;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`";
 		}
 		$res = implode(',',$arrRes);
 		return($res);
 	}
-	public function getMonthlySumSQL(){
-		for($m=1;$m<13;$m++){
+	public function getMonthlySumSQL($start=1, $end=12){
+		for($m=$start;$m<=$end;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "SUM(`$month`) as '$month'";
 		}
@@ -281,7 +281,7 @@ class Budget{
 		return($res);
 	}
 	
-	public function getTableHeader($type='monthly'){
+	public function getTableHeader($type='monthly', $start=1, $end=12){
 		switch($type){
 			case 'quarterly':
 				for($m=1;$m<5;$m++){
@@ -291,7 +291,7 @@ class Budget{
 				return($res);
 				break;
 			default:
-				for($m=1;$m<13;$m++){
+				for($m=$start;$m<=$end;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
 					$arrRes[] = $month;
 				}

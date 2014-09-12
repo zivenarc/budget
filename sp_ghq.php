@@ -14,11 +14,13 @@ while ($rw = $oSQL->f($rs)){
 	$arrProfit[$rw['pccID']] = $rw;
 }
 
-$sql = "SELECT pc, prtGHQ, ".Budget::getMonthlySumSQL()." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
+$startMonth = date('n',$oBudget->date_start);
+
+$sql = "SELECT pc, prtGHQ, ".Budget::getMonthlySumSQL($startMonth,12)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
 		GROUP BY prtGHQ, pc";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=1;$m<13;$m++){
+	for($m=$startMonth;$m<13;$m++){
 		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrPC[$rw['pc']][$rw['prtGHQ']][$month] += $rw[$month];
 		$arrSubtotal[$rw['pc']][$month] += $rw[$month];
@@ -29,7 +31,7 @@ while ($rw = $oSQL->f($rs)){
 
 foreach($arrPC as $pc=>$arrGhq){
 	foreach ($arrGhq as $ghq=>$values){
-		for($m=1;$m<13;$m++){
+		for($m=$startMonth;$m<13;$m++){
 			$month = (date('M',mktime(0,0,0,$m,15)));
 			$arrRatio[$pc][$ghq][$month] = $arrSubtotal[$pc][$month]?$values[$month]/$arrSubtotal[$pc][$month]:0;
 		}
@@ -38,7 +40,7 @@ foreach($arrPC as $pc=>$arrGhq){
 
 // echo '<pre>';print_r($arrRatio);echo '</pre>';
 
-$sqlFields = "prtGHQ, pc, SUM(Total) as Total, ".Budget::getMonthlySumSQL();
+$sqlFields = "prtGHQ, pc, SUM(Total) as Total, ".Budget::getMonthlySumSQL($startMonth,12);
 
 
 $arrFilter = Array(
@@ -52,7 +54,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=1;$m<13;$m++){
+	for($m=$startMonth;$m<13;$m++){
 		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
@@ -63,8 +65,6 @@ while ($rw = $oSQL->f($rs)){
 $arrFilter = Array(
 	Items::DIRECT_COSTS,
 	Items::INTERCOMPANY_COSTS,
-	Items::CY_RENT,
-	Items::WH_RENT,
 	Items::KAIZEN
 );
 $reportKey = 'Direct costs';
@@ -73,25 +73,26 @@ $sql = "SELECT $sqlFields FROM vw_master
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=1;$m<13;$m++){
+	for($m=$startMonth;$m<13;$m++){
 		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
+	
 
 $reportKey = 'Reclassified fixed costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('J00801', 'J00803','J00804','J00805','J00806','J00808')
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('J00801', 'J00803','J00804','J00805','J00806','J00808','J0080W')
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=1;$m<13;$m++){
+	for($m=$startMonth;$m<13;$m++){
 		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		} else {
-			if (!is_array($arrRatio[$rw['pc']])) echo '<pre>','Error for PC',$arrProfit[$rw['pc']]['pccTitle'], " ({$rw['pc']})"," cannot distribute $month",$rw[$month] ,'</pre>';
+			if (!is_array($arrRatio[$rw['pc']])) error_distribution(Array('data'=>$rw,'reportKey'=>$reportKey,'month'=>$month, 'sql'=>$sql));
 			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
 				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$ratios[$month];
 			}
@@ -102,17 +103,17 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'General costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000' AND pccFLagProd = 1
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000' AND (pccFLagProd = 1 OR prtGHQ is NOT NULL)
 		GROUP by pc, prtGHQ";
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=1;$m<13;$m++){
+	for($m=$startMonth;$m<13;$m++){
 		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		} else {
-			if (!is_array($arrRatio[$rw['pc']])) echo '<pre>','Error for PC',$rw['pc'],' cannot distribute ',$rw[$month] ,'</pre>';
+			if (!is_array($arrRatio[$rw['pc']])) error_distribution(Array('data'=>$rw,'reportKey'=>$reportKey,'month'=>$month, 'sql'=>$sql));
 			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
 				// echo '<pre>distributing pc',$rw['pc'],' to ',$ghq, ', '.$ratios[$month]*100,'</pre>';
 				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$ratios[$month];
@@ -124,7 +125,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'Corporate costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000'  AND pccFLagProd = 0
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000'  AND (pccFLagProd = 0 AND prtGHQ IS NULL)
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -135,7 +136,7 @@ while ($rw = $oSQL->f($rs)){
 		$key = $reportKey;
 	}
 
-	for($m=1;$m<13;$m++){
+	for($m=$startMonth;$m<13;$m++){
 		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$key][$month] += $rw[$month];
@@ -154,7 +155,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=1;$m<13;$m++){
+	for($m=$startMonth;$m<13;$m++){
 		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
@@ -169,11 +170,11 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'N/O income';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account like '60%' 
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account like '60%')
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=1;$m<13;$m++){
+	for($m=$startMonth;$m<13;$m++){
 		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
@@ -193,7 +194,46 @@ $sql = "SELECT $sqlFields FROM vw_master
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=1;$m<13;$m++){
+	for($m=$startMonth;$m<13;$m++){
+		$month = (date('M',mktime(0,0,0,$m,15)));
+		if ($rw['prtGHQ']){
+			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
+		} else {
+			foreach($arrGHQSubtotal as $ghq=>$revenue){
+				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+			}
+		}
+		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+	}
+}
+
+$reportKey = 'Extraordinary income';
+$sql = "SELECT $sqlFields FROM vw_master 
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account like '70%')
+		GROUP by pc, prtGHQ";
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	for($m=$startMonth;$m<13;$m++){
+		$month = (date('M',mktime(0,0,0,$m,15)));
+		if ($rw['prtGHQ']){
+			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
+		} else {
+			foreach($arrGHQSubtotal as $ghq=>$revenue){
+				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+			}
+		}
+		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+	}
+}
+
+
+$reportKey = 'Extraordinary costs';
+$sql = "SELECT $sqlFields FROM vw_master 
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account like '75%' or account like '76%') 
+		GROUP by pc, prtGHQ";
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	for($m=$startMonth;$m<13;$m++){
 		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
@@ -212,7 +252,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=1;$m<13;$m++){
+	for($m=$startMonth;$m<13;$m++){
 		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
@@ -233,7 +273,7 @@ echo '<p>',$oBudget->timestamp,'</p>';
 <table id='report' class='budget'>
 <thead>
 	<th>Item</th>
-	<?php echo Budget::getTableHeader('monthly'); ?>
+	<?php echo Budget::getTableHeader('monthly', $startMonth,12); ?>
 	<th>Total</th>
 </thead>
 <tbody>
@@ -248,7 +288,7 @@ foreach ($arrReport as $ghq=>$arrItems){
 		<tr>
 			<td><?php echo $item;?></td>
 			<?php
-			for ($m=1;$m<13;$m++){
+			for ($m=$startMonth;$m<13;$m++){
 				$month = (date('M',mktime(0,0,0,$m,15)));
 				?>
 				<td class="budget-decimal"><?php Reports::render($values[$month],0);?></td>
@@ -270,7 +310,7 @@ foreach ($arrGrandTotal as $item=>$values){
 		<tr>
 			<td><?php echo $item;?></td>
 			<?php
-			for ($m=1;$m<13;$m++){
+			for ($m=$startMonth;$m<13;$m++){
 				$month = (date('M',mktime(0,0,0,$m,15)));
 				?>
 				<td class="budget-decimal"><?php Reports::render($values[$month],0);?></td>
@@ -286,7 +326,7 @@ foreach ($arrGrandTotal as $item=>$values){
 <tr class="budget-total">
 <td>Total NRBT</td>
 <?php
-for ($m=1;$m<13;$m++){
+for ($m=$startMonth;$m<13;$m++){
 				$month = (date('M',mktime(0,0,0,$m,15)));
 				?>
 				<td class="budget-decimal"><?php Reports::render($arrNRBT[$month],0);?></td>
@@ -329,4 +369,10 @@ foreach($arrGHQSubtotal as $ghq=>$revenue){
 </table>
 <?php
 include ('includes/inc-frame_bottom.php');
+
+function error_distribution($params){
+	GLOBAL $arrProfit;
+	echo '<pre>','Error for PC ',$arrProfit[$params['data']['pc']]['pccTitle'], " ({$params['data']['pc']})"," cannot distribute {$params['reportKey']} in {$params['month']} ({$params['data'][$params['month']]})" ,'</pre>';
+	echo '<pre>',$params['sql'],'</pre>';
+}
 ?>
