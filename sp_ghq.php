@@ -40,7 +40,7 @@ foreach($arrPC as $pc=>$arrGhq){
 
 // echo '<pre>';print_r($arrRatio);echo '</pre>';
 
-$sqlFields = "prtGHQ, pc, SUM(Total) as Total, ".Budget::getMonthlySumSQL($startMonth,12);
+$sqlFields = "prtGHQ, pc, SUM(".Budget::getYTDSQL($startMonth,12).") as Total, ".Budget::getMonthlySumSQL($startMonth,12);
 
 
 $arrFilter = Array(
