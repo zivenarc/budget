@@ -38,9 +38,11 @@ if(!isset($_GET['tab'])){
 		case 'f865db6b-d328-102e-9d25-5de97ba9df63':
 		case 'f865e1de-d328-102e-9d25-5de97ba9df63':
 		case '48b5ae6c-e650-11de-959c-00188bc729d2':
+			Reports::masterByActivityEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
+			break;
 		case 'all':
 			echo "<input type='hidden' id='group' value='activity'/>";
-			Reports::masterByActivityEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
+			Reports::masterByGHQEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
 		break;
 		case 'f865e855-d328-102e-9d25-5de97ba9df63':
 			$sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") OR (customer=9907 AND Group_code=94))";

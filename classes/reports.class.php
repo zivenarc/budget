@@ -518,6 +518,32 @@ class Reports{
 			ob_flush();
 	}
 	
+	public function masterbyGHQEst($sqlWhere, $currency=643){
+		
+		GLOBAL $budget_scenario;
+		$Budget = new Budget($budget_scenario);
+		
+		$strFields = self::_getMonthlyFields($currency);
+		
+		ob_start();
+			$sql = "SELECT prtGHQ as 'GroupLevel1', prtGHQ as 'level1_code', `Budget item`, `Group`, `item`,
+					{$strFields}
+			FROM `vw_master` 			
+			{$sqlWhere} AND Group_code=94 ## Gross margin only
+			GROUP BY `vw_master`.prtGHQ, `vw_master`.item
+			ORDER BY prtGHQ, `Group`, `vw_master`.itmOrder ASC			
+			";
+			
+			self::firstLevelReport($sql, 'Activity', $Budget);
+			//==========================================================================================================================Non-customer-related data
+			self::noFirstLevelReport($sqlWhere, $currency);
+			?>
+			</tbody>
+			</table>
+			<?php			
+			ob_flush();
+	}
+	
 	public function masterYactbyActivityEst($sqlWhere){
 		global $oSQL;
 		
@@ -917,7 +943,7 @@ class Reports{
 	}
 	
 	function render($number, $decimals=0, $dec_separator='.',$thousand_separator=',',$negative='budget-negative'){
-		if (!$number) {
+		if ($number==0) {
 			echo '';
 			return;
 		}
