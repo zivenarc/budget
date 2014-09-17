@@ -441,31 +441,26 @@ class Reports{
 	}
 		
 	
-	public function masterbyCustomerEst($sqlWhere){
+	public function masterbyCustomerEst($sqlWhere, $currency=643){
 		
 		GLOBAL $budget_scenario;
 		$Budget = new Budget($budget_scenario);
 		
+		$strFields = self::_getMonthlyFields($currency);
+		
 		ob_start();
-			$sql = "SELECT Customer_name as 'GroupLevel1', customer as 'level1_code', `Budget item`, `Group`, `item`, ".Budget::getMonthlySumSQL().", ".
-					Budget::getQuarterlySumSQL().", 
-					SUM(".Budget::getYTDSQL().") as Total, 
-					SUM(estimate) as estimate, 
-					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
-					SUM(YTD) as YTD, 
-					SUM(".Budget::getYTDSQL(date('n',$Budget->date_start),12).") as ROY_A, 
-					SUM(ROY) as ROY, 
-					scnType
+			$sql = "SELECT Customer_name as 'GroupLevel1', customer as 'level1_code', `Budget item`, `Group`, `item`, 
+			{$strFields}
 			FROM `vw_master` 
 			LEFT JOIN tbl_scenario ON scnID=scenario
-			$sqlWhere AND Group_code=94 ## Gross margin only
+			{$sqlWhere} AND Group_code=94 ## Gross margin only
 			GROUP BY `vw_master`.customer, `vw_master`.item
 			ORDER BY `vw_master`.customer, `Group`, `vw_master`.itmOrder ASC			
 			";
 			
 			self::firstLevelReport($sql, 'Customer', $Budget);
 			//==========================================================================================================================Non-customer-related data
-			self::noFirstLevelReport($sqlWhere);
+			self::noFirstLevelReport($sqlWhere, $currency);
 			?>
 			</tbody>
 			</table>
@@ -473,22 +468,16 @@ class Reports{
 			ob_flush();
 	}
 	
-	public function masterbyProfitEst($sqlWhere){
+	public function masterbyProfitEst($sqlWhere, $currency=643){
 		
-		GLOBAL $budget_scenario;
-		$Budget = new Budget($budget_scenario);
+		$strFields = self::_getMonthlyFields($currency);
 		
 		ob_start();
-			$sql = "SELECT `Budget item` as 'GroupLevel1', `item` as 'level1_code', `Profit` as 'Budget item', `Group`, `pc` as 'item', ".Budget::getMonthlySumSQL().", ".
-					Budget::getQuarterlySumSQL().", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate, 
-					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
-					SUM(YTD) as YTD, 
-					SUM(".Budget::getYTDSQL(date('n',$Budget->date_start),12).") as ROY_A, 
-					SUM(ROY) as ROY,
-					scnType
+			$sql = "SELECT `Budget item` as 'GroupLevel1', `item` as 'level1_code', `Profit` as 'Budget item', `Group`, `pc` as 'item', 
+			{$strFields}
 			FROM `vw_master` 
-			LEFT JOIN tbl_scenario ON scnID=scenario
-			$sqlWhere 
+			##LEFT JOIN tbl_scenario ON scnID=scenario
+			{$sqlWhere}
 			GROUP BY `item`, `pc`
 			ORDER BY `Group`, level1_code, item
 			";
@@ -502,23 +491,18 @@ class Reports{
 			ob_flush();
 	}
 	
-	public function masterbyActivityEst($sqlWhere){
+	public function masterbyActivityEst($sqlWhere, $currency=643){
 		
 		GLOBAL $budget_scenario;
 		$Budget = new Budget($budget_scenario);
 		
+		$strFields = self::_getMonthlyFields($currency);
+		
 		ob_start();
-			$sql = "SELECT Activity_title as 'GroupLevel1', activity as 'level1_code', `Budget item`, `Group`, `item`,".
-					Budget::getMonthlySumSQL().", ".
-					Budget::getQuarterlySumSQL().
-					", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate,  
-					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
-					SUM(YTD) as YTD, 
-					SUM(".Budget::getYTDSQL(date('n',$Budget->date_start),12).") as ROY_A, 
-					SUM(ROY) as ROY,
-					scnType
+			$sql = "SELECT Activity_title as 'GroupLevel1', activity as 'level1_code', `Budget item`, `Group`, `item`,
+					{$strFields}
 			FROM `vw_master` 
-			LEFT JOIN tbl_scenario ON scnID=scenario
+			##LEFT JOIN tbl_scenario ON scnID=scenario
 			$sqlWhere AND Group_code=94 ## Gross margin only
 			GROUP BY `vw_master`.activity, `vw_master`.item
 			ORDER BY prtRHQ, prtGHQ,`vw_master`.activity, `Group`, `vw_master`.itmOrder ASC			
@@ -526,7 +510,7 @@ class Reports{
 			
 			self::firstLevelReport($sql, 'Activity', $Budget);
 			//==========================================================================================================================Non-customer-related data
-			self::noFirstLevelReport($sqlWhere);
+			self::noFirstLevelReport($sqlWhere, $currency);
 			?>
 			</tbody>
 			</table>
@@ -536,26 +520,22 @@ class Reports{
 	
 	public function masterYactbyActivityEst($sqlWhere){
 		global $oSQL;
-		GLOBAL $budget_scenario;
-		$Budget = new Budget($budget_scenario);
+		
+		$strFields = self::_getMonthlyFields($currency);
 		
 		ob_start();
-			$sql = "SELECT prtGHQ as 'GroupLevel1', activity as 'level1_code', CONCAT(`account`,': ',`Title`) as `Budget item`, Yact_group as `Group`, account as `item`,".
-					Budget::getMonthlySumSQL().", ".
-					Budget::getQuarterlySumSQL().					
-					", SUM(".Budget::getYTDSQL().") as Total, SUM(estimate) as estimate,
-					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
-					SUM(YTD) as YTD, 
-					SUM(".Budget::getYTDSQL(date('n',$Budget->date_start),12).") as ROY_A, 
-					SUM(ROY) as ROY					
-			FROM `vw_master` $sqlWhere AND yact_group_code IN ('450000','400000') ## Gross margin only
+			$sql = "SELECT prtGHQ as 'GroupLevel1', activity as 'level1_code', CONCAT(`account`,': ',`Title`) as `Budget item`, Yact_group as `Group`, account as `item`,
+					{$strFields}				
+			FROM `vw_master` 
+			{$sqlWhere} 
+			AND yact_group_code IN ('450000','400000') ## Gross margin only
 			GROUP BY `vw_master`.prtGHQ, `vw_master`.account
 			ORDER BY prtGHQ,`vw_master`.activity, `Yact_group`, `vw_master`.account ASC			
 			";
 			
 			self::firstLevelReport($sql, 'Activity');
 			//==========================================================================================================================Non-customer-related data
-			self::noFirstLevelReport_YACT($sqlWhere);
+			self::noFirstLevelReport_YACT($sqlWhere, $currency);
 			?>
 			</tbody>
 			</table>
@@ -640,19 +620,14 @@ class Reports{
 	
 	private function noFirstLevelReport_YACT($sqlWhere){
 				
-		global $oSQL, $budget_scenario;
-	
-		$Budget = new Budget($budget_scenario);
-	
-		$sql = "SELECT CONCAT(`account`,': ',`Title`) as `Budget item`, `item`, yact_group as `Group`, yact_group_code as `Group_code`, ".Budget::getMonthlySumSQL().", ".
-					Budget::getQuarterlySumSQL().", SUM(".Budget::getYTDSQL().") as Total ,SUM(estimate) as estimate, 
-					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
-					SUM(YTD) as YTD, 
-					SUM(".Budget::getYTDSQL((integer)date('n',$Budget->date_start),12).") as ROY_A, 
-					SUM(ROY) as ROY, 
-					scnType
+		global $oSQL;
+		
+		$strFields = self::_getMonthlyFields($currency);
+		
+		$sql = "SELECT CONCAT(`account`,': ',`Title`) as `Budget item`, `item`, yact_group as `Group`, yact_group_code as `Group_code`, 
+			{$strFields}
 			FROM `vw_master`
-			LEFT JOIN tbl_scenario ON scnID=scenario
+			##LEFT JOIN tbl_scenario ON scnID=scenario
 			$sqlWhere 
 			GROUP BY `yact_group`, `account`
 			ORDER BY `yact_group`, `account` ASC";
@@ -714,22 +689,17 @@ class Reports{
 			self::echoBudgetItemString($data,'budget-grandtotal');
 	}
 	
-	private function noFirstLevelReport($sqlWhere){
+	private function noFirstLevelReport($sqlWhere, $currency=643){
 				
-		global $oSQL, $budget_scenario;
-	
-		$Budget = new Budget($budget_scenario);
-	
-		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`, ".Budget::getMonthlySumSQL().", ".
-					Budget::getQuarterlySumSQL().", SUM(".Budget::getYTDSQL().") as Total ,SUM(estimate) as estimate, 
-					SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1).") as YTD_A, 
-					SUM(YTD) as YTD, 
-					SUM(".Budget::getYTDSQL((integer)date('n',$Budget->date_start),12).") as ROY_A, 
-					SUM(ROY) as ROY, 
-					scnType
+		global $oSQL;		
+		
+		$strFields = self::_getMonthlyFields($currency);
+		
+		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`, 
+					{$strFields}
 			FROM `vw_master`
-			LEFT JOIN tbl_scenario ON scnID=scenario
-			$sqlWhere 
+			##LEFT JOIN tbl_scenario ON scnID=scenario
+			{$sqlWhere} 
 			GROUP BY `Group`, `Budget item`
 			ORDER BY `Group`, `itmOrder` ASC";
 			
@@ -788,6 +758,24 @@ class Reports{
 			$data = $grandTotal;
 			$data['Budget item']='Grand total';
 			self::echoBudgetItemString($data,'budget-grandtotal');
+	}
+	
+	private function _getMonthlyFields($currency){
+		GLOBAL $budget_scenario;
+		$Budget = new Budget($budget_scenario);
+		$arrRates = $Budget->getMonthlyRates($currency);
+		
+		$res=	Budget::getMonthlySumSQL(1,12,$arrRates).", ".
+				Budget::getQuarterlySumSQL($arrRates).", 
+				SUM(".Budget::getYTDSQL(1,12,$arrRates).") as Total ,
+				SUM(estimate/{$arrRates['YTD']}) as estimate, 
+				SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1,$arrRates).") as YTD_A, 
+				SUM(YTD/{$arrRates['YTD']}) as YTD, 
+				SUM(".Budget::getYTDSQL((integer)date('n',$Budget->date_start),12,$arrRates).") as ROY_A, 
+				SUM(ROY/{$arrRates['YTD']}) as ROY";
+		
+		return ($res);
+		
 	}
 	
 	private function echoBudgetItemString($data, $strClass=''){					

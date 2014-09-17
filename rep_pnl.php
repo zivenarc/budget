@@ -3,7 +3,7 @@ require ('common/auth.php');
 require ('classes/budget.class.php');
 
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
-
+$currency = isset($_GET['currency'])?$_GET['currency']:643;
 
 if(!isset($_GET['tab'])){
 	$oBudget = new Budget($budget_scenario);
@@ -19,6 +19,15 @@ if(!isset($_GET['tab'])){
 } else {
 	require ('classes/reports.class.php');
 	include ('includes/inc_report_buttons.php');
+	
+	if(isset($_GET['currency'])){
+		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
+		$rs = $oSQL->q($sql);
+		$rw = $oSQL->f($rs);
+		echo '<h2>',$rw["curTitle$strLocal"],'</h2>';
+	}
+	
+	
 	if ($_GET['tab']=='all'){
 		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
 		$sqlWhere = "WHERE pc in (SELECT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1)";
@@ -31,13 +40,13 @@ if(!isset($_GET['tab'])){
 		case '48b5ae6c-e650-11de-959c-00188bc729d2':
 		case 'all':
 			echo "<input type='hidden' id='group' value='activity'/>";
-			Reports::masterByActivityEst($sqlWhere." AND scenario='$budget_scenario'");	
+			Reports::masterByActivityEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
 		break;
 		case 'f865e855-d328-102e-9d25-5de97ba9df63':
 			$sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") OR (customer=9907 AND Group_code=94))";
 		default:
 			echo "<input type='hidden' id='group' value='customer'/>";
-			Reports::masterByCustomerEst($sqlWhere." AND scenario='$budget_scenario'");
+			Reports::masterByCustomerEst($sqlWhere." AND scenario='$budget_scenario'",$currency);
 			break;
 	}
 	?>

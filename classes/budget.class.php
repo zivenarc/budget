@@ -247,10 +247,15 @@ class Budget{
 		return($this->settings);
 	}
 	
-	public function getYTDSQL($mStart=1, $mEnd=12){
+	public function getYTDSQL($mStart=1, $mEnd=12, $arrRates = null){
 		for($m=$mStart;$m<=$mEnd;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
-			$arrRes[] = "`$month`";
+			
+			if (is_array($arrRates)){				
+				$arrRes[] = "`$month`/{$arrRates[$month]}";
+			} else {
+				$arrRes[] = "`$month`";
+			}
 		}
 		$res = implode('+',$arrRes);
 		return($res);
@@ -264,19 +269,31 @@ class Budget{
 		$res = implode(',',$arrRes);
 		return($res);
 	}
-	public function getMonthlySumSQL($start=1, $end=12){
+	public function getMonthlySumSQL($start=1, $end=12, $arrRates = null){
 		for($m=$start;$m<=$end;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
-			$arrRes[] = "SUM(`$month`) as '$month'";
+			if (is_array($arrRates)){				
+				$arrRes[] = "SUM(`$month`)/{$arrRates[$month]} as '$month'";
+			} else {
+				$arrRes[] = "SUM(`$month`) as '$month'";
+			}			
+			
 		}
 		$res = implode(',',$arrRes);
 		return($res);
 	}
 	
-	public function getQuarterlySumSQL(){
-			for($m=1;$m<5;$m++){
-			$arrRes[] = "SUM(`Q$m`) as 'Q$m'";
-		}
+	public function getQuarterlySumSQL($arrRates = null){
+			if(is_array($arrRates)){
+				$arrRes[] = "SUM(`Jan`/{$arrRates['Jan']}+`Feb`/{$arrRates['Feb']}+`Mar`/{$arrRates['Mar']}) as 'Q1'";
+				$arrRes[] = "SUM(`Apr`/{$arrRates['Apr']}+`May`/{$arrRates['May']}+`Jun`/{$arrRates['Jun']}) as 'Q2'";
+				$arrRes[] = "SUM(`Jul`/{$arrRates['Jul']}+`Aug`/{$arrRates['Aug']}+`Sep`/{$arrRates['Sep']}) as 'Q3'";
+				$arrRes[] = "SUM(`Oct`/{$arrRates['Oct']}+`Nov`/{$arrRates['Nov']}+`Dec`/{$arrRates['Dec']}) as 'Q4'";
+			} else {
+				for($m=1;$m<5;$m++){			
+					$arrRes[] = "SUM(`Q$m`) as 'Q$m'";
+				}
+			}
 		$res = implode(',',$arrRes);
 		return($res);
 	}
@@ -327,10 +344,15 @@ class Budget{
 				
 			}
 			$rs = $oSQL->q($sql);
-			while ($rw=$oSQL->f($rs)){
-				echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=",$rw['pccGUID'],"'>",$rw['pccTitle'],"</a></li>\r\n";
+			
+			if (isset($_GET['currency'])){
+				$strCurrencyURL = "&currency=".$_GET['currency'];
 			}
-			echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=all'>All</a></li>\r\n";
+			
+			while ($rw=$oSQL->f($rs)){
+				echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}{$strCurrencyURL}&tab=",$rw['pccGUID'],"'>",$rw['pccTitle'],"</a></li>\r\n";
+			}
+			echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}{$strCurrencyURL}&tab=all'>All</a></li>\r\n";
 			?>
 			</ul>
 		</div>
@@ -435,6 +457,69 @@ class Budget{
 		$res = ob_get_clean();
 		return($res);
 	}
+	
+	public function getMonthlyRates($currency){		
+		
+		$res = Array();
+		for($m=1;$m<=12;$m++){
+				$month = date('M',mktime(0,0,0,$m,15));
+				$res[$month] = 1;
+		}
+		$res['YTD']=1;$res['ROY']=1;
+		
+		if ($currency==643){
+			return ($res);
+		}
+		
+		$start_month = date('n',$this->date_start);
+		
+		$sql = "SELECT * FROM common_db.tbl_currency WHERE curID={$currency}";
+		$rs = $this->oSQL->q($sql);
+		
+		if ($this->oSQL->num_rows($rs)){
+			$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate) as Rate
+						FROM common_db.tbl_rate_history
+						WHERE erhCurrencyID={$currency} 
+							AND YEAR(erhDate)={$this->year} 
+							AND MONTH(erhDate)<{$start_month}
+						GROUP BY DATE_FORMAT(erhDate,'%b')";
+			
+			$rs = $this->oSQL->q($sql);
+			while ($rw = $this->oSQL->f($rs)){
+				$res[$rw['month']] = $rw['Rate'];
+			}
+			
+			$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency 
+						WHERE curTitle=scvVariableID AND scvScenarioID='{$this->id}'
+							AND curID={$currency}";
+			$rs = $this->oSQL->q($sql);
+			$rw = $this->oSQL->f($rs);
+			
+			for($m=$start_month;$m<=12;$m++){
+				$month = date('M',mktime(0,0,0,$m,15));
+				$res[$month] = $rw['Rate'];
+			}
+			
+			$res['ROY'] = $res['Dec'];
+			
+			$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency, tbl_scenario
+						WHERE curTitle=scvVariableID AND scvScenarioID=scnLastID
+							AND scnID='{$this->id}'
+							AND curID={$currency}";
+
+			$rs = $this->oSQL->q($sql);
+			$rw = $this->oSQL->f($rs);
+			$res['YTD'] = $rw['Rate'];
+			
+			return ($res);
+			
+		} else {
+			return (false);
+		}
+		
+		
+	}
+	
 }
 
 ?>
