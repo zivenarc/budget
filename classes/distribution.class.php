@@ -277,7 +277,7 @@ class Distribution extends Document{
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
 					$master_row->activity = $total['activity'];
-					$master_row->customer = 0;					
+					$master_row->customer = self::EMPTY_CUSTOMER;					
 					$item = $Items->getById($this->item);
 					$master_row->account = $item->getYACT($this->profit);
 					$master_row->item = $this->item;
