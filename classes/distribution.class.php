@@ -12,6 +12,8 @@ $arrCSS[] = '../common/eiseGrid/eiseGrid.css';
 
 class Distribution extends Document{
 	
+	const EMPTY_CUSTOMER = 1894;
+	
 	function __construct($id=''){
 		GLOBAL $strLocal;
 		//GLOBAL $arrUsrData;
@@ -249,7 +251,7 @@ class Distribution extends Document{
 						WHERE scenario='{$this->scenario}'
 							AND pc='{$this->profit}'
 							AND item='{$this->item}'
-							AND customer is null
+							AND IFNULL(customer,".self::EMPTY_CUSTOMER.")=".self::EMPTY_CUSTOMER."
 						GROUP BY activity;";
 				$rs = $this->oSQL->q($sql);
 				while ($total = $this->oSQL->f($rs)){				
