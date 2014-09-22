@@ -85,43 +85,17 @@ $reportKey = 'Reclassified fixed costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('J00801', 'J00803','J00804','J00805','J00806','J00808','J0080W')
 		GROUP by pc, prtGHQ";
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
-		$month = (date('M',mktime(0,0,0,$m,15)));
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		} else {
-			if (!is_array($arrRatio[$rw['pc']])) error_distribution(Array('data'=>$rw,'reportKey'=>$reportKey,'month'=>$month, 'sql'=>$sql));
-			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
-				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$ratios[$month];
-			}
-		}
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-}
+
+distribute($reportKey, $sql);
+
+
 
 $reportKey = 'General costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000' AND (pccFLagProd = 1 OR prtGHQ is NOT NULL)
 		GROUP by pc, prtGHQ";
-// echo '<pre>',$sql,'</pre>';
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
-		$month = (date('M',mktime(0,0,0,$m,15)));
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		} else {
-			if (!is_array($arrRatio[$rw['pc']])) error_distribution(Array('data'=>$rw,'reportKey'=>$reportKey,'month'=>$month, 'sql'=>$sql));
-			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
-				// echo '<pre>distributing pc',$rw['pc'],' to ',$ghq, ', '.$ratios[$month]*100,'</pre>';
-				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$ratios[$month];
-			}
-		}
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-}
+
+distribute($reportKey, $sql);
 
 $reportKey = 'Corporate costs';
 $sql = "SELECT $sqlFields FROM vw_master 
@@ -374,5 +348,33 @@ function error_distribution($params){
 	GLOBAL $arrProfit;
 	echo '<pre>','Error for PC ',$arrProfit[$params['data']['pc']]['pccTitle'], " ({$params['data']['pc']})"," cannot distribute {$params['reportKey']} in {$params['month']} ({$params['data'][$params['month']]})" ,'</pre>';
 	echo '<pre>',$params['sql'],'</pre>';
+}
+
+function distribute($reportKey, $sql){
+	GLOBAL $oSQL;
+	GLOBAl $startMonth;
+	GLOBAl $arrReport;
+	GLOBAL $arrGrandTotal;
+	GLOBAL $arrRatio;
+	
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		for($m=$startMonth;$m<13;$m++){
+			$month = (date('M',mktime(0,0,0,$m,15)));
+			if ($rw[$month]!=0){
+				if ($rw['prtGHQ']){
+					$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
+				} else {
+					if (!is_array($arrRatio[$rw['pc']])) error_distribution(Array('data'=>$rw,'reportKey'=>$reportKey,'month'=>$month, 'sql'=>$sql));
+					foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
+						$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$ratios[$month];
+					}
+				}
+				$arrGrandTotal[$reportKey][$month] += $rw[$month];
+			} else {
+				//skip;
+			} 
+		}
+	}	
 }
 ?>

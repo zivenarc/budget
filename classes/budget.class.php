@@ -458,7 +458,7 @@ class Budget{
 		return($res);
 	}
 	
-	public function getMonthlyRates($currency){		
+	public function getMonthlyRates($currency=643){		
 		
 		$res = Array();
 		for($m=1;$m<=12;$m++){
@@ -467,7 +467,7 @@ class Budget{
 		}
 		$res['YTD']=1;$res['ROY']=1;
 		
-		if ($currency==643){
+		if ($currency==643 || !$currency){
 			return ($res);
 		}
 		
