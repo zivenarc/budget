@@ -257,7 +257,11 @@ class Budget{
 				$arrRes[] = "`$month`";
 			}
 		}
-		$res = implode('+',$arrRes);
+		if(is_array($arrRes)){
+			$res = implode('+',$arrRes);
+		} else {
+			$res = '0';
+		}
 		return($res);
 	}
 		
