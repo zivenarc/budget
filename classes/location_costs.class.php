@@ -293,49 +293,42 @@ class Location_costs extends Document{
 			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new budget_session($this->scenario, $this->GUID);
 			
+			
+			$sqlSelect = "SELECT pc,pccTitle, activity, prtTitle, ".Budget::getMonthlySumSQL();
+			$sqlFrom = " FROM reg_headcount 
+							LEFT JOIN vw_profit ON pccID=pc
+							LEFT JOIN vw_product_type ON prtID=activity";
+			$sqlWhere = " WHERE scenario='{$this->scenario}' 
+							AND location=".(integer)$this->location." 
+							AND posted=1";
+			$sqlGroup = " GROUP BY pc, activity";
+			
 			switch ($this->distribution){
 				case 'all':
-					$sql = "SELECT pc,pccTitle, ".Budget::getMonthlySumSQL()." FROM reg_headcount 
-						LEFT JOIN vw_profit ON pccID=pc
-						WHERE scenario='{$this->scenario}' 
-								AND location=".(integer)$this->location." 
-								AND posted=1
-						GROUP BY pc";
+					//change nothing
 					break;
 				case 'wc':
-					$sql = "SELECT pc,pccTitle, ".Budget::getMonthlySumSQL()." FROM reg_headcount 
-						LEFT JOIN vw_profit ON pccID=pc
-						WHERE scenario='{$this->scenario}' 
-								AND location=".(integer)$this->location." 
-								AND posted=1
-								AND wc=1
-						GROUP BY pc";
+					$sqlWhere .= " AND wc=1";						
 					break;
 				case 'bc':
-					$sql = "SELECT pc,pccTitle, ".Budget::getMonthlySumSQL()." FROM reg_headcount 
-						LEFT JOIN vw_profit ON pccID=pc
-						WHERE scenario='{$this->scenario}' 
-								AND location=".(integer)$this->location." 
-								AND posted=1
-								AND wc=0
-						GROUP BY pc";
+					$sqlWhere = " AND wc=0";
 					break;
 				case 'users':
-						$sql = "SELECT pc,pccTitle, ".Budget::getMonthlySumSQL()." FROM reg_headcount 
-						LEFT JOIN vw_profit ON pccID=pc
-						LEFT JOIN vw_employee ON empGUID1C=particulars
-						JOIN stbl_user ON usrEmployeeID = empID
-						WHERE scenario='{$this->scenario}' 
-								AND location=".(integer)$this->location." 
-								AND posted=1								
-						GROUP BY pc";
+						$sqlFrom .= " LEFT JOIN vw_employee ON empGUID1C=particulars
+										JOIN stbl_user ON usrEmployeeID = empID";
 					break;
 			
 			}
 			
+			$sql = $sqlSelect.$sqlFrom.$sqlWhere.$sqlGroup;
 			// echo '<pre>';print($sql);echo '</pre>';						
 			
 			$rs = $this->oSQL->q($sql);	
+			
+			if (!$this->oSQL->num_rows($rs)){
+				die ('ERROR: No data found for this location');
+			}
+			
 			$headcount = array();
 			while ($rw = $this->oSQL->f($rs)){
 				$arrLoc[] = $rw;
@@ -346,7 +339,7 @@ class Location_costs extends Document{
 					$avg +=  $rw[$month];
 				}
 				$avg = $avg/12;
-				$arrPostComment[] = $rw['pccTitle']." - ".number_format($avg,1,'.',',');
+				$arrPostComment[] = "{$rw['pccTitle']}({$rw['prtTitle']}) - ".number_format($avg,1,'.',',');
 			}
 						
 			
@@ -359,7 +352,7 @@ class Location_costs extends Document{
 					
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $hc_data['pc'];
-						$master_row->activity = $record->activity;
+						$master_row->activity = $hc_data['activity'];
 						$master_row->customer = $record->customer;										
 						//$activity = $Activities->getByCode($record->activity);
 						$denominator = $record->period=='annual'?12:1;
