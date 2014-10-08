@@ -300,7 +300,8 @@ class Location_costs extends Document{
 							LEFT JOIN vw_product_type ON prtID=activity";
 			$sqlWhere = " WHERE scenario='{$this->scenario}' 
 							AND location=".(integer)$this->location." 
-							AND posted=1";
+							AND posted=1
+							AND salary>0";
 			$sqlGroup = " GROUP BY pc, activity";
 			
 			switch ($this->distribution){
@@ -339,7 +340,7 @@ class Location_costs extends Document{
 					$avg +=  $rw[$month];
 				}
 				$avg = $avg/12;
-				$arrPostComment[] = "{$rw['pccTitle']}({$rw['prtTitle']}) - ".number_format($avg,1,'.',',');
+				$arrPostComment[] = "{$rw['pccTitle']} ({$rw['prtTitle']}) - ".number_format($avg,1,'.',',');
 			}
 						
 			
