@@ -677,7 +677,7 @@ class Headcount extends Document{
 					
 				for($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
-					$master_row->{$month} = - 0.13 * $payroll[$month];
+					$master_row->{$month} = - 14/29.6/12 * $payroll[$month];
 				}
 				
 				//-----------------------------------------------------------------Canteen
