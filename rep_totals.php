@@ -10,7 +10,7 @@ $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$bud
 $oBudget = new Budget($budget_scenario);
 $denominator = isset($_GET['denominator'])?(double)$_GET['denominator']:1;
 
-$arrJS[] = 'js/rep_pnl.js';
+$arrJS[] = 'js/rep_totals.js';
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 if ($denominator!=1) {
