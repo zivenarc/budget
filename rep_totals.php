@@ -116,6 +116,15 @@ foreach($arrReport as $group=>$arrItem){
 ?>
 </tbody>
 <tfoot>
+	<tr>
+		<th>Branch</th>
+		<?php foreach($arrProfit as $pc=>$flag){
+					echo '<th>',$pc,'</th>';
+		};?>
+		<th class='budget-ytd'>Total</th>
+		<th>Last</th>
+		<th>Diff</th>
+	</tr>
 	<tr class="budget-total">
 		<td>Total result</td>
 <?php
