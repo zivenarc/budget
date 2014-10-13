@@ -28,9 +28,11 @@ class Reports{
 			<tbody>
 			<?php
 			while ($rw=$oSQL->f($rs)){
-				echo '<tr>';
+				?>
+				<tr class='graph'>
+				<?php
 				echo "<td><a href='javascript:getCustomerKPI({activity:{$rw['prtID']}});'>",$rw['Activity'],'</a></td>';
-				echo '<td>',$rw['Unit'],'</td>';
+				echo '<td class="unit">',$rw['Unit'],'</td>';
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",number_format($rw[$month],0,'.',','),'</td>';

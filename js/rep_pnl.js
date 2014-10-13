@@ -1,3 +1,21 @@
+google.load("visualization", "1", {packages:["corechart"]});
+
+var months = Array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+
+function drawChart(arrData, target, options){
+	var data = google.visualization.arrayToDataTable(arrData);
+	
+	var options = options || {
+		title: arrData[0][1],
+		hAxis: {title: 'Month', textStyle: {fontSize:10}},
+		height: 400,
+		legend: { position: "none" }
+	};
+	
+	var chart = new google.visualization.ColumnChart(target);
+	chart.draw(data, options);
+}
+
 var tabs_options = {beforeLoad: function( event, ui ) {
 				$(ui.panel).html(spinner_div());
 				ui.jqXHR.error(function() {
@@ -13,6 +31,7 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 				},
 				load: function (event, ui) {
 					init_panel(ui.panel); 
+					console.log(ui);
 					localStorage.repPnlTab = $(this).tabs('option','active');
 				},	
 			};
@@ -22,6 +41,8 @@ function spinner_div(){
 	return (res);
 }
 
+var header = document.title;
+
 $(document).ready(function(){
 	$('#tabs').tabs(tabs_options);
 	$('#budget_scenario').change(function(){		
@@ -29,6 +50,7 @@ $(document).ready(function(){
 		console.log($(this));
 		$('#scenario').submit();
 	});
+		
 	
 });
 
@@ -69,6 +91,19 @@ function init_panel(o){
 						$('#'+report_id).find('tr').removeClass('report-selected');
 						var tr = $(this).parent('tr');
 						tr.addClass('report-selected');
+						if (tr.hasClass('graph')){							
+							var ggData = [['Month',$('td:first',tr).text()]];
+							var mV;
+							for (i=0;i<12;i++){
+								mV = parseInt($('td.budget-'+months[i],tr).text().replace(',',''));
+								ggData.push([months[i],mV]);
+							}
+							console.log (ggData);
+							
+							drawChart(ggData, $('#graph',o).get(0));
+							
+						}
+						
 					});
 				});
 				
