@@ -401,7 +401,11 @@ class Indirect_costs extends Document{
 			if(is_array($this->records[$this->gridName])){
 			
 				foreach($this->records[$this->gridName] as $id=>$record){
-
+						
+						if ($record->item == Items::WH_RENT) {
+							$record->customer = 1894;
+						}
+						
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $record->profit;
 						$master_row->activity = $record->activity;

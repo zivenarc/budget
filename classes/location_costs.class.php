@@ -349,7 +349,9 @@ class Location_costs extends Document{
 				foreach($this->records[$this->gridName] as $id=>$record){
 					foreach($arrLoc as $loc=>$hc_data){
 						
-						
+						if ($record->item == Items::WH_RENT) {
+							$record->customer = 1894;
+						}
 					
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $hc_data['pc'];
