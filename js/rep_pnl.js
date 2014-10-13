@@ -1,4 +1,6 @@
-google.load("visualization", "1", {packages:["corechart"]});
+if (window.google){
+	google.load("visualization", "1", {packages:["corechart"]});
+}
 
 var months = Array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 
