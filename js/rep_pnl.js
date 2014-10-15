@@ -10,6 +10,8 @@ function drawChart(arrData, target, options){
 	var options = options || {
 		title: arrData[0][1],
 		hAxis: {title: 'Month', textStyle: {fontSize:10}},
+		series: {0:{targetAxisIndex:0},
+				1: {targetAxisIndex:1, type: "line",annotations: {pointShape:'square'}}},
 		height: 400,
 		legend: { position: "none" }
 	};
@@ -93,16 +95,25 @@ function init_panel(o){
 						$('#'+report_id).find('tr').removeClass('report-selected');
 						var tr = $(this).parent('tr');
 						tr.addClass('report-selected');
-						if (tr.hasClass('graph')){							
-							var ggData = [['Month',$('td:first',tr).text()]];
+						if (tr.hasClass('graph')){		
+							var activity = $('td:first',tr).text();
+							var ggData = [['Month',activity, 'Productivity']];
 							var mV;
-							for (i=0;i<12;i++){
-								mV = parseInt($('td.budget-'+months[i],tr).text().replace(',',''));
-								ggData.push([months[i],mV]);
-							}
+							
+							
+							
+							var request = {'pccGUID':localStorage.pccGUID,'activity':activity,'budget_scenario':$('#budget_scenario').val()};													
+							$.post('rep_headcount.php',request, function(data){
+								console.log(data);
+								for (i=0;i<12;i++){
+									mV = parseInt($('td.budget-'+months[i],tr).text().replace(',',''));
+									headcount = data[months[i]];
+									ggData.push([months[i],mV, headcount!=0?mV/headcount:null]);
+								}
+								drawChart(ggData, $('#graph',o).get(0));							
+							});
 							console.log (ggData);
 							
-							drawChart(ggData, $('#graph',o).get(0));
 							
 						}
 						
@@ -170,7 +181,7 @@ function getSource(data){
 			// $(this).html('Lorem ipsum');
 		// }
 	// });
-	console.log(data);
+	// console.log(data);
 				
 }
 
@@ -191,5 +202,5 @@ function getCustomerKPI(data){
 			// $(this).html('Lorem ipsum');
 		// }
 	// });
-	console.log(data);
+	// console.log(data);
 }
