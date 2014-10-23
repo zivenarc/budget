@@ -225,6 +225,14 @@ class Sales extends Document{
 			$this->customer = isset($_POST[$this->prefix.'CustomerID'])?$_POST[$this->prefix.'CustomerID']:$this->customer;
 		}
 		
+							
+		if ($this->profit!=$_POST[$this->prefix.'ProfitID']){
+			foreach ($this->records[$this->gridName] as $id=>$row){
+				$row->flagUpdated = true;				
+				$row->profit = $this->profit;
+			}
+		}
+		
 		//-------------------Updating grid records---------------------------------
 		$arrUpdated = $_POST['inp_'.$this->gridName.'_updated'];
 		if(is_array($arrUpdated)){
@@ -234,14 +242,10 @@ class Sales extends Document{
 				$row = $this->get_record($_POST['id'][$id]);					
 
 				if ($row){
-					
-					if ($this->profit!=$_POST[$this->prefix.'ProfitID']){
-						$row->flagUpdated = true;				
-						$row->profit = $this->profit;
-					}
 				
 					if ($arrUpdated[$id]){				
-						$row->flagUpdated = true;				
+						$row->flagUpdated = true;
+						$row->profit = $this->profit;						
 						$row->product = $_POST['product'][$id];				
 						$row->activity = $_POST['activity'][$id];				
 						$row->customer = $_POST['customer'][$id]?$_POST['customer'][$id]:$this->customer;				
