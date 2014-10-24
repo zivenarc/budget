@@ -226,22 +226,27 @@ class Sales extends Document{
 		}
 		
 							
-		if ($this->profit!=$_POST[$this->prefix.'ProfitID']){
+		if (isset($_POST[$this->prefix.'ProfitID'])){
 			foreach ($this->records[$this->gridName] as $id=>$row){
-				$row->flagUpdated = true;				
-				$row->profit = $this->profit;
-			}
+				$row = $this->get_record($id); 
+				if ($row->profit!=$this->profit){		
+					$row->flagUpdated = true;				
+					$row->profit = $this->profit;
+				}
+			} 			
 		}
 		
 		if ($this->customer){
 			foreach ($this->records[$this->gridName] as $id=>$row){
-				$row->flagUpdated = true;				
-				$row->customer = $this->customer;
-				// print_r($row);die();
+				$row = $this->get_record($id);
+				if ($row->customer!=$this->customer){
+					$row->flagUpdated = true;				
+					$row->customer = $this->customer;
+				}
 			}
 		}
 		
-		
+		// print_r($this->records[$this->gridName]);die();
 		
 		//-------------------Updating grid records---------------------------------
 		$arrUpdated = $_POST['inp_'.$this->gridName.'_updated'];
@@ -258,7 +263,7 @@ class Sales extends Document{
 						$row->profit = $this->profit;						
 						$row->product = $_POST['product'][$id];				
 						$row->activity = $_POST['activity'][$id];				
-						$row->customer = $_POST['customer'][$id]?$_POST['customer'][$id]:$this->customer;				
+						$row->customer = isset($_POST['customer'][$id])?$_POST['customer'][$id]:$this->customer;					
 						$row->comment = $_POST['comment'][$id];				
 						$row->selling_rate = str_replace(',','',$_POST['selling_rate'][$id]);				
 						$row->selling_curr = $_POST['selling_curr'][$id];				
@@ -270,7 +275,7 @@ class Sales extends Document{
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
 						}					
 					} else {
-						$row->flagUpdated = false;
+						// $row->flagUpdated = false;
 					}
 				}
 			}	
@@ -297,6 +302,7 @@ class Sales extends Document{
 			foreach ($this->records[$this->gridName] as $i=>$row){				
 				if ($row->flagUpdated || $row->flagDeleted){
 					$sql[] = $row->getSQLstring();
+					// print_r($sql);die();
 				}
 			}
 		};
