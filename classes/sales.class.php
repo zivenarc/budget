@@ -233,6 +233,16 @@ class Sales extends Document{
 			}
 		}
 		
+		if ($this->customer){
+			foreach ($this->records[$this->gridName] as $id=>$row){
+				$row->flagUpdated = true;				
+				$row->customer = $this->customer;
+				// print_r($row);die();
+			}
+		}
+		
+		
+		
 		//-------------------Updating grid records---------------------------------
 		$arrUpdated = $_POST['inp_'.$this->gridName.'_updated'];
 		if(is_array($arrUpdated)){
