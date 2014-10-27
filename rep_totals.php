@@ -43,6 +43,19 @@ while ($rw=$oSQL->f($rs)){
 	$arrEstimate[$rw['Group']][$rw['Budget item']] += $rw['Estimate'];
 	$arrProfit[$keyProfit] = $rw['pccFlagProd'];
 }
+
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/12 as Total
+		FROM reg_headcount
+		LEFT JOIN vw_profit ON pccID=pc
+		WHERE scenario='$budget_scenario' and posted=1
+		GROUP BY Profit
+		ORDER BY pccFlagProd,Profit";
+$rs = $oSQL->q($sql);
+while ($rw=$oSQL->f($rs)){
+	$keyProfit = Budget::getProfitAlias($rw);
+	$arrHeadcount['FTE'][$keyProfit] += $rw['Total'];	
+}
+// echo '<pre>';print_r($arrHeadcount);echo '</pre>';echo $sql;
 // echo '<pre>';print_r($arrReport);echo '</pre>';
 ?>
 <table class='budget' id='report'>
@@ -177,6 +190,17 @@ foreach($arrProfit as $pc=>$flag){
 }
 ?>
 	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotal)/array_sum($arrReport['01.Gross Margin']['Revenue']),1);?></td>
+</tr>
+<tr class="budget-ratio">
+	<td>Headcount</td>
+<?php
+foreach($arrProfit as $pc=>$flag){
+	?>
+	<td class='budget-decimal'><?php Reports::render($arrHeadcount['FTE'][$pc],1);?></td>
+	<?php
+}
+?>
+	<td class='budget-decimal'><?php Reports::render(array_sum($arrHeadcount['FTE']),1);?></td>
 </tr>
 </tfoot>
 </table>
