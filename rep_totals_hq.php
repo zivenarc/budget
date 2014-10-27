@@ -161,24 +161,6 @@ foreach($arrProfit as $pc=>$flag){
 ?>
 	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrandTotal)-array_sum($arrGrandTotalEstimate));?></td>
 </tr>
-<tr class="budget-ratio">
-	<td>% of revenue</td>
-<?php
-foreach($arrProfit as $pc=>$flag){
-	if ($arrReport['01.Gross Margin']['Revenue'][$pc]){
-		$arrCostRatio[$pc] = $arrGrandTotal[$pc]/$arrReport['01.Gross Margin']['Revenue'][$pc]*100;	
-	} else {
-		$arrCostRatio[$pc]=0;
-	}
-	$arrCostRatio['Corporate'] = - $arrGrandTotal['Corporate']/array_sum($arrReport['01.Gross Margin']['Revenue'])*100;
-	$arrCostRatio['Sales'] = - $arrGrandTotal['Sales']/array_sum($arrReport['01.Gross Margin']['Revenue'])*100;
-	?>
-	<td class='budget-decimal'><?php Reports::render($arrCostRatio[$pc],1);?></td>
-	<?php
-}
-?>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotal)/array_sum($arrReport['01.Gross Margin']['Revenue']),1);?></td>
-</tr>
 </tfoot>
 </table>
 	<ul class='link-footer'>
