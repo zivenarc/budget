@@ -323,12 +323,12 @@ class MSF extends Document{
 						GROUP BY pc"; 
 			break;
 			case 'users':
-				$sql = "SELECT pc, wc, activity, 'user' as unit, ".Budget::getMonthlySumSQL()." FROM reg_headcount
+				$sql = "SELECT pc, wc, 'user' as unit, ".Budget::getMonthlySumSQL()." FROM reg_headcount
 					LEFT JOIN vw_profit ON pccID=pc				
 					WHERE scenario='".$oBudget->id."' 
 						AND posted=1 AND wc=1 
 						AND pccFlagProd=1 AND pc<>99
-						GROUP BY pc, activity";
+						GROUP BY pc";
 				break;
 			default:
 				return (false);
