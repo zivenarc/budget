@@ -426,12 +426,15 @@ class Budget{
 				case 'ICD':
 					$keyProfit = 'Toyota';
 					break;
-				case 'Forwarding':
-				case 'STP office':
+				case 'Forwarding':				
 				case 'NOVO':
 				case 'Krekshino':
 					$keyProfit = 'FWD';
-					break;						
+					break;
+				case 'STP':
+				case 'CHB':
+					$keyProfit = 'STP+CHB';
+					break;
 				default:
 					$keyProfit = $rw['Profit'];
 			}

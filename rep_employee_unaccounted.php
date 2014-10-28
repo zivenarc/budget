@@ -17,7 +17,7 @@ $rs =$oSQL->q($sql);
 echo '<ol>';
 while ($rw=$oSQL->f($rs)){
 	// print_r($rw);
-	echo '<li>',$rw["empTitle$strLocal"],' (',$rw["funTitle$strLocal"],'), ',$rw["pccTitle$strLocal"],' </li>';
+	echo '<li>',$rw["empTitleLocal"],' (',$rw["funTitleLocal"],'), ',$rw["pccTitle$strLocal"],' </li>';
 }
 echo '</ol>';
 
