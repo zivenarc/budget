@@ -261,7 +261,7 @@ class MSF extends Document{
 							// $master_row->activity = $total['activity'];
 							// $master_row->customer = $record->customer;					
 							$item = $Items->getById($this->item);
-							//$master_row->account = $item->getYACT($this->profit);
+							$master_row->account = $item->getYACT($record->pc);
 							$master_row->item = $this->item;
 							for($m=1;$m<13;$m++){
 								$month = date('M',mktime(0,0,0,$m,15));
@@ -278,7 +278,7 @@ class MSF extends Document{
 					// $master_row->activity = $total['activity'];
 					// $master_row->customer = self::EMPTY_CUSTOMER;					
 					$item = $Items->getById($this->item);
-					//$master_row->account = $item->getYACT($this->profit);
+					$master_row->account = $item->getYACT($this->profit);
 					$master_row->item = $this->item;
 					for($m=1;$m<13;$m++){
 						$month = date('M',mktime(0,0,0,$m,15));
