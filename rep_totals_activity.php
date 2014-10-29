@@ -6,6 +6,8 @@ require ('classes/reports.class.php');
 require ('classes/item.class.php');
 
 $activity = (integer)$_GET['activity'];
+$ghq = urldecode($_GET['ghq']);
+$unit = urldecode($_GET['unit']);
 
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 
@@ -23,6 +25,28 @@ if ($activity){
 	$rs = $oSQL->q($sql);
 	$subtitle = $oSQL->get_data($rs);
 	echo '<h2>',$subtitle,'</h2>';
+	$sqlActivityFilter = "AND activity={$activity}";
+}
+if ($ghq){
+	$sql = "SELECT prtID FROM vw_product_type WHERE prtGHQ=".$oSQL->e($_GET['ghq']);
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrActivity[] = $rw['prtID'];
+	}
+	$subtitle = $ghq;
+	echo '<h2>',$subtitle,'</h2>';
+	$sqlActivityFilter = "AND activity IN (".implode(',',$arrActivity).")";
+}
+if ($unit){
+	$sql = "SELECT prtID, prtTitle FROM vw_product_type WHERE prtUnit=".$oSQL->e($_GET['unit']);
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrActivity[] = $rw['prtID'];
+		$arrHref[] = "<span><a href='{$_SERVER['PHP_SELF']}?activity={$rw['prtID']}'>{$rw['prtTitle']}</a></span>";
+	}
+	$subtitle = $unit;
+	echo '<h2>',$subtitle,": ", implode(', ',$arrHref),'</h2>';
+	$sqlActivityFilter = "AND activity IN (".implode(',',$arrActivity).")";
 }
 echo '<p>',$oBudget->timestamp,'</p>';
 ?>
@@ -32,7 +56,7 @@ echo '<p>',$oBudget->timestamp,'</p>';
 $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".Budget::getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM vw_master
 		WHERE scenario='$budget_scenario'
-		AND activity={$activity}
+		{$sqlActivityFilter}
 		GROUP BY Profit, `Budget item`,`item`
 		ORDER BY `Group`,pccFlagProd,Profit,itmOrder";
 $rs = $oSQL->q($sql);
@@ -57,7 +81,7 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/12 
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='$budget_scenario' and posted=1
-		AND activity={$activity}
+		{$sqlActivityFilter}
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
@@ -71,7 +95,7 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/$de
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='$budget_scenario' and active=1
 			AND account='J00400'
-			AND activity={$activity}
+			{$sqlActivityFilter}
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
@@ -86,7 +110,7 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/$de
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='$budget_scenario' and active=1
 			AND (account NOT LIKE '6%' AND account NOT LIKE '7%')
-		AND activity={$activity}
+		{$sqlActivityFilter}
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
