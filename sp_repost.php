@@ -35,7 +35,7 @@ if ($_GET['tab']){
 	$arrJS[] = 'js/journal.js';		
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
-	echo Budget::getScenarioTabs();
+	echo Budget::getScenarioTabs(true);
 	?>
 <script>
 	function repost(tab, event){

@@ -428,7 +428,7 @@ class Budget{
 		ob_flush();
 	}
 	
-	public function getScenarioTabs(){
+	public function getScenarioTabs($flagWrite=0){
 		GLOBAL $oSQL;
 		GLOBAL $arrUsrData;
 		GLOBAL $budget_scenario;
@@ -438,7 +438,7 @@ class Budget{
 		<div id='tabs' class='tabs'>
 			<ul>
 			<?php
-			$sql = "SELECT * FROM tbl_scenario WHERE scnFlagDeleted=0";			
+			$sql = "SELECT * FROM tbl_scenario WHERE scnFlagDeleted=0".($flagWrite?" AND scnFlagReadOnly=0":"");			
 			$rs = $oSQL->q($sql);
 			while ($rw=$oSQL->f($rs)){
 				echo "<li><a href='",$_SERVER['PHP_SELF'],"?tab=",$rw['scnID'],"'>",$rw['scnTitle'],"</a></li>\r\n";
