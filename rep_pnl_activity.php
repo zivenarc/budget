@@ -25,7 +25,7 @@ if(!isset($_GET['tab'])){
 		$sqlWhere = "WHERE 1=1";
 	} else {
 		// $sqlWhere = "WHERE activity in (SELECT prtID FROM vw_product_type WHERE prtGHQ=".$oSQL->e($_GET['tab']).")";
-		$sqlWhere = "WHERE activity = ".$oSQL->e($_GET['tab']).")";
+		$sqlWhere = "WHERE activity = ".$oSQL->e($_GET['tab']);
 	}
 	
 	Reports::masterByCustomerEst($sqlWhere." AND scenario='$budget_scenario'");
