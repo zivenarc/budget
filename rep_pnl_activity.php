@@ -15,7 +15,8 @@ if(!isset($_GET['tab'])){
 	?>
 	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 	<?php
-	Budget::getGHQTabs('reg_master', true);
+	// Budget::getGHQTabs('reg_master', true);
+	Budget::getActivityTabs('reg_master', true);
 	include ('includes/inc-frame_bottom.php');
 } else {
 	require ('classes/reports.class.php');
@@ -23,7 +24,8 @@ if(!isset($_GET['tab'])){
 	if ($_GET['tab']=='all'){
 		$sqlWhere = "WHERE 1=1";
 	} else {
-		$sqlWhere = "WHERE activity in (SELECT prtID FROM vw_product_type WHERE prtGHQ=".$oSQL->e($_GET['tab']).")";
+		// $sqlWhere = "WHERE activity in (SELECT prtID FROM vw_product_type WHERE prtGHQ=".$oSQL->e($_GET['tab']).")";
+		$sqlWhere = "WHERE activity = ".$oSQL->e($_GET['tab']).")";
 	}
 	
 	Reports::masterByCustomerEst($sqlWhere." AND scenario='$budget_scenario'");

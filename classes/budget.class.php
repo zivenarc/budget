@@ -396,6 +396,38 @@ class Budget{
 		ob_flush();
 	}
 	
+	public function getActivityTabs($register='', $acl = false){
+		GLOBAL $oSQL;
+		GLOBAL $arrUsrData;
+		GLOBAL $budget_scenario;
+			
+		ob_start();
+		?>
+		<div id='tabs' class='tabs'>
+			<ul>
+			<?php
+			if (!$register){
+				$sql = "SELECT DISTINCT prtID, prtTitle{$arrUsrData['strLocal']} as prtTitle FROM vw_product_type";
+			} else {
+				$sql = "SELECT DISTINCT prtID, prtTitle{$arrUsrData['strLocal']} as prtTitle
+						FROM `$register`
+						JOIN vw_product_type ON prtID=activity						
+						 $sqlWhere
+						";
+				
+			}
+			$rs = $oSQL->q($sql);
+			while ($rw=$oSQL->f($rs)){
+				echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=",$rw['prtID'],"'>",$rw['prtTitle'],"</a></li>\r\n";
+			}
+			echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=all'>All</a></li>\r\n";
+			?>
+			</ul>
+		</div>
+		<?php
+		ob_flush();
+	}
+	
 	public function getScenarioTabs(){
 		GLOBAL $oSQL;
 		GLOBAL $arrUsrData;
