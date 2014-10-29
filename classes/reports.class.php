@@ -934,7 +934,7 @@ class Reports{
 				<tfoot>
 					<tr class="budget-subtotal">
 						<td colspan="5">Total:</td>
-						<td><?php self::render($total);?></td>
+						<td id='journal_total'><?php self::render($total);?></td>
 					</tr>
 				</tfoot>
 				<tbody>

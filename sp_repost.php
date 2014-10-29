@@ -39,6 +39,7 @@ if ($_GET['tab']){
 	?>
 <script>
 	function repost(tab, event){
+		var total;
 		$(event.srcElement).addClass('spinner');
 		$('.budget-document-link',$('#div_'+tab)).each(function(){
 			var href = $(this).attr('href');
@@ -60,6 +61,7 @@ if ($_GET['tab']){
 							tr.find('#amount_'+guid).text(number_format(data.amount,0,'.',','));
 							tr.find('#usrTitle_'+guid).text(data.editor);
 							tr.find('#timestamp_'+guid).text(data.timestamp_short);
+							total+=data.amount;							
 						} else {
 							td_posted.removeClass('spinner').text('Error');
 						}
@@ -71,6 +73,7 @@ if ($_GET['tab']){
 		});
 		
 		$(event.srcElement).removeClass('spinner');
+		$('#journal_total',$('#div_'+tab)).text(number_format(total,0,'.',','));
 	}
 </script>
 	<?php
