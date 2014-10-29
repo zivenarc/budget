@@ -57,7 +57,7 @@ if ($_GET['tab']){
 						console.log(data);
 						if (data.flagPosted==1){
 							td_posted.addClass('budget-icon-posted');
-							tr.find('#amount_'+guid).text(data.amount);
+							tr.find('#amount_'+guid).text(number_format(data.amount,0,'.',','));
 							tr.find('#usrTitle_'+guid).text(data.editor);
 							tr.find('#timestamp_'+guid).text(data.timestamp_short);
 						} else {
