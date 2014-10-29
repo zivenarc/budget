@@ -223,27 +223,27 @@ class Sales extends Document{
 			$this->product_folder = isset($_POST[$this->prefix.'ProductFolderID'])?$_POST[$this->prefix.'ProductFolderID']:$this->product_folder;
 			$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
 			$this->customer = isset($_POST[$this->prefix.'CustomerID'])?$_POST[$this->prefix.'CustomerID']:$this->customer;
-		}
-		
-							
-		if (isset($_POST[$this->prefix.'ProfitID'])){
-			foreach ($this->records[$this->gridName] as $id=>$row){
-				$row = $this->get_record($id); 
-				if ($row->profit!=$this->profit){		
-					$row->flagUpdated = true;				
-					$row->profit = $this->profit;
-				}
-			} 			
-		}
-		
-		if ($this->customer){
-			foreach ($this->records[$this->gridName] as $id=>$row){
-				$row = $this->get_record($id);
-				if ($row->customer!=$this->customer){
-					$row->flagUpdated = true;				
-					$row->customer = $this->customer;
+
+			if (isset($_POST[$this->prefix.'ProfitID'])){
+				foreach ($this->records[$this->gridName] as $id=>$row){
+					$row = $this->get_record($id); 
+					if ($row->profit!=$this->profit){		
+						$row->flagUpdated = true;				
+						$row->profit = $this->profit;
+					}
+				}	 			
+			}
+
+			if ($this->customer){
+				foreach ($this->records[$this->gridName] as $id=>$row){
+					$row = $this->get_record($id);
+					if ($row->customer!=$this->customer){
+						$row->flagUpdated = true;				
+						$row->customer = $this->customer;
+					}
 				}
 			}
+			
 		}
 		
 		// print_r($this->records[$this->gridName]);die();
