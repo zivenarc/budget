@@ -94,8 +94,8 @@ class headcount_record {
 			$arrRes[] = "`salary`=".(double)$this->salary;
 			$arrRes[] = "`insurance`=".(double)$this->insurance;
 			$arrRes[] = "`mobile_limit`=".(double)$this->mobile_limit;
-			$arrRes[] = "`wc`=".(integer)$this->wc;
-			$arrRes[] = "`vks`=".(integer)$this->vks;
+			$arrRes[] = "`wc`=".$this->wc?1:0;
+			$arrRes[] = "`vks`=".$this->vks?1:0;
 			$arrRes[] = "`fuel`=".(double)$this->fuel;
 			$arrRes[] = "`start_date`=".($this->start_date ? $oSQL->e($this->start_date) : 'NULL');
 			$arrRes[] = "`new_fte`=".(integer)$this->new_fte;

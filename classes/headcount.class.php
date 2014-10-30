@@ -175,7 +175,7 @@ class Headcount extends Document{
 			'title'=>'W/collar'
 			,'field'=>'wc'
 			,'type'=>'boolean'			
-			, 'disabled'=>($this->type=='current')
+			, 'disabled'=>false//($this->type=='current')
 		);
 		
 		$grid->Columns[] = Array(
