@@ -5,7 +5,8 @@ require ('common/auth.php');
 if ($_GET['tab']){
 	
 	?>
-<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost</button>
+<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
+<div/>
 
 	<?php
 	require ('classes/reports.class.php');
@@ -36,47 +37,6 @@ if ($_GET['tab']){
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
 	echo Budget::getScenarioTabs(true);
-	?>
-<script>
-	function repost(tab, event){
-		var total;
-		$(event.srcElement).addClass('spinner');
-		$('.budget-document-link',$('#div_'+tab)).each(function(){
-			var href = $(this).attr('href');
-			var tr = $(this).parents('tr');
-			// console.log(tr);
-			var td_posted = tr.find('td.td-posted'); 
-			// console.log(td_posted);
-			var guid = tr.attr('id').replace('tr_','');
-			td_posted.addClass('spinner');
-			$.post(href,{DataAction:'unpost'},function(data){
-				console.log(data);
-				if (data.flagPosted==0){
-					td_posted.removeClass('budget-icon-posted');
-					tr.find('#amount_'+guid).text('0.00');
-					$.post(href,{DataAction:'post'},function(data){
-						console.log(data);
-						if (data.flagPosted==1){
-							td_posted.addClass('budget-icon-posted');
-							tr.find('#amount_'+guid).text(number_format(data.amount,0,'.',','));
-							tr.find('#usrTitle_'+guid).text(data.editor);
-							tr.find('#timestamp_'+guid).text(data.timestamp_short);
-							total+=data.amount;							
-						} else {
-							td_posted.removeClass('spinner').text('Error');
-						}
-					});
-				} else {
-					td_posted.removeClass('spinner').text('Error');
-				}
-			});
-		});
-		
-		$(event.srcElement).removeClass('spinner');
-		$('#journal_total',$('#div_'+tab)).text(number_format(total,0,'.',','));
-	}
-</script>
-	<?php
 	include ('includes/inc-frame_bottom.php');
 }
 ?>
