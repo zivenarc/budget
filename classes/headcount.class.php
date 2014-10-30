@@ -322,14 +322,12 @@ class Headcount extends Document{
 				$row = $this->get_record($_POST['id'][$id]);					
 	
 				if ($row){
-					
-					if ($this->profit!=$_POST[$this->prefix.'ProfitID']){
-						$row->flagUpdated = true;				
-						$row->profit = $this->profit;
-					}
+										
 				
 					if ($arrUpdated[$id]){				
+						
 						$row->flagUpdated = true;
+						$row->profit = $this->profit;
 						$row->comment = $_POST['comment'][$id];				
 						$row->location = $_POST['location'][$id];				
 						$row->activity = $_POST['activity'][$id];				
