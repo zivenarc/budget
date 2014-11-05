@@ -396,7 +396,7 @@ class Budget{
 		ob_flush();
 	}
 	
-	public function getActivityTabs($register='', $acl = false){
+	public function getActivityTabs($register='', $acl = false, $sqlWhere=""){
 		GLOBAL $oSQL;
 		GLOBAL $arrUsrData;
 		GLOBAL $budget_scenario;
@@ -417,10 +417,19 @@ class Budget{
 				
 			}
 			$rs = $oSQL->q($sql);
+			
+			$arrGET = $_GET;
+						
 			while ($rw=$oSQL->f($rs)){
-				echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=",$rw['prtID'],"'>",$rw['prtTitle'],"</a></li>\r\n";
+				$arrGET['tab'] = $rw['prtID'];
+				$arrGET['budget_scenario'] = $budget_scenario;
+				// echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=",$rw['prtID'],"'>",$rw['prtTitle'],"</a></li>\r\n";
+				echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>",$rw['prtTitle'],"</a></li>\r\n";
 			}
-			echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=all'>All</a></li>\r\n";
+			
+			$arrGET['tab'] = 'all';
+			// echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=all'>All</a></li>\r\n";
+			echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>All</a></li>\r\n";
 			?>
 			</ul>
 		</div>
