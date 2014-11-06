@@ -7,7 +7,8 @@ require ('classes/item.class.php');
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 $oBudget = new Budget($budget_scenario);
 
-$startMonth = date('n',$oBudget->date_start);
+// $startMonth = date('n',$oBudget->date_start);
+$startMonth = 1;
 
 if($_GET['DataAction']=='update'){
 	$sql = Array();
@@ -18,14 +19,14 @@ if($_GET['DataAction']=='update'){
 				LEFT JOIN vw_product_type ON prtID = activity
 				##WHERE item =  '".Items::REVENUE."'
 				WHERE account='J00400'
-				AND scenario =  '$budget_scenario' AND source NOT IN ('Estimate','Actual')
+				AND scenario =  '$budget_scenario' AND source NOT IN ('Estimate')##,'Actual')
 				GROUP BY pc, prtGHQ";
 	for ($i=0;$i<count($sql);$i++){
 		// echo '<pre>',$sql[$i],'</pre>';
 		$oSQL->q($sql[$i]);
 	}
 	
-	redirect($_SERVER['PHP_SELF']);
+	redirect($_SERVER['PHP_SELF']."?budget_scenario={$budget_scenario}");
 	die();
 	
 }
@@ -33,7 +34,7 @@ if($_GET['DataAction']=='update'){
 if (!isset($_GET['tab'])){
 	
 	$arrJS[] = 'js/rep_pnl.js';
-	$arrActions[] = Array ('title'=>'Refresh','action'=>$_SERVER['PHP_SELF']."?DataAction=update",'class'=>'calculator');
+	$arrActions[] = Array ('title'=>'Refresh','action'=>$_SERVER['PHP_SELF']."?DataAction=update&budget_scenario={$budget_scenario}",'class'=>'calculator');
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'::',$oBudget->title,'</h1>';
 		?>

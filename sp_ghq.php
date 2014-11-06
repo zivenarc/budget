@@ -6,7 +6,13 @@ require ('classes/item.class.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 
+
+$budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
+
 $oBudget = new Budget($budget_scenario);
+$denominator = isset($_GET['denominator'])?(double)$_GET['denominator']:1;
+
+$arrJS[] = 'js/rep_totals.js';
 
 $sql = "SELECT * FROM vw_profit";
 $rs = $oSQL->q($sql);
@@ -14,7 +20,8 @@ while ($rw = $oSQL->f($rs)){
 	$arrProfit[$rw['pccID']] = $rw;
 }
 
-$startMonth = date('n',$oBudget->date_start);
+// $startMonth = date('n',$oBudget->date_start);
+$startMonth = 1;
 
 $sql = "SELECT pc, prtGHQ, ".Budget::getMonthlySumSQL($startMonth,12)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
 		GROUP BY prtGHQ, pc";
@@ -40,8 +47,9 @@ foreach($arrPC as $pc=>$arrGhq){
 
 // echo '<pre>';print_r($arrRatio);echo '</pre>';
 
-$sqlFields = "prtGHQ, pc, SUM(".Budget::getYTDSQL($startMonth,12).") as Total, ".Budget::getMonthlySumSQL($startMonth,12);
-
+$sqlFields = "CONCAT(account,': ',title) as account, prtGHQ, pc, pccFlagProd, 
+				SUM(".Budget::getYTDSQL($startMonth,12).") as Total, ".Budget::getMonthlySumSQL($startMonth,12);
+$sqlGroupBy = "account, pc, prtGHQ";
 
 $arrFilter = Array(
 	Items::REVENUE,
@@ -68,9 +76,9 @@ $arrFilter = Array(
 	Items::KAIZEN
 );
 $reportKey = 'Direct costs';
-$sql = "SELECT $sqlFields FROM vw_master 
+$sql = "SELECT {$sqlFields} FROM vw_master 
 		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND item IN ('".implode("','",$arrFilter)."')
-		GROUP by pc, prtGHQ";
+		GROUP BY {$sqlGroupBy}";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<13;$m++){
@@ -82,9 +90,10 @@ while ($rw = $oSQL->f($rs)){
 	
 
 $reportKey = 'Reclassified fixed costs';
-$sql = "SELECT $sqlFields FROM vw_master 
+$sql = "SELECT {$sqlFields} FROM vw_master 
 		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('J00801', 'J00803','J00804','J00805','J00806','J00808','J0080W')
-		GROUP by pc, prtGHQ";
+		GROUP by {$sqlGroupBy}
+		ORDER by account";
 
 distribute($reportKey, $sql);
 
@@ -93,35 +102,17 @@ distribute($reportKey, $sql);
 $reportKey = 'General costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000' AND (pccFLagProd = 1 OR prtGHQ is NOT NULL)
-		GROUP by pc, prtGHQ";
+		GROUP by {$sqlGroupBy}
+		ORDER BY account";
 
 distribute($reportKey, $sql);
 
 $reportKey = 'Corporate costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000'  AND (pccFLagProd = 0 AND prtGHQ IS NULL)
-		GROUP by pc, prtGHQ";
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-
-	if ($rw['pc']==9){
-		$key = 'General costs';
-	} else {
-		$key = $reportKey;
-	}
-
-	for($m=$startMonth;$m<13;$m++){
-		$month = (date('M',mktime(0,0,0,$m,15)));
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$key][$month] += $rw[$month];
-		} else {
-			foreach($arrGHQSubtotal as $ghq=>$revenue){
-				$arrReport[$ghq][$key][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
-			}
-		}
-		$arrGrandTotal[$key][$month] += $rw[$month];
-	}
-}
+		GROUP by {$sqlGroupBy}
+		ORDER BY account";
+distribute ($reportKey, $sql);
 
 $reportKey = 'MSF';
 $sql = "SELECT $sqlFields FROM vw_master 
@@ -243,7 +234,9 @@ while ($rw = $oSQL->f($rs)){
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 echo '<p>',$oBudget->timestamp,'</p>';
+
 ?>
+<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 <table id='report' class='budget'>
 <thead>
 	<th>Item</th>
@@ -254,7 +247,7 @@ echo '<p>',$oBudget->timestamp,'</p>';
 <?php
 foreach ($arrReport as $ghq=>$arrItems){
 	echo '<tr>';
-	echo '<th colspan="14">',$ghq,'</th>';
+	echo '<th colspan="14">',($ghq?$ghq:'[None]'),'</th>';
 	echo "</tr>\r\n";
 	
 	foreach ($arrItems as $item=>$values){
@@ -322,7 +315,7 @@ for ($m=$startMonth;$m<13;$m++){
 <tr>
 <?php
 foreach($arrGHQSubtotal as $ghq=>$revenue){
-	echo '<th>',$ghq,'</th>';
+	echo '<th>',($ghq?$ghq:'[None]'),'</th>';
 }
 ?>
 	<th>Total</th>
@@ -341,7 +334,43 @@ foreach($arrGHQSubtotal as $ghq=>$revenue){
 </tr>
 </tbody>
 </table>
+
+<h1>Additional info</h1>
 <?php
+foreach ($arrBreakDown as $group=>$accounts){
+	echo '<h3>',$group,'</h3>';
+	$strTableID = urlencode($group);
+	?>
+	<table class='budget' id='<?php echo $strTableID;?>'>
+	<thead>
+		<tr>
+			<th>Activity</th>
+			<?php
+			foreach ($accounts as $account=>$ghq){
+				echo '<th>',$account,'</th>';
+			}
+			?>
+		</tr>
+	</thead>
+	<tbody>
+		<?php
+			foreach ($arrReport as $ghq=>$values){
+				echo '<tr>';
+				echo '<th>',($ghq?$ghq:'[None]'),'</th>';
+				foreach ($accounts as $account=>$products){
+					echo '<td class="budget-decimal">',Reports::render(-$products[$ghq]),'</td>';
+				}
+				echo '</tr>';
+			}
+		?>
+	</tbody>
+	</table>
+	<ul class='link-footer'>
+		<li><a href='javascript:SelectContent("<?php echo $strTableID;?>");'>Select table</a></li>
+	</ul>
+	<?
+}
+
 include ('includes/inc-frame_bottom.php');
 
 function error_distribution($params){
@@ -355,26 +384,46 @@ function distribute($reportKey, $sql){
 	GLOBAl $startMonth;
 	GLOBAl $arrReport;
 	GLOBAL $arrGrandTotal;
-	GLOBAL $arrRatio;
+	GLOBAL $arrRatio,$arrGHQSubtotal,$arrRevenue;
+	GLOBAL $arrBreakDown, $sqlFields, $sqlGroupBy;	
 	
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
+	
+		if ($rw['pc']==9){
+			$key = 'General costs';
+		} else {
+			$key = $reportKey;
+		}
+	
 		for($m=$startMonth;$m<13;$m++){
 			$month = (date('M',mktime(0,0,0,$m,15)));
 			if ($rw[$month]!=0){
 				if ($rw['prtGHQ']){
-					$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
+					$arrReport[$rw['prtGHQ']][$key][$month] += $rw[$month];
+					$arrBreakDown[$key][$rw['account'].$rw['title']][$rw['prtGHQ']] += $rw[$month];
 				} else {
-					if (!is_array($arrRatio[$rw['pc']])) error_distribution(Array('data'=>$rw,'reportKey'=>$reportKey,'month'=>$month, 'sql'=>$sql));
-					foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
-						$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$ratios[$month];
+					if (!is_array($arrRatio[$rw['pc']])) {
+						if ($rw['pccFlagProd']){
+							error_distribution(Array('data'=>$rw,'reportKey'=>$key,'month'=>$month, 'sql'=>$sql));
+						} else {
+							foreach($arrGHQSubtotal as $ghq=>$revenue){
+								$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+								$arrBreakDown[$key][$rw['account'].$rw['title']][$ghq] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+							}
+						}
+					} else {
+						foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
+							$arrReport[$ghq][$key][$month] += $rw[$month]*$ratios[$month];
+							$arrBreakDown[$key][$rw['account'].$rw['title']][$ghq] += $rw[$month]*$ratios[$month];
+						}
 					}
 				}
-				$arrGrandTotal[$reportKey][$month] += $rw[$month];
+				$arrGrandTotal[$key][$month] += $rw[$month];
 			} else {
 				//skip;
 			} 
 		}
-	}	
+	}
 }
 ?>
