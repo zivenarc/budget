@@ -22,7 +22,7 @@ $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 	
 	// $keyProfit = Budget::getProfitAlias($rw);
-	$keyProfit = $rw['Profit']
+	$keyProfit = $rw['Profit'];
 
 	$arrReport[$rw['Group']][$rw['Budget item']][$keyProfit] += $rw['Total'];
 	$arrTotal[$rw['Group']][$keyProfit] += $rw['Total'];
@@ -40,7 +40,7 @@ $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 	
 	// $keyProfit = Budget::getProfitAlias($rw);
-	$keyProfit = $rw['Profit']
+	$keyProfit = $rw['Profit'];
 	$arrHeadcount[$keyProfit] += $rw['FTE'];
 }
 // echo '<pre>';print_r($arrReport);echo '</pre>';
