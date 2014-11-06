@@ -1,5 +1,5 @@
 <?php
-$flagNoAuth = true;
+// $flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
 
@@ -17,6 +17,23 @@ if(!isset($_GET['tab'])){
 	?>
 	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 	<?php
+		if(!isset($_GET['ghq'])){
+	?>
+		<div id='ghq_filter'>
+			<ul class='link-footer'>
+			<?php
+				$sql = "SELECT DISTINCT prtGHQ FROM vw_product_type ORDER BY prtGHQ";
+				$rs = $oSQL->q($sql);
+				while ($rw = $oSQL->f($rs)){
+					?>
+					<li><a href="<?php echo $_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&ghq=",urlencode($rw['prtGHQ']);?>"><?php echo $rw['prtGHQ']?$rw['prtGHQ']:"[None]";?></a></li>
+					<?
+				}
+			?>
+			</ul>
+		</div>
+	<?php
+	}
 	// Budget::getGHQTabs('reg_master', true);
 	Budget::getActivityTabs('reg_master', true, "WHERE TRUE ".$sqlActivityFilter);
 	include ('includes/inc-frame_bottom.php');
@@ -29,7 +46,7 @@ if(!isset($_GET['tab'])){
 		// $sqlWhere = "WHERE activity in (SELECT prtID FROM vw_product_type WHERE prtGHQ=".$oSQL->e($_GET['tab']).")";
 		$sqlWhere = "WHERE activity = ".$oSQL->e($_GET['tab'])."  {$sqlActivityFilter}";
 	}
-	echo '<pre>',$sqlWhere,'</pre>';
+	// echo '<pre>',$sqlWhere,'</pre>';
 	Reports::masterByCustomerEst($sqlWhere." AND scenario='$budget_scenario'");
 	?>
 		<ul class='link-footer'>
