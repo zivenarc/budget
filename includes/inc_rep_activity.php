@@ -1,8 +1,8 @@
 <?php
 
 $activity = (integer)$_GET['activity'];
-$ghq = urldecode($_GET['ghq']);
-$unit = urldecode($_GET['unit']);
+if (isset($_GET['ghq'])) $ghq = urldecode($_GET['ghq']);
+if (isset($_GET['unit'])) $unit = urldecode($_GET['unit']);
 
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 
@@ -18,16 +18,16 @@ if ($denominator!=1) {
 if ($activity){
 	$sql = "SELECT prtTitle FROM vw_product_type WHERE prtID={$activity}";
 	$rs = $oSQL->q($sql);
-	$subtitle = $oSQL->get_data($rs);
+	$subtitle = "Activity: ".$oSQL->get_data($rs);
 	$sqlActivityFilter = "AND activity={$activity}";
 }
-if ($ghq){
+if (isset($_GET['ghq'])){
 	$sql = "SELECT prtID FROM vw_product_type WHERE prtGHQ=".$oSQL->e($_GET['ghq']);
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
 		$arrActivity[] = $rw['prtID'];
 	}
-	$subtitle = $ghq;
+	$subtitle = "GHQ: ".$ghq;
 	$sqlActivityFilter = "AND activity IN (".implode(',',$arrActivity).")";
 }
 if ($unit){

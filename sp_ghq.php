@@ -231,6 +231,17 @@ while ($rw = $oSQL->f($rs)){
 }
 // echo '<pre>';print_r($arrReport);echo '</pre>';
 
+$reportKey = 'Control PBT';
+$sql = "SELECT $sqlFields FROM vw_master 
+		WHERE scenario='$budget_scenario' AND source<>'Estimate'";
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	for($m=$startMonth;$m<13;$m++){
+		$month = (date('M',mktime(0,0,0,$m,15)));
+		$arrControl[$month] += $rw[$month];
+	}
+}
+
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 echo '<p>',$oBudget->timestamp,'</p>';
@@ -302,6 +313,18 @@ for ($m=$startMonth;$m<13;$m++){
 ?>
 	<td class="budget-decimal budget-ytd"><?php Reports::render(array_sum($arrNRBT),0);?></td>
 </tr>
+<tr class="budget-total">
+<td>Control</td>
+<?php
+for ($m=$startMonth;$m<13;$m++){
+				$month = (date('M',mktime(0,0,0,$m,15)));
+				?>
+				<td class="budget-decimal" style="background-color:<?php echo (round($arrControl[$month],0)==round($arrNRBT[$month],0)?'lightgreen':'pink');?>;"><?php Reports::render($arrControl[$month],0);?></td>
+				<?php
+}
+?>
+	<td class="budget-decimal budget-ytd"><?php Reports::render(array_sum($arrControl),0);?></td>
+</tr>
 </tbody>
 </table>
 
@@ -350,16 +373,22 @@ foreach ($arrBreakDown as $group=>$accounts){
 				echo '<th>',$account,'</th>';
 			}
 			?>
+			<th>Total</th>
+			<th>Control</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
 			foreach ($arrReport as $ghq=>$values){
+				$rowTotal = 0;
 				echo '<tr>';
 				echo '<th>',($ghq?$ghq:'[None]'),'</th>';
-				foreach ($accounts as $account=>$products){
+				foreach ($accounts as $account=>$products){					
+					$rowTotal += $products[$ghq];
 					echo '<td class="budget-decimal">',Reports::render(-$products[$ghq]),'</td>';
 				}
+				echo '<td class="budget-ytd budget-decimal">',Reports::render(-$rowTotal),'</td>';
+				echo '<td class="budget-ytd budget-decimal">',is_array($arrReport[$ghq][$group])?Reports::render(-array_sum($arrReport[$ghq][$group])):'n/a','</td>';
 				echo '</tr>';
 			}
 		?>
@@ -408,7 +437,7 @@ function distribute($reportKey, $sql){
 							error_distribution(Array('data'=>$rw,'reportKey'=>$key,'month'=>$month, 'sql'=>$sql));
 						} else {
 							foreach($arrGHQSubtotal as $ghq=>$revenue){
-								$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+								$arrReport[$ghq][$key][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
 								$arrBreakDown[$key][$rw['account'].$rw['title']][$ghq] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
 							}
 						}
