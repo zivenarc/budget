@@ -101,7 +101,7 @@ distribute($reportKey, $sql);
 
 $reportKey = 'General costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000' AND (pccFLagProd = 1 OR prtGHQ is NOT NULL)
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000' AND (pccFLagProd = 1 OR IFNULL(prtGHQ,'')<>'')
 		GROUP by {$sqlGroupBy}
 		ORDER BY account";
 
@@ -109,7 +109,7 @@ distribute($reportKey, $sql);
 
 $reportKey = 'Corporate costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000'  AND (pccFLagProd = 0 AND prtGHQ IS NULL)
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000'  AND (pccFLagProd = 0 AND IFNULL(prtGHQ,'')='')
 		GROUP by {$sqlGroupBy}
 		ORDER BY account";
 distribute ($reportKey, $sql);
