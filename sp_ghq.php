@@ -419,7 +419,7 @@ function distribute($reportKey, $sql){
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
 	
-		if ($rw['pc']==9){
+		if ($rw['pc']==9 && $reportKey=='Corporate costs'){
 			$key = 'General costs';
 		} else {
 			$key = $reportKey;
