@@ -361,6 +361,9 @@ foreach($arrGHQSubtotal as $ghq=>$revenue){
 <h1>Additional info</h1>
 <?php
 foreach ($arrBreakDown as $group=>$accounts){
+	$arrColTotal = Array();
+	$nControlTotal = 0;
+
 	echo '<h3>',$group,'</h3>';
 	$strTableID = urlencode($group);
 	?>
@@ -381,17 +384,41 @@ foreach ($arrBreakDown as $group=>$accounts){
 		<?php
 			foreach ($arrReport as $ghq=>$values){
 				$rowTotal = 0;
-				echo '<tr>';
-				echo '<th>',($ghq?$ghq:'[None]'),'</th>';
+				?>
+				<tr>
+				<th><?php echo ($ghq?$ghq:'[None]');?></th>
+				<?php				
 				foreach ($accounts as $account=>$products){					
 					$rowTotal += $products[$ghq];
-					echo '<td class="budget-decimal">',Reports::render(-$products[$ghq]),'</td>';
+					$arrColTotal[$account] += $products[$ghq];
+					?>
+					<td class="budget-decimal"><?php Reports::render(-$products[$ghq]);?></td>
+					<?php
 				}
+				
+				$nControlTotal += is_array($arrReport[$ghq][$group])?array_sum($arrReport[$ghq][$group]):0;
+				
 				echo '<td class="budget-ytd budget-decimal">',Reports::render(-$rowTotal),'</td>';
 				echo '<td class="budget-ytd budget-decimal">',is_array($arrReport[$ghq][$group])?Reports::render(-array_sum($arrReport[$ghq][$group])):'n/a','</td>';
-				echo '</tr>';
-			}
+				?>
+				</tr>
+				<?php
+			}									
 		?>
+		<tfoot>
+			<tr class='budget-total'>
+				<td>Total:</td>
+				<?php
+				foreach ($accounts as $account=>$products){	
+					?>
+					<td class='budget-decimal'><?php Reports::render(-$arrColTotal[$account]);?></td>					
+					<?php
+				}
+				?>
+				<td class='budget-decimal'><?php Reports::render(-array_sum($arrColTotal));?></td>										
+				<td class='budget-decimal'><?php Reports::render(-($nControlTotal));?></td>										
+			</tr>
+		</tfoot>
 	</tbody>
 	</table>
 	<ul class='link-footer'>
