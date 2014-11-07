@@ -4,7 +4,8 @@ $(document).ready(function(){
 	
 		$('#budget_scenario').change(function(){		
 		$(this).wrap($('<form>',{method:'GET',id:'scenario'}));		
-		console.log($(this));
+		// console.log($(this));
+		$('#frameContent').addClass('ui-widget-overlay');
 		$('#scenario').submit();
 	});
 	
