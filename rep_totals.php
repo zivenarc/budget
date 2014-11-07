@@ -16,7 +16,7 @@ echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 if ($denominator!=1) {
 	echo '<h2>RUB x',$denominator,'</h2>';
 }
-echo '<p>',$oBudget->timestamp,'</p>';
+echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 ?>
 <div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 <?php

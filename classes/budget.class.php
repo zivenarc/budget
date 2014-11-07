@@ -216,7 +216,9 @@ class Budget{
 		
 		$this->flagUpdate = !$rw['scnFlagReadOnly'];
 		
-		$this->getSettings($this->oSQL, $this-id);
+		$this->getSettings($this->oSQL, $this->id);
+		$this->rates = 'USD = '.$this->settings['usd'].', EUR = '.$this->settings['eur'];
+		
 		
 	}
 	
@@ -228,6 +230,8 @@ class Budget{
 		$sql = "SELECT SCV.*, VAR.* FROM tbl_scenario_variable SCV
 					JOIN tbl_variable VAR ON varID=scvVariableID
 					WHERE scvScenarioID='".$scenario."'";
+					
+			// echo '<pre>',$sql,'</pre>';
 			
 			$rs = $oSQL->q($sql);
 			while($rw = $oSQL->f($rs)){
@@ -244,7 +248,9 @@ class Budget{
 				}
 				$this->settings[$rw['varID']] = $value;
 			}
+		
 		return($this->settings);
+		
 	}
 	
 	public function getYTDSQL($mStart=1, $mEnd=12, $arrRates = null){
