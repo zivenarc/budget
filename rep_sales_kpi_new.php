@@ -22,9 +22,9 @@ if(!isset($_GET['tab'])){
 	require ('classes/reports.class.php');
 	include ('includes/inc_report_buttons.php');
 	if ($_GET['tab']=='all'){
-		$sqlWhere = " WHERE scenario='$budget_scenario' AND customer=9902";
+		$sqlWhere = " WHERE scenario='$budget_scenario' AND customer=9907";
 	} else {
-		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") AND scenario='$budget_scenario' AND customer=9902";
+		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") AND scenario='$budget_scenario' AND customer=9907";
 	}
 
 	Reports::salesByActivity($sqlWhere);
