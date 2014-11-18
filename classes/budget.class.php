@@ -514,12 +514,13 @@ class Budget{
 	
 	public function getMonthlyRates($currency=643){		
 		
-		$res = Array();
+		$res = Array('YTD'=>1,'ROY'=>1);
+		
 		for($m=1;$m<=12;$m++){
 				$month = date('M',mktime(0,0,0,$m,15));
 				$res[$month] = 1;
 		}
-		$res['YTD']=1;$res['ROY']=1;
+		
 		
 		if ($currency==643 || !$currency){
 			return ($res);
@@ -554,7 +555,9 @@ class Budget{
 				$res[$month] = $rw['Rate'];
 			}
 			
-			$res['ROY'] = $res['Dec'];
+			if ($start_month>1) {
+				$res['ROY'] = $res['Dec'];
+			}
 			
 			$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency, tbl_scenario
 						WHERE curTitle=scvVariableID AND scvScenarioID=scnLastID
@@ -563,7 +566,9 @@ class Budget{
 
 			$rs = $this->oSQL->q($sql);
 			$rw = $this->oSQL->f($rs);
-			$res['YTD'] = $rw['Rate'];
+			if ($start_month>1) {
+				$res['YTD'] = $rw['Rate'];
+			}
 			
 			return ($res);
 			
