@@ -4,10 +4,11 @@ class Reports{
 	public function salesByActivity($sqlWhere=''){
 		GLOBAL $oSQL;
 		ob_start();
-			$sql = "SELECT prtRHQ, pc, prtID, prtTitle as 'Activity', vw_product_type.prtUnit as 'Unit', ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total FROM `reg_sales`
+			$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', vw_product_type.prtUnit as 'Unit', ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total 
+					FROM `reg_sales`
 					LEFT JOIN vw_product ON prdID=product
 					LEFT JOIN vw_product_type ON prtID=prdCategoryID
-					$sqlWhere AND posted=1
+					$sqlWhere AND posted=1 AND kpi=1
 					GROUP BY `reg_sales`.`activity`, `reg_sales`.`unit`
 					ORDER BY prtGHQ, prtRHQ";
 			$rs = $oSQL->q($sql);
@@ -27,10 +28,16 @@ class Reports{
 			</thead>			
 			<tbody>
 			<?php
+			$prtGHQ = '';
 			while ($rw=$oSQL->f($rs)){
 				?>
 				<tr class='graph'>
 				<?php
+				if ($rw['prtGHQ']!=$prtGHQ){
+					?>
+					<tr><th colspan="17"><?php echo $rw['prtGHQ'];?></th></tr>
+					<?php
+				};
 				echo "<td><a href='javascript:getCustomerKPI({activity:{$rw['prtID']}});'>",$rw['Activity'],'</a></td>';
 				echo '<td class="unit">',$rw['Unit'],'</td>';
 				for ($m=1;$m<13;$m++){
@@ -49,6 +56,7 @@ class Reports{
 									
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';
 				echo "</tr>\r\n";
+				$prtGHQ = $rw['prtGHQ'];
 			}
 			?>
 			</tbody>
