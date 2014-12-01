@@ -35,7 +35,7 @@ class Reports{
 				<?php
 				if ($rw['prtGHQ']!=$prtGHQ){
 					?>
-					<tr><th colspan="17"><?php echo $rw['prtGHQ'];?></th></tr>
+					<tr><th colspan="19"><?php echo $rw['prtGHQ'];?></th></tr>
 					<?php
 				};
 				echo "<td><a href='javascript:getCustomerKPI({activity:{$rw['prtID']}});'>",$rw['Activity'],'</a></td>';
@@ -95,11 +95,14 @@ class Reports{
 			<tbody>
 			<?php
 			while ($rw=$oSQL->f($rs)){
-				echo '<tr>';
-				echo "<td>",$rw['Customer'],'</td>';
-				echo '<td>',$rw['unit'],'</td>';
+				?>
+				<tr>
+					<td><?php echo $rw['Customer'];?></td>
+					<td><?php echo $rw['unit'];?></td>
+				<?php
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
+					$arrTotal[$month] += $rw[$month];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",number_format($rw[$month],0,'.',','),'</td>';
 				}
 				$arrQuarter = Array('Q1'=>$rw['Jan']+$rw['Feb']+$rw['Mar'],
@@ -109,7 +112,10 @@ class Reports{
 				
 				for ($q=1;$q<5;$q++){		
 					$quarter = 'Q'.$q;
-					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
+					$arrQTotal[$quarter] += $arrQuarter[$quarter];
+					?>
+					<td class='budget-decimal budget-quarterly budget-$quarter'><?php self::render($arrQuarter[$quarter])?></td>
+					<?php
 				}				
 									
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';
@@ -117,6 +123,26 @@ class Reports{
 			}
 			?>
 			</tbody>
+			<tfoot>
+				<tr class="budget-subtotal">
+					<td colspan="2">Total:</td>
+					<?php
+					for ($m=1;$m<13;$m++){
+						$month = date('M',mktime(0,0,0,$m,15));
+						?>
+						<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($arrTotal[$month]);?></td>
+						<?php
+					}
+					for ($q=1;$q<5;$q++){		
+						$quarter = 'Q'.$q;						
+						?>
+						<td class='budget-decimal budget-quarterly budget-<?php echo $quarter;?>'><?php self::render($arrQTotal[$quarter])?></td>
+						<?php
+					}
+					?>
+					<td class='budget-decimal budget-ytd'><?php self::render(array_sum($arrTotal));?></td>
+				</tr>
+			</tfoot>
 			</table>
 			<?php
 			ob_flush();

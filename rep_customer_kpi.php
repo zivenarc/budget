@@ -26,5 +26,8 @@ if ($_POST['pccGUID']=='all'){
 	// $data[] = $rw;
 // }
 Reports::salesByCustomer($strPCFilter.' '.$sqlWhere);
+?>
+	
+<?php
 include ('includes/inc-frame_bottom.php');
 ?>
