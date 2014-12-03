@@ -11,6 +11,7 @@ if(!isset($_GET['tab'])){
 	// $arrJS[]='js/input_form.js';	
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
+	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	?>
 	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 	<?php
@@ -26,7 +27,6 @@ if(!isset($_GET['tab'])){
 		$rw = $oSQL->f($rs);
 		echo '<h2>',$rw["curTitle$strLocal"],'</h2>';
 	}
-	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	
 	if ($_GET['tab']=='all'){
 		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
