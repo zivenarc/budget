@@ -1,5 +1,5 @@
 <?php
-// $flagNoAuth = true;
+$flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
@@ -17,7 +17,7 @@ echo '<p>',$oBudget->timestamp,'</p>';
 <div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 <?php
 
-if(!isset($_GET['ghq'])){
+if(true || !isset($_GET['ghq'])){
 ?>
 	<div id='ghq_filter'>
 		<ul class='link-footer'>
@@ -102,7 +102,23 @@ while ($rw=$oSQL->f($rs)){
 	$arrOpIncomeEstimate += $rw['Estimate'];	
 }
 
-// echo '<pre>';print_r($arrHeadcount);echo '</pre>';echo $sql;
+$sql = "SELECT prtTitle, unit, pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/$denominator as Total
+		##, SUM(estimate)/$denominator as Estimate
+		FROM reg_sales
+		LEFT JOIN vw_profit ON pccID=pc
+		LEFT JOIN vw_product_type ON prtID=activity
+		WHERE scenario='$budget_scenario' and posted=1 and kpi=1			
+		{$sqlActivityFilter}
+		GROUP BY activity, Profit
+		ORDER BY activity, pccFlagProd,Profit";
+$rs = $oSQL->q($sql);
+while ($rw=$oSQL->f($rs)){
+	$keyProfit = Budget::getProfitAlias($rw);
+	$arrKPI[$rw['prtTitle'].', '.$rw['unit']][$keyProfit] += $rw['Total'];	
+	//$arrKPIEstimate += $rw['Estimate'];	
+}
+
+// echo '<pre>';print_r($arrKPI);echo '</pre>';echo $sql;
 // echo '<pre>';print_r($arrReport);echo '</pre>';
 ?>
 <table class='budget' id='report'>
@@ -321,6 +337,22 @@ foreach($arrProfit as $pc=>$flag){
 ?>
 	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOpIncome)/100,array_sum($arrHeadcount['FTE']),0);?></td>
 </tr>
+<tr><th colspan="<?php echo count($arrProfit)+4;?>">KPI</th></td>
+<?php foreach ($arrKPI as $kpi=>$values){ ?>
+<tr>
+	<td><?php echo $kpi;?></td>
+<?php
+	foreach($arrProfit as $pc=>$flag){
+		?>
+		<td class='budget-decimal'><?php Reports::render($values[$pc]);?></td>
+		<?php
+	}
+?>
+	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($values));?></td>
+	<td class='budget-decimal'><?php echo 'n/a';?></td>
+	<td class='budget-decimal'><?php echo 'n/a';?></td>
+</tr>
+<?php } ?>
 </tfoot>
 </table>
 	<ul class='link-footer'>

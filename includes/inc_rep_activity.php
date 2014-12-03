@@ -28,7 +28,11 @@ if (isset($_GET['ghq'])){
 		$arrActivity[] = $rw['prtID'];
 	}
 	$subtitle = "GHQ: ".$ghq;
-	$sqlActivityFilter = "AND activity IN (".implode(',',$arrActivity).")";
+	if ($_GET['ghq']==''){
+		$sqlActivityFilter = "AND activity IS NULL";
+	} else {
+		$sqlActivityFilter = "AND activity IN (".implode(',',$arrActivity).")";
+	}
 }
 if ($unit){
 	$sql = "SELECT prtID, prtTitle FROM vw_product_type WHERE prtUnit=".$oSQL->e($_GET['unit']);
