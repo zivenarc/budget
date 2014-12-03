@@ -10,7 +10,7 @@ include ('includes/inc_rep_activity.php');
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 echo '<h2>',$subtitle,'</h2>';
-echo '<p>',$oBudget->timestamp,'</p>';
+echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
 
 ?>

@@ -26,7 +26,7 @@ if(!isset($_GET['tab'])){
 		$rw = $oSQL->f($rs);
 		echo '<h2>',$rw["curTitle$strLocal"],'</h2>';
 	}
-	
+	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	
 	if ($_GET['tab']=='all'){
 		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
