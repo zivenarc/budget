@@ -3,6 +3,8 @@ $flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
 
+unset($_SESSION['cntID']);
+
 $cntID = isset($_GET['cntID'])?(integer)$_GET['cntID']:9907;//new if not defined
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 
