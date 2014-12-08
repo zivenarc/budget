@@ -8,6 +8,7 @@ $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$bud
 
 $oBudget = new Budget($budget_scenario);
 
+session_start();
 $_SESSION['cntID'] = $cntID;
 
 if(!isset($_GET['tab'])){
