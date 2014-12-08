@@ -8,6 +8,7 @@ $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$bud
 
 $oBudget = new Budget($budget_scenario);
 
+$_SESSION['cntID'] = $cntID;
 
 if(!isset($_GET['tab'])){
 	$arrJS[] = 'https://www.google.com/jsapi';
@@ -15,7 +16,7 @@ if(!isset($_GET['tab'])){
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$oBudget->title,' :: ',$arrUsrData["pagTitle$strLocal"],'</h1>';
 	
-	$sql = "SELECT cntTitle$strLocal FROM vw_customer WHERE cntID={$cntID} LIMIT 1";
+	$sql = "SELECT cntTitle$strLocal FROM vw_customer WHERE cntID={$_SESSION['cntID']} LIMIT 1";
 	$rs = $oSQL->q($sql);
 	$cntTitle = $oSQL->get_data($rs);
 	echo '<h2>',$cntTitle,'</h2>';
@@ -29,9 +30,9 @@ if(!isset($_GET['tab'])){
 	require ('classes/reports.class.php');
 	include ('includes/inc_report_buttons.php');
 	if ($_GET['tab']=='all'){
-		$sqlWhere = " WHERE scenario='$budget_scenario' AND customer={$cntID}";
+		$sqlWhere = " WHERE scenario='$budget_scenario' AND customer={$_SESSION['cntID']}";
 	} else {
-		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") AND scenario='$budget_scenario' AND customer={$cntID}";
+		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") AND scenario='$budget_scenario' AND customer={$_SESSION['cntID']}";
 	}
 
 	Reports::salesByActivity($sqlWhere);
