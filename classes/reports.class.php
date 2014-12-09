@@ -849,7 +849,7 @@ class Reports{
 			<?php 			
 			if (strlen($data['GroupLevel1'])){				
 			?>
-			<td class='budget-tdh code-<?php echo $data['level1_code'];?>' data-code='<?php echo $data['level1_code'];?>'><span><?php echo $data['GroupLevel1'];?></span></td>
+			<td class='budget-tdh code-<?php echo urlencode($data['level1_code']);?>' data-code='<?php echo $data['level1_code'];?>'><span><?php echo $data['GroupLevel1'];?></span></td>
 			<td><?php echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\',\'level1\':\''.$data['level1_code'].'\'})">'.$data['Budget item'].'</a>';?></td>
 			<?php 
 			} 
