@@ -37,7 +37,8 @@ class MSF extends Document{
 		parent::refresh($sql);		
 				
 		$this->total = $this->data[$this->prefix."Total"];
-		//$this->item = self::MSF_ITEM;
+		// $this->item = self::MSF_ITEM;
+		$this->item = $this->data[$this->prefix."ItemGUID"];
 				
 		if($this->GUID){
 			$this->subtotal = Array();
@@ -256,23 +257,38 @@ class MSF extends Document{
 			// print_r($this->subtotal);
 			if(is_array($this->records[$this->gridName])){
 					// echo '<pre>';print_r($this->records[$this->gridName]);echo '</pre>';die();
-					foreach($this->records[$this->gridName] as $id=>$record){
-
+					
+					$sql = "SELECT pc, activity, ".Budget::getMonthlySumSQL()."
+							FROM reg_master							
+							WHERE account='J00400'
+							AND scenario =  '{$this->scenario}' AND source NOT IN ('Estimate','Actual')
+							GROUP BY pc, activity";
+					$rs = $this->oSQL->q($sql);
+					while ($rw = $this->oSQL->f($rs)){
+						for($m=1;$m<13;$m++){
+							$month = date('M',mktime(0,0,0,$m,15));
+							$arrDistribution[$rw['pc']][$rw['activity']][$month] = $rw[$month];
+							$arrPCSubtotal[$rw['pc']][$month] += $rw[$month];
+						}						
+					}
+					
+					foreach($this->records[$this->gridName] as $id=>$record){						
+						foreach ($arrDistribution[$record->pc] as $activity=>$values){
 							$master_row = $oMaster->add_master();
 							$master_row->profit = $record->pc;
-							// $master_row->activity = $total['activity'];
+							$master_row->activity = $activity;
 							// $master_row->customer = $record->customer;					
 							$item = $Items->getById($this->item);
 							$master_row->account = $item->getYACT($record->pc);
 							$master_row->item = $this->item;
 							for($m=1;$m<13;$m++){
 								$month = date('M',mktime(0,0,0,$m,15));
-								$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]*$total[$month];
+								$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]*$total[$month]*($values[$month]/$arrPCSubtotal[$record->pc][$month]);
 							}				
 													
 							
 							//echo '<pre>';print_r($master_row);echo '</pre>';
-		
+						}
 					}
 					
 					$master_row = $oMaster->add_master();
