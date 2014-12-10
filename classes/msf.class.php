@@ -37,7 +37,7 @@ class MSF extends Document{
 		parent::refresh($sql);		
 				
 		$this->total = $this->data[$this->prefix."Total"];
-		$this->item = self::MSF_ITEM;
+		//$this->item = self::MSF_ITEM;
 				
 		if($this->GUID){
 			$this->subtotal = Array();
@@ -62,14 +62,15 @@ class MSF extends Document{
 		
 		parent::defineEF();
 		
-		// $this->Columns[] = Array(
-					// 'title'=>'Item'
-					// ,'field'=>$this->prefix.'ItemGUID'
-					// ,'type'=>'combobox'
-					// ,'sql'=>$Items->getStructuredRef()
-					// , 'mandatory' => true
-					// , 'disabled'=>!$this->flagUpdate
-				// );
+		$this->Columns[] = Array(
+					'title'=>'Item'
+					,'field'=>$this->prefix.'ItemGUID'
+					,'type'=>'combobox'
+					,'sql'=>$Items->getStructuredRef()
+					, 'mandatory' => true
+					, 'disabled'=>!$this->flagUpdate					
+				);
+			
 		$this->Columns[] =Array(
 					'title'=>'Total'
 					,'field'=>$this->prefix."Total"
@@ -220,6 +221,7 @@ class MSF extends Document{
 		$sql[] = "START TRANSACTION;";
 		$sql[] = "UPDATE `".$this->table."` 
 						SET ".$this->prefix."ProfitID=".$this->profit."
+						,".$this->prefix."ItemGUID=".$this->oSQL->e($this->item)."						
 						,".$this->prefix."Total=".(double)$this->total."						
 						,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
 						,".$this->prefix."Scenario='".$this->scenario."'
