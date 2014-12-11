@@ -40,6 +40,12 @@ if(!isset($_GET['tab'])){
 	?>
 		<div id='graph'/>
 		<ul class='link-footer'>
+			<li><a href='javascript:SelectContent("kpi_<?php echo $_GET['tab'];?>");'>Select table</a></li>
+		</ul>
+	<?php	
+	Reports::masterbyGHQEst($sqlWhere);
+		?>
+		<ul class='link-footer'>
 			<li><a href='javascript:SelectContent("report_<?php echo $_GET['tab'];?>");'>Select table</a></li>
 		</ul>
 	<?php

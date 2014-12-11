@@ -17,7 +17,7 @@ class Reports{
 				return (false);
 			}			
 			?>
-			<table id='report' class='budget'>
+			<table id='kpi' class='budget'>
 			<thead>
 				<tr><th>Activity</th><th>Unit</th>
 					<?php 

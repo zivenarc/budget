@@ -61,9 +61,13 @@ $(document).ready(function(){
 function init_panel(o){
 		
 		var pccGUID = $('#pccGUID',o).val();
-		var report_id = 'report_'+pccGUID;
+		
 		var request_uri = $('#request_uri',o).val();
-		$('#report',o).attr('id',report_id);
+		$('.budget',o).each(function(){
+			var report_id = $(this).attr('id')+'_'+pccGUID;
+			$(this).attr('id',report_id);
+		});
+		
 		
 		var group = $('#group',o).val();
 		
