@@ -5,6 +5,8 @@ require ('classes/reports.class.php');
 require ('classes/budget.class.php');
 include ('includes/inc-frame_top.php');
 
+$budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
+
 if (isset($_POST['activity'])){
 	$sqlWhere = " AND activity=".$oSQL->e($_POST['activity']);
 }
@@ -25,7 +27,7 @@ if ($_POST['pccGUID']=='all'){
 // while ($rw=$oSQL->f($rs)){
 	// $data[] = $rw;
 // }
-Reports::salesByCustomer($strPCFilter.' '.$sqlWhere);
+Reports::salesByCustomer($strPCFilter.' '.$sqlWhere." AND scenario='{$budget_scenario}' AND active=1");
 ?>
 	
 <?php
