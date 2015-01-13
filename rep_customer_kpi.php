@@ -5,7 +5,7 @@ require ('classes/reports.class.php');
 require ('classes/budget.class.php');
 include ('includes/inc-frame_top.php');
 
-$budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
+$budget_scenario = isset($_REQUEST['budget_scenario'])?$_REQUEST['budget_scenario']:$budget_scenario;
 
 if (isset($_POST['activity'])){
 	$sqlWhere = " AND activity=".$oSQL->e($_POST['activity']);
