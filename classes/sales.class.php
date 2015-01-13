@@ -159,6 +159,14 @@ class Sales extends Document{
 		
 		$grid->Columns[] = parent::getCurrencyEG('buying_curr');		
 		
+		$grid->Columns[] =Array(
+				'title'=>"KPI"
+				,'field'=>'kpi'
+				,'type'=>'boolean'
+				,'mandatory'=>false
+				, 'disabled'=>$this->flagPosted
+		);	
+		
 		if (!$this->flagPosted){		
 			$grid->Columns[] =Array(
 				'title'=>"Formula"
@@ -270,6 +278,7 @@ class Sales extends Document{
 						$row->buying_rate = str_replace(',','',$_POST['buying_rate'][$id]);				
 						$row->buying_curr = $_POST['buying_curr'][$id];				
 						$row->formula = $_POST['formula'][$id];				
+						$row->kpi = $_POST['kpi'][$id];				
 						for ($m=1;$m<13;$m++){
 							$month = date('M',mktime(0,0,0,$m,15));
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
