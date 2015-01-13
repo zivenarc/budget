@@ -114,6 +114,13 @@ $sql = "SELECT $sqlFields FROM vw_master
 		ORDER BY account";
 distribute ($reportKey, $sql);
 
+$reportKey = 'Distributed corporate costs';
+$sql = "SELECT $sqlFields FROM vw_master 
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account ='607000' 
+		GROUP by {$sqlGroupBy}
+		ORDER BY account";
+distribute ($reportKey, $sql);
+
 $reportKey = 'MSF';
 $sql = "SELECT $sqlFields FROM vw_master 
 		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account='527000' 
@@ -135,7 +142,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'N/O income';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account like '60%')
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account like '60%') AND account<>'607000'
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
