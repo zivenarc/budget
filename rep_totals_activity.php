@@ -44,7 +44,7 @@ $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 
-	$keyProfit = Budget::getProfitAlias($rw);
+	$keyProfit = $rw['Profit'];//Budget::getProfitAlias($rw);
 	
 	if ($rw['item']==Items::REVENUE || $rw['item']==Items::INTERCOMPANY_REVENUE){
 		$arrRevenue[$keyProfit] += $rw['Total'];
