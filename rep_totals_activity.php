@@ -68,7 +68,7 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/12 
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	$keyProfit = Budget::getProfitAlias($rw);
+	$keyProfit = $rw['Profit'];//Budget::getProfitAlias($rw);
 	$arrHeadcount['FTE'][$keyProfit] += $rw['Total'];	
 }
 
@@ -82,7 +82,7 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/$de
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	$keyProfit = Budget::getProfitAlias($rw);
+	$keyProfit = $rw['Profit'];//Budget::getProfitAlias($rw);
 	$arrGrossRevenue[$keyProfit] += $rw['Total'];	
 	$arrGrossRevenueEstimate += $rw['Estimate'];	
 }
@@ -97,7 +97,7 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/$de
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	$keyProfit = Budget::getProfitAlias($rw);
+	$keyProfit = $rw['Profit'];//Budget::getProfitAlias($rw);
 	$arrOpIncome[$keyProfit] += $rw['Total'];	
 	$arrOpIncomeEstimate += $rw['Estimate'];	
 }
@@ -113,7 +113,7 @@ $sql = "SELECT prtTitle, unit, pccTitle as Profit, pccFlagProd, SUM(".Budget::ge
 		ORDER BY activity, pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	$keyProfit = Budget::getProfitAlias($rw);
+	$keyProfit = $rw['Profit'];//Budget::getProfitAlias($rw);
 	$arrKPI[$rw['prtTitle'].', '.$rw['unit']][$keyProfit] += $rw['Total'];	
 	//$arrKPIEstimate += $rw['Estimate'];	
 }
