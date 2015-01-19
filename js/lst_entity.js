@@ -9,6 +9,9 @@ $(document).ready(function(){
 						"Error loading the tab" );
 					});
 				  },								
-				spinner:''
+				spinner:'',
+				load: function(){
+					eiseListInitialize();
+					}
 				});
 });
