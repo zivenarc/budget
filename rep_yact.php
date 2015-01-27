@@ -43,20 +43,20 @@ if(!isset($_GET['tab'])){
 	} else {
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).")";
 	}
-	switch ($_GET['tab']){
-		case 'f865db6b-d328-102e-9d25-5de97ba9df63':
-		case 'f865e1de-d328-102e-9d25-5de97ba9df63':
-		case 'all':
+	// switch ($_GET['tab']){
+		// case 'f865db6b-d328-102e-9d25-5de97ba9df63':
+		// case 'f865e1de-d328-102e-9d25-5de97ba9df63':
+		// case 'all':
 			echo "<input type='hidden' id='group' value='activity'/>";
 			Reports::masterYactByActivityEst($sqlWhere." AND scenario='$budget_scenario'");	
-		break;
-		case 'f865e855-d328-102e-9d25-5de97ba9df63':
-			$sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") OR (customer=9907 AND Group_code=94))";
-		default:
-			echo "<input type='hidden' id='group' value='customer'/>";
-			Reports::masterYactByCustomerEst($sqlWhere." AND scenario='$budget_scenario'");
-			break;
-	}
+		// break;
+		// case 'f865e855-d328-102e-9d25-5de97ba9df63':
+			// $sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") OR (customer=9907 AND Group_code=94))";
+		// default:
+			// echo "<input type='hidden' id='group' value='customer'/>";
+			// Reports::masterYactByCustomerEst($sqlWhere." AND scenario='$budget_scenario'");
+			// break;
+	// }
 	?>
 		<ul class='link-footer'>
 			<li><a href='javascript:SelectContent("report_<?php echo $_GET['tab'];?>");'>Select table</a></li>
