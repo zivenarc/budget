@@ -756,8 +756,8 @@ class Reports{
 		$sqlOps = str_replace('GROUP BY `yact_group`, `account`', '', $sqlOps);
 		$rs = $oSQL->q($sqlOps);
 		$rw = $oSQL->f($rs);
-		$rw['Group'] = "Operating income";
-		self::echoBudgetItemString($rw,'budget-grandtotal');
+		$rw['Budget item'] = "Operating income";
+		self::echoBudgetItemString($rw,'budget-subtotal');
 		
 	}
 	
