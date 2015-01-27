@@ -474,7 +474,7 @@ class Budget{
 					$keyProfit = 'Toyota';
 					break;
 				case 'Forwarding':				
-				case 'NOVO':
+				//case 'NOVO':
 				case 'Krekshino':
 					$keyProfit = 'FWD';
 					break;
