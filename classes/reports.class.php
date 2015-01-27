@@ -749,6 +749,16 @@ class Reports{
 			$data = $grandTotal;
 			$data['Budget item']='Grand total';
 			self::echoBudgetItemString($data,'budget-grandtotal');
+			
+		//------ Operating income -------
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND account NOT LIKE '6%'", $sql);
+		$sqlOps = str_replace('GROUP BY `yact_group`, `account`', '', $sqlOps);
+		$rs = $oSQL->q($sqlOps);
+		$rw = $oSQL->f($rs);
+		$rw['Group'] = "Operating income";
+		self::echoBudgetItemString($data,'budget-grandtotal');
+		
 	}
 	
 	private function noFirstLevelReport($sqlWhere, $currency=643){
