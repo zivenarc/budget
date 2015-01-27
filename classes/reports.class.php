@@ -757,7 +757,7 @@ class Reports{
 		$rs = $oSQL->q($sqlOps);
 		$rw = $oSQL->f($rs);
 		$rw['Group'] = "Operating income";
-		self::echoBudgetItemString($data,'budget-grandtotal');
+		self::echoBudgetItemString($rw,'budget-grandtotal');
 		
 	}
 	
