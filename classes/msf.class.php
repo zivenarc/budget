@@ -182,7 +182,7 @@ class MSF extends Document{
 			
 			$sql = "SELECT SUM(".Budget::getYTDSQL().") as Total, ".Budget::getMonthlySumSQL()." 
 						FROM reg_master 
-						WHERE active=1 AND scenario='{$this->scenario}' AND pc={$this->profit}";
+						WHERE active=1 AND scenario='{$this->scenario}' AND pc={$this->profit} AND source<>'Estimate'";
 			$rs = $this->oSQL->q($sql);	
 			$total = $this->oSQL->f($rs);
 			
