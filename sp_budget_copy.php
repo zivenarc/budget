@@ -49,7 +49,7 @@ $sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item
 					'{$new_budget}', active
 				FROM reg_master WHERE scenario=@refID AND active=1 AND estimate=0
 				GROUP BY company, pc, activity, customer, account, item
-				HAVING YTD<>0;";
+				HAVING FYE<>0;";
 				
 $sql [] = "DELETE FROM tbl_scenario_variable WHERE scvScenarioID='{$new_budget}';";
 $sql [] = "INSERT INTO tbl_scenario_variable (scvVariableID, scvScenarioID, scvValue, scvEditBy, scvEditDate, scvInsertBy, scvInsertDate, scvFlagDeleted, scvGUID)
