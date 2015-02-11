@@ -27,7 +27,7 @@ class budget_session {
 		$this->records['master'] = Array();
 	}
 	
-	public function save(){
+	public function save($flagPostActualPeriods = false){
 		
 		GLOBAL $arrUsrData;
 		
@@ -38,7 +38,7 @@ class budget_session {
 		$sql[] = "DELETE FROM `reg_master` WHERE `source`='".$this->id."'";
 		
 		for ($i=0;$i<count($this->records['master']);$i++){
-			$sql[] = $this->records['master'][$i]->getSQLstring(date('m',$this->budget->date_start));
+			$sql[] = $this->records['master'][$i]->getSQLstring(date('m',$this->budget->date_start),12,$flagPostActualPeriods);
 		}
 		
 		// $sql[] = "DELETE FROM `tbl_headcount` WHERE `source`='".$this->id."'";
@@ -153,10 +153,14 @@ class master_record{
 		return(true);
 	}
 	
-	public function getSQLstring($mStart=1, $mEnd=12){
+	public function getSQLstring($mStart=1, $mEnd=12, $flagPostActualPeriods = false){
 		
 		GLOBAL $oSQL;
-	
+		
+		if ($flagPostActualPeriods) {
+			$mStart = 1;
+		}
+		
 		for($m=$mStart;$m<=$mEnd;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`=".$this->{$month};
@@ -453,7 +457,7 @@ class Budget{
 		<div id='tabs' class='tabs'>
 			<ul>
 			<?php
-			$sql = "SELECT * FROM tbl_scenario WHERE scnFlagDeleted=0".($flagWrite?" AND scnFlagReadOnly=0":"");			
+			$sql = "SELECT * FROM tbl_scenario WHERE scnFlagDeleted=0 AND scnFlagArchive=0 ".($flagWrite?" AND scnFlagReadOnly=0":"");			
 			$rs = $oSQL->q($sql);
 			while ($rw=$oSQL->f($rs)){
 				echo "<li><a href='",$_SERVER['PHP_SELF'],"?tab=",$rw['scnID'],"'>",$rw['scnTitle'],"</a></li>\r\n";

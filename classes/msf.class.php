@@ -303,7 +303,7 @@ class MSF extends Document{
 						$master_row->{$month} = -$total[$month];
 					}
 				
-				$oMaster->save();
+				$oMaster->save(true);//Save into actual periods
 				$this->markPosted();
 			}
 		}
