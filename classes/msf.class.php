@@ -261,7 +261,7 @@ class MSF extends Document{
 					$sql = "SELECT pc, activity, ".Budget::getMonthlySumSQL()."
 							FROM reg_master							
 							WHERE account='J00400'
-							AND scenario =  '{$this->scenario}' AND source NOT IN ('Estimate','Actual')
+							AND scenario =  '{$this->scenario}' AND source NOT IN ('Estimate')
 							GROUP BY pc, activity";
 					$rs = $this->oSQL->q($sql);
 					while ($rw = $this->oSQL->f($rs)){
