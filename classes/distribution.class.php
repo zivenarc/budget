@@ -113,7 +113,7 @@ class Distribution extends Document{
 				,'prefix'=>'cnt'
 				,'sql'=>"SELECT cntID as optValue, cntTitle as optText FROM vw_customer"
 				, 'mandatory' => true
-				, 'disabled'=>false
+				, 'disabled'=>!$this->flagUpdate
 				, 'default'=>0
 				, 'class'=>'costs_supplier'
 			);		
@@ -133,16 +133,16 @@ class Distribution extends Document{
 			'title'=>$month
 			,'field'=>strtolower($month)
 			,'class'=>'budget-month'
-			,'type'=>'decimal'
+			,'type'=>'money'
 			, 'mandatory' => true
-			, 'disabled'=>false
+			, 'disabled'=>!$this->flagUpdate
 			,'totals'=>true
 		);
 		}
 		$grid->Columns[] =Array(
 			'title'=>'Total'
 			,'field'=>'YTD'
-			,'type'=>'decimal'
+			,'type'=>'money'
 			,'totals'=>true
 			,'disabled'=>true
 		);
