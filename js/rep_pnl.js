@@ -165,6 +165,7 @@ function init_panel(o){
 function getSource(data){
 		
 	data.pccGUID = localStorage.pccGUID;
+	data.budget_scenario = $('#budget_scenario').val();
 	var key =  ($('#group').val());	
 		
 	if (data.level1!=undefined){

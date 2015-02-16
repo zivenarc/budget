@@ -4,6 +4,10 @@ require ('common/auth.php');
 require ('classes/reports.class.php');
 include ('includes/inc-frame_top.php');
 
+if (isset($_POST['budget_scenario'])){
+	$budget_scenario = $_POST['budget_scenario'];
+}
+
 if (isset($_POST['customer'])){
 	$sqlWhere = " AND customer=".$oSQL->e($_POST['customer']);
 }

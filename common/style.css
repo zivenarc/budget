@@ -1889,3 +1889,11 @@ td.costs_supplier{
 .budget-icon-deleted{
 	background: url(/common/images/icons/page_white_delete.png) no-repeat;
 }
+
+th.budget-inactive{
+	background-color:#E3EBF0 !important;	
+}
+td.budget-inactive{
+	background-color:#eee !important;
+	color:#222 !important;
+}
