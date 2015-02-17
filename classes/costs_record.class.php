@@ -103,7 +103,7 @@ class costs_record{
 	}
 	
 	public function total(){
-		for($m=1;$m<12;$m++){
+		for($m=1;$m<13;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
