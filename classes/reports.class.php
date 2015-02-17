@@ -257,14 +257,15 @@ class Reports{
 			GROUP BY prtGHQ, account
 			ORDER BY prtGHQ, account			
 			";
-		$rs = $oSQL->q($sql);
+			$rs = $oSQL->q($sql);
+			$tableID = "YACT_".md5($sql);
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
 				//echo "<pre>$sql</pre>";
 				return (false);
 			}
 			?>
-			<table id='report' class='budget'>
+			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr><th>Activity</th><th>Account</th><th>Title</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
 			</thead>			
@@ -288,6 +289,9 @@ class Reports{
 			?>
 			</tbody>
 			</table>
+			<ul class='link-footer'>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
 			<?php			
 			ob_flush();
 		
@@ -306,13 +310,14 @@ class Reports{
 			
 			";
 			$rs = $oSQL->q($sql);
+			$tableID = "byProfit_".md5($sql);
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
 				//echo "<pre>$sql</pre>";
 				return (false);
 			}
 			?>
-			<table id='report' class='budget'>
+			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr><th>Profit center</th><th>Account</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
 			</thead>			
@@ -353,6 +358,9 @@ class Reports{
 			?>
 			</tbody>
 			</table>
+			<ul class='link-footer'>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
 			<?php			
 			ob_flush();
 	}
@@ -369,13 +377,14 @@ class Reports{
 			
 			";
 			$rs = $oSQL->q($sql);
+			$tableID = "byAct_".md5($sql);
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
 				//echo "<pre>$sql</pre>";
 				return (false);
 			}
 			?>
-			<table id='report' class='budget'>
+			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr>
 					<th>Activity</th><th>Account</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th>
@@ -418,6 +427,9 @@ class Reports{
 			?>
 			</tbody>
 			</table>
+			<ul class='link-footer'>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
 			<?php			
 			ob_flush();
 	}
@@ -433,13 +445,14 @@ class Reports{
 			
 			";
 			$rs = $oSQL->q($sql);
+			$tableID = "byCust_".md5($sql);
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
 				//echo "<pre>$sql</pre>";
 				return (false);
 			}
 			?>
-			<table id='report' class='budget'>
+			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr><th>Customer</th><th>Account</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
 			</thead>			
@@ -480,6 +493,9 @@ class Reports{
 			?>
 			</tbody>
 			</table>
+			<ul class='link-footer'>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
 			<?php			
 			ob_flush();
 	}
@@ -503,11 +519,15 @@ class Reports{
 			";
 			
 			self::firstLevelReport($sql, 'Customer', $Budget);
+			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
 			self::noFirstLevelReport($sqlWhere, $currency);
 			?>
 			</tbody>
 			</table>
+			<ul class='link-footer'>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
 			<?php			
 			ob_flush();
 	}
@@ -553,11 +573,15 @@ class Reports{
 			";
 			
 			self::firstLevelReport($sql, 'Activity', $Budget);
+			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
 			self::noFirstLevelReport($sqlWhere, $currency);
 			?>
 			</tbody>
 			</table>
+			<ul class='link-footer'>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
 			<?php			
 			ob_flush();
 	}
@@ -616,13 +640,15 @@ class Reports{
 	private function firstLevelReport($sql, $firstLevelTitle, $Budget=null){
 		global $oSQL;				
 		
+		$tableID = "FLR_".md5($sql);
+		
 		if (!$rs = $oSQL->q($sql)){
 				echo "<div class='error'>SQL error:</div>";
 				echo "<pre>$sql</pre>";
 				return (false);
 			};
 			?>
-			<table id='report' class='budget'>
+			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr>
 					<th><?php echo $firstLevelTitle; ?></th>
