@@ -9,6 +9,9 @@ $budget_scenario = isset($_REQUEST['budget_scenario'])?$_REQUEST['budget_scenari
 
 if (isset($_POST['activity'])){
 	$sqlWhere = " AND activity=".$oSQL->e($_POST['activity']);
+	$sql = "SELECT * FROM vw_product_type WHERE prtID=".$oSQL->e($_POST['activity']);
+	$rs = $oSQL->q($sql);
+	$rwAct = $oSQL->f($rs);
 }
 
 if ($_POST['pccGUID']=='all'){
@@ -27,9 +30,13 @@ if ($_POST['pccGUID']=='all'){
 // while ($rw=$oSQL->f($rs)){
 	// $data[] = $rw;
 // }
+?>
+<div id='output'>
+<h2><?php echo $rwAct["prtTitle$strLocal"];?></h2>
+<?php
 Reports::salesByCustomer($strPCFilter.' '.$sqlWhere." AND scenario='{$budget_scenario}' AND active=1");
 ?>
-	
+</div>
 <?php
 include ('includes/inc-frame_bottom.php');
 ?>

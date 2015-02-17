@@ -15,9 +15,10 @@ class Reports{
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
 				return (false);
-			}			
+			}
+			$tableID = "kpi_".md5($sql);
 			?>
-			<table id='kpi' class='budget'>
+			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr><th>Activity</th><th>Unit</th>
 					<?php 
@@ -61,6 +62,9 @@ class Reports{
 			?>
 			</tbody>
 			</table>
+			<ul class='link-footer'>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
 			<?php
 			ob_flush();
 	}
@@ -76,14 +80,15 @@ class Reports{
 					WHERE posted=1 AND scenario='{$budget_scenario}' $sqlWhere
 					GROUP BY `reg_sales`.`customer`
 					ORDER BY Total DESC"; 
-					echo $sql;
+			//echo $sql;
 			$rs = $oSQL->q($sql);
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
 				return (false);
-			}			
+			}
+			$tableID = "report_".md5($sql);
 			?>
-			<table id='report' class='budget'>
+			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr><th>Customer</th><th>Unit</th>
 					<?php 
@@ -144,6 +149,9 @@ class Reports{
 				</tr>
 			</tfoot>
 			</table>
+			<ul class='link-footer'>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>			
 			<?php
 			ob_flush();
 	}

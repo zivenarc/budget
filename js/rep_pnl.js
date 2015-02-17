@@ -64,8 +64,8 @@ function init_panel(o){
 		
 		var request_uri = $('#request_uri',o).val();
 		$('.budget',o).each(function(){
-			var report_id = $(this).attr('id')+'_'+pccGUID;
-			$(this).attr('id',report_id);
+			var report_id = $(this).attr('id');//+'_'+pccGUID;
+			//$(this).attr('id',report_id);
 		});
 		
 		
@@ -196,7 +196,7 @@ function getCustomerKPI(data){
 	data.budget_scenario = $('#budget_scenario').val();
 	
 	$('#sources').detach();
-	$('<div>',{id:'sources'}).load('rep_customer_kpi.php #report',data, function(){
+	$('<div>',{id:'sources'}).load('rep_customer_kpi.php #output',data, function(){
 		$(this).dialog({
 			'title':'Customer KPI',
 			'modal':true,
