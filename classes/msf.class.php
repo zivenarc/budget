@@ -317,11 +317,12 @@ class MSF extends Document{
 										echo '<pre>ERROR: ',$e,'</pre>';
 										echo '<pre>Month: ',$month,'</pre>';
 										echo '<pre>Record PC: ',$record->pc,'</pre>';
-										echo '<pre>';print_r($record);echo '</pre>';
-										echo '<pre>';print_r($this->subtotal);echo '</pre>';
-										echo '<pre>';print_r($item_values);echo '</pre>';
-										echo '<pre>';print_r($values);echo '</pre>';
-										echo '<pre>';print_r($arrPCSubtotal);echo '</pre>';
+										echo '<pre>НГ: ',$activity,'</pre>';
+										echo '<pre>Запись ТЧ: ';print_r($record);echo '</pre>';
+										echo '<pre>Итоги по ТЧ: ';print_r($this->subtotal);echo '</pre>';
+										echo '<pre>Данные по строке исходного БС: ';print_r($item_values);echo '</pre>';
+										echo '<pre>Данные по ЦФО/Активности: ';print_r($values);echo '</pre>';
+										echo '<pre>Выручка ЦФО: ';print_r($arrPCSubtotal);echo '</pre>';
 									} else {
 										$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]
 																*$item_values[$month]															
