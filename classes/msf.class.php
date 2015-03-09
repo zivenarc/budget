@@ -313,11 +313,7 @@ class MSF extends Document{
 									// $master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]
 															// *$total[$month]															
 															// *($values[$month]/$arrPCSubtotal[$record->pc][$month]);	
-									try {						
-									$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]
-															*$item_values[$month]															
-															*($values[$month]/$arrPCSubtotal[$record->pc][$month]);
-									} catch (Exception $e){
+									if ($this->subtotal[strtolower($month)] || $arrPCSubtotal[$record->pc][$month]) {
 										echo '<pre>ERROR: ',$e,'</pre>';
 										echo '<pre>Month: ',$month,'</pre>';
 										echo '<pre>Record PC: ',$record->pc,'</pre>';
@@ -326,8 +322,12 @@ class MSF extends Document{
 										echo '<pre>';print_r($item_values);echo '</pre>';
 										echo '<pre>';print_r($values);echo '</pre>';
 										echo '<pre>';print_r($arrPCSubtotal);echo '</pre>';
-										
+									} else {
+										$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]
+																*$item_values[$month]															
+																*($values[$month]/$arrPCSubtotal[$record->pc][$month]);
 									}
+																			
 								}				
 														
 								//echo '<pre>';print_r($master_row);echo '</pre>';
