@@ -313,7 +313,7 @@ class MSF extends Document{
 									// $master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]
 															// *$total[$month]															
 															// *($values[$month]/$arrPCSubtotal[$record->pc][$month]);	
-									if ($this->subtotal[strtolower($month)] || $arrPCSubtotal[$record->pc][$month]) {
+									if ($this->subtotal[strtolower($month)]==0 || $arrPCSubtotal[$record->pc][$month]==0) {
 										echo '<pre>ERROR: ',$e,'</pre>';
 										echo '<pre>Month: ',$month,'</pre>';
 										echo '<pre>Record PC: ',$record->pc,'</pre>';
