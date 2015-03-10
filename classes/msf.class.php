@@ -137,7 +137,7 @@ class MSF extends Document{
 			,'class'=>'budget-month'
 			,'type'=>'decimal'
 			, 'mandatory' => true
-			, 'disabled'=>false
+			, 'disabled'=>!$this->flagUpdate
 			,'totals'=>true
 		);
 		}
@@ -252,12 +252,14 @@ class MSF extends Document{
 		}
 		
 		if($mode=='post'){
+			
+			//$this->oSQL->startProfiling();
+		
 			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new budget_session($this->scenario, $this->GUID);
 			// print_r($this->subtotal);
 			if(is_array($this->records[$this->gridName])){
-					// echo '<pre>';print_r($this->records[$this->gridName]);echo '</pre>';die();
-					
+					// echo '<pre>';print_r($this->records[$this->gridName]);echo '</pre>';die();					
 					$sql = "SELECT pc, activity, ".Budget::getMonthlySumSQL()."
 							FROM reg_master							
 							WHERE account='J00400'
@@ -287,54 +289,48 @@ class MSF extends Document{
 						}
 						for($m=1;$m<13;$m++){
 							$month = date('M',mktime(0,0,0,$m,15));
-							$arrAccounts[$item][$month] += $rw[$month];
+							if ($rw[$month]!=0){
+								$arrAccounts[$item][$month] += $rw[$month];
+							}
 						}
-					}
-					
+					}					
 					// echo '<pre>';print_r($arrAccounts);echo '</pre>';
 					// echo '<pre>';print_r($arrDistribution);echo '</pre>';die();
 					
 					foreach($this->records[$this->gridName] as $id=>$record){						
-						foreach ($arrDistribution[$record->pc] as $activity=>$values){
-						
+						foreach ($arrDistribution[$record->pc] as $activity=>$values){							
 							foreach($arrAccounts as $item_code=>$item_values){
-								//echo '<pre>';print_r($item_values);echo '</pre>';
+								// echo '<pre>',$item_code,"\r\n";print_r($item_values);echo '</pre>';
 								$master_row = $oMaster->add_master();
 								$master_row->profit = $record->pc;
 								$master_row->activity = $activity;
 								// $master_row->customer = $record->customer;					
 								//$item = $Items->getById($this->item);
 								$item = $Items->getById($item_code);
+								// echo '<pre>';print_r($item);echo '<pre>';
 								$master_row->account = $item->getYACT($record->pc);
 								// $master_row->item = $this->item;
-								$master_row->item = $item;
+								$master_row->item = $item_code;
 								for($m=1;$m<13;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
 									// $master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]
 															// *$total[$month]															
 															// *($values[$month]/$arrPCSubtotal[$record->pc][$month]);	
-									if ($this->subtotal[strtolower($month)]==0 || $arrPCSubtotal[$record->pc][$month]==0) {
-										echo '<pre>ERROR: ',$e,'</pre>';
-										echo '<pre>Month: ',$month,'</pre>';
-										echo '<pre>Record PC: ',$record->pc,'</pre>';
-										echo '<pre>НГ: ',$activity,'</pre>';
-										echo '<pre>Запись ТЧ: ';print_r($record);echo '</pre>';
-										echo '<pre>Итоги по ТЧ: ';print_r($this->subtotal);echo '</pre>';
-										echo '<pre>Данные по строке исходного БС: ';print_r($item_values);echo '</pre>';
-										echo '<pre>Данные по ЦФО/Активности: ';print_r($values);echo '</pre>';
-										echo '<pre>Выручка ЦФО: ';print_r($arrPCSubtotal);echo '</pre>';
-									} else {
-										$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]
+									$master_row->{$month} = round(
+																$record->{$month}/$this->subtotal[strtolower($month)]
 																*$item_values[$month]															
-																*($values[$month]/$arrPCSubtotal[$record->pc][$month]);
-									}
-																			
+																*($values[$month]/$arrPCSubtotal[$record->pc][$month])
+															,2);
+																		
 								}				
 														
-								//echo '<pre>';print_r($master_row);echo '</pre>';
+								// echo '<pre>';print_r($master_row);echo '</pre>';
 							}																					
-						}
+						}						
+						//echo $id,"\r\n";
 					}
+					
+					
 					
 					foreach($arrAccounts as $item_code=>$item_values){
 						$master_row = $oMaster->add_master();
@@ -345,18 +341,22 @@ class MSF extends Document{
 						$item = $Items->getById($item_code);
 						$master_row->account = $item->getYACT($this->profit);
 						// $master_row->item = $this->item;
-						$master_row->item = $item;
+						$master_row->item = $item_code;
 						for($m=1;$m<13;$m++){
 							$month = date('M',mktime(0,0,0,$m,15));
 							//$master_row->{$month} = -$total[$month];
 							$master_row->{$month} = -$item_values[$month];
 						}
 					}
+										
 				
-				$oMaster->save(true);//Save into actual periods
+				$oMaster->save(true);//Save into actual periods				
 				$this->markPosted();
 			}
-		}
+		
+		// $this->oSQL->showProfileInfo();
+		
+		}		
 		
 		return($sqlSuccess);
 				
