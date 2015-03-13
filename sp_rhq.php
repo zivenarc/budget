@@ -178,6 +178,29 @@ while ($rw = $oSQL->f($rs)){
 	}
 }
 
+
+$reportKey = 'RFC: Warehouse costs';
+$sql = "SELECT $sqlFields FROM vw_master 
+		LEFT JOIN vw_yact YACT ON yctID=account
+		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='J' AND pccFLagProd = 1
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN('J0080W') AND pccFLagProd = 1
+		GROUP by pc, prtGHQ";
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	for($m=1;$m<13;$m++){
+		$month = (date('M',mktime(0,0,0,$m,15)));
+		if ($rw['prtGHQ']){
+			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];			
+		} else {
+			if (!is_array($arrRatio[$rw['pc']])) echo '<pre>','Error for PC',$arrProfit[$rw['pc']]['pccTitle'], " ({$rw['pc']})"," cannot distribute $month",$rw[$month] ,'</pre>';
+			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
+				$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];				
+			}
+		}
+		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+	}
+}
+
 $reportKey = 'RFC: Depreciation';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
@@ -205,7 +228,7 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'RFC: Other';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (YACT.yctParentID IN ('SZ0040') AND account NOT IN ('J00806','J00801')) AND pccFLagProd = 1
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (YACT.yctParentID IN ('SZ0040') AND account NOT IN ('J00806','J00801','J0080W')) AND pccFLagProd = 1
 		GROUP by pc, prtGHQ";
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
