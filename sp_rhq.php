@@ -1,5 +1,5 @@
 <?php
-$flagNoAuth = true;
+// $flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/reference.class.php');
 require ('classes/item.class.php');
@@ -159,18 +159,19 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'Labor costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='J' AND pccFLagProd = 1
+		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='J' AND pccFLagProd = 1
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN('J00801') AND pccFLagProd = 1
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
 		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
+			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];			
 		} else {
 			if (!is_array($arrRatio[$rw['pc']])) echo '<pre>','Error for PC',$arrProfit[$rw['pc']]['pccTitle'], " ({$rw['pc']})"," cannot distribute $month",$rw[$month] ,'</pre>';
 			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
-				$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];
+				$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];				
 			}
 		}
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
@@ -180,7 +181,8 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'Depreciation';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('512000','J00806') AND pccFLagProd = 1
+		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('512000','J00806') AND pccFLagProd = 1
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('J00806') AND pccFLagProd = 1
 		GROUP by pc, prtGHQ";
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -203,7 +205,7 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'Other fixed costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account IN ('J00803','J00804','J00805','J00808') OR (YACT.yctParentID IN ('59900S') AND account NOT IN ('512000','J00806'))) AND pccFLagProd = 1
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (YACT.yctParentID IN ('SZ0040') AND account NOT IN ('J00806','J00801')) AND pccFLagProd = 1
 		GROUP by pc, prtGHQ";
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -223,10 +225,33 @@ while ($rw = $oSQL->f($rs)){
 	}
 }
 
-$reportKey = 'Personnel costs';
+$reportKey = 'SGA:Personnel costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='5' AND (pccFLagProd = 1 OR activity is not null)
+		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='5' AND (pccFLagProd = 1 OR activity is not null)
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND (pccFLagProd = 1 OR activity is not null)
+		GROUP by pc, prtGHQ";
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	for($m=1;$m<13;$m++){
+		$month = (date('M',mktime(0,0,0,$m,15)));
+		if ($rw['prtGHQ']){
+			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
+		} else {
+			if (!is_array($arrRatio[$rw['pc']])) echo '<pre>','Error for PC',$arrProfit[$rw['pc']]['pccTitle'], " ({$rw['pc']})"," cannot distribute $month",$rw[$month] ,'</pre>';
+			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
+				$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];
+			}
+		}
+		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+	}
+}
+
+$reportKey = 'Other SGA';
+$sql = "SELECT $sqlFields FROM vw_master 
+		LEFT JOIN vw_yact YACT ON yctID=account
+		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='5' AND (pccFLagProd = 1 OR activity is not null)
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S') AND (pccFLagProd = 1 OR activity is not null)
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
