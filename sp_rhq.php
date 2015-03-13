@@ -112,8 +112,8 @@ while ($rw = $oSQL->f($rs)){
 $arrFilter = Array(
 	Items::DIRECT_COSTS,
 	Items::INTERCOMPANY_COSTS,
-	Items::CY_RENT,
-	Items::WH_RENT,
+	//Items::CY_RENT,
+	//Items::WH_RENT,
 	Items::KAIZEN
 );
 $reportKey = 'Direct costs';
@@ -129,7 +129,7 @@ while ($rw = $oSQL->f($rs)){
 	}
 }
 
-$reportKey = '<i>Freight costs</i>';
+$reportKey = '<i>thereof: Freight costs</i>';
 $sql = "SELECT $sqlFields FROM vw_master 
 		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') AND activity in (".implode(",",$arrFreightFilter).")
 		GROUP by prtGHQ"; 
@@ -156,7 +156,7 @@ while ($rw = $oSQL->f($rs)){
 	}
 }
 
-$reportKey = 'Labor costs';
+$reportKey = 'RFC: Labor costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
 		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='J' AND pccFLagProd = 1
@@ -178,7 +178,7 @@ while ($rw = $oSQL->f($rs)){
 	}
 }
 
-$reportKey = 'Depreciation';
+$reportKey = 'RFC: Depreciation';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
 		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('512000','J00806') AND pccFLagProd = 1
@@ -202,7 +202,7 @@ while ($rw = $oSQL->f($rs)){
 	}
 }
 
-$reportKey = 'Other fixed costs';
+$reportKey = 'RFC: Other';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
 		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (YACT.yctParentID IN ('SZ0040') AND account NOT IN ('J00806','J00801')) AND pccFLagProd = 1
@@ -247,7 +247,7 @@ while ($rw = $oSQL->f($rs)){
 	}
 }
 
-$reportKey = 'Other SGA';
+$reportKey = 'SGA:Other';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
 		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='5' AND (pccFLagProd = 1 OR activity is not null)
