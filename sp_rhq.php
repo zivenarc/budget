@@ -293,7 +293,7 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'Corporate costs: other';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account IN ('J00803','J00804','J00805','J00806','J00808') OR YACT.yctParentID IN ('59900S'))  AND pccFLagProd = 0
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S')  AND (pccFLagProd = 0  and activity is null)
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
