@@ -250,9 +250,8 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'SGA:Personnel costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		LEFT JOIN vw_yact YACT ON yctID=account
-		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='5' AND (pccFLagProd = 1 OR activity is not null)
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND (pccFLagProd = 1 OR activity is not null)
+		LEFT JOIN vw_yact YACT ON yctID=account		
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND (pccFLagProd = 1 OR pc=9 OR activity is not null)
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -261,9 +260,19 @@ while ($rw = $oSQL->f($rs)){
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		} else {
-			if (!is_array($arrRatio[$rw['pc']])) echo '<pre>','Error for PC',$arrProfit[$rw['pc']]['pccTitle'], " ({$rw['pc']})"," cannot distribute $month",$rw[$month] ,'</pre>';
-			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
-				$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];
+			if (!is_array($arrRatio[$rw['pc']])) {
+						if ($rw['pccFlagProd']){
+							error_distribution(Array('data'=>$rw,'reportKey'=>$key,'month'=>$month, 'sql'=>$sql));
+						} else {
+							foreach($arrGHQSubtotal as $ghq=>$revenue){
+								$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+								$arrBreakDown[$reportKey][$rw['account'].$rw['title']][$ghq] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+							}
+						}
+			} else {
+				foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
+					$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];
+				}
 			}
 		}
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
@@ -272,9 +281,8 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'SGA:Other';
 $sql = "SELECT $sqlFields FROM vw_master 
-		LEFT JOIN vw_yact YACT ON yctID=account
-		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='5' AND (pccFLagProd = 1 OR activity is not null)
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S') AND (pccFLagProd = 1 OR activity is not null)
+		LEFT JOIN vw_yact YACT ON yctID=account		
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S') AND (pccFLagProd = 1  OR pc=9 OR activity is not null)
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -283,9 +291,19 @@ while ($rw = $oSQL->f($rs)){
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		} else {
-			if (!is_array($arrRatio[$rw['pc']])) echo '<pre>','Error for PC',$arrProfit[$rw['pc']]['pccTitle'], " ({$rw['pc']})"," cannot distribute $month",$rw[$month] ,'</pre>';
-			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
-				$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];
+			if (!is_array($arrRatio[$rw['pc']])) {
+						if ($rw['pccFlagProd']){
+							error_distribution(Array('data'=>$rw,'reportKey'=>$key,'month'=>$month, 'sql'=>$sql));
+						} else {
+							foreach($arrGHQSubtotal as $ghq=>$revenue){
+								$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+								$arrBreakDown[$reportKey][$rw['account'].$rw['title']][$ghq] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+							}
+						}
+			} else {
+				foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
+					$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];
+				}
 			}
 		}
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
@@ -295,7 +313,7 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'Corporate costs: personnel';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P')  AND (pccFLagProd = 0 and activity is null)
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P')  AND ((pccFLagProd = 0 AND pc<>9)and activity is null)
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -316,7 +334,7 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'Corporate costs: other';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S')  AND (pccFLagProd = 0  and activity is null)
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S')  AND ((pccFLagProd = 0 AND pc<>9)  and activity is null)
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -537,4 +555,12 @@ foreach($arrGHQSubtotal as $ghq=>$revenue){
 </table>
 <?php
 include ('includes/inc-frame_bottom.php');
+
+
+function error_distribution($params){
+	GLOBAL $arrProfit;
+	echo '<pre>','Error for PC ',$arrProfit[$params['data']['pc']]['pccTitle'], " ({$params['data']['pc']})"," cannot distribute {$params['reportKey']} in {$params['month']} ({$params['data'][$params['month']]})" ,'</pre>';
+	echo '<pre>',$params['sql'],'</pre>';
+}
+
 ?>
