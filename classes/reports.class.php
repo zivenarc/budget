@@ -801,12 +801,14 @@ class Reports{
 		
 		$strFields = self::_getMonthlyFields($currency);
 		
+		$sqlGroup = "GROUP BY `Group`, `Budget item`";
+		
 		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`, 
 					{$strFields}
 			FROM `vw_master`
 			##LEFT JOIN tbl_scenario ON scnID=scenario
 			{$sqlWhere} 
-			GROUP BY `Group`, `Budget item`
+			{$sqlGroup}
 			ORDER BY `Group`, `itmOrder` ASC";
 			
 			// echo '<pre>',$sql,'</pre>';
@@ -862,8 +864,19 @@ class Reports{
 			self::echoBudgetItemString($data,'budget-subtotal');
 			//Grand total
 			$data = $grandTotal;
-			$data['Budget item']='Grand total';
+			$data['Budget item']='Profit before tax';
 			self::echoBudgetItemString($data,'budget-grandtotal');
+			
+		//------ Operating income -------
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND account NOT LIKE '6%'", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $oSQL->q($sqlOps);
+		while ($rw = $oSQL->f($rs)){
+			$rw['Budget item'] = "Operating income";
+			self::echoBudgetItemString($rw,'budget-subtotal');
+		}
+			
 	}
 	
 	private function _getMonthlyFields($currency){
