@@ -5,10 +5,9 @@ require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 require ('classes/item.class.php');
 
-$budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
+include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
-$denominator = isset($_GET['denominator'])?(double)$_GET['denominator']:1;
 
 $arrJS[] = 'js/rep_totals.js';
 include ('includes/inc-frame_top.php');

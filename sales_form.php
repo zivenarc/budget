@@ -110,6 +110,8 @@ if ($oDocument->customer && $oDocument->flagUpdate ){
 
 $oDocument->fillGrid();
 
+$arrUsrData["pagTitle$strLocal"] .= ' #'.$oDocument->ID;
+
 require ('includes/inc-frame_top.php');
 require ('includes/inc_document_header.php');
 ?>

@@ -55,7 +55,7 @@ class budget_session {
 		
 		$sql[] = "COMMIT;";
 		
-				
+		// $this->oSQL->startProfiling();		
 		// echo '<pre>',implode(";\r\n",$sql),'</pre>';
 		for($i=0;$i<count($sql);$i++){
 			if ($sql[$i]) $this->oSQL->q($sql[$i]);
@@ -63,7 +63,7 @@ class budget_session {
 		
 		$res = $this->read();
 		//echo $res['html'];
-		
+		// $this->oSQL->showProfileInfo();
 	}
 	
 	public function read(){
@@ -166,10 +166,11 @@ class master_record{
 			$arrRes[] = "`$month`=".$this->{$month};
 		}
 		
+				
 		//========= Быдлокод
 		$arrRes[] = "`company`='OOO'";
-		$arrRes[] = "`account`='".$this->account."'";
-		$arrRes[] = "`item`='".$this->item."'";
+		$arrRes[] = "`account`='".$this->account."'";		
+		$arrRes[] = "`item`='".$this->item."'";		
 		$arrRes[] = "`pc`=".$this->profit;
 		$arrRes[] = "`source`='".$this->source."'";
 		$arrRes[] = "`scenario`='".$this->scenario."'";
@@ -217,11 +218,15 @@ class Budget{
 		$this->timestamp = "Updated by ".$rw['usrTitle']." on ".date('d.m.Y H:i',strtotime($rw['scnEditDate'])).", <a href='{$rw['script']}?{$rw['prefix']}ID={$rw['id']}'>".$rw['title']." #".$rw['id']."</a>";
 		$this->type = $rw['scnType'];
 		
-		
 		$this->flagUpdate = !$rw['scnFlagReadOnly'];
+		$this->flagArchive = (integer)$rw['scnFlagArchive'];
 		
 		$this->getSettings($this->oSQL, $this->id);
-		$this->rates = 'USD = '.$this->settings['usd'].', EUR = '.$this->settings['eur'];
+		$this->rates = "<a href='?currency=840'>USD</a> = {$this->settings['usd']}, <a href='?currency=978'>EUR</a> = {$this->settings['eur']}";
+		
+		if ($rw['scnLastID']) {
+			$this->reference_scenario = new Budget($rw['scnLastID']);
+		};
 		
 		
 	}
@@ -251,6 +256,7 @@ class Budget{
 						break;
 				}
 				$this->settings[$rw['varID']] = $value;
+				$this->extendedSettings[$rw['varID']] = Array('title'=>$rw['varTitle'],'value'=>$value);
 			}
 		
 		return($this->settings);
@@ -321,6 +327,28 @@ class Budget{
 				$res = '<th class="budget-quarterly">'.implode('</th><th class="budget-quarterly">',$arrRes).'</th>';
 				return($res);
 				break;
+			case 'mr':
+				ob_start();
+				?>
+					<th colspan="4">Current month</th>
+					<th colspan="4">YTD</th>				
+					<th colspan="3">Next month</th>
+				</tr>
+				<tr>
+					<th>Actual</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+					<th>Actual</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+					<th>Actual</th>
+					<th>Budget</th>
+					<th>Diff</th>
+				</tr>
+				<?php
+				$res = ob_get_contents();
 			default:
 				for($m=$start;$m<=$end;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
@@ -359,14 +387,19 @@ class Budget{
 			}
 			$rs = $oSQL->q($sql);
 			
+			$arrGET = $_GET;
+			
 			if (isset($_GET['currency'])){
 				$strCurrencyURL = "&currency=".$_GET['currency'];
 			}
 			
 			while ($rw=$oSQL->f($rs)){
-				echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}{$strCurrencyURL}&tab=",$rw['pccGUID'],"'>",$rw['pccTitle'],"</a></li>\r\n";
+				$arrGET['pccGUID'] = $rw['pccGUID'];				
+				echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>",$rw['pccTitle'],"</a></li>\r\n";
+				
 			}
-			echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}{$strCurrencyURL}&tab=all'>All</a></li>\r\n";
+			$arrGET['pccGUID'] = 'all';	
+			echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>All</a></li>\r\n";
 			?>
 			</ul>
 		</div>
@@ -495,19 +528,40 @@ class Budget{
 		return ($keyProfit);
 	}
 	
-	public function getScenarioSelect(){
+	public function getScenarioSelect($params = Array()){
 		GLOBAL $budget_scenario;
 		GLOBAL $oSQL;
 		GLOBAL $strLocal;
 		
-		$sql = "SELECT * FROM tbl_scenario";
+		if (isset($params['budget_scenario'])){
+			$scnID=$params['budget_scenario'];
+		} else {
+			$scnID=$budget_scenario;
+		}
+		
+		if (isset($params['type'])){
+			$sqlWhere = "WHERE ";
+		}
+		
+		switch ($params['type']){
+			case 'FYE':
+				$sqlWhere .= "scnType='FYE' ";
+				break;
+			case 'Budget':
+				$sqlWhere .= "scnType='Budget' ";
+				break;
+			default:
+				break;
+		}
+		
+		$sql = "SELECT * FROM tbl_scenario {$sqlWhere}";
 		$rs = $oSQL->q($sql);
 		ob_start();
 		?>
 		<select name='budget_scenario' id='budget_scenario'>
 		<?php
 		while ($rw=$oSQL->f($rs)){
-			echo "<option ".($budget_scenario==$rw['scnID']?'SELECTED':'')." value='{$rw['scnID']}'>{$rw["scnTitle$strLocal"]}</option>";
+			echo "<option ".($scnID==$rw['scnID']?'SELECTED':'')." value='{$rw['scnID']}'>{$rw["scnTitle$strLocal"]}</option>";
 		}
 		?>
 		</select>
@@ -581,6 +635,35 @@ class Budget{
 		}
 		
 		
+	}
+	
+	function readOnly($flag = true){
+		
+		GLOBAL $arrUsrData;
+		
+		$sql = "UPDATE tbl_scenario SET scnFlagReadOnly=".(integer)$flag.", scnEditBy='{$arrUsrData['usrID']}', scnEditDate=NOW() WHERE scnID='{$this->id}'";
+		$this->oSQL->q($sql);
+	
+	}
+	
+	function archive($flag = true){
+		
+		GLOBAL $arrUsrData;
+		
+		$sql[] = "UPDATE tbl_scenario SET scnFlagArchive=".(integer)$flag.", scnEditBy='{$arrUsrData['usrID']}', scnEditDate=NOW() WHERE scnID='{$this->id}'";
+		
+		if ($flag){
+			$sqlDoc = "SELECT * FROM stbl_entity WHERE entType='REF'";
+			$rs = $this->oSQL->q($sqlDoc);
+			while ($rw = $this->oSQL->f($rs)){			
+				$sql[] = "DELETE FROM `{$rw['entTable']}` WHERE `{$rw['entPrefix']}FlagPosted`=0 AND `{$rw['entPrefix']}Scenario`='{$this->id}'";
+			}
+		}
+		
+		for ($i=0;$i<count($sql);$i++){
+			$this->oSQL->q($sql[$i]);
+		};
+	
 	}
 	
 }

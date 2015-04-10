@@ -45,6 +45,7 @@ class sales_record{
 			$this->selling_rate = $data['selling_rate'];
 			$this->buying_rate= $data['buying_rate'];	
 			$this->formula= $data['formula'];	
+			$this->kpi= $data['kpi'];	
 		}		
 		return (true);
 	}	
@@ -87,6 +88,7 @@ class sales_record{
 			$arrRes[] = "`activity`=".(integer)$oProduct->activity;
 			$arrRes[] = "`unit`='".$oProduct->unit."'";
 			$arrRes[] = "`formula`=".$oSQL->e($this->formula);
+			$arrRes[] = "`kpi`=".(integer)$this->kpi;
 			if ($this->id){
 				$res = "UPDATE `reg_sales` SET ". implode(',',$arrRes)." WHERE id=".$this->id;
 			} else {
@@ -97,7 +99,7 @@ class sales_record{
 	}
 	
 	public function total(){
-		for($m=1;$m<12;$m++){
+		for($m=1;$m<13;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
