@@ -6,11 +6,11 @@ $arrJS[] = 'js/input_form.js';
 
 $msfID=$_GET['msfID']?$_GET['msfID']:$_POST['msfID'];
 
-$oBudget = new Budget($budget_scenario);
+
 $oDocument = new MSF($msfID);
 $oDocument->defineEF();
 $oDocument->defineGrid();
-
+$oBudget = new Budget($oDocument->scenario);
 
 if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
