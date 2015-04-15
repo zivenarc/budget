@@ -94,6 +94,7 @@ function init_panel(o){
 		
 		$('.budget-monthly',o).hide();
 		
+	if (typeof(report_id)!='undefined')){
 		$('#'+report_id).find('td').each(function(){		
 					$(this).click(function(){					
 						$('#'+report_id).find('tr').removeClass('report-selected');
@@ -123,7 +124,8 @@ function init_panel(o){
 						
 					});
 				});
-				
+			};
+			
 		$('.budget-tdh',o).mouseenter(function(){
 			if (localStorage.group!='customer' || $(this).hasClass('customer-other')) {
 				return (false);
