@@ -12,7 +12,7 @@ if (isset($_GET['type'])){
 } elseif (isset($_COOKIE['pnl_type'])) {
 	$type = $_COOKIE['pnl_type'];
 } else {
-	switch ($_GET['tab']){
+	switch ($_GET['pccGUID']){
 		case 'f865db6b-d328-102e-9d25-5de97ba9df63':
 		case 'f865e1de-d328-102e-9d25-5de97ba9df63':
 		case '48b5ae6c-e650-11de-959c-00188bc729d2':
@@ -23,14 +23,14 @@ if (isset($_GET['type'])){
 		break;
 		case 'f865e855-d328-102e-9d25-5de97ba9df63':
 			$type = 'customer';
-			//$sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") OR (customer=9907 AND Group_code=94))";
+			//$sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") OR (customer=9907 AND Group_code=94))";
 		default:
 			$type = 'customer';			
 			break;
 	}
 }
 
-if(!isset($_GET['tab'])){
+if(!isset($_GET['pccGUID'])){
 	$oBudget = new Budget($budget_scenario);
 	$arrJS[]='js/rep_pnl.js';
 	// $arrJS[]='js/input_form.js';	
@@ -49,7 +49,7 @@ if(!isset($_GET['tab'])){
 	include ('includes/inc-frame_bottom.php');
 } else {
 	require ('classes/reports.class.php');
-	include ('includes/inc_report_buttons.php');
+	//include ('includes/inc_report_buttons.php');
 	
 	if(isset($_GET['currency'])){
 		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
@@ -58,26 +58,26 @@ if(!isset($_GET['tab'])){
 		echo '<h2>',$rw["curTitle$strLocal"],'</h2>';
 	}
 	
-	if ($_GET['tab']=='all'){
+	if ($_GET['pccGUID']=='all'){
 		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
 		$sqlWhere = "WHERE pc in (SELECT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1)";
 	} else {
-		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).")";
+		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 	}
 	switch ($type){
 		case 'activity':		
-			Reports::monthlyByActivityEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
+			Reports::monthlyReport($sqlWhere,$currency, 'activity');	
 			break;
 		case 'ghq':
 			echo "<input type='hidden' id='group' value='activity'/>";
-			Reports::monthlyByGHQEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
+			Reports::monthlyReport($sqlWhere,$currency,'ghq');	
 		break;
 		// case 'f865e855-d328-102e-9d25-5de97ba9df63':
-			// $sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") OR (customer=9907 AND Group_code=94))";
+			// $sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") OR (customer=9907 AND Group_code=94))";
 		case 'customer':
 		default:
 			echo "<input type='hidden' id='group' value='customer'/>";
-			Reports::monthlyByCustomerEst($sqlWhere." AND scenario='$budget_scenario'",$currency);
+			Reports::monthlyReport($sqlWhere,$currency,'customer');
 			break;
 	}
 

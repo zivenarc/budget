@@ -1,6 +1,12 @@
 <?php
 class Reports{
 	
+	public $ID;
+	public $Budget;
+	public $Currency;
+	public $Denominator;
+	private $oSQL;
+	
 	public function salesByActivity($sqlWhere=''){
 		GLOBAL $oSQL;
 		ob_start();
@@ -586,6 +592,70 @@ class Reports{
 			ob_flush();
 	}
 	
+	public function monthlyReport($sqlWhere, $currency=643,$type='ghq'){
+		
+		GLOBAL $budget_scenario;
+		$Budget = new Budget($budget_scenario);
+		
+		switch($type){
+			case 'activity':
+				$sqlMeasure = "Activity_title as 'GroupLevel1', activity as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				break;
+			case 'customer':
+				$sqlMeasure = "Customer_name as 'GroupLevel1', customer as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				break;
+			case 'ghq':
+			default:
+				$sqlMeasure = "prtGHQ as 'GroupLevel1', prtGHQ as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				break;
+		}
+		
+		$strFields = self::_getMonthlyFields($currency);
+		
+		$strFields = self::_getMRFields($currency);
+		
+		$sqlGroup = "GROUP BY GroupLevel1, level1_code, `Budget item`, `item`, `Group`";
+		
+		ob_start();
+		
+		$sql = "SELECT {$sqlMeasure}
+					{$strFields['actual']}
+			FROM `vw_master`			
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND Group_code=94 
+			{$sqlGroup}	
+			UNION ALL
+				SELECT {$sqlMeasure}
+				{$strFields['budget']}
+			FROM `vw_master`				
+			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND Group_code=94 
+			{$sqlGroup}			
+			ORDER BY `Group`, `itmOrder` ASC";
+		
+		$sql = "SELECT `GroupLevel1`, `level1_code`, `Budget item`, `Group`, `item`,`itmOrder`,
+					SUM(CM_A) as CM_A,
+					SUM(CM_B) as CM_B,
+					SUM(YTD_A) as YTD_A,
+					SUM(YTD_B) as YTD_B,
+					SUM(NM_A) as NM_A,
+					SUM(NM_B) as NM_B
+				FROM ({$sql}) U {$sqlGroup} 
+				ORDER BY `level1_code`, `Group`, `itmOrder` ASC";
+			
+			
+			self::firstLevelReportMR($sql, 'Activity', $Budget);
+			$tableID = "FLR_".md5($sql);
+			//==========================================================================================================================Non-customer-related data
+			self::noFirstLevelReportMR($sqlWhere, $currency);
+			?>
+			</tbody>
+			</table>
+			<ul class='link-footer'>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
+			<?php			
+			ob_flush();
+	}
+	
 	public function masterbyGHQEst($sqlWhere, $currency=643){
 		
 		GLOBAL $budget_scenario;
@@ -713,6 +783,64 @@ class Reports{
 				
 			}
 	}
+	
+	private function firstLevelReportMR($sql, $firstLevelTitle, $Budget=null){
+		global $oSQL;				
+		
+		$tableID = "FLR_".md5($sql);
+		
+		if (!$rs = $oSQL->q($sql)){
+				echo "<div class='error'>SQL error:</div>";
+				echo "<pre>$sql</pre>";
+				return (false);
+			};
+			?>
+			<table id='<?php echo $tableID;?>' class='budget'>
+			<thead>
+				<tr>
+					<th rowspan="2"><?php echo $firstLevelTitle; ?></th>
+					<th rowspan="2">Account</th>
+					<?php echo Budget::getTableHeader('mr'); 							
+					?>					
+			</thead>			
+			<tbody>
+			<?php
+			if ($oSQL->num_rows($rs)){
+				$GroupLevel1 = '';		
+				while ($rw=$oSQL->f($rs)){
+					if($GroupLevel1 && $GroupLevel1!=$rw['GroupLevel1']){
+						$data = $subtotal[$GroupLevel1];
+						$data['Budget item']=$group;
+						self::echoMRItemString($data,'budget-subtotal', $Budget);
+					}
+						
+					$subtotal[$rw['GroupLevel1']]['CM_A'] += $rw['CM_A'];
+					$subtotal[$rw['GroupLevel1']]['CM_B'] += $rw['CM_B'];
+					$subtotal[$rw['GroupLevel1']]['YTD_A'] += $rw['YTD_A'];
+					$subtotal[$rw['GroupLevel1']]['YTD_B'] += $rw['YTD_B'];
+					$subtotal[$rw['GroupLevel1']]['NM_A'] += $rw['NM_A'];
+					$subtotal[$rw['GroupLevel1']]['NM_B'] += $rw['NM_B'];
+					
+														
+					
+					$data = $rw;
+					if ($data['GroupLevel1']==$GroupLevel1 && $GroupLevel1) $data['GroupLevel1']="&nbsp;";
+					
+					// echo '<pre>';print_r($data);echo '</pre>';
+					
+					self::echoMRItemString($data,$tr_class, $Budget);
+					
+					$GroupLevel1 = $rw['GroupLevel1'];
+					$group = $rw['Group'];
+				}
+				$data = $subtotal[$GroupLevel1];
+				$data['Budget item']=$group;
+				self::echoMRItemString($data,'budget-subtotal', $Budget);
+				
+				
+			}
+	}
+	
 	
 	private function noFirstLevelReport_YACT($sqlWhere){
 				
@@ -879,6 +1007,88 @@ class Reports{
 			
 	}
 	
+	private function noFirstLevelReportMR($sqlWhere, $currency=643){
+				
+		global $oSQL;		
+		
+		$strFields = self::_getMRFields($currency);
+		
+		$sqlGroup = "GROUP BY `Budget item`, `item`, `Group`, `Group_code`";
+		
+		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
+					{$strFields['actual']}
+			FROM `vw_master`			
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}'
+			{$sqlGroup}	
+			UNION ALL
+				SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
+				{$strFields['budget']}
+			FROM `vw_master`				
+			{$sqlWhere} AND scenario='{$strFields['from_b']}'
+			{$sqlGroup}			
+			ORDER BY `Group`, `itmOrder` ASC";
+			
+			// echo '<pre>',$sql,'</pre>';
+		
+		$sql = self::_unionMRQueries($sql, $sqlGroup);
+			
+			$group = '';
+			$subtotal = Array();
+			$grandTotal = Array();
+			$rs = $oSQL->q($sql);
+			while ($rw=$oSQL->f($rs)){				
+				if ($rw['Group_code']==94){
+					$tr_class = "budget-total";
+				} else {
+					$tr_class = 'budget-item';
+				}
+				
+				if($group && $group!=$rw['Group']){
+					$data = $subtotal[$group];
+					$data['Budget item']=$group;
+					self::echoMRItemString($data,'budget-subtotal');
+				}
+				
+
+				$subtotal[$rw['Group']]['CM_A'] += $rw['CM_A'];
+				$subtotal[$rw['Group']]['CM_B'] += $rw['CM_B'];
+				$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
+				$subtotal[$rw['Group']]['YTD_B'] += $rw['YTD_B'];
+				$subtotal[$rw['Group']]['NM_A'] += $rw['NM_A'];
+				$subtotal[$rw['Group']]['NM_B'] += $rw['NM_B'];
+				
+				$grandTotal['CM_A'] += $rw['CM_A'];
+				$grandTotal['CM_B'] += $rw['CM_B'];
+				$grandTotal['YTD_A'] += $rw['YTD_A'];
+				$grandTotal['YTD_B'] += $rw['YTD_B'];
+				$grandTotal['NM_A'] += $rw['NM_A'];
+				$grandTotal['NM_B'] += $rw['NM_B'];
+				
+				
+				self::echoMRItemString($rw,$tr_class);				
+				$group = $rw['Group'];
+			}
+			//last group subtotal
+			$data = $subtotal[$group];
+			$data['Budget item']=$group;
+			self::echoMRItemString($data,'budget-subtotal');
+			//Grand total
+			$data = $grandTotal;
+			$data['Budget item']='Profit before tax';
+			self::echoMRItemString($data,'budget-grandtotal');
+			
+		//------ Operating income -------
+		
+		// $sqlOps = str_replace($sqlWhere, $sqlWhere." AND account NOT LIKE '6%'", $sql);
+		// $sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		// $rs = $oSQL->q($sqlOps);
+		// while ($rw = $oSQL->f($rs)){
+			// $rw['Budget item'] = "Operating income";
+			// self::echoMRItemString($rw,'budget-subtotal');
+		// }
+			
+	}
+	
 	private function _getMonthlyFields($currency){
 		GLOBAL $budget_scenario;
 		$Budget = new Budget($budget_scenario);
@@ -892,6 +1102,38 @@ class Reports{
 				SUM(YTD/{$arrRates['YTD']}) as YTD, 
 				SUM(".Budget::getYTDSQL((integer)date('n',$Budget->date_start),12,$arrRates).") as ROY_A, 
 				SUM(ROY/{$arrRates['YTD']}) as ROY";
+		
+		return ($res);
+		
+	}
+	
+	private function _getMRFields($currency){
+		GLOBAL $budget_scenario;
+		$Budget = new Budget($budget_scenario);
+		$arrRates = $Budget->getMonthlyRates($currency);
+		
+		$cm = date('M',$Budget->date_start - 1);
+		$nm = date('M',$Budget->date_start);
+				
+		$nCurrent = (integer)date('m',$Budget->date_start - 1);
+		
+		$res['actual']=	"SUM(`{$cm}`)/{$arrRates[$cm]} as CM_A, 
+						0 as CM_B,								
+						SUM(".Budget::getYTDSQL(1,$nCurrent,$arrRates).") as YTD_A ,
+						0 as YTD_B, 
+						SUM(`$nm`)/{$arrRates[$nm]} as NM_A , 
+						0 as NM_B";
+		$res['budget'] = "0 as CM_A, 
+						SUM(`{$cm}`)/{$arrRates[$cm]} as CM_B,								
+						0 as YTD_A,
+						SUM(".Budget::getYTDSQL(1,$nCurrent,$arrRates).") as YTD_B, 
+						0 as NM_A , 
+						SUM(`$nm`)/{$arrRates[$nm]} as NM_B";
+		
+		$res['from_a'] = $Budget->id;
+		$res['from_b'] = $Budget->reference_scenario->id;
+		
+		// echo '<pre>',$res,'</pre>'; 
 		
 		return ($res);
 		
@@ -973,6 +1215,60 @@ class Reports{
 		ob_flush();
 	}
 	
+	private function echoMRItemString($data, $strClass=''){					
+		
+		ob_start();
+		static $GroupLevel1;
+		?>
+		<tr class='<?php echo $strClass;?>'>
+			<?php 			
+			if (strlen($data['GroupLevel1'])){				
+			?>
+			<td class='budget-tdh code-<?php echo urlencode($data['level1_code']);?>' data-code='<?php echo $data['level1_code'];?>'><span><?php echo $data['GroupLevel1'];?></span></td>
+			<td><?php echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\',\'level1\':\''.$data['level1_code'].'\'})">'.$data['Budget item'].'</a>';?></td>
+			<?php 
+			} 
+			else 			
+			{	
+			?>
+			<td colspan="2">
+			<?php
+				if ($data['Group_code']==94) {
+					echo 'Total '.strtolower($data['Budget item']); 
+				} else {
+					if (strpos($strClass,'total') || !isset($data['item'])){
+						echo $data['Budget item'];
+					} else {
+						echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\'})">'.$data['Budget item'].'</a>';
+					}
+				}
+			?>
+			</td>
+			<?php
+			}
+				// echo '<pre>';print_r($data);echo '</pre>';		
+					?>
+					<td class='budget-decimal budget-ytd'><?php self::render($data['CM_A'],0);?></td>
+					<td class='budget-decimal'><?php self::render($data['CM_B'],0);?></td>
+					<td class='budget-decimal'><?php self::render($data['CM_A']-$data['CM_B'],0);?></td>
+					<td class='budget-decimal'><em><?php self::render_ratio($data['CM_A'],$data['CM_B']);?></em></td>
+					
+					<td class='budget-decimal budget-quarterly'><?php self::render($data['YTD_A'],0);?></td>
+					<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
+					<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
+					<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B']);?></em></td>
+					
+					<td class='budget-decimal budget-ytd'><?php self::render($data['NM_A'],0);?></td>
+					<td class='budget-decimal'><?php self::render($data['NM_B'],0);?></td>
+					<td class='budget-decimal'><?php self::render($data['NM_A']-$data['NM_B'],0);?></td>
+					<?php				
+				
+			?>						
+		</tr>
+		<?php
+		ob_flush();
+	}
+	
 	function getJournalEntries($data){
 		
 		if (!count($data)){
@@ -1049,15 +1345,28 @@ class Reports{
 		
 	}
 	
-	function render_ratio ($n1, $n2){
+	function render_ratio ($n1, $n2, $decimals=1){
 		if ((integer)$n2==0){
 			echo 'n/a';
 			return;			
 		} else {
-			self::render($n1/$n2*100,1);
+			self::render($n1/$n2*100,$decimals);
 		}
 	}
-	
+		
+	private function _unionMRQueries($sql, $sqlGroup){
+		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
+					SUM(CM_A) as CM_A,
+					SUM(CM_B) as CM_B,
+					SUM(YTD_A) as YTD_A,
+					SUM(YTD_B) as YTD_B,
+					SUM(NM_A) as NM_A,
+					SUM(NM_B) as NM_B
+				FROM ({$sql}) U {$sqlGroup} 
+				ORDER BY `Group`, `itmOrder` ASC";
+		return($sql);
+		
+	}
 }
 
 ?>

@@ -335,15 +335,15 @@ class Budget{
 					<th colspan="3">Next month</th>
 				</tr>
 				<tr>
-					<th>Actual</th>
+					<th class='budget-ytd'>Actual</th>
 					<th>Budget</th>
 					<th>Diff</th>
 					<th>%</th>
-					<th>Actual</th>
+					<th class='budget-quarterly'>Actual</th>
 					<th>Budget</th>
 					<th>Diff</th>
 					<th>%</th>
-					<th>Actual</th>
+					<th class='budget-ytd'>Forecast</th>
 					<th>Budget</th>
 					<th>Diff</th>
 				</tr>
