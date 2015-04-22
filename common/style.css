@@ -1,4 +1,4 @@
-* {
+﻿* {
 -moz-box-sizing:border-box !important;
 }
 
@@ -1750,7 +1750,7 @@ display: block;
 	color:red;
 }
 td.budget-ytd{
-	background-color:#fffee4;
+	background-color:#fffee4 !important;
 	font-weight:bold;
 }
 th.budget-ytd{
@@ -1760,7 +1760,7 @@ th.budget-quarterly{
 	background-color:#0099FF;	
 }
 td.budget-quarterly{
-	background-color:#D6EBFF;	
+	background-color:#D6EBFF !important;	
 }
 .budget-month th{
 	background-color:navy;
@@ -1796,7 +1796,7 @@ td.costs_supplier{
 .budget-total td{
 	background-color: #eee;
 	font-weight: bold;
-	font-size: 1.1em;
+	font-size: 1.2em;
 	border-bottom:2px solid black;
 }
 .budget-tdh{

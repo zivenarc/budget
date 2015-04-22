@@ -360,7 +360,7 @@ class Budget{
 		}
 	}
 	
-	public function getProfitTabs($register='', $acl = false){
+	public function getProfitTabs($register='', $acl = false, $params = Array()){
 		GLOBAL $oSQL;
 		GLOBAL $arrUsrData;
 		GLOBAL $budget_scenario;
@@ -368,6 +368,10 @@ class Budget{
 		if ($acl){
 			$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
 			$sqlWhere = "JOIN stbl_profit_role ON pccID=pcrProfitID WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
+		}
+		
+		foreach ($params as $key=>$value){
+			$sqlWhere .= " AND `{$key}`='{$value}'\r\n";
 		}
 		
 		ob_start();

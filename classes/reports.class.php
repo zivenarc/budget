@@ -993,7 +993,7 @@ class Reports{
 			//Grand total
 			$data = $grandTotal;
 			$data['Budget item']='Profit before tax';
-			self::echoBudgetItemString($data,'budget-grandtotal');
+			self::echoBudgetItemString($data,'budget-total');
 			
 		//------ Operating income -------
 		
@@ -1075,7 +1075,7 @@ class Reports{
 			//Grand total
 			$data = $grandTotal;
 			$data['Budget item']='Profit before tax';
-			self::echoMRItemString($data,'budget-grandtotal');
+			self::echoMRItemString($data,'budget-total');
 			
 		//------ Operating income -------
 		

@@ -1,5 +1,5 @@
 <?php
-$flagNoAuth = true;
+// $flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
 
@@ -11,7 +11,7 @@ $_SESSION['cntID'] = $cntID;
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 $oBudget = new Budget($budget_scenario);
 
-if(!isset($_GET['tab'])){
+if(!isset($_GET['pccGUID'])){
 	$arrJS[] = 'https://www.google.com/jsapi';
 	$arrJS[]='js/rep_pnl.js';
 	include ('includes/inc-frame_top.php');
@@ -25,30 +25,22 @@ if(!isset($_GET['tab'])){
 	?>
 	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 	<?php
-	Budget::getProfitTabs('reg_sales');	
+	Budget::getProfitTabs('reg_sales', false, Array('customer'=>$cntID));	
 	include ('includes/inc-frame_bottom.php');
 } else {
 	require ('classes/reports.class.php');
 	include ('includes/inc_report_buttons.php');
-	if ($_GET['tab']=='all'){
+	if ($_GET['pccGUID']=='all'){
 		$sqlWhere = " WHERE scenario='$budget_scenario' AND customer={$cntID}";
 	} else {
-		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") AND scenario='$budget_scenario' AND customer={$cntID}";
+		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND scenario='$budget_scenario' AND customer={$cntID}";
 	}
 
 	Reports::salesByActivity($sqlWhere);
 	?>
 		<div id='graph'/>
-		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("kpi_<?php echo $_GET['tab'];?>");'>Select table</a></li>
-		</ul>
 	<?php	
 	Reports::masterbyGHQEst($sqlWhere);
-		?>
-		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("report_<?php echo $_GET['tab'];?>");'>Select table</a></li>
-		</ul>
-	<?php
 }
 
 
