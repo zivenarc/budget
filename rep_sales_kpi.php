@@ -7,7 +7,7 @@ $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$bud
 $oBudget = new Budget($budget_scenario);
 
 
-if(!isset($_GET['tab'])){
+if(!isset($_GET['pccGUID'])){
 	$arrJS[] = 'https://www.google.com/jsapi';
 	$arrJS[]='js/rep_pnl.js';
 	include ('includes/inc-frame_top.php');
@@ -20,10 +20,10 @@ if(!isset($_GET['tab'])){
 } else {
 	require ('classes/reports.class.php');
 	include ('includes/inc_report_buttons.php');
-	if ($_GET['tab']=='all'){
+	if ($_GET['pccGUID']=='all'){
 		$sqlWhere = " WHERE scenario='$budget_scenario'";
 	} else {
-		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") AND scenario='$budget_scenario'";
+		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND scenario='$budget_scenario'";
 	}
 
 	Reports::salesByActivity($sqlWhere);
