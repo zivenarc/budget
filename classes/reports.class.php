@@ -1,11 +1,16 @@
 <?php
 class Reports{
 	
-	public $ID;
+	private $ID;
 	public $Budget;
 	public $Currency;
 	public $Denominator;
 	private $oSQL;
+	
+	function __construct(){
+		GLOBAL $oSQL;
+		$this->oSQL = $oSQL;
+	}
 	
 	public function salesByActivity($sqlWhere=''){
 		GLOBAL $oSQL;
@@ -220,33 +225,101 @@ class Reports{
 			?>
 			<table id='report' class='budget'>
 			<thead>
-				<tr><th>Location</th><th>Activity</th><th>Function</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Average</th></tr>
+				<tr><th>Location</th><th>Activity</th><th>Function</th><?php echo Budget::getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
 			</thead>			
 			<tbody>
 			<?php
 			while ($rw=$oSQL->f($rs)){
-				echo '<tr>';
-				echo '<td>',$rw['Location'],'</td>';
-				echo '<td>',$rw['Activity'],'</td>';
-				echo '<td><strong>',$rw['funTitle'],'</strong> (',$rw['funTitleLocal'],')</td>';
+				?>
+				<tr>
+					<td><?php echo $rw['Location'];?></td>
+					<td><?php echo $rw['Activity'];?></td>
+					<td><strong><?php echo $rw['funTitle'];?></strong> (<?php echo $rw['funTitleLocal'];?>)</td>
+				<?php
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month'>",($rw[$month]?$rw[$month]:""),'</td>';
 					$headcount[$m] += $rw[$month];
 				}
-				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],1,'.',','),'</td>';
+				?>
+					<td class='budget-decimal budget-ytd'><?php echo number_format($rw['Total'],1,'.',',');?></td>
+				</tr>
+				<?php
 				$headcount['ytd'] += $rw['Total'];
-				echo "</tr>\r\n";
 			}
 			?>
-			<tr class='budget-subtotal'><td colspan='3'>Total</td>
+			<tr class='budget-subtotal'><td colspan='3'>Total headcount</td>
 			<?php
 			for ($m=1;$m<13;$m++){
 				echo '<td class="budget-decimal">',$headcount[$m],'</td>';
 			}
-			echo '<td class="budget-decimal budget-ytd">',number_format($headcount['ytd'],1,'.',','),'</td>';
+			
 			?>
+				<td class="budget-decimal budget-ytd"><?php echo number_format($headcount['ytd'],1,'.',',');?></td>
 			</tr>
+			<?php
+				$sql = "SELECT account, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
+						FROM `reg_master`
+						$sqlWhere
+							AND account IN ('J00400','J00802') AND active=1
+						GROUP BY account";
+				$rs = $oSQL->q($sql);	
+				if ($oSQL->num_rows($rs)){
+					while ($rw = $oSQL->f($rs)){
+						if ($rw['account']=='J00400'){
+							?>
+							<tr>
+								<td colspan="3">Revenue, RUBx1,000</td>
+								<?php
+								for ($m=1;$m<13;$m++){
+									$month = date('M',mktime(0,0,0,$m,15));
+									echo '<td class="budget-decimal">',number_format($rw[$month]/1000,0,'.',','),'</td>';
+									$arrRevenuePerFTE[$m] = $rw[$month]/$headcount[$m]/1000;									
+								}
+								?>
+								<td class='budget-decimal budget-ytd'><?php echo number_format($rw['Total']/1000,0,'.',',');?></td>
+							</tr>
+							<tr>
+								<td colspan="3">Revenue per FTE</td>
+								<?php
+								for ($m=1;$m<13;$m++){									
+									echo '<td class="budget-decimal">',number_format($arrRevenuePerFTE[$m],0,'.',','),'</td>';									
+								}
+								?>
+								<td class='budget-decimal budget-ytd'><?php echo number_format($rw['Total']/$headcount['ytd']/1000,0,'.',',');?></td>
+							</tr>
+							<?php
+						}
+						for ($m=1;$m<13;$m++){
+							$month = date('M',mktime(0,0,0,$m,15));
+							$arrGP[$month] += $rw[$month];
+						}
+						$arrGP['Total'] += $rw['Total'];
+					}
+					?>
+					<tr>
+						<td colspan="3">Gross profit, RUBx1,000</td>
+						<?php
+						for ($m=1;$m<13;$m++){
+									$month = date('M',mktime(0,0,0,$m,15));
+									echo '<td class="budget-decimal">',number_format($arrGP[$month]/1000,0,'.',','),'</td>';
+									$arrGPPerFTE[$m] = $arrGP[$month]/$headcount[$m]/1000;
+						}
+						?>
+						<td class='budget-decimal budget-ytd'><?php echo number_format($arrGP['Total']/1000,0,'.',',');?></td>
+					</tr>
+					<tr>
+						<td colspan="3">GP per FTE</td>
+						<?php
+						for ($m=1;$m<13;$m++){									
+							echo '<td class="budget-decimal">',number_format($arrGPPerFTE[$m],0,'.',','),'</td>';									
+						}
+						?>
+						<td class='budget-decimal budget-ytd'><?php echo number_format($arrGP['Total']/$headcount['ytd']/1000,0,'.',',');?></td>
+					</tr>
+					<?php
+				}
+			?>
 			</tbody>
 			</table>
 			<?php
