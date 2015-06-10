@@ -222,8 +222,11 @@ class Reports{
 				echo "<div class='warning'>No data found</div>";
 				return (false);
 			}
+			
+			$tableID = md5($sql);
+			
 			?>
-			<table id='report' class='budget'>
+			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr><th>Location</th><th>Activity</th><th>Function</th><?php echo Budget::getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
 			</thead>			
@@ -322,6 +325,9 @@ class Reports{
 			?>
 			</tbody>
 			</table>
+			<ul class='link-footer'>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
 			<?php
 			ob_flush();
 	}

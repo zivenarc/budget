@@ -92,7 +92,9 @@ function init_panel(o){
 			}
 		});
 		
-		$('.budget-monthly',o).hide();
+		if ($('#period_switch',o).length){
+			$('.budget-monthly',o).hide();
+		};
 		
 	if (typeof(report_id)!='undefined'){
 		$('#'+report_id).find('td').each(function(){		
