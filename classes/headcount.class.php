@@ -746,7 +746,7 @@ class Headcount extends Document{
 			$row->activity = $rw['empProductTypeID'];			
 			$row->salary = $rw['empSalary'];
 			$row->insurance = $rw['insurance'];
-			$row->mobile_limit = $rw['empMobileLimit'];
+			$row->mobile_limit = $rw['funMobile'];
 			$row->fuel = $rw['funFuel'];
 			for ($m=1;$m<13;$m++){
 				$month = date('M',mktime(0,0,0,$m,15));
