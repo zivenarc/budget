@@ -234,10 +234,10 @@ class Interco_sales extends Document{
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		if ($mode=='update' || $mode=='post'){
-			$this->profit = $_POST[self::Prefix.'ProfitID'];
-			$this->product_folder = $_POST[self::Prefix.'ProductFolderID'];
-			$this->comment = $_POST[self::Prefix.'Comment'];
-			$this->customer = $_POST[self::Prefix.'CustomerID'];
+			$this->profit = isset($_POST[self::Prefix.'ProfitID'])?$_POST[self::Prefix.'ProfitID']:$this->profit;
+			$this->product_folder = isset($_POST[self::Prefix.'ProductFolderID'])?$_POST[self::Prefix.'ProductFolderID']:$this->product_folder;
+			$this->comment = isset($_POST[self::Prefix.'Comment'])?$_POST[self::Prefix.'Comment']:$this->comment;
+			$this->customer = isset($_POST[self::Prefix.'CustomerID'])?$_POST[self::Prefix.'CustomerID']:$this->customer;
 		}
 		
 		//-------------------Updating grid records---------------------------------

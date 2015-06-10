@@ -56,6 +56,7 @@ class Document extends easyForm{
 		$this->scenario = $this->data[$this->prefix.'Scenario'];
 		$this->profit = $this->data[$this->prefix.'ProfitID'];
 		$this->customer = $this->data[$this->prefix.'CustomerID'];
+		$this->supplier = $this->data[$this->prefix.'SupplierID'];
 		$this->location = $this->data[$this->prefix.'LocationID'];
 		$this->product_folder = $this->data[$this->prefix.'ProductFolderID'];
 		$this->comment = $this->data[$this->prefix.'Comment'];
@@ -88,7 +89,7 @@ class Document extends easyForm{
 			'title'=>'Scenario'
 			,'field'=>$this->prefix.'Scenario'
 			,'type'=>'combobox'
-			,'sql'=>'SELECT scnID as optValue, scnTitle as optText FROM tbl_scenario'
+			,'sql'=>'SELECT scnID as optValue, scnTitle as optText FROM tbl_scenario '.($this->flagUpdate?" WHERE scnFlagReadOnly=0":"")
 			,'default'=>$budget_scenario	
 			,'disabled'=>!$this->flagUpdate
 		);
