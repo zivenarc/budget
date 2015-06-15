@@ -255,9 +255,9 @@ class Interco_sales extends Document{
 						$row->product = $_POST['product'][$id];				
 						$row->customer = $_POST['customer'][$id];				
 						$row->comment = $_POST['comment'][$id];				
-						$row->selling_rate = str_replace(',','',$_POST['selling_rate'][$id]);				
+						$row->selling_rate = (double)str_replace(',','',$_POST['selling_rate'][$id]);				
 						$row->selling_curr = $_POST['selling_curr'][$id];				
-						$row->buying_rate = str_replace(',','',$_POST['buying_rate'][$id]);				
+						$row->buying_rate = (double)str_replace(',','',$_POST['buying_rate'][$id]);				
 						$row->buying_curr = $_POST['buying_curr'][$id];				
 						for ($m=1;$m<13;$m++){
 							$month = date('M',mktime(0,0,0,$m,15));
