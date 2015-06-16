@@ -334,12 +334,12 @@ class Headcount extends Document{
 						$row->employee = $_POST['particulars'][$id];				
 						$row->job = $_POST['function'][$id];				
 						$row->pc_profile = $_POST['pc_profile'][$id];				
-						$row->wc = (integer)$_POST['wc'][$id];
-						$row->vks = (integer)$_POST['vks'][$id];			
-						$row->insurance = str_replace(',','',$_POST['insurance'][$id]);							
-						$row->salary = str_replace(',','',$_POST['salary'][$id]);							
-						$row->mobile_limit = str_replace(',','',$_POST['mobile_limit'][$id]);							
-						$row->fuel = str_replace(',','',$_POST['fuel'][$id]);
+						$row->wc = (integer)($_POST['wc'][$id]=='on'?1:0);
+						$row->vks = (integer)($_POST['vks'][$id]=='on'?1:0);			
+						$row->insurance = (double)str_replace(',','',$_POST['insurance'][$id]);							
+						$row->salary = (double)str_replace(',','',$_POST['salary'][$id]);							
+						$row->mobile_limit = (double)str_replace(',','',$_POST['mobile_limit'][$id]);							
+						$row->fuel = (double)str_replace(',','',$_POST['fuel'][$id]);
 						if ($this->type=='new'){
 							$row->start_date = isset($_POST['start_date'][$id])?date('Y-m-d',strtotime($_POST['start_date'][$id])):$row->start_date;							
 							$row->new_fte = (integer)$_POST['new_fte'][$id];
