@@ -2,7 +2,7 @@
 require ('common/auth.php');
 require ('classes/budget.class.php');
 
-$budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
+$fye_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$fye_scenario;
 $currency = isset($_GET['currency'])?$_GET['currency']:643;
 
 //------------------------------------- type of report details -------------------------------------------//
@@ -31,13 +31,13 @@ if (isset($_GET['type'])){
 }
 
 if(!isset($_GET['pccGUID'])){
-	$oBudget = new Budget($budget_scenario);
+	$oBudget = new Budget($fye_scenario);
 	$arrJS[]='js/rep_pnl.js';
 	// $arrJS[]='js/input_form.js';	
 	
-	$arrActions[] = Array ('title'=>'By customer','action'=>"?budget_scenario={$budget_scenario}&type=customer");
-	$arrActions[] = Array ('title'=>'By activity','action'=>"?budget_scenario={$budget_scenario}&type=activity");
-	$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?budget_scenario={$budget_scenario}&type=ghq");
+	$arrActions[] = Array ('title'=>'By customer','action'=>"?budget_scenario={$fye_scenario}&type=customer");
+	$arrActions[] = Array ('title'=>'By activity','action'=>"?budget_scenario={$fye_scenario}&type=activity");
+	$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?budget_scenario={$fye_scenario}&type=ghq");
 		
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';

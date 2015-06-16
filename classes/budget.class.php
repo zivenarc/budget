@@ -519,10 +519,10 @@ class Budget{
 				case 'Krekshino':
 					$keyProfit = 'FWD';
 					break;
-				case 'STP':
-				case 'CHB':
-					$keyProfit = 'STP+CHB';
-					break;
+				// case 'STP':
+				// case 'CHB':
+					// $keyProfit = 'STP+CHB';
+					// break;
 				default:
 					$keyProfit = $rw['Profit'];
 			}

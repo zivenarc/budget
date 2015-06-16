@@ -80,4 +80,5 @@ while ($rw = $oSQL->f($rs)){
 
 //require ("lang_en.php");
 $budget_scenario = $arrSetup['stpScenarioID'];
+$fye_scenario = $arrSetup['stpFYEID'];
 ?>
