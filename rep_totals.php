@@ -46,7 +46,7 @@ while ($rw=$oSQL->f($rs)){
 $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/12 as Total
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='$budget_scenario' and posted=1
+		WHERE scenario='$budget_scenario' and posted=1 and salary>50
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
