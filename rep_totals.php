@@ -93,8 +93,8 @@ while ($rw=$oSQL->f($rs)){
 		<?php foreach($arrProfit as $pc=>$flag){
 					echo '<th>',$pc,'</th>';
 		};?>
-		<th class='budget-ytd'>Total</th>
-		<th>Last</th>
+		<th class='budget-ytd'><?php echo $oBudget->type=='FYE'?'FYE':'Total';?></th>
+		<th><?php echo $oBudget->type=='FYE'?'Budget':'Last';?></th>
 		<th>Diff</th>
 	</tr>
 </thead>
@@ -162,8 +162,8 @@ foreach($arrReport as $group=>$arrItem){
 		<?php foreach($arrProfit as $pc=>$flag){
 					echo '<th>',$pc,'</th>';
 		};?>
-		<th class='budget-ytd'>Total</th>
-		<th>Last</th>
+		<th class='budget-ytd'><?php echo $oBudget->type=='FYE'?'FYE':'Total';?></th>
+		<th><?php echo $oBudget->type=='FYE'?'Budget':'Last';?></th>
 		<th>Diff</th>
 	</tr>
 	<tr class="budget-total">
