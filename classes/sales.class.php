@@ -273,9 +273,9 @@ class Sales extends Document{
 						$row->activity = $_POST['activity'][$id];				
 						$row->customer = isset($_POST['customer'][$id])?$_POST['customer'][$id]:$this->customer;					
 						$row->comment = $_POST['comment'][$id];				
-						$row->selling_rate = str_replace(',','',$_POST['selling_rate'][$id]);				
+						$row->selling_rate = (double)str_replace(',','',$_POST['selling_rate'][$id]);				
 						$row->selling_curr = $_POST['selling_curr'][$id];				
-						$row->buying_rate = str_replace(',','',$_POST['buying_rate'][$id]);				
+						$row->buying_rate = (double)str_replace(',','',$_POST['buying_rate'][$id]);				
 						$row->buying_curr = $_POST['buying_curr'][$id];				
 						$row->formula = $_POST['formula'][$id];				
 						$row->kpi = $_POST['kpi'][$id];				
