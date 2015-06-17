@@ -38,6 +38,11 @@ if(!isset($_GET['pccGUID'])){
 	} else {
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 	}
+	
+	if ($_GET['nowh']){
+		$sqlWhere .= " AND pc NOT in (5,15)";
+	}
+	
 	switch ($type){
 		case 'activity':		
 			Reports::masterByActivityEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
