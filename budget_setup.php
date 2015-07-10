@@ -62,6 +62,14 @@ Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> 
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
 	Budget::getScenarioTabs();
+	?>
+	<nav>
+		<a href='sp_post_all.php'>Post all</a>|
+		<a href='sp_repost_hr.php'>HR docs</a>|
+		<a href='sp_repost_loc.php'>Location costs</a>|
+		<a href='sp_repost_hq.php'>HQ costs</a>
+	</nav>
+	<?php
 	include ('includes/inc-frame_bottom.php');
 }
 

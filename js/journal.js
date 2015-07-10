@@ -21,8 +21,16 @@ $(document).ready(function(){
 });
 
 function repost(tab, event){
-		var total;
+		var total = 0;
 		$(event.srcElement).addClass('spinner');
+		
+		$('#sources').find('tr').each(function(){
+			$(this).find('td.journal-current').eq(0).after('<td class="budget-decimal"></td>');
+			$(this).find('th.journal-current').eq(0).after('<th class="budget-ytd">New result</th>');
+		});
+		
+		//return;
+		
 		$('.budget-document-link',$('#div_'+tab)).each(function(){
 			var href = $(this).attr('href');
 			var tr = $(this).parents('tr');
@@ -32,18 +40,19 @@ function repost(tab, event){
 			var guid = tr.attr('id').replace('tr_','');
 			td_posted.addClass('spinner');
 			$.post(href,{DataAction:'unpost'},function(data){
-				console.log(data);
+				// console.log(data);
 				if (data.flagPosted==0){
 					td_posted.removeClass('budget-icon-posted');
-					tr.find('#amount_'+guid).text('0.00');
+					tr.find('#amount_'+guid).next().text('0.00');
 					$.post(href,{DataAction:'post'},function(data){
-						console.log(data);
+						// console.log(data);
 						if (data.flagPosted==1){
 							td_posted.addClass('budget-icon-posted');
-							tr.find('#amount_'+guid).text(number_format(data.amount,0,'.',','));
+							tr.find('#amount_'+guid).next().html($('<span>',{text:number_format(data.amount,0,'.',','), class:(data.amount<0?'budget-negative':'')}));
 							tr.find('#usrTitle_'+guid).text(data.editor);
 							tr.find('#timestamp_'+guid).text(data.timestamp_short);
-							total+=data.amount;							
+							total+=parseFloat(data.amount);console.log(data.amount);console.log(total);
+							$('#journal_total',$('#div_'+tab)).next().text(number_format(total,0,'.',','));							
 						} else {
 							td_posted.removeClass('spinner').text('Error');
 						}
@@ -55,5 +64,5 @@ function repost(tab, event){
 		});
 		
 		$(event.srcElement).removeClass('spinner');
-		$('#journal_total',$('#div_'+tab)).text(number_format(total,0,'.',','));
+		// $('#journal_total',$('#div_'+tab)).text(number_format(total,0,'.',','));
 }

@@ -19,7 +19,7 @@ if ($_GET['tab']){
 						UNION ALL 
 					SELECT DISTINCT source FROM reg_costs WHERE buying_curr<>'RUB')
 		GROUP BY vw_journal.guid
-		ORDER BY vw_journal.edit_date ASC";	
+		##ORDER BY vw_journal.edit_date ASC";	
 
 		$rs =$oSQL->q($sql);
 		while ($rw=$oSQL->f($rs)){

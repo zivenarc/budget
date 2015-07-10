@@ -1368,7 +1368,7 @@ class Reports{
 					<td><a class="budget-document-link" target="_blank" href="<?php echo $data[$i]['script'].'?'.$data[$i]['prefix'].'ID='.$data[$i]['id'];?>"><?php echo $data[$i]['guid'];?></a></td>
 					<td class="td-posted <?php echo ($data[$i]['posted']?'budget-icon-posted':'');?>">&nbsp;</td>
 					<td class="td-deleted <?php echo ($data[$i]['deleted']?'budget-icon-deleted':'');?>">&nbsp;</td>
-					<td id="amount_<?php echo $data[$i]['guid'];?>" class="budget-decimal"><?php self::render($data[$i]['amount']);?></td>
+					<td id="amount_<?php echo $data[$i]['guid'];?>" class="journal-current budget-decimal"><?php self::render($data[$i]['amount']);?></td>
 					<td><?php echo $data[$i]['pccTitle'];?></td>
 					<td><?php echo $data[$i]['comment'];?></td>
 					<td id="usrTitle_<?php echo $data[$i]['guid'];?>"><?php echo $data[$i]['usrTitle'];?></td>
@@ -1390,7 +1390,7 @@ class Reports{
 						<th>GUID</th>
 						<th>Posted</th>
 						<th>Deleted</th>
-						<th>Amount</th>
+						<th class='journal-current'>Amount</th>
 						<th>Profit</th>
 						<th>Comment</th>
 						<th>Editor</th>
@@ -1400,7 +1400,7 @@ class Reports{
 				<tfoot>
 					<tr class="budget-subtotal">
 						<td colspan="5">Total:</td>
-						<td id='journal_total'><?php self::render($total);?></td>
+						<td class='journal-current budget-decimal' id='journal_total'><?php self::render($total);?></td>
 					</tr>
 				</tfoot>
 				<tbody>
