@@ -349,6 +349,7 @@ class Budget{
 				</tr>
 				<?php
 				$res = ob_get_contents();
+				break;
 			default:
 				for($m=$start;$m<=$end;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
