@@ -732,7 +732,7 @@ class Headcount extends Document{
 		}
 		
 		
-		$sql = "SELECT *, (SELECT SUM(dmsPrice) FROM tbl_insurance ON dmsLocationID=empLocationID) as insurance 
+		$sql = "SELECT *, (SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance 
 					FROM vw_employee_select WHERE empProfitID={$this->pc->code}";//die($sql);
 		$rs = $this->oSQL->q($sql);
 		while ($rw=$this->oSQL->f($rs)){
