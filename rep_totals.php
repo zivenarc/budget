@@ -8,6 +8,9 @@ require ('classes/item.class.php');
 include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
+$mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1;
+$mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12;
+
 
 $arrJS[] = 'js/rep_totals.js';
 include ('includes/inc-frame_top.php');
@@ -15,16 +18,33 @@ echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 if ($denominator!=1) {
 	echo '<h2>RUB x',$denominator,'</h2>';
 }
+
+if ($mthStart!=1 || $mthEnd!=12){
+	if ($mthStart==$mthEnd){
+		echo '<h2>',date('F',mktime(0,0,0,$mthStart)),' only</h2>';
+	} else {
+		echo '<h2>Period: ',date('M',mktime(0,0,0,$mthStart))," &ndash; ", date('M',mktime(0,0,0,$mthEnd)),'</h2>';
+	}
+}
+
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 ?>
 <div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 <?php
 
-$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".Budget::getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
+$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, SUM(".Budget::getYTDSQL($mthStart,$mthEnd).")/$denominator as Total, 0 as Estimate
 		FROM vw_master
-		WHERE scenario='$budget_scenario'
+		WHERE scenario='{$oBudget->id}'
+		GROUP BY Profit, `Budget item`,`item`
+		UNION ALL
+		SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, 0 as Total, SUM(".Budget::getYTDSQL($mthStart,$mthEnd).")/$denominator as Estimate
+		FROM vw_master
+		WHERE scenario='{$oBudget->reference_scenario->id}'
 		GROUP BY Profit, `Budget item`,`item`
 		ORDER BY `Group`,pccFlagProd,Profit,itmOrder";
+
+// echo '<pre>',$sql,'</pre>';
+		
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 
@@ -43,7 +63,7 @@ while ($rw=$oSQL->f($rs)){
 	$arrProfit[$keyProfit] = $rw['pccFlagProd'];
 }
 
-$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/12 as Total
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL($mthStart,$mthEnd).")/".($mthEnd-$mthStart+1)." as Total
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='$budget_scenario' and posted=1 and salary>50
@@ -55,10 +75,17 @@ while ($rw=$oSQL->f($rs)){
 	$arrHeadcount['FTE'][$keyProfit] += $rw['Total'];	
 }
 
-$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL($mthStart,$mthEnd).")/$denominator as Total, 0 as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='$budget_scenario' and active=1
+		WHERE scenario='{$oBudget->id}' and active=1
+			AND account='J00400'
+		GROUP BY Profit
+		UNION ALL
+		SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".Budget::getYTDSQL($mthStart,$mthEnd).")/$denominator as Estimate
+		FROM reg_master
+		LEFT JOIN vw_profit ON pccID=pc
+		WHERE scenario='{$oBudget->reference_scenario->id}' and active=1
 			AND account='J00400'
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
@@ -69,10 +96,17 @@ while ($rw=$oSQL->f($rs)){
 	$arrGrossRevenueEstimate += $rw['Estimate'];	
 }
 
-$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL($mthStart,$mthEnd).")/$denominator as Total, 0 as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='$budget_scenario' and active=1
+		WHERE scenario='{$oBudget->id}' and active=1
+			AND (account NOT LIKE '6%' AND account NOT LIKE '7%')
+		GROUP BY Profit
+		UNION ALL
+		SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".Budget::getYTDSQL($mthStart,$mthEnd).")/$denominator as Estimate
+		FROM reg_master
+		LEFT JOIN vw_profit ON pccID=pc
+		WHERE scenario='{$oBudget->reference_scenario->id}' and active=1
 			AND (account NOT LIKE '6%' AND account NOT LIKE '7%')
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
@@ -167,7 +201,7 @@ foreach($arrReport as $group=>$arrItem){
 		<th>Diff</th>
 	</tr>
 	<tr class="budget-total">
-		<td>Total result</td>
+		<td>Profit before tax</td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
@@ -180,7 +214,7 @@ foreach($arrProfit as $pc=>$flag){
 	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotal)-array_sum($arrGrandTotalEstimate));?></td>
 </tr>
 <tr>
-		<td>Last</td>
+		<td><?php echo $oBudget->type=='FYE'?'Budget':'Last';?></td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
