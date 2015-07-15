@@ -6,7 +6,7 @@ require ('classes/budget.class.php');
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 
 
-if(!isset($_GET['tab'])){
+if(!isset($_GET['pccGUID'])){
 	$oBudget = new Budget($budget_scenario);
 	$arrJS[]='js/rep_pnl.js';
 	// $arrJS[]='js/input_form.js';	
@@ -21,29 +21,29 @@ if(!isset($_GET['tab'])){
 	require ('classes/reports.class.php');
 	?>
 	<input type='hidden' id='request_uri' value='<?php echo $_SERVER['REQUEST_URI'];?>'/>
-	<input type='hidden' id='pccGUID' value='<?php echo $_GET['tab'];?>'/>
+	<input type='hidden' id='pccGUID' value='<?php echo $_GET['pccGUID'];?>'/>
 	<div class="report-radio f-row">
 	<div id='period_switch'>
-		<input type='radio' id='period_monthly_<?php echo $_GET['tab'];?>' name='period' value='monthly'/>
-		<label for='period_monthly_<?php echo $_GET['tab'];?>'>Monthly</label>
-		<input type='radio' checked id='period_quarterly_<?php echo $_GET['tab'];?>' name='period' value='quarterly'/>
-		<label for='period_quarterly_<?php echo $_GET['tab'];?>'>Quarterly</label>
+		<input type='radio' id='period_monthly_<?php echo $_GET['pccGUID'];?>' name='period' value='monthly'/>
+		<label for='period_monthly_<?php echo $_GET['pccGUID'];?>'>Monthly</label>
+		<input type='radio' checked id='period_quarterly_<?php echo $_GET['pccGUID'];?>' name='period' value='quarterly'/>
+		<label for='period_quarterly_<?php echo $_GET['pccGUID'];?>'>Quarterly</label>
 	</div>
 	<div id='detail_switch'>
-		<input type='radio' id='detail_all_<?php echo $_GET['tab'];?>' checked name='detail' value='all'/>
-		<label for='detail_all_<?php echo $_GET['tab'];?>'>Details</label>
-		<input type='radio' id='detail_totals_<?php echo $_GET['tab'];?>' name='detail' value='totals'/>
-		<label for='detail_totals_<?php echo $_GET['tab'];?>'>Totals</label>
+		<input type='radio' id='detail_all_<?php echo $_GET['pccGUID'];?>' checked name='detail' value='all'/>
+		<label for='detail_all_<?php echo $_GET['pccGUID'];?>'>Details</label>
+		<input type='radio' id='detail_totals_<?php echo $_GET['pccGUID'];?>' name='detail' value='totals'/>
+		<label for='detail_totals_<?php echo $_GET['pccGUID'];?>'>Totals</label>
 	</div>
 	</div>
 	<?php
-	if ($_GET['tab']=='all'){
+	if ($_GET['pccGUID']=='all'){
 		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
 		$sqlWhere = "WHERE pc in (SELECT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles))";
 	} else {
-		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).")";
+		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 	}
-	// switch ($_GET['tab']){
+	// switch ($_GET['pccGUID']){
 		// case 'f865db6b-d328-102e-9d25-5de97ba9df63':
 		// case 'f865e1de-d328-102e-9d25-5de97ba9df63':
 		// case 'all':
@@ -51,7 +51,7 @@ if(!isset($_GET['tab'])){
 			Reports::masterYactByActivityEst($sqlWhere." AND scenario='$budget_scenario'");	
 		// break;
 		// case 'f865e855-d328-102e-9d25-5de97ba9df63':
-			// $sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['tab']).") OR (customer=9907 AND Group_code=94))";
+			// $sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") OR (customer=9907 AND Group_code=94))";
 		// default:
 			// echo "<input type='hidden' id='group' value='customer'/>";
 			// Reports::masterYactByCustomerEst($sqlWhere." AND scenario='$budget_scenario'");
@@ -59,7 +59,7 @@ if(!isset($_GET['tab'])){
 	// }
 	?>
 		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("report_<?php echo $_GET['tab'];?>");'>Select table</a></li>
+			<li><a href='javascript:SelectContent("report_<?php echo $_GET['pccGUID'];?>");'>Select table</a></li>
 		</ul>
 	<?php
 }
