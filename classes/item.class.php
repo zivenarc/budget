@@ -53,6 +53,8 @@ class Items extends Reference{
 	const TRANSPORTATION_TAX = '602b629f-f52f-11de-95b2-00188bc729d2';
 	const INSURANCE = 'f0b14b46-f52b-11de-95b2-00188bc729d2';
 	
+	const PROFIT_SHARE = 'fd09fb23-efd0-11e3-926a-00155d010e0b';
+	
 	function __construct(){
 		parent::__construct();
 		$this->child_class = 'Item';

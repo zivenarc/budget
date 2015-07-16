@@ -11,6 +11,7 @@ include_once ('classes/yact_coa.class.php');
 $Products = new Products ();
 $Activities = new Activities ();
 $YACT = new YACT_COA();
+$Items = new Items();
 
 $arrJS[] = '../common/eiseGrid/eiseGrid.js';
 $arrCSS[] = '../common/eiseGrid/eiseGrid.css';
@@ -219,6 +220,7 @@ class Sales extends Document{
 		GLOBAL $arrUsrData;
 		GLOBAL $Activities;
 		GLOBAL $YACT;
+		GLOBAL $Items;
 		
 		if (!$this->ID){
 			$this->Update();
@@ -366,6 +368,28 @@ class Sales extends Document{
 							$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
 						}
 					}
+					
+					if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
+						$master_row = $oMaster->add_master();	
+						$master_row->profit = $this->profit;
+						$master_row->activity = $record->activity;
+						$master_row->customer = $record->customer;				
+						
+						$activity = $Activities->getByCode($record->activity);
+						$account = $activity->YACT;
+						
+						//$master_row->item = Items::PROFIT_SHARE;
+						$item = $Items->getById(Items::PROFIT_SHARE);
+						$master_row->account = $item->getYACT($master_row->profit);
+						$master_row->item = $item->id;
+						
+						for($m=1;$m<13;$m++){
+							$month = date('M',mktime(0,0,0,$m,15));
+							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$settings[strtolower($record->selling_curr)]-$record->buying_rate*$settings[strtolower($record->buying_curr)])/2;
+						}
+					}
+					
+					
 				}
 				$oMaster->save();
 				$this->markPosted();
