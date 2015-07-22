@@ -281,11 +281,38 @@ class Budget{
 		return($res);
 	}
 	
-	public function getThisYTDSQL($arrRates = null){		
+	public function getThisYTDSQL($period_type = 'ytd',$arrRates = null){		
 		$cm = date('M',$this->date_start - 1);
 		$nm = date('M',$this->date_start);		
 		$nCurrent = (integer)date('m',$this->date_start - 1);	
-		return($this->getYTDSQL(1,$nCurrent,$arrRates));
+		
+		switch ($period_type){
+			case 'ytd':
+				return($this->getYTDSQL(1,$nCurrent,$arrRates));
+				break;
+			case 'cm':
+				return($this->getYTDSQL($nCurrent,$nCurrent,$arrRates));
+				break;
+			case 'nm':
+				return($this->getYTDSQL($nCurrent,$nCurrent,$arrRates));
+				break;
+			case 'roy':
+				return($this->getYTDSQL($nCurrent+1,12,$arrRates));
+				break;
+			case 'q1':
+				return($this->getYTDSQL(1,3,$arrRates));
+				break;
+			case 'q2':
+				return($this->getYTDSQL(4,6,$arrRates));
+				break;	
+			case 'q3':
+				return($this->getYTDSQL(7,9,$arrRates));
+				break;
+			case 'q4':
+				return($this->getYTDSQL(10,12,$arrRates));
+				break;
+		}
+		
 	}
 	
 	public function getMonthlySQL($start=1, $end=12){
