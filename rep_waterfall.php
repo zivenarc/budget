@@ -29,6 +29,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								WHERE
 								scenario='{$budget}' AND source<>'Estimate' AND account IN ('J00400', 'J00802')
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
+						'tolerance'=>0.05,
 						'limit'=>10);
 
 $settings['gpbu'] = Array('title'=>"GP by business unit",
