@@ -135,6 +135,7 @@ class Waterfall {
 					  },
 					  tooltip: {isHtml: true},
 					  hAxis: {slantedTextAngle:90, textStyle:{fontSize: 10}},
+					  vAxis: {format:'number', textStyle:{fontSize: 10}},
 					  chartArea: {top:'10%', bottom:'50%', height: '50%'}
 					};
 
