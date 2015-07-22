@@ -32,6 +32,26 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 						'tolerance'=>0.05,
 						'limit'=>10);
 
+$settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
+					'sqlBase' => "SELECT IF(C.cntParentID<>723,C.cntParentID, C.cntID) as optValue, 
+										IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 
+										SUM(".$oBudget->getThisYTDSQL().") as Actual, 
+										0 as Budget, 
+										SUM(".$oBudget->getThisYTDSQL().") as Diff
+								FROM vw_master 
+								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+								WHERE scenario='{$actual}' AND source='Actual' AND account IN ('J00400', 'J00802') AND pc NOT in (5,15)
+								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
+								UNION ALL
+								SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 0 as Actual, SUM(".$oBudget->getThisYTDSQL().")  as Budget, -SUM(".$oBudget->getThisYTDSQL().") as Diff
+								FROM vw_master 
+								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+								WHERE
+								scenario='{$budget}' AND source<>'Estimate' AND account IN ('J00400', 'J00802') AND pc NOT in (5,15)
+								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
+						'tolerance'=>0.05,
+						'limit'=>10);
+						
 $settings['gpbu'] = Array('title'=>"GP by business unit",
 'sqlBase' => "SELECT pc as optValue, 
 					Profit as optText, 
