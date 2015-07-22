@@ -280,7 +280,14 @@ class Budget{
 		}
 		return($res);
 	}
-		
+	
+	public function getThisYTDSQL($arrRates = null){		
+		$cm = date('M',$this->date_start - 1);
+		$nm = date('M',$this->date_start);		
+		$nCurrent = (integer)date('m',$this->date_start - 1);	
+		return($this->getYTDSQL(1,$nCurrent,$arrRates));
+	}
+	
 	public function getMonthlySQL($start=1, $end=12){
 		for($m=$start;$m<=$end;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));

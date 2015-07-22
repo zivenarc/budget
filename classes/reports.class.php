@@ -801,10 +801,7 @@ class Reports{
 			<thead>
 				<tr>
 					<th><?php echo $firstLevelTitle; ?></th>
-					<th>Account</th>
-					<?php echo Budget::getTableHeader(); 
-							echo Budget::getTableHeader('quarterly');
-					?>
+					<th>Account</th>					
 					<th class='budget-ytd'><?php echo $Budget->type=='Budget'?'Budget':'FYE';?></th>
 					<th><?php echo $Budget->type=='Budget'?'Estimate':'Budget';?></th>
 					<th>Diff</th>
