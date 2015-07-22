@@ -84,7 +84,7 @@ class Waterfall {
 			?>
 			<tr class="<?php echo $record[2];?>">
 				<td><?php echo $record[0];?></td>
-				<td class='budget-decimal'><span style='color:<?php echo $record[0]<0?'red':'black';?>;'><?php echo number_format($record[1],0,'.',',');?></span></td>
+				<td class='budget-decimal'><span style='color:<?php echo $record[1]<0?'red':'black';?>;'><?php echo number_format($record[1],0,'.',',');?></span></td>
 			</tr>
 			<?php
 		}
