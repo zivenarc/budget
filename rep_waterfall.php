@@ -45,7 +45,8 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 			FROM vw_master 			
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' AND account IN ('J00400', 'J00802')
-			GROUP BY pc"
+			GROUP BY pc",
+			'tolerance'=>0.05
 			);
 
 $settings['opbu'] = Array('title'=>"OP by business unit",
