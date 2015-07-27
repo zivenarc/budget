@@ -311,7 +311,7 @@ class Reports{
 						?>
 						<td class='budget-decimal budget-ytd'><?php echo number_format($arrGP['Total']/1000,0,'.',',');?></td>
 					</tr>
-					<tr>
+					<tr class='budget-subtotal'>
 						<td colspan="3">GP per FTE</td>
 						<?php
 						for ($m=1;$m<13;$m++){									
@@ -322,6 +322,55 @@ class Reports{
 					</tr>
 					<?php
 				}
+				
+				//---------------- Total staff costs
+				$sql = "SELECT account, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
+						FROM `vw_master`
+						$sqlWhere
+							AND Group_code IN (95)
+						";
+				$rs = $oSQL->q($sql);	
+				if ($oSQL->num_rows($rs)){
+					while ($rw = $oSQL->f($rs)){						
+							?>
+							<tr>
+								<td colspan="3">Staff costs, RUBx1,000</td>
+								<?php
+								for ($m=1;$m<13;$m++){
+									$month = date('M',mktime(0,0,0,$m,15));
+									echo '<td class="budget-decimal">',number_format(-$rw[$month]/1000,0,'.',','),'</td>';
+									$arrSC[$month] = -$rw[$month];
+									$arrSCPerFTE[$m] = -$rw[$month]/$headcount[$m]/1000;									
+								}
+								?>
+								<td class='budget-decimal budget-ytd'><?php echo number_format(-$rw['Total']/1000,0,'.',',');?></td>
+							</tr>							
+							<?php
+							$arrSC['Total'] = -$rw['Total'];
+					}
+					?>
+					<tr>
+						<td colspan="3">Gross profit/Staff costs</td>
+						<?php
+						for ($m=1;$m<13;$m++){
+									$month = date('M',mktime(0,0,0,$m,15));
+									echo '<td class="budget-decimal">',number_format($arrGP[$month]/$arrSC[$month],1,'.',','),'</td>';									
+						}
+						?>
+						<td class='budget-decimal budget-ytd'><?php echo number_format($arrGP['Total']/$arrSC['Total'],1,'.',',');?></td>
+					</tr>
+					<tr class='budget-subtotal'>
+						<td colspan="3">Cost per FTE</td>
+						<?php
+						for ($m=1;$m<13;$m++){									
+							echo '<td class="budget-decimal">',number_format($arrSCPerFTE[$m],0,'.',','),'</td>';									
+						}
+						?>
+						<td class='budget-decimal budget-ytd'><?php echo number_format($arrSC['Total']/$headcount['ytd']/1000,0,'.',',');?></td>
+					</tr>
+					<?php
+				}
+				
 			?>
 			</tbody>
 			</table>
