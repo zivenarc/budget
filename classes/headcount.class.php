@@ -743,7 +743,9 @@ class Headcount extends Document{
 		
 		$sql = "SELECT *, (SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
 					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090) as empEndDate
-					FROM vw_employee_select WHERE empProfitID={$this->pc->code}";//die($sql);
+					FROM vw_employee_select 
+					WHERE empProfitID={$this->pc->code}
+					ORDER BY empSalary DESC, empFunctionGUID, empTitleLocal";//die($sql);
 		$rs = $this->oSQL->q($sql);
 		while ($rw=$this->oSQL->f($rs)){
 			$row = $this->add_record();
