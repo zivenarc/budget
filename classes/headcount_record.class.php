@@ -52,7 +52,8 @@ class headcount_record {
 			$this->pc_profile = $data['pc_profile'];
 			$this->wc = $data['wc'];
 			$this->vks = $data['vks'];
-			$this->start_date = $data['start_date'];
+			$this->start_date = strtotime($data['start_date']);
+			$this->end_date = strtotime($data['end_date']);
 			$this->new_fte = $data['new_fte'];
 	
 		}		
@@ -65,7 +66,7 @@ class headcount_record {
 		return(true);
 	}
 	
-	public function getSQLstring(){
+	public function getSQLstring($mStart=1, $mEnd=12, $flagPostActualPeriods = false){
 		
 		GLOBAL $oSQL;
 		
@@ -73,11 +74,14 @@ class headcount_record {
 			$res = "DELETE FROM `reg_headcount` WHERE id={$this->id} LIMIT 1;";	
 			return ($res);
 		}
+		
+		if ($flagPostActualPeriods) {
+			$mStart = 1;
+		}
 	
-	
-		for($m=1;$m<13;$m++){
+		for($m=$mStart;$m<=$mEnd;$m++){
 			$month = date('M',mktime(0,0,0,$m,15));
-			$arrRes[] = "`$month`=".(integer)$this->{$month};
+			$arrRes[] = "`$month`=".(double)$this->{$month};
 		}
 		
 		if($this->salary){
@@ -97,7 +101,8 @@ class headcount_record {
 			$arrRes[] = "`wc`=".($this->wc?1:0);
 			$arrRes[] = "`vks`=".($this->vks?1:0);
 			$arrRes[] = "`fuel`=".(double)$this->fuel;
-			$arrRes[] = "`start_date`=".($this->start_date ? $oSQL->e($this->start_date) : 'NULL');
+			$arrRes[] = "`start_date`=".($this->start_date ? $oSQL->e(date('Y-m-d',$this->start_date)) : 'NULL');
+			$arrRes[] = "`end_date`=".($this->end_date ? $oSQL->e(date('Y-m-d',$this->end_date)) : 'NULL');
 			$arrRes[] = "`new_fte`=".(integer)$this->new_fte;
 			$arrRes[] = "`particulars`=".($this->employee?$oSQL->e($this->employee):'NULL');
 			if ($this->id){
@@ -117,6 +122,33 @@ class headcount_record {
 			$res += $this->{$month};
 		}
 		return ($res);
+	}
+	
+	public function getFTE($m, $year){
+		$res = 1;
+		
+		$current_month_start = mktime(0,0,0,$m,1,$year);
+		$current_month_end = mktime(0,0,0,$m+1,0,$year);
+		
+		// echo date('d.m.Y',$current_month_start), " - ",date('d.m.Y',$current_month_end), "\r\n";
+		// echo "Start date - ", date('d.m.Y', $this->start_date), "\r\n";
+		
+		if($this->start_date>$current_month_end){
+			$res = 0; 
+		} elseif ($this->start_date>$current_month_start) {			
+			$res = 1 - ($this->start_date - $current_month_start)/($current_month_end-$current_month_start); 
+			// echo 'Partial employment since ',date('d.m.Y',$this->start_date),' = 1 - (',$this->start_date,'-',$current_month_start,')/(',$current_month_end,' - ',$current_month_start,') = ', $res,"\r\n";
+		};
+		
+		if ($this->end_date){
+			if($this->end_date<$current_month_start){
+				$res = 0; 
+			} elseif ($this->end_date<$current_month_end) {
+				$res = 1 - ($current_month_end - $this->end_date)/($current_month_end-$current_month_start); 
+			};
+		}
+		
+		return($res);
 	}
 }
 ?>

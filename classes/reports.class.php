@@ -241,11 +241,11 @@ class Reports{
 				<?php
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
-					echo "<td class='budget-decimal budget-$month'>",($rw[$month]?$rw[$month]:""),'</td>';
+					echo "<td class='budget-decimal budget-$month'>",self::render($rw[$month],1),'</td>';
 					$headcount[$m] += $rw[$month];
 				}
 				?>
-					<td class='budget-decimal budget-ytd'><?php echo number_format($rw['Total'],1,'.',',');?></td>
+					<td class='budget-decimal budget-ytd'><?php echo self::render($rw['Total'],1);?></td>
 				</tr>
 				<?php
 				$headcount['ytd'] += $rw['Total'];
@@ -254,11 +254,11 @@ class Reports{
 			<tr class='budget-subtotal'><td colspan='3'>Total headcount</td>
 			<?php
 			for ($m=1;$m<13;$m++){
-				echo '<td class="budget-decimal">',$headcount[$m],'</td>';
+				echo '<td class="budget-decimal">',self::render($headcount[$m],1),'</td>';
 			}
 			
 			?>
-				<td class="budget-decimal budget-ytd"><?php echo number_format($headcount['ytd'],1,'.',',');?></td>
+				<td class="budget-decimal budget-ytd"><?php self::render($headcount['ytd'],1);?></td>
 			</tr>
 			<?php
 				$sql = "SELECT account, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
@@ -276,20 +276,20 @@ class Reports{
 								<?php
 								for ($m=1;$m<13;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
-									echo '<td class="budget-decimal">',number_format($rw[$month]/1000,0,'.',','),'</td>';
+									echo '<td class="budget-decimal">',self::render($rw[$month]/1000),'</td>';
 									$arrRevenuePerFTE[$m] = $rw[$month]/$headcount[$m]/1000;									
 								}
 								?>
-								<td class='budget-decimal budget-ytd'><?php echo number_format($rw['Total']/1000,0,'.',',');?></td>
+								<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']/1000);?></td>
 							</tr>
 							<tr>
 								<td colspan="3">Revenue per FTE</td>
 								<?php
 								for ($m=1;$m<13;$m++){									
-									echo '<td class="budget-decimal">',number_format($arrRevenuePerFTE[$m],0,'.',','),'</td>';									
+									echo '<td class="budget-decimal">',self::render($arrRevenuePerFTE[$m]),'</td>';									
 								}
 								?>
-								<td class='budget-decimal budget-ytd'><?php echo number_format($rw['Total']/$headcount['ytd']/1000,0,'.',',');?></td>
+								<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']/$headcount['ytd']/1000);?></td>
 							</tr>
 							<?php
 						}
@@ -305,20 +305,22 @@ class Reports{
 						<?php
 						for ($m=1;$m<13;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
-									echo '<td class="budget-decimal">',number_format($arrGP[$month]/1000,0,'.',','),'</td>';
+									echo '<td class="budget-decimal">',self::render($arrGP[$month]/1000),'</td>';
 									$arrGPPerFTE[$m] = $arrGP[$month]/$headcount[$m]/1000;
 						}
 						?>
-						<td class='budget-decimal budget-ytd'><?php echo number_format($arrGP['Total']/1000,0,'.',',');?></td>
+						<td class='budget-decimal budget-ytd'><?php self::render($arrGP['Total']/1000);?></td>
 					</tr>
 					<tr class='budget-subtotal'>
 						<td colspan="3">GP per FTE</td>
 						<?php
 						for ($m=1;$m<13;$m++){									
-							echo '<td class="budget-decimal">',number_format($arrGPPerFTE[$m],0,'.',','),'</td>';									
+							?>
+							<td class="budget-decimal"><?php self::render($arrGPPerFTE[$m]);?></td>
+							<?php
 						}
 						?>
-						<td class='budget-decimal budget-ytd'><?php echo number_format($arrGP['Total']/$headcount['ytd']/1000,0,'.',',');?></td>
+						<td class='budget-decimal budget-ytd'><?php self::render_ratio($arrGP['Total']/100000,$headcount['ytd'],0);?></td>
 					</tr>
 					<?php
 				}
@@ -354,7 +356,9 @@ class Reports{
 						<?php
 						for ($m=1;$m<13;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
-									echo '<td class="budget-decimal">',number_format($arrGP[$month]/$arrSC[$month],1,'.',','),'</td>';									
+									?>
+									<td class="budget-decimal"><?php self::render_ratio($arrGP[$month]*100,$arrSC[$month],1);?></td>
+									<?php
 						}
 						?>
 						<td class='budget-decimal budget-ytd'><?php echo number_format($arrGP['Total']/$arrSC['Total'],1,'.',',');?></td>

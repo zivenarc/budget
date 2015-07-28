@@ -340,25 +340,34 @@ class Headcount extends Document{
 						$row->salary = (double)str_replace(',','',$_POST['salary'][$id]);							
 						$row->mobile_limit = (double)str_replace(',','',$_POST['mobile_limit'][$id]);							
 						$row->fuel = (double)str_replace(',','',$_POST['fuel'][$id]);
-						if ($this->type=='new'){
-							$row->start_date = isset($_POST['start_date'][$id])?date('Y-m-d',strtotime($_POST['start_date'][$id])):$row->start_date;							
+						
+						$row->start_date = isset($_POST['start_date'][$id])?strtotime($_POST['start_date'][$id]):$row->start_date;							
+						$row->end_date = isset($_POST['end_date'][$id])?strtotime($_POST['end_date'][$id]):$row->end_date;							
+						
+						if ($this->type=='new'){							
 							$row->new_fte = (integer)$_POST['new_fte'][$id];
 						};
 								
-						$start_date = strtotime($_POST['start_date'][$id]);
+						// $start_date = strtotime($_POST['start_date'][$id]);
 								
 						for ($m=1;$m<13;$m++){
 							$month = date('M',mktime(0,0,0,$m,15));
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							$current_month_end = mktime(0,0,0,$m+1,0,$oBudget->year);
-							// echo date('d.m.Y',$start_date),';',date('d.m.Y',$current_month_start),"\r\n";
+							// echo date('d.m.Y',$row->start_date),';',date('d.m.Y',$current_month_start),"\r\n";
 							if ($this->type=='current'){
+								
 								$row->{$month} = (integer)$_POST[strtolower($month)][$id];
+								
+								$row->{$month} = $row->getFTE($m, $oBudget->year);
+								
+								
+								
 							} else {
-								if($start_date>$current_month_end){
+								if($row->start_date>$current_month_end){
 									$row->{$month} = 0;
 								} else {
-									$row->hc = $_POST['new_fte'][$id]*(date('t',$current_month_start)-date('j',$start_date))/date('t',$current_month_start);							 
+									$row->hc = $_POST['new_fte'][$id]*(date('t',$current_month_start)-date('j',$row->start_date))/date('t',$current_month_start);							 
 									// $row->{$month} = $hc;
 									$row->{$month} = (integer)$_POST['new_fte'][$id];
 								}
@@ -399,7 +408,7 @@ class Headcount extends Document{
 		if(is_array($this->records[$this->gridName])){			
 			foreach ($this->records[$this->gridName] as $i=>$row){				
 				if ($row->flagUpdated || $row->flagDeleted){
-					$sql[] = $row->getSQLstring();
+					$sql[] = $row->getSQLstring(date('m',$this->budget->date_start),12,false);
 				}
 			}
 		};
@@ -732,7 +741,8 @@ class Headcount extends Document{
 		}
 		
 		
-		$sql = "SELECT *, (SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance 
+		$sql = "SELECT *, (SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
+					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090) as empEndDate
 					FROM vw_employee_select WHERE empProfitID={$this->pc->code}";//die($sql);
 		$rs = $this->oSQL->q($sql);
 		while ($rw=$this->oSQL->f($rs)){
@@ -748,9 +758,12 @@ class Headcount extends Document{
 			$row->insurance = $rw['insurance'];
 			$row->mobile_limit = $rw['funMobile'];
 			$row->fuel = $rw['funFuel'];
+			$row->start_date = strtotime($rw['empStartDate']);
+			$row->end_date = strtotime($rw['empEndDate']);
+			
 			for ($m=1;$m<13;$m++){
 				$month = date('M',mktime(0,0,0,$m,15));
-				$row->{$month} = $rw['empSalary']?1:0;
+				$row->{$month} = $row->getFTE($m, $oBudget->year);
 			}
 		}	
 	}
