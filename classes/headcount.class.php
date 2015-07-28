@@ -163,6 +163,15 @@ class Headcount extends Document{
 			);
 		}
 		
+		if ($this->type=='current'){
+			$grid->Columns[] = Array(
+				'title'=>'End date'
+				,'field'=>'end_date'
+				,'type'=>'date'				
+				, 'disabled'=>false
+			);
+		}
+		
 		$grid->Columns[] = Array(
 			'title'=>'Function'
 			,'field'=>'function'
