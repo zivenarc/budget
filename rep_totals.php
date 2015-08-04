@@ -1,5 +1,9 @@
 <?php
 // $flagNoAuth = true;
+define ('STAFF_COSTS', '02.Staff costs');
+define ('GROSS_PROFIT', '01.Gross Margin');
+
+
 require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
@@ -177,7 +181,7 @@ foreach($arrReport as $group=>$arrItem){
 	</tr>
 	<?php
 	//------ Ratios for gross margin
-	if ($group == '01.Gross Margin'){
+	if ($group == GROSS_PROFIT){
 		?>
 		<tr class="budget-ratio">
 			<td>GP, %</td>
@@ -190,6 +194,23 @@ foreach($arrReport as $group=>$arrItem){
 		?>
 		<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrTotal[$group]),array_sum($arrRevenue));?></td>
 		<td class='budget-decimal'><?php Reports::render_ratio(array_sum($arrEstimate[$group]),$arrRevenueEst);?></td>				
+		</tr>
+		<?php
+	}
+	
+	if ($group == STAFF_COSTS){
+		?>
+		<tr class="budget-ratio">
+			<td>GP to Staff costs</td>
+			<?php
+			foreach($arrProfit as $pc=>$flag){
+			?>
+			<td class='budget-decimal'><?php Reports::render_ratio(-$arrTotal[GROSS_PROFIT][$pc],$arrTotal[STAFF_COSTS][$pc]*100);?></td>
+			<?php
+		}
+		?>
+		<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(-array_sum($arrTotal[GROSS_PROFIT]),array_sum($arrTotal[STAFF_COSTS])*100);?></td>
+		<td class='budget-decimal'><?php Reports::render_ratio(-array_sum($arrEstimate[GROSS_PROFIT]),array_sum($arrEstimate[STAFF_COSTS])*100);?></td>				
 		</tr>
 		<?php
 	}
@@ -246,19 +267,19 @@ foreach($arrProfit as $pc=>$flag){
 	<td>% of revenue</td>
 <?php
 foreach($arrProfit as $pc=>$flag){
-	if ($arrReport['01.Gross Margin']['Revenue'][$pc]){
-		$arrCostRatio[$pc] = $arrGrandTotal[$pc]/$arrReport['01.Gross Margin']['Revenue'][$pc]*100;	
+	if ($arrReport[GROSS_PROFIT]['Revenue'][$pc]){
+		$arrCostRatio[$pc] = $arrGrandTotal[$pc]/$arrReport[GROSS_PROFIT]['Revenue'][$pc]*100;	
 	} else {
 		$arrCostRatio[$pc]=0;
 	}
-	$arrCostRatio['Corporate'] = - $arrGrandTotal['Corporate']/array_sum($arrReport['01.Gross Margin']['Revenue'])*100;
-	$arrCostRatio['Sales'] = - $arrGrandTotal['Sales']/array_sum($arrReport['01.Gross Margin']['Revenue'])*100;
+	$arrCostRatio['Corporate'] = - $arrGrandTotal['Corporate']/array_sum($arrReport[GROSS_PROFIT]['Revenue'])*100;
+	$arrCostRatio['Sales'] = - $arrGrandTotal['Sales']/array_sum($arrReport[GROSS_PROFIT]['Revenue'])*100;
 	?>
 	<td class='budget-decimal'><?php Reports::render($arrCostRatio[$pc],1);?></td>
 	<?php
 }
 ?>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotal)/array_sum($arrReport['01.Gross Margin']['Revenue']),1);?></td>
+	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotal)/array_sum($arrReport[GROSS_PROFIT]['Revenue']),1);?></td>
 </tr>
 <tr class="budget-subtotal">
 	<td>Headcount</td>
