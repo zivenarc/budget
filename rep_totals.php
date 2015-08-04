@@ -114,7 +114,7 @@ $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 	$keyProfit = Budget::getProfitAlias($rw);
 	$arrOpIncome[$keyProfit] += $rw['Total'];	
-	$arrOpIncomeEstimate += $rw['Estimate'];	
+	$arrOpIncomeEstimate[$keyProfit] += $rw['Estimate'];	
 }
 
 // echo '<pre>';print_r($arrHeadcount);echo '</pre>';echo $sql;
@@ -288,7 +288,7 @@ foreach($arrProfit as $pc=>$flag){
 ?>
 	<td class='budget-decimal budget-ytd'><?php Reports::render(100,1);?></td>	
 </tr>
-<tr>
+<tr class="budget-subtotal">
 	<td>Operating income</td>
 <?php
 foreach($arrProfit as $pc=>$flag){
@@ -298,11 +298,33 @@ foreach($arrProfit as $pc=>$flag){
 }
 ?>
 	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome));?></td>
-	<td class='budget-decimal'><?php Reports::render($arrOpIncomeEstimate);?></td>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrOpIncome)-$arrOpIncomeEstimate);?></td>
+	<td class='budget-decimal'><?php Reports::render(array_sum($arrOpIncomeEstimate));?></td>
+	<td class='budget-decimal'><?php Reports::render(array_sum($arrOpIncome)-array_sum($arrOpIncomeEstimate));?></td>
+</tr>
+<tr>
+	<td>Operating income, budget</td>
+<?php
+foreach($arrProfit as $pc=>$flag){
+	?>
+	<td class='budget-decimal'><?php Reports::render($arrOpIncomeEstimate[$pc]);?></td>
+	<?php
+}
+?>
+	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncomeEstimate));?></td>	
+</tr>
+<tr>
+	<td>Diff</td>
+<?php
+foreach($arrProfit as $pc=>$flag){
+	?>
+	<td class='budget-decimal'><?php Reports::render($arrOpIncome[$pc] - $arrOpIncomeEstimate[$pc]);?></td>
+	<?php
+}
+?>
+	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome) - array_sum($arrOpIncomeEstimate));?></td>	
 </tr>
 <tr class="budget-ratio">
-	<td>%of total</td>
+	<td>OI, %of total</td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
@@ -313,7 +335,7 @@ foreach($arrProfit as $pc=>$flag){
 	<td class='budget-decimal budget-ytd'><?php Reports::render(100,1);?></td>	
 </tr>
 <tr class="budget-ratio">
-	<td>%of revenue</td>
+	<td>OI, %of revenue</td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>

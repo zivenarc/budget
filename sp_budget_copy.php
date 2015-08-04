@@ -36,6 +36,7 @@ $sql[] = "DELETE FROM `reg_costs` WHERE `scenario`='{$new_budget}';";
 $sql[] = "DELETE FROM `reg_depreciation` WHERE `scenario`='{$new_budget}';";
 $sql[] = "DELETE FROM `reg_vehicles` WHERE `scenario`='{$new_budget}';";
 $sql[] = "DELETE FROM `reg_headcount` WHERE `scenario`='{$new_budget}';";
+$sql[] = "DELETE FROM `reg_rent` WHERE `scenario`='{$new_budget}';";
 
 $sql [] = "DELETE FROM reg_master WHERE scenario='{$new_budget}';";
 
