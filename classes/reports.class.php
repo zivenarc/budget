@@ -214,7 +214,7 @@ class Reports{
 					LEFT JOIN vw_function ON funGUID=function
 					LEFT JOIN vw_product_type ON prtID=activity
 					LEFT JOIN vw_location ON locID=location
-					$sqlWhere AND posted=1 AND salary>0
+					$sqlWhere AND posted=1 AND active=1 AND salary>0
 					GROUP BY `activity`, `location`, `function` 
 					ORDER BY location, prtRHQ";
 			$rs = $oSQL->q($sql);			

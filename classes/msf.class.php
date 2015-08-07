@@ -135,7 +135,7 @@ class MSF extends Document{
 			'title'=>$month
 			,'field'=>strtolower($month)
 			,'class'=>'budget-month'
-			,'type'=>'decimal'
+			,'type'=>'money'
 			, 'mandatory' => true
 			, 'disabled'=>!$this->flagUpdate
 			,'totals'=>true
@@ -144,7 +144,7 @@ class MSF extends Document{
 		$grid->Columns[] =Array(
 			'title'=>'Total'
 			,'field'=>'YTD'
-			,'type'=>'decimal'
+			,'type'=>'money'
 			,'totals'=>true
 			,'disabled'=>true
 		);
@@ -402,7 +402,7 @@ class MSF extends Document{
 				return (false);
 			break;
 		}
-		 	
+			
 		$rs = $this->oSQL->q($sql);
 		while ($rw=$this->oSQL->f($rs)){
 			$row = $this->add_record();
@@ -416,7 +416,7 @@ class MSF extends Document{
 				$arrSum[$month] = $this->total - $arrSubtotal[$month];
 			}
 		}
-		
+		//die($sql); 
 	}
 	
 }
