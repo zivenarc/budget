@@ -1841,7 +1841,12 @@ td.costs_supplier{
 
 .report-selected td{
 	background-color:#FFCC99 !important;
-	color: white !important;
+	color: #222 !important;
+}
+
+td.report-selected {
+	border: 2px solid black !important;
+	
 }
 
 .report-radio{

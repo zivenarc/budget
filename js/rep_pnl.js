@@ -100,8 +100,12 @@ function init_panel(o){
 		$('#'+report_id).find('td').each(function(){		
 					$(this).click(function(){					
 						$('#'+report_id).find('tr').removeClass('report-selected');
+						$('#'+report_id).find('td').removeClass('report-selected');
 						var tr = $(this).parent('tr');
+						
 						tr.addClass('report-selected');
+						$(this).addClass('report-selected'); 
+						
 						if (tr.hasClass('graph')){		
 							var activity = $('td:first',tr).text();
 							var ggData = [['Month',activity, 'Productivity']];
