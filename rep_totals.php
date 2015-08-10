@@ -21,8 +21,19 @@ $arrRates = $oBudget->getMonthlyRates($currency);
 $arrJS[] = 'js/rep_totals.js';
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
+
+if($currency!=643){
+		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
+		$rs = $oSQL->q($sql);
+		$rw = $oSQL->f($rs);
+		$curTitle = $rw["curTitle$strLocal"];
+		echo '<h2>',$curTitle,'</h2>';
+} else {
+	$curTitle = "RUB";
+}
+
 if ($denominator!=1) {
-	echo '<h2>RUB x',$denominator,'</h2>';
+	echo "<h2>{$curTitle} x{$denominator}</h2>";
 }
 
 if ($mthStart!=1 || $mthEnd!=12){
@@ -39,12 +50,7 @@ echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
 <?php
 
-if($currency!=643){
-		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
-		$rs = $oSQL->q($sql);
-		$rw = $oSQL->f($rs);
-		echo '<h2>',$rw["curTitle$strLocal"],'</h2>';
-}
+
 
 $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, SUM(".Budget::getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
 		FROM vw_master
