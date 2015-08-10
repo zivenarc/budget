@@ -26,14 +26,15 @@ if($currency!=643){
 		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
 		$rs = $oSQL->q($sql);
 		$rw = $oSQL->f($rs);
-		$curTitle = $rw["curTitle$strLocal"];
-		echo '<h2>',$curTitle,'</h2>';
+		$curTitle = $rw["curTitle$strLocal"];		
 } else {
 	$curTitle = "RUB";
 }
 
 if ($denominator!=1) {
 	echo "<h2>{$curTitle} x{$denominator}</h2>";
+} else {
+	echo "<h2>{$curTitle}</h2>";
 }
 
 if ($mthStart!=1 || $mthEnd!=12){
