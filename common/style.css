@@ -1840,7 +1840,7 @@ td.costs_supplier{
 }
 
 .report-selected td{
-	background-color:orange !important;
+	background-color:#FFCC99 !important;
 	color: white !important;
 }
 
