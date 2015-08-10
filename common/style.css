@@ -1841,7 +1841,7 @@ td.costs_supplier{
 
 .report-selected td{
 	background-color:orange !important;
-	color: white;
+	color: white !important;
 }
 
 .report-radio{
