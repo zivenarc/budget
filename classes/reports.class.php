@@ -209,14 +209,17 @@ class Reports{
 	public function headcountByJob($sqlWhere=''){
 		GLOBAL $oSQL;
 		ob_start();
-			$sql = "SELECT prtRHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal , ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
+			
+			$sqlSelect = "SELECT prtRHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pccTitle,pccTitleLocal , ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
 					FROM `reg_headcount`
 					LEFT JOIN vw_function ON funGUID=function
 					LEFT JOIN vw_product_type ON prtID=activity
 					LEFT JOIN vw_location ON locID=location
-					$sqlWhere AND posted=1 AND active=1 AND salary>0
-					GROUP BY `activity`, `location`, `function` 
-					ORDER BY location, prtRHQ";
+					LEFT JOIN vw_profit ON pccID=pc
+					$sqlWhere AND posted=1 AND active=1 AND salary>0";
+			
+			$sql = $sqlSelect." GROUP BY `activity`
+					ORDER BY prtRHQ";
 			$rs = $oSQL->q($sql);			
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
@@ -228,16 +231,14 @@ class Reports{
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
-				<tr><th>Location</th><th>Activity</th><th>Function</th><?php echo Budget::getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
+				<tr><th>Activity</th><?php echo Budget::getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
 			</thead>			
 			<tbody>
 			<?php
 			while ($rw=$oSQL->f($rs)){
 				?>
 				<tr>
-					<td><?php echo $rw['Location'];?></td>
-					<td><?php echo $rw['Activity'];?></td>
-					<td><strong><?php echo $rw['funTitle'];?></strong> (<?php echo $rw['funTitleLocal'];?>)</td>
+					<td><?php echo $rw['Activity'];?></td>					
 				<?php
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
@@ -250,8 +251,76 @@ class Reports{
 				<?php
 				$headcount['ytd'] += $rw['Total'];
 			}
+			
+			$sql = $sqlSelect." GROUP BY `location`";
+			$rs = $oSQL->q($sql);			
 			?>
-			<tr class='budget-subtotal'><td colspan='3'>Total headcount</td>
+			<tr><th>Location</th><?php echo Budget::getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
+			<?php
+			while ($rw=$oSQL->f($rs)){
+				?>
+				<tr>
+					<td><?php echo $rw['Location'];?></td>					
+				<?php
+				for ($m=1;$m<13;$m++){
+					$month = date('M',mktime(0,0,0,$m,15));
+					echo "<td class='budget-decimal budget-$month'>",self::render($rw[$month],1),'</td>';
+				
+				}
+				?>
+					<td class='budget-decimal budget-ytd'><?php echo self::render($rw['Total'],1);?></td>
+				</tr>
+				<?php
+				
+			}
+			$sql = $sqlSelect." GROUP BY `function` ORDER BY funFlagWC";
+			$rs = $oSQL->q($sql);			
+			?>
+			<tr><th>Function</th><?php echo Budget::getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
+			<?php
+			while ($rw=$oSQL->f($rs)){
+				?>
+				<tr>
+					<td><?php echo '<strong>',$rw['funTitle'],'</strong> | ',$rw['funTitleLocal'];?></td>					
+				<?php
+				for ($m=1;$m<13;$m++){
+					$month = date('M',mktime(0,0,0,$m,15));
+					echo "<td class='budget-decimal budget-$month'>",self::render($rw[$month],1),'</td>';
+				
+				}
+				?>
+					<td class='budget-decimal budget-ytd'><?php echo self::render($rw['Total'],1);?></td>
+				</tr>
+				<?php
+				
+			}
+			
+			$sql = $sqlSelect." GROUP BY `pc` ORDER BY pccFlagProd";
+			$rs = $oSQL->q($sql);			
+			if ($oSQL->num_rows($rs)>1){
+				?>
+				<tr><th>Business unit</th><?php echo Budget::getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
+				<?php
+				while ($rw=$oSQL->f($rs)){
+					?>
+					<tr>
+						<td><?php echo '<strong>',$rw['pccTitle'],'</strong> | ',$rw['pccTitleLocal'];?></td>					
+					<?php
+					for ($m=1;$m<13;$m++){
+						$month = date('M',mktime(0,0,0,$m,15));
+						echo "<td class='budget-decimal budget-$month'>",self::render($rw[$month],1),'</td>';
+					
+					}
+					?>
+						<td class='budget-decimal budget-ytd'><?php echo self::render($rw['Total'],1);?></td>
+					</tr>
+					<?php
+					
+				}
+			}
+			?>
+			
+			<tr class='budget-subtotal'><td>Total headcount</td>
 			<?php
 			for ($m=1;$m<13;$m++){
 				echo '<td class="budget-decimal">',self::render($headcount[$m],1),'</td>';
@@ -272,7 +341,7 @@ class Reports{
 						if ($rw['account']=='J00400'){
 							?>
 							<tr>
-								<td colspan="3">Revenue, RUBx1,000</td>
+								<td>Revenue, RUBx1,000</td>
 								<?php
 								for ($m=1;$m<13;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
@@ -283,7 +352,7 @@ class Reports{
 								<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']/1000);?></td>
 							</tr>
 							<tr>
-								<td colspan="3">Revenue per FTE</td>
+								<td>Revenue per FTE</td>
 								<?php
 								for ($m=1;$m<13;$m++){									
 									echo '<td class="budget-decimal">',self::render($arrRevenuePerFTE[$m]),'</td>';									
@@ -301,7 +370,7 @@ class Reports{
 					}
 					?>
 					<tr>
-						<td colspan="3">Gross profit, RUBx1,000</td>
+						<td>Gross profit, RUBx1,000</td>
 						<?php
 						for ($m=1;$m<13;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
@@ -312,7 +381,7 @@ class Reports{
 						<td class='budget-decimal budget-ytd'><?php self::render($arrGP['Total']/1000);?></td>
 					</tr>
 					<tr class='budget-subtotal'>
-						<td colspan="3">GP per FTE</td>
+						<td>GP per FTE</td>
 						<?php
 						for ($m=1;$m<13;$m++){									
 							?>
@@ -336,7 +405,7 @@ class Reports{
 					while ($rw = $oSQL->f($rs)){						
 							?>
 							<tr>
-								<td colspan="3">Staff costs, RUBx1,000</td>
+								<td>Staff costs, RUBx1,000</td>
 								<?php
 								for ($m=1;$m<13;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
@@ -352,19 +421,19 @@ class Reports{
 					}
 					?>
 					<tr>
-						<td colspan="3">Gross profit/Staff costs</td>
+						<td>Gross profit/Staff costs</td>
 						<?php
 						for ($m=1;$m<13;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
 									?>
-									<td class="budget-decimal"><?php self::render_ratio($arrGP[$month]*100,$arrSC[$month],1);?></td>
+									<td class="budget-decimal"><?php self::render_ratio($arrGP[$month]/100,$arrSC[$month],1);?></td>
 									<?php
 						}
 						?>
 						<td class='budget-decimal budget-ytd'><?php echo number_format($arrGP['Total']/$arrSC['Total'],1,'.',',');?></td>
 					</tr>
 					<tr class='budget-subtotal'>
-						<td colspan="3">Cost per FTE</td>
+						<td>Cost per FTE</td>
 						<?php
 						for ($m=1;$m<13;$m++){									
 							echo '<td class="budget-decimal">',number_format($arrSCPerFTE[$m],0,'.',','),'</td>';									
