@@ -273,7 +273,7 @@ class Reports{
 				<?php
 				
 			}
-			$sql = $sqlSelect." GROUP BY `function` ORDER BY funFlagWC";
+			$sql = $sqlSelect." GROUP BY `function` ORDER BY funRHQ, funFlagWC";
 			$rs = $oSQL->q($sql);			
 			?>
 			<tr><th>Function</th><?php echo Budget::getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
