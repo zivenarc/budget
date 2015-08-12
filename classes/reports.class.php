@@ -2,7 +2,7 @@
 class Reports{
 	
 	private $ID;
-	public $Budget;
+	public $oBudget;
 	public $Currency;
 	public $Denominator;
 	private $oSQL;
@@ -95,6 +95,7 @@ class Reports{
 			$rs = $oSQL->q($sql);
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
+				echo '<pre>',$sql,'</pre>';
 				return (false);
 			}
 			$tableID = "report_".md5($sql);
@@ -711,7 +712,7 @@ class Reports{
 	public function masterbyCustomerEst($sqlWhere, $currency=643){
 		
 		GLOBAL $budget_scenario;
-		$Budget = new Budget($budget_scenario);
+		$oBudget = new Budget($budget_scenario);
 		
 		$strFields = self::_getMonthlyFields($currency);
 		
@@ -725,7 +726,7 @@ class Reports{
 			ORDER BY `vw_master`.customer, `Group`, `vw_master`.itmOrder ASC			
 			";
 			
-			self::firstLevelReport($sql, 'Customer', $Budget);
+			self::firstLevelReport($sql, 'Customer', $oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
 			self::noFirstLevelReport($sqlWhere, $currency);
@@ -765,7 +766,7 @@ class Reports{
 	public function masterbyActivityEst($sqlWhere, $currency=643){
 		
 		GLOBAL $budget_scenario;
-		$Budget = new Budget($budget_scenario);
+		$oBudget = new Budget($budget_scenario);
 		
 		$strFields = self::_getMonthlyFields($currency);
 		
@@ -779,7 +780,7 @@ class Reports{
 			ORDER BY prtRHQ, prtGHQ,`vw_master`.activity, `Group`, `vw_master`.itmOrder ASC			
 			";
 			
-			self::firstLevelReport($sql, 'Activity', $Budget);
+			self::firstLevelReport($sql, 'Activity', $oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
 			self::noFirstLevelReport($sqlWhere, $currency);
@@ -796,7 +797,7 @@ class Reports{
 	public function monthlyReport($sqlWhere, $currency=643,$type='ghq'){
 		
 		GLOBAL $budget_scenario;
-		$Budget = new Budget($budget_scenario);
+		$oBudget = new Budget($budget_scenario);
 		
 		switch($type){
 			case 'activity':
@@ -843,7 +844,7 @@ class Reports{
 				ORDER BY `level1_code`, `Group`, `itmOrder` ASC";
 			
 			
-			self::firstLevelReportMR($sql, 'Activity', $Budget);
+			self::firstLevelReportMR($sql, 'Activity', $oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
 			self::noFirstLevelReportMR($sqlWhere, $currency);
@@ -860,7 +861,7 @@ class Reports{
 	public function masterbyGHQEst($sqlWhere, $currency=643){
 		
 		GLOBAL $budget_scenario;
-		$Budget = new Budget($budget_scenario);
+		$oBudget = new Budget($budget_scenario);
 		
 		$strFields = self::_getMonthlyFields($currency);
 		
@@ -873,7 +874,7 @@ class Reports{
 			ORDER BY prtGHQ, `Group`, `vw_master`.itmOrder ASC			
 			";
 			
-			self::firstLevelReport($sql, 'Activity', $Budget);
+			self::firstLevelReport($sql, 'Activity', $oBudget);
 			//==========================================================================================================================Non-customer-related data
 			self::noFirstLevelReport($sqlWhere, $currency);
 			?>
@@ -908,7 +909,7 @@ class Reports{
 			ob_flush();
 	}
 	
-	private function firstLevelReport($sql, $firstLevelTitle, $Budget=null){
+	private function firstLevelReport($sql, $firstLevelTitle, $oBudget=null){
 		global $oSQL;				
 		
 		$tableID = "FLR_".md5($sql);
@@ -925,11 +926,11 @@ class Reports{
 					<th><?php echo $firstLevelTitle; ?></th>
 					<th>Account</th>					
 					<?php 
-						echo $Budget->getTableHeader();
-						echo $Budget->getTableHeader('quarterly');
+						echo $oBudget->getTableHeader();
+						echo $oBudget->getTableHeader('quarterly');
 					?>		
-					<th class='budget-ytd'><?php echo $Budget->type=='Budget'?'Budget':'FYE';?></th>
-					<th><?php echo $Budget->type=='Budget'?'Estimate':'Budget';?></th>
+					<th class='budget-ytd'><?php echo $oBudget->type=='Budget'?'Budget':'FYE';?></th>
+					<th><?php echo $oBudget->type=='Budget'?'Estimate':'Budget';?></th>
 					<th>Diff</th>
 					<th>%</th>
 					<th class='budget-ytd FYE_analysis'>YTD Actual</th>
@@ -950,7 +951,7 @@ class Reports{
 					if($GroupLevel1 && $GroupLevel1!=$rw['GroupLevel1']){
 						$data = $subtotal[$GroupLevel1];
 						$data['Budget item']=$group;
-						self::echoBudgetItemString($data,'budget-subtotal', $Budget);
+						self::echoBudgetItemString($data,'budget-subtotal', $oBudget);
 					}
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
@@ -973,20 +974,20 @@ class Reports{
 					
 					$data = $rw;
 					if ($data['GroupLevel1']==$GroupLevel1 && $GroupLevel1) $data['GroupLevel1']="&nbsp;";
-					self::echoBudgetItemString($data,$tr_class, $Budget);
+					self::echoBudgetItemString($data,$tr_class, $oBudget);
 					
 					$GroupLevel1 = $rw['GroupLevel1'];
 					$group = $rw['Group'];
 				}
 				$data = $subtotal[$GroupLevel1];
 				$data['Budget item']=$group;
-				self::echoBudgetItemString($data,'budget-subtotal', $Budget);
+				self::echoBudgetItemString($data,'budget-subtotal', $oBudget);
 				
 				
 			}
 	}
 	
-	private function firstLevelReportMR($sql, $firstLevelTitle, $Budget=null){
+	private function firstLevelReportMR($sql, $firstLevelTitle, $oBudget=null){
 		global $oSQL;				
 		
 		$tableID = "FLR_".md5($sql);
@@ -1013,7 +1014,7 @@ class Reports{
 					if($GroupLevel1 && $GroupLevel1!=$rw['GroupLevel1']){
 						$data = $subtotal[$GroupLevel1];
 						$data['Budget item']=$group;
-						self::echoMRItemString($data,'budget-subtotal', $Budget);
+						self::echoMRItemString($data,'budget-subtotal', $oBudget);
 					}
 						
 					$subtotal[$rw['GroupLevel1']]['CM_A'] += $rw['CM_A'];
@@ -1030,14 +1031,14 @@ class Reports{
 					
 					// echo '<pre>';print_r($data);echo '</pre>';
 					
-					self::echoMRItemString($data,$tr_class, $Budget);
+					self::echoMRItemString($data,$tr_class, $oBudget);
 					
 					$GroupLevel1 = $rw['GroupLevel1'];
 					$group = $rw['Group'];
 				}
 				$data = $subtotal[$GroupLevel1];
 				$data['Budget item']=$group;
-				self::echoMRItemString($data,'budget-subtotal', $Budget);
+				self::echoMRItemString($data,'budget-subtotal', $oBudget);
 				
 				
 			}
@@ -1293,16 +1294,16 @@ class Reports{
 	
 	private function _getMonthlyFields($currency){
 		GLOBAL $budget_scenario;
-		$Budget = new Budget($budget_scenario);
-		$arrRates = $Budget->getMonthlyRates($currency);
+		$oBudget = new Budget($budget_scenario);
+		$arrRates = $oBudget->getMonthlyRates($currency);
 		
 		$res=	Budget::getMonthlySumSQL(1,12,$arrRates).", ".
 				Budget::getQuarterlySumSQL($arrRates).", 
 				SUM(".Budget::getYTDSQL(1,12,$arrRates).") as Total ,
 				SUM(estimate/{$arrRates['YTD']}) as estimate, 
-				SUM(".Budget::getYTDSQL(1, (integer)date('n',$Budget->date_start)-1,$arrRates).") as YTD_A, 
+				SUM(".Budget::getYTDSQL(1, (integer)date('n',$oBudget->date_start)-1,$arrRates).") as YTD_A, 
 				SUM(YTD/{$arrRates['YTD']}) as YTD, 
-				SUM(".Budget::getYTDSQL((integer)date('n',$Budget->date_start),12,$arrRates).") as ROY_A, 
+				SUM(".Budget::getYTDSQL((integer)date('n',$oBudget->date_start),12,$arrRates).") as ROY_A, 
 				SUM(ROY/{$arrRates['YTD']}) as ROY";
 		
 		return ($res);
@@ -1311,13 +1312,13 @@ class Reports{
 	
 	private function _getMRFields($currency){
 		GLOBAL $budget_scenario;
-		$Budget = new Budget($budget_scenario);
-		$arrRates = $Budget->getMonthlyRates($currency);
+		$oBudget = new Budget($budget_scenario);
+		$arrRates = $oBudget->getMonthlyRates($currency);
 		
-		$cm = date('M',$Budget->date_start - 1);
-		$nm = date('M',$Budget->date_start);
+		$cm = date('M',$oBudget->date_start - 1);
+		$nm = date('M',$oBudget->date_start);
 				
-		$nCurrent = (integer)date('m',$Budget->date_start - 1);
+		$nCurrent = (integer)date('m',$oBudget->date_start - 1);
 		
 		$res['actual']=	"SUM(`{$cm}`)/{$arrRates[$cm]} as CM_A, 
 						0 as CM_B,								
@@ -1332,8 +1333,8 @@ class Reports{
 						0 as NM_A , 
 						SUM(`$nm`)/{$arrRates[$nm]} as NM_B";
 		
-		$res['from_a'] = $Budget->id;
-		$res['from_b'] = $Budget->reference_scenario->id;
+		$res['from_a'] = $oBudget->id;
+		$res['from_b'] = $oBudget->reference_scenario->id;
 		
 		// echo '<pre>',$res,'</pre>'; 
 		

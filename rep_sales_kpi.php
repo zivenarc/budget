@@ -25,9 +25,10 @@ if(!isset($_GET['pccGUID'])){
 	} else {
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND scenario='$budget_scenario'";
 	}
-
+	
 	Reports::salesByActivity($sqlWhere);
 	?>
+		<!--<input id='pccGUID' type="hidden" value="<?php echo $_GET['pccGUID'];?>"/>-->
 		<div id='graph'/>
 	<?php
 }
