@@ -15,11 +15,25 @@ $oDocument->defineGrid();
 include ('includes/inc_profit_acl.php');
 
 if ($_POST['DataAction']){
+
+	if($_POST['DataAction']=='classify'){
+		$oDocument->classify(); 
+		redirect($_SERVER['REQUEST_URI']);
+		die();
+	}
+	
+	if($_POST['DataAction']=='declassify'){
+		$oDocument->declassify();
+		redirect($_SERVER['REQUEST_URI']);
+		die();
+	}
+	
 	 if($_POST['DataAction']=='fill'){
 		
 		$oDocument->fillData($oBudget);
 		
 	}
+		
 	
 	if ($oDocument->save($_POST['DataAction'])){
 		$oDocument->refresh($oDocument->ID);
@@ -93,12 +107,21 @@ if ($oDocument->profit && $oDocument->flagUpdate){
 	$arrActions[] = Array ('title'=>'Fill grid','action'=>'javascript:fillGrid();','class'=>'brick');
 }
 
+if ($oDocument->ID && !$oDocument->classified){
+	$arrActions[] = Array ('title'=>'Classify','action'=>'javascript:send(\'classify\');','class'=>'delete');
+}
+
+if ($oDocument->ID && $oDocument->classified==$arrUsrData['usrID']){
+	$arrActions[] = Array ('title'=>'Declassify','action'=>'javascript:send(\'declassify\');','class'=>'accept');
+}
+
 //============================== Main form definition ==============================
 
 $oDocument->fillGrid($oDocument->grid);
 
 require ('includes/inc-frame_top.php');
 require ('includes/inc_document_header.php');
+
 ?>
 <script>
 
@@ -132,7 +155,6 @@ $(document).ready(function(){
     }
 	
 });
-
 </script>
 <?php
 require ('includes/inc-frame_bottom.php');

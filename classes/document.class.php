@@ -61,6 +61,7 @@ class Document extends easyForm{
 		$this->product_folder = $this->data[$this->prefix.'ProductFolderID'];
 		$this->comment = $this->data[$this->prefix.'Comment'];
 		$this->amount = $this->data[$this->prefix.'Amount'];
+		$this->classified = $this->data[$this->prefix.'ClassifiedBy'];
 		
 		$this->budget = new Budget($this->scenario);
 		
@@ -163,6 +164,45 @@ class Document extends easyForm{
 			$sql[] = "UPDATE `{$this->table}` SET `{$this->prefix}FlagDeleted`=0, `{$this->prefix}EditBy`='{$arrUsrData['usrID']}', `{$this->prefix}EditDate`=NOW() WHERE `{$this->prefix}ID`={$this->ID} LIMIT 1;";
 			$sql[] = "UPDATE `{$this->register}` SET `active`=1 WHERE `source`='{$this->GUID}';";
 			$sql[] = $this->getActionSQL('restore');
+			$sql[] = "SET AUTOCOMMIT=1;";
+			$sql[] = "COMMIT;";
+					
+			return($this->doSQL($sql));
+			
+		} else {
+			return (false);
+		}
+		
+	}
+	
+	public function classify(){
+		GLOBAL $arrUsrData;
+		//if ($arrUsrData['FlagUpdate']){
+		if (true){
+			$sql = Array();
+			$sql[] = "SET AUTOCOMMIT=0;";
+			$sql[] = "START TRANSACTION;";
+			$sql[] = "UPDATE `{$this->table}` SET `{$this->prefix}ClassifiedBy`='{$arrUsrData['usrID']}', `{$this->prefix}EditBy`='{$arrUsrData['usrID']}', `{$this->prefix}EditDate`=NOW() WHERE `{$this->prefix}ID`={$this->ID} LIMIT 1;";			
+			$sql[] = $this->getActionSQL('classify');
+			$sql[] = "SET AUTOCOMMIT=1;";
+			$sql[] = "COMMIT;";
+				//echo '<pre>';print_r($sql);echo '</pre>';
+			return($this->doSQL($sql));
+			
+		} else {
+			return (false);
+		}
+		
+	}
+	
+	public function declassify(){
+		GLOBAL $arrUsrData;
+		if ($arrUsrData['FlagUpdate']){
+			$sql = Array();
+			$sql[] = "SET AUTOCOMMIT=0;";
+			$sql[] = "START TRANSACTION;";
+			$sql[] = "UPDATE `{$this->table}` SET `{$this->prefix}ClassifiedBy`='', `{$this->prefix}EditBy`='{$arrUsrData['usrID']}', `{$this->prefix}EditDate`=NOW() WHERE `{$this->prefix}ID`={$this->ID} LIMIT 1;";			
+			$sql[] = $this->getActionSQL('declassify');
 			$sql[] = "SET AUTOCOMMIT=1;";
 			$sql[] = "COMMIT;";
 					

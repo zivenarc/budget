@@ -207,12 +207,14 @@ function fillGrid(type){
 			});
 			break;
 		default:
-			send(type);
+			send('fill'+type);
 			break;
 	}
-	
-	function send(type){
-		$('#DataAction').val('fill'+type);
+		
+}
+
+function send(action){
+		$('#DataAction').val(action);
 		var input = $( "input, textarea, select" ).serialize();
 		$('#loader').show();
 		$.post(location.href,input,function(data){
@@ -238,8 +240,7 @@ function fillGrid(type){
 			// });
 			
 		});
-	};
-}
+};
 
 function parse_textarea(){
 	var strInput = $("#input_textarea").val().replace(/\r\n/g, "\n");

@@ -10,15 +10,25 @@ echo '</h1>';
 echo '<p id="timestamp">',$oDocument->timestamp,'</p>';
 
 if($oDocument->flagPosted){
-	echo '<p id="doc_status" class="budget-doc-posted">Posted</p>';
+	echo '<p id="doc_status" class="budget-doc-posted">',($strLocal?'Проведен':'Posted'),'</p>';
 }
 
 if($oDocument->flagDeleted){
-	echo '<p id="doc_status" class="budget-doc-deleted">Deleted</p>';
+	echo '<p id="doc_status" class="budget-doc-deleted">',($strLocal?'Удален':'Deleted'),'</p>';
 }
 
 if(isset($oDocument->budget) && !$oDocument->budget->flagUpdate){
 	echo '<p class="warning">The budget has been submitted and cannot be updated</p>';
+}
+
+if ($oDocument->classified) {
+	?>
+	<div class='warning'>Classified by <?php echo strtoupper($oDocument->classified); ?></div>
+	<?php
+	if (strtoupper($oDocument->classified) != $arrUsrData['usrID']){		
+		require ('includes/inc-frame_bottom.php');
+		die();
+	}
 }
 
 ?>
