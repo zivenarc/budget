@@ -354,7 +354,7 @@ class Headcount extends Document{
 						$row->end_date = isset($_POST['end_date'][$id])?strtotime($_POST['end_date'][$id]):$row->end_date;							
 						
 						if ($this->type=='new'){							
-							$row->new_fte = (integer)$_POST['new_fte'][$id];
+							$row->new_fte = (double)$_POST['new_fte'][$id];
 						};
 								
 						// $start_date = strtotime($_POST['start_date'][$id]);
@@ -378,7 +378,7 @@ class Headcount extends Document{
 								} else {
 									$row->hc = $_POST['new_fte'][$id]*(date('t',$current_month_start)-date('j',$row->start_date))/date('t',$current_month_start);							 
 									// $row->{$month} = $hc;
-									$row->{$month} = (integer)$_POST['new_fte'][$id];
+									$row->{$month} = (double)$_POST['new_fte'][$id];
 								}
 							
 							}
