@@ -103,7 +103,7 @@ class headcount_record {
 			$arrRes[] = "`fuel`=".(double)$this->fuel;
 			$arrRes[] = "`start_date`=".($this->start_date ? $oSQL->e(date('Y-m-d',$this->start_date)) : 'NULL');
 			$arrRes[] = "`end_date`=".($this->end_date ? $oSQL->e(date('Y-m-d',$this->end_date)) : 'NULL');
-			$arrRes[] = "`new_fte`=".(integer)$this->new_fte;
+			$arrRes[] = "`new_fte`=".(double)$this->new_fte;
 			$arrRes[] = "`particulars`=".($this->employee?$oSQL->e($this->employee):'NULL');
 			if ($this->id){
 				$res = "UPDATE `reg_headcount` SET ". implode(',',$arrRes)." WHERE id=".$this->id;
