@@ -96,7 +96,7 @@ include ('includes/inc-frame_top.php');
 							echo "<td class='budget-decimal budget-$month'>",Reports::render($subtotal[$pcc][$month],1),'</td>';							
 						}
 						?>
-						<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($subtotal[$pcc]),1);?></td>
+						<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($subtotal[$pcc])/12,1);?></td>
 					</tr>
 					<?php
 				}
