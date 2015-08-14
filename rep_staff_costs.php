@@ -109,7 +109,7 @@ include ('includes/inc-frame_top.php');
 					<td><?php echo $rw['empFunction'];?></td>
 					<td class='budget-decimal'><?php echo number_format($rw['empSalary'],2,'.',',');?></td>
 					<td><?php echo $rw['empStartDate'];?></td>
-					<td><?php echo $rw['empEndDate']?$rw['empEndDate']:'('.$rw['end_date'].')';?></td>				
+					<td><?php echo $rw['empEndDate']?$rw['empEndDate']:($rw['end_date']?'('.$rw['end_date'].')':'');?></td>				
 				<?php				
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
