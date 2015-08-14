@@ -469,7 +469,7 @@ class Headcount extends Document{
 						if ($eligible) {						
 							$salary[$month] = ($record->{$month})*$record->salary*($m<$settings['salary_review_month']?1:1+$settings['salary_increase_ratio']);
 						} else {
-							if ($this->type=='current'){
+							if (true || $this->type=='current'){
 								$salary[$month] = ($record->{$month})*$record->salary;
 							} else {
 								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
