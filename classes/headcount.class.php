@@ -765,12 +765,12 @@ class Headcount extends Document{
 		$sql = "SELECT empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,
 						IF(empID IN ({$strMaternity}),0,empSalary) as empSalary
 						,(SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
-					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090 AND rsgDateEnd>='".date('Y-m-d',$oBudget->date_start)."') as empEndDate
+					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090 AND DATEDIFF(rsgDateEnd,'".date('Y-m-d',$oBudget->date_start)."')>0) as empEndDate
 					FROM vw_employee_select 
 					WHERE empProfitID={$this->pc->code}
 					ORDER BY empSalary DESC, empFunctionGUID, empTitleLocal";//die($sql);
 					
-		
+		// echo $sql;
 		
 		$rs = $this->oSQL->q($sql);
 		while ($rw=$this->oSQL->f($rs)){
