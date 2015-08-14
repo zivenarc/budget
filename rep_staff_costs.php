@@ -4,58 +4,47 @@ require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 
-$repDateStart = '2015-01-01';
-$repDateEnd = '2015-01-31';
+$budget_scenario='FYE_15_Jul';
+$oBudget = new Budget($budget_scenario);
+$ytd = date('m',$oBudget->date_start)-1;
 
-$sql = "SELECT empID, empGUID, empCode1C, pccTitle, empTitle, empFunction, empSalary, empStartDate, empEndDate, 
-	IF (empStartDate BETWEEN '{$repDateStart}' AND '{$repDateEnd}', 1 - DATEDIFF(empStartDate, '{$repDateStart}')/DATEDIFF('{$repDateEnd}','{$repDateStart}'),1)
-		- IF (empEndDate BETWEEN '{$repDateStart}' AND '{$repDateEnd}', DATEDIFF('{$repDateEnd}', empEndDate )/DATEDIFF('{$repDateEnd}','{$repDateStart}'),0) as FTE
-FROM common_db.tbl_employee, common_db.tbl_profit
-WHERE empStartDate <= '{$repDateEnd}' 
-AND (empEndDate IS NULL OR empEndDate >='{$repDateEnd}')
-AND empSalary >0 AND empFlagDeleted=0
-AND pccID = empProfitID";
+//------------------------------------Fill in the actual data-------------------
+$sql = Array();
+$sql[] = "START TRANSACTION;";
+$sql[] = "SET @scnID:='{$budget_scenario}';";
+$sql[] = "SET @item:='453d8da7-963b-4c4f-85ca-99e26d9fc7a2', @yact:='J00801';";
+$sql[] = "DELETE FROM reg_headcount WHERE scenario=@scnID and source='Actual';";
 
-$rs = $oSQL->q($sql);
-include ('includes/inc-frame_top.php');
+for($m=1;$m<=$ytd;$m++){
+	$year = date('Y',$oBudget->date_start);
+	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
+	$repDateEnd = date('Y-m-d',mktime(0,0,0,$m+1,0,$year));
+	
+	$month = date('M',mktime(0,0,0,$m,1,$year));
+	// echo '<pre>',$repDateStart,' - ',$repDateEnd,'</pre>';
+	// echo $month;
 
-/*
-?>
-<div><?php echo $oSQL->num_rows($rs), " employees";?></div>
-<table class='budget'>
-<tr>
-		<th>ID</th>		
-		<th>Code</th>		
-		<th>PC</th>		
-		<th>Name</th>		
-		<th>Title</th>		
-		<th>Salary</th>		
-		<th>Start date</th>		
-		<th>Resignation date</th>		
-		<th>FTE</th>		
-</tr>
-<?php
-while ($rw = $oSQL->f($rs)){
-?>
-	<tr>
-		<td><?php echo $rw['empID'];?></td>
-		<td><?php echo $rw['empCode1C'];?></td>
-		<td><?php echo $rw['pccTitle'];?></td>
-		<td><?php echo $rw['empTitle'];?></td>
-		<td><?php echo $rw['empFunction'];?></td>
-		<td><?php echo $rw['empSalary'];?></td>
-		<td><?php echo $rw['empStartDate'];?></td>
-		<td><?php echo $rw['empEndDate'];?></td>
-		<td><?php echo $rw['FTE'];?></td>
-	</tr>
-<?php	
-};
-?>
-</table>
+	$sql[] = "SET @repDateStart:='{$repDateStart}', @repDateEnd:='{$repDateEnd}';";
+	$sql[] = "UPDATE reg_headcount SET `{$month}`=0 WHERE scenario=@scnID AND source<>'Actual';";
+	$sql[] = "INSERT INTO reg_headcount (company, pc, location, activity, `{$month}` ,source, scenario, particulars, account, item, `function`,salary, wc, active, posted)
+				SELECT 'OOO', IFNULL((SELECT ephProfitID FROM common_db.tbl_employee_profit WHERE ephEmployeeGUID1C=empGUID1C AND DATEDIFF(@repDateEnd, ephDate)>=0 ORDER BY ephDate DESC LIMIT 1),1), empLocationID, empProductTypeID, 
+					IF (empStartDate BETWEEN @repDateStart AND @repDateEnd, 1 - DATEDIFF(empStartDate, @repDateStart)/DATEDIFF(@repDateEnd,@repDateStart),1)
+						- IF (empEndDate BETWEEN @repDateStart AND @repDateEnd, DATEDIFF(@repDateEnd, empEndDate )/DATEDIFF(@repDateEnd,@repDateStart),0) as FTE
+						, 'Actual', @scnID, empGUID1C, IFNULL(empYACT,@yact),@item, empFunctionGUID, empSalary, IFNULL((SELECT funFlagWC FROM common_db.tbl_function WHERE funGUID=empFunctionGUID),0), 1, 1
+				FROM common_db.tbl_employee
+				WHERE empStartDate <= @repDateEnd 
+				AND (empEndDate IS NULL OR empEndDate >=@repDateEnd)
+				AND empSalary>0 AND empFlagDeleted=0;";
+	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_vacation SET salary=0 WHERE vacVactypeID IN (4,5) AND vacDateStart<@repDateEnd AND vacDateEnd>@repDateStart AND vacEmployeeID=empID and empGUID1C=particulars;";
+	
+}
 
+$sql[] = "DELETE FROM reg_headcount WHERE scenario=@scnID AND source='Actual' AND ".$oBudget->getYTDSQL(1,$ytd)."=0;";
 
-<?php
-*/
+// echo '<pre>';print_r($sql);echo '</pre>';
+for ($i=0;$i<count($sql);$i++){
+	$oSQL->q($sql[$i]);
+}
 
 $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empTitleLocal, empFunction, empSalary, empStartDate, empEndDate, 
 						locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pccTitle,pccTitleLocal , ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
@@ -78,6 +67,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 			
 			$tableID = md5($sql);
 			
+include ('includes/inc-frame_top.php');			
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
@@ -94,7 +84,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 			</thead>			
 			<tbody>
 			<?php
-			while ($rw=$oSQL->f($rs)){
+			while ($rw=$oSQL->f($rs)){				
 				?>
 				<tr>
 					<td><?php echo $rw['empID'];?></td>
@@ -102,14 +92,14 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 					<td><?php echo $rw['pccTitle'];?></td>
 					<td><?php echo $rw['empTitleLocal'];?></td>
 					<td><?php echo $rw['empFunction'];?></td>
-					<td><?php echo $rw['empSalary'];?></td>
+					<td class='budget-decimal'><?php echo number_format($rw['empSalary'],2,'.',',');?></td>
 					<td><?php echo $rw['empStartDate'];?></td>
 					<td><?php echo $rw['empEndDate'];?></td>				
 				<?php
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month'>",Reports::render($rw[$month],1),'</td>';
-				
+					$total[$month] += $rw[$month];
 				}
 				?>
 					<td class='budget-decimal budget-ytd'><?php echo Reports::render($rw['Total'],1);?></td>
@@ -117,6 +107,18 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 			<?php
 			}
 			?>
+			<tfoot>
+			<tr class='budget-subtotal'>
+			<td colspan="8">Total</td>
+			<?php
+				for ($m=1;$m<13;$m++){
+					$month = date('M',mktime(0,0,0,$m,15));
+					echo "<td class='budget-decimal budget-$month'>",Reports::render($total[$month],1),'</td>';					
+				}
+			?>
+			<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($total)/12,1);?></td>
+			</tr>
+			</tfoot>
 			</tbody>
 			</table>
 			
