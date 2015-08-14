@@ -86,6 +86,20 @@ include ('includes/inc-frame_top.php');
 			<?php
 			$pcc = "";
 			while ($rw=$oSQL->f($rs)){				
+				if ($pcc && $pcc!=$rw['pccTitle']){
+					?>
+					<tr class="budget-subtotal">
+						<td colspan="8">Subtotal <?php echo $pcc;?></td>
+						<?php				
+						for ($m=1;$m<13;$m++){
+							$month = date('M',mktime(0,0,0,$m,15));
+							echo "<td class='budget-decimal budget-$month'>",Reports::render($subtotal[$pcc][$month],1),'</td>';							
+						}
+						?>
+						<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($subtotal[$pcc]),1);?></td>
+					</tr>
+					<?php
+				}
 				?>
 				<tr>
 					<td><?php echo $rw['empID'];?></td>
@@ -107,20 +121,7 @@ include ('includes/inc-frame_top.php');
 					<td class='budget-decimal budget-ytd'><?php echo Reports::render($rw['Total'],1);?></td>
 				</tr>
 			<?php
-				if ($pcc && $pcc!=$rw['pccTitle']){
-					?>
-					<tr class="budget-subtotal">
-						<td colspan="8">Subtotal <?php echo $pcc;?></td>
-						<?php				
-						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
-							echo "<td class='budget-decimal budget-$month'>",Reports::render($subtotal[$pcc][$month],1),'</td>';							
-						}
-						?>
-						<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($subtotal[$pcc]),1);?></td>
-					</tr>
-					<?php
-				}
+				
 				$pcc = $rw['pccTitle'];
 			}
 			?>
