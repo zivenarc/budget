@@ -57,7 +57,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 					WHERE scenario='FYE_15_Jul'
 					AND posted=1 AND active=1 AND salary>0";
 			
-			$sql = $sqlSelect." GROUP BY `particulars`
+			$sql = $sqlSelect." GROUP BY pc, `particulars`
 					ORDER BY pc, empSalary DESC, funGUID, empTitleLocal";
 			$rs = $oSQL->q($sql);			
 			if (!$oSQL->num_rows($rs)){
