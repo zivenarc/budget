@@ -735,6 +735,8 @@ class Headcount extends Document{
 		$dateEstStart = ($oBudget->year-2).'-10-01';
 		$dateEstEnd = ($oBudget->year-1).'-09-30';
 		
+		$dateBudgetStart = ($oBudget->year).'-01-01';
+		$dateBudgetEnd = ($oBudget->year).'-12-31';
 		
 		$sql = "select empProfitID, SUM(case when (datediff(empStartDate, '{$dateEstStart}')<0 and datediff (ifnull(empEndDate, '9999-12-31'), '{$dateEstStart}')>0) THEN 1 ELSE 0 END) AS hc_opening,
 				SUM(case when (datediff(empStartDate, '{$dateEstEnd}')<0 and datediff (ifnull(empEndDate, '9999-12-31'), '{$dateEstEnd}')>0) THEN 1 ELSE 0 END) AS hc_closing,
@@ -749,12 +751,27 @@ class Headcount extends Document{
 			$this->comment = "Actual turnover for last year - {$turnover}%";
 		}
 		
+		$sql = "SELECT DISTINCT(vacEmployeeID) as vacEmployeeID FROM treasury.tbl_vacation WHERE vacVactypeID IN (4,5) AND vacDateStart<'{$dateBudgetEnd}' AND vacDateEnd>'{$dateBudgetStart}'";
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			$arrMaternity[] = $rw['vacEmployeeID'];
+		}
+		if (is_array($arrMaternity)){
+			$strMaternity = implode(',',$arrMaternity);
+		} else {
+			$strMaternity = 'NULL';
+		}
 		
-		$sql = "SELECT *, (SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
-					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090) as empEndDate
+		$sql = "SELECT empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,
+						IF(empID IN ({$strMaternity}),0,empSalary) as empSalary
+						,(SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
+					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090 AND rsgDateEnd>'".$oBudget->date_start."') as empEndDate
 					FROM vw_employee_select 
 					WHERE empProfitID={$this->pc->code}
 					ORDER BY empSalary DESC, empFunctionGUID, empTitleLocal";//die($sql);
+					
+		
+		
 		$rs = $this->oSQL->q($sql);
 		while ($rw=$this->oSQL->f($rs)){
 			$row = $this->add_record();

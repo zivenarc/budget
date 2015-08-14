@@ -84,7 +84,7 @@ class headcount_record {
 			$arrRes[] = "`$month`=".(double)$this->{$month};
 		}
 		
-		if($this->salary){
+		if($this->salary+$this->insurance){
 			$arrRes[] = "`company`='OOO'";
 			$arrRes[] = "`account`='".$this->account->code."'";
 			$arrRes[] = "`item`='".Items::SALARY."'";
