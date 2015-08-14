@@ -58,7 +58,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 					AND posted=1 AND active=1 AND salary>0";
 			
 			$sql = $sqlSelect." GROUP BY `particulars`
-					ORDER BY pc, empTitleLocal";
+					ORDER BY pc, empSalary DESC, funGUID, empTitleLocal";
 			$rs = $oSQL->q($sql);			
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
@@ -84,6 +84,7 @@ include ('includes/inc-frame_top.php');
 			</thead>			
 			<tbody>
 			<?php
+			$pcc = "";
 			while ($rw=$oSQL->f($rs)){				
 				?>
 				<tr>
@@ -95,16 +96,32 @@ include ('includes/inc-frame_top.php');
 					<td class='budget-decimal'><?php echo number_format($rw['empSalary'],2,'.',',');?></td>
 					<td><?php echo $rw['empStartDate'];?></td>
 					<td><?php echo $rw['empEndDate'];?></td>				
-				<?php
+				<?php				
 				for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month'>",Reports::render($rw[$month],1),'</td>';
 					$total[$month] += $rw[$month];
+					$subtotal[$rw['pccTitle']][$month] += $rw[$month];
 				}
 				?>
 					<td class='budget-decimal budget-ytd'><?php echo Reports::render($rw['Total'],1);?></td>
 				</tr>
 			<?php
+				if ($pcc && $pcc!=$rw['pccTitle']){
+					?>
+					<tr class="budget-subtotal">
+						<td colspan="8">Subtotal <?php echo $pcc;?></td>
+						<?php				
+						for ($m=1;$m<13;$m++){
+							$month = date('M',mktime(0,0,0,$m,15));
+							echo "<td class='budget-decimal budget-$month'>",Reports::render($subtotal[$pcc][$month],1),'</td>';							
+						}
+						?>
+						<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($subtotal[$pcc]),1);?></td>
+					</tr>
+					<?php
+				}
+				$pcc = $rw['pccTitle'];
 			}
 			?>
 			<tfoot>
