@@ -230,6 +230,7 @@ class Reports{
 			$tableID = md5($sql);
 			
 			?>
+			<div style="display:none;><pre><?php echo $sql;?></pre></div>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr><th>Activity</th><?php echo Budget::getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
@@ -241,15 +242,10 @@ class Reports{
 				<tr>
 					<td><?php echo $rw['Activity'];?></td>					
 				<?php
+				self::_renderHeadcountArray($rw);
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
-					echo "<td class='budget-decimal budget-$month'>",self::render($rw[$month],1),'</td>';
-					$headcount[$m] += $rw[$month];
+					$headcount[$m] += $rw[date('M',mktime(0,0,0,$m,15))];
 				}
-				?>
-					<td class='budget-decimal budget-ytd'><?php echo self::render($rw['Total'],1);?></td>
-				</tr>
-				<?php
 				$headcount['ytd'] += $rw['Total'];
 			}
 			
@@ -263,15 +259,7 @@ class Reports{
 				<tr>
 					<td><?php echo $rw['Location'];?></td>					
 				<?php
-				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
-					echo "<td class='budget-decimal budget-$month'>",self::render($rw[$month],1),'</td>';
-				
-				}
-				?>
-					<td class='budget-decimal budget-ytd'><?php echo self::render($rw['Total'],1);?></td>
-				</tr>
-				<?php
+				self::_renderHeadcountArray($rw);
 				
 			}
 			$sql = $sqlSelect." GROUP BY `function` ORDER BY funRHQ, funFlagWC";
@@ -284,15 +272,7 @@ class Reports{
 				<tr>
 					<td><?php echo '<strong>',$rw['funTitle'],'</strong> | ',$rw['funTitleLocal'];?></td>					
 				<?php
-				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
-					echo "<td class='budget-decimal budget-$month'>",self::render($rw[$month],1),'</td>';
-				
-				}
-				?>
-					<td class='budget-decimal budget-ytd'><?php echo self::render($rw['Total'],1);?></td>
-				</tr>
-				<?php
+				self::_renderHeadcountArray($rw);
 				
 			}
 			
@@ -307,15 +287,7 @@ class Reports{
 					<tr>
 						<td><?php echo '<strong>',$rw['pccTitle'],'</strong> | ',$rw['pccTitleLocal'];?></td>					
 					<?php
-					for ($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
-						echo "<td class='budget-decimal budget-$month'>",self::render($rw[$month],1),'</td>';
-					
-					}
-					?>
-						<td class='budget-decimal budget-ytd'><?php echo self::render($rw['Total'],1);?></td>
-					</tr>
-					<?php
+					self::_renderHeadcountArray($rw);
 					
 				}
 			}
@@ -453,6 +425,18 @@ class Reports{
 			</ul>
 			<?php
 			ob_flush();
+	}
+	
+	private function _renderHeadcountArray($rw){
+		for ($m=1;$m<13;$m++){
+					$month = date('M',mktime(0,0,0,$m,15));
+					echo "<td class='budget-decimal budget-$month'>",self::render($rw[$month],1),'</td>';
+				
+				}
+				?>
+					<td class='budget-decimal budget-ytd'><?php echo self::render($rw['Total'],1);?></td>
+				</tr>
+		<?php
 	}
 	
 	public function masterByYACT($sqlWhere=''){
