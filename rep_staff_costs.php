@@ -53,6 +53,7 @@ for($m=1;$m<=$ytd;$m++){
 }
 
 $sql[] = "DELETE FROM reg_headcount WHERE scenario=@scnID AND source='Actual' AND ".$oBudget->getYTDSQL(1,$ytd)."=0;";
+$sql[] = "COMMIT";
 
 // echo '<pre>';print_r($sql);echo '</pre>';
 for ($i=0;$i<count($sql);$i++){
