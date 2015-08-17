@@ -70,7 +70,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 					WHERE scenario='{$budget_scenario}'
 					AND posted=1 AND active=1 AND salary>0";
 			
-			$sql = $sqlSelect." GROUP BY pc, `particulars`
+			$sql = $sqlSelect."\r\n GROUP BY pc, `particulars`
 					ORDER BY pc, empSalary DESC, funGUID, empTitleLocal";
 			$rs = $oSQL->q($sql);			
 			if (!$oSQL->num_rows($rs)){
@@ -81,8 +81,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 			$tableID = md5($sql);
 			
 include ('includes/inc-frame_top.php');			
-			?>
-			<div style='display:none;'><pre><?php echo $sql;?></pre></div>
+			?>			
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr>
@@ -153,7 +152,10 @@ include ('includes/inc-frame_top.php');
 			</tfoot>
 			</tbody>
 			</table>
-			
+			<nav>
+				<li><a href="javascript:SelectContent('<?php echo $tableID;?>');">Select table</a></li>
+			</nav>
+			<div style='display:none;'><pre><?php echo $sql;?></pre></div>
 <?php
 include ('includes/inc-frame_bottom.php');
 			
