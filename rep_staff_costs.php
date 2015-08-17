@@ -47,6 +47,7 @@ for($m=1;$m<=$ytd;$m++){
 					AND vacEmployeeID=empID 
 					AND empGUID1C=particulars
 					AND source='Actual'
+					AND scenario=@scnID
 					AND `{$month}`<>0;";
 	
 }
