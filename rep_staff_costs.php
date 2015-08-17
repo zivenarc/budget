@@ -38,7 +38,11 @@ for($m=1;$m<=$ytd;$m++){
 				WHERE empStartDate <= @repDateEnd 
 				AND (empEndDate IS NULL OR empEndDate >=@repDateStart)
 				AND empSalary>0;";
-	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_vacation SET salary=0 WHERE vacVactypeID IN (4,5) AND vacDateStart<@repDateEnd AND vacDateEnd>@repDateStart AND vacEmployeeID=empID and empGUID1C=particulars;";
+	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_vacation SET salary=0 
+				WHERE vacVactypeID IN (4,5) 
+					AND ((@repDateStart BETWEEN vacDateStart AND vacDateEnd) OR (@repDateEnd BETWEEN vacDateStart AND vacDateEnd))  
+					AND vacEmployeeID=empID 
+					AND empGUID1C=particulars;";
 	
 }
 
