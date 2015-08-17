@@ -67,7 +67,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 					LEFT JOIN vw_location ON locID=location
 					LEFT JOIN vw_profit ON pccID=pc
 					LEFT JOIN vw_employee ON empGUID1C=particulars
-					WHERE scenario='FYE_15_Jul'
+					WHERE scenario='{$budget_scenario}'
 					AND posted=1 AND active=1 AND salary>0";
 			
 			$sql = $sqlSelect." GROUP BY pc, `particulars`
@@ -82,6 +82,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 			
 include ('includes/inc-frame_top.php');			
 			?>
+			<div style='display:none;'><pre><?php echo $sql;?></pre></div>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr>
