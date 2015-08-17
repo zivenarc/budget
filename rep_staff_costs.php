@@ -45,7 +45,9 @@ for($m=1;$m<=$ytd;$m++){
 				WHERE vacVactypeID IN (4,5) 
 					AND ((@repDateStart BETWEEN vacDateStart AND vacDateEnd) OR (@repDateEnd BETWEEN vacDateStart AND vacDateEnd))  
 					AND vacEmployeeID=empID 
-					AND empGUID1C=particulars;";
+					AND empGUID1C=particulars
+					AND source='Actual'
+					AND `{$month}`<>0;";
 	
 }
 
