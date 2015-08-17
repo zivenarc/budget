@@ -15,7 +15,7 @@ if ($_GET['tab']){
 		LEFT JOIN vw_profit ON pccID=vw_journal.pc
 		LEFT JOIN vw_location ON locID=vw_journal.pc
 		##WHERE vw_journal.posted=1 AND vw_journal.scenario='{$_GET['tab']}' 
-		WHERE vw_journal.scenario='{$_GET['tab']}' 
+		WHERE  vw_journal.deleted=0 vw_journal.scenario='{$_GET['tab']}' 
 		AND guid IN (SELECT DISTINCT source FROM reg_sales WHERE selling_curr<>'RUB' OR buying_curr<>'RUB' 
 						UNION ALL 
 					SELECT DISTINCT source FROM reg_costs WHERE buying_curr<>'RUB')
