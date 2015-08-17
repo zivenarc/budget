@@ -230,7 +230,7 @@ class Reports{
 			$tableID = md5($sql);
 			
 			?>
-			<div style="display:none;><pre><?php echo $sql;?></pre></div>
+			<div style="display:none;"><pre><?php echo $sql;?></pre></div>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr><th>Activity</th><?php echo Budget::getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
