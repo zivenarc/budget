@@ -25,6 +25,9 @@ switch ($_POST['DataAction']){
 
 $oBudget->getSettings();
 $arrData = $oBudget->extendedSettings;
+
+$arrRates = $oBudget->getMonthlyRates('978');
+
 ?>
 <div>
 <h2><?php echo $oBudget->title;?> :: 
@@ -53,6 +56,28 @@ Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> 
 		echo '<tr><td colspan="3">No settings defined for this scenario</td></tr>';
 	}
 ?>
+</table>
+<h2>EUR rates</h2>
+<table class='log'>
+	<thead>
+		<tr>
+		<?php
+		for($m=1;$m<13;$m++){
+			echo '<th>',date('M',mktime(0,0,0,$m,1,2015)),'</th>';
+		}
+		?>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+		<?php
+		for($m=1;$m<13;$m++){
+			$month = date('M',mktime(0,0,0,$m,1,2015));
+			echo '<td>',number_format($arrRates[$month],4,'.',','),'</td>';
+		}
+		?>
+		</tr>
+	</tbody>
 </table>
 
 <?php
