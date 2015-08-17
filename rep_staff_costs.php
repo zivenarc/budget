@@ -33,7 +33,10 @@ for($m=1;$m<=$ytd;$m++){
 					, empProductTypeID
 					, IF (empStartDate BETWEEN @repDateStart AND @repDateEnd, 1 - DATEDIFF(empStartDate, @repDateStart)/DATEDIFF(@repDateEnd,@repDateStart),1)
 						- IF (empEndDate BETWEEN @repDateStart AND @repDateEnd, DATEDIFF(@repDateEnd, empEndDate )/DATEDIFF(@repDateEnd,@repDateStart),0) as FTE
-						, 'Actual', @scnID, empGUID1C, IFNULL(empYACT,@yact),@item, empFunctionGUID, empSalary, IFNULL((SELECT funFlagWC FROM common_db.tbl_function WHERE funGUID=empFunctionGUID),0), 1, 1
+						, 'Actual', @scnID, empGUID1C, IFNULL(empYACT,@yact),@item, empFunctionGUID
+						##, empSalary
+						, IFNULL((SELECT epsSalary FROM common_db.tbl_employee_salary WHERE epsEmployeeGUID1C=empGUID1C AND DATEDIFF(@repDateEnd, epsDate)>=0 ORDER BY epsDate DESC LIMIT 1),empSalary) as Salary
+						, IFNULL((SELECT funFlagWC FROM common_db.tbl_function WHERE funGUID=empFunctionGUID),0), 1, 1
 				FROM common_db.tbl_employee
 				WHERE empStartDate <= @repDateEnd 
 				AND (empEndDate IS NULL OR empEndDate >=@repDateStart)
