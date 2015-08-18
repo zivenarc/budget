@@ -47,7 +47,7 @@ foreach($arrPC as $pc=>$arrGhq){
 // echo '<pre>';print_r($arrRatio);echo '</pre>';
 
 $sqlFields = "CONCAT(account,': ',title) as account, prtGHQ, pc, pccFlagProd, 
-				SUM(".Budget::getYTDSQL($startMonth,12, $arrRates).") as Total, ".Budget::getMonthlySumSQL($startMonth,12);
+				SUM(".Budget::getYTDSQL($startMonth,12, $arrRates).") as Total, ".Budget::getMonthlySumSQL($startMonth,12, $arrRates);
 $sqlGroupBy = "account, pc, prtGHQ";
 
 $arrFilter = Array(
