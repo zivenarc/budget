@@ -6,11 +6,10 @@ require ('classes/item.class.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 
-
-$budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
-
+include ('includes/inc_report_settings.php');
 $oBudget = new Budget($budget_scenario);
-$denominator = isset($_GET['denominator'])?(double)$_GET['denominator']:1;
+
+$arrRates = $oBudget->getMonthlyRates($currency);
 
 $arrJS[] = 'js/rep_totals.js';
 
@@ -23,7 +22,7 @@ while ($rw = $oSQL->f($rs)){
 // $startMonth = date('n',$oBudget->date_start);
 $startMonth = 1;
 
-$sql = "SELECT pc, prtGHQ, ".Budget::getMonthlySumSQL($startMonth,12)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
+$sql = "SELECT pc, prtGHQ, ".Budget::getMonthlySumSQL($startMonth,12, $arrRates)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
 		GROUP BY prtGHQ, pc";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -48,7 +47,7 @@ foreach($arrPC as $pc=>$arrGhq){
 // echo '<pre>';print_r($arrRatio);echo '</pre>';
 
 $sqlFields = "CONCAT(account,': ',title) as account, prtGHQ, pc, pccFlagProd, 
-				SUM(".Budget::getYTDSQL($startMonth,12).") as Total, ".Budget::getMonthlySumSQL($startMonth,12);
+				SUM(".Budget::getYTDSQL($startMonth,12, $arrRates).") as Total, ".Budget::getMonthlySumSQL($startMonth,12);
 $sqlGroupBy = "account, pc, prtGHQ";
 
 $arrFilter = Array(
