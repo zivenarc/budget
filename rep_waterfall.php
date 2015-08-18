@@ -1,5 +1,6 @@
 <?php
 $flagNoAuth = true;
+$_DEBUG = true;
 include('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/waterfall.class.php');
@@ -43,19 +44,22 @@ foreach($arrPeriodType as $id=>$title){
 	$arrActions[] = Array ('title'=>$title,'action'=>$url);
 }
 
+$sqlActual = "SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
+$sqlBudget = "SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
+
 $settings['gpcus'] = Array('title'=>"GP by customer",
 					'sqlBase' => "SELECT IF(C.cntParentID<>723,C.cntParentID, C.cntID) as optValue, 
 										IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 
-										SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Actual, 
+										{$sqlActual} as Actual, 
 										0 as Budget, 
-										SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Diff
+										{$sqlActual} as Diff
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE scenario='{$actual}' AND source='Actual' AND account IN ('J00400', 'J00802')
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
 								UNION ALL
 								SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 0 as Actual, 
-								SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")  as Budget, -SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).") as Diff
+								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE
@@ -67,16 +71,16 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 					'sqlBase' => "SELECT IF(C.cntParentID<>723,C.cntParentID, C.cntID) as optValue, 
 										IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 
-										SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Actual, 
+										{$sqlActual} as Actual, 
 										0 as Budget, 
-										SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Diff
+										{$sqlActual} as Diff
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE scenario='{$actual}' AND source='Actual' AND account IN ('J00400', 'J00802') AND pc NOT in (5,15)
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
 								UNION ALL
 								SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 0 as Actual, 
-								SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")  as Budget, -SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).") as Diff
+								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE
@@ -88,14 +92,14 @@ $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 $settings['gpbu'] = Array('title'=>"GP by business unit",
 'sqlBase' => "SELECT pc as optValue, 
 					Profit as optText, 
-					SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Actual, 
+					{$sqlActual} as Actual, 
 					0 as Budget, 
-					SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Diff
+					{$sqlActual} as Diff
 			FROM vw_master 			
 			WHERE scenario='{$actual}' AND source='Actual' AND account IN ('J00400', 'J00802')
 			GROUP BY pc
 			UNION ALL
-			SELECT pc, Profit, 0 as Actual, SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")  as Budget, -SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).") as Diff
+			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' AND account IN ('J00400', 'J00802')
@@ -106,14 +110,14 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 $settings['opbu'] = Array('title'=>"OP by business unit",
 'sqlBase' => "SELECT pc as optValue, 
 					Profit as optText, 
-					SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Actual, 
+					{$sqlActual} as Actual, 
 					0 as Budget, 
-					SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Diff
+					{$sqlActual} as Diff
 			FROM vw_master 			
 			WHERE scenario='{$actual}' AND source='Actual' AND LEFT(account,1) NOT IN ('6', '7')
 			GROUP BY pc
 			UNION ALL
-			SELECT pc, Profit, 0 as Actual, SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")  as Budget, -SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).") as Diff
+			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' AND LEFT(account,1) NOT IN ('6', '7')
@@ -125,16 +129,16 @@ $settings['opbu'] = Array('title'=>"OP by business unit",
 $settings['pbt'] = Array('title'=>"PBT by factors",
 'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
 					IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
-					SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Actual, 
+					{$sqlActual} as Actual, 
 					0 as Budget, 
-					SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Diff
+					{$sqlActual} as Diff
 			FROM vw_master 			
 			WHERE scenario='{$actual}' AND source='Actual' AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)
 			UNION ALL
 			SELECT IF(`Group_code` IN (108,110,96),item,Group_code), 
 				IF(`Group_code` IN (108,110,96),`Budget item`,`Group`), 
-				0 as Actual, SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")  as Budget, -SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).") as Diff
+				0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' AND Group_code<>121
@@ -144,16 +148,16 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 $settings['pbtwwh'] = Array('title'=>"PBT by factors w/o Warehouse",
 'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
 					IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
-					SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Actual, 
+					{$sqlActual} as Actual, 
 					0 as Budget, 
-					SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).") as Diff
+					{$sqlActual} as Diff
 			FROM vw_master 			
 			WHERE scenario='{$actual}' AND source='Actual' AND pc NOT IN (5,15) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)
 			UNION ALL
 			SELECT IF(`Group_code` IN (108,110,96),item,Group_code), 
 				IF(`Group_code` IN (108,110,96),`Budget item`,`Group`), 
-				0 as Actual, SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")  as Budget, -SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).") as Diff
+				0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc NOT IN (5,15) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
@@ -217,8 +221,8 @@ foreach($settings as $type=>$data){
 ?>
 </ul>
 </nav>
-<?php
-
+<?php 
+if ($_DEBUG) echo '<pre>',$oWF->sqlBase,'</pre>';
 require ('includes/inc-frame_bottom.php');
 
 ?>
