@@ -4,9 +4,9 @@ require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 
-$budget_scenario='FYE_15_Jul';
+$budget_scenario='ACT_14_Dec';
 $oBudget = new Budget($budget_scenario);
-$ytd = date('m',$oBudget->date_start)-1;
+$ytd = date('m',$oBudget->date_start-1);echo $ytd;
 
 //------------------------------------Fill in the actual data-------------------
 $sql = Array();
@@ -16,7 +16,7 @@ $sql[] = "SET @item:='453d8da7-963b-4c4f-85ca-99e26d9fc7a2', @yact:='J00801';";
 $sql[] = "DELETE FROM reg_headcount WHERE scenario=@scnID and source='Actual';";
 
 for($m=1;$m<=$ytd;$m++){
-	$year = date('Y',$oBudget->date_start);
+	$year = date('Y',$oBudget->date_start-1);
 	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
 	$repDateEnd = date('Y-m-d',mktime(0,0,0,$m+1,0,$year));
 	

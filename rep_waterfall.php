@@ -55,7 +55,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 										{$sqlActual} as Diff
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
-								WHERE scenario='{$actual}' AND source='Actual' AND account IN ('J00400', 'J00802')
+								WHERE scenario='{$actual}' AND account IN ('J00400', 'J00802')
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
 								UNION ALL
 								SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 0 as Actual, 
@@ -76,7 +76,7 @@ $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 										{$sqlActual} as Diff
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
-								WHERE scenario='{$actual}' AND source='Actual' AND account IN ('J00400', 'J00802') AND pc NOT in (5,15)
+								WHERE scenario='{$actual}' AND account IN ('J00400', 'J00802') AND pc NOT in (5,15)
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
 								UNION ALL
 								SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 0 as Actual, 
@@ -96,7 +96,7 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}' AND source='Actual' AND account IN ('J00400', 'J00802')
+			WHERE scenario='{$actual}' AND account IN ('J00400', 'J00802')
 			GROUP BY pc
 			UNION ALL
 			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
@@ -114,7 +114,7 @@ $settings['opbu'] = Array('title'=>"OP by business unit",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}' AND source='Actual' AND LEFT(account,1) NOT IN ('6', '7')
+			WHERE scenario='{$actual}' AND LEFT(account,1) NOT IN ('6', '7')
 			GROUP BY pc
 			UNION ALL
 			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
@@ -133,7 +133,7 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}' AND source='Actual' AND Group_code<>121
+			WHERE scenario='{$actual}' AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)
 			UNION ALL
 			SELECT IF(`Group_code` IN (108,110,96),item,Group_code), 
@@ -152,7 +152,7 @@ $settings['pbtwwh'] = Array('title'=>"PBT by factors w/o Warehouse",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}' AND source='Actual' AND pc NOT IN (5,15) AND Group_code<>121
+			WHERE scenario='{$actual}' AND pc NOT IN (5,15) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)
 			UNION ALL
 			SELECT IF(`Group_code` IN (108,110,96),item,Group_code), 
