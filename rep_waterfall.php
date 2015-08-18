@@ -162,6 +162,41 @@ $settings['pbtwwh'] = Array('title'=>"PBT by factors w/o Warehouse",
 			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc NOT IN (5,15) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
 			'tolerance'=>0.07);
+
+$settings['whp'] = Array('title'=>"PBT Pokrov",
+'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
+					IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
+					{$sqlActual} as Actual, 
+					0 as Budget, 
+					{$sqlActual} as Diff
+			FROM vw_master 			
+			WHERE scenario='{$actual}' AND pc IN (5) AND Group_code<>121
+			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)
+			UNION ALL
+			SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code), 
+				IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`), 
+				0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+			FROM vw_master 			
+			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc IN (5) AND Group_code<>121
+			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)",
+			'tolerance'=>0.05);
+$settings['whs'] = Array('title'=>"PBT Shushary",
+'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
+					IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
+					{$sqlActual} as Actual, 
+					0 as Budget, 
+					{$sqlActual} as Diff
+			FROM vw_master 			
+			WHERE scenario='{$actual}' AND pc IN (15) AND Group_code<>121
+			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)
+			UNION ALL
+			SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code), 
+				IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`), 
+				0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+			FROM vw_master 			
+			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc IN (15) AND Group_code<>121
+			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)",
+			'tolerance'=>0.05);
 			
 $type = $_GET['type']?$_GET['type']:'gpcus';
 			
