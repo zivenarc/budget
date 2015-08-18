@@ -1,6 +1,6 @@
 <?php
 $flagNoAuth = true;
-$_DEBUG = true;
+// $_DEBUG = true;
 include('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/waterfall.class.php');
@@ -17,7 +17,7 @@ $arrActualRates = $oActual->getMonthlyRates($currency);
 $arrBudgetRates = $oBudget->getMonthlyRates($currency);
 
 $limit = 8;
-$denominator = 1000;
+//$denominator = 1000;
 
 if (isset($_GET['period_type'])) {
 	$period_type = $_GET['period_type'];
