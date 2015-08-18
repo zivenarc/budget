@@ -4,7 +4,7 @@ require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 
-$budget_scenario='ACT_14_Dec';
+$budget_scenario='FYE_15_Jul';
 $oBudget = new Budget($budget_scenario);
 $ytd = date('m',$oBudget->date_start-1);echo $ytd;
 
