@@ -311,6 +311,9 @@ class Budget{
 			case 'q4':
 				return($this->getYTDSQL(10,12,$arrRates));
 				break;
+			default:
+				return($this->getYTDSQL(1,12,$arrRates));
+				break;
 		}
 		
 	}
