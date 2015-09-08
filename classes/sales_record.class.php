@@ -81,9 +81,9 @@ class sales_record{
 			$arrRes[] = "`customer`=".(integer)$this->customer;
 			$arrRes[] = "`comment`=".$oSQL->e($this->comment);
 			$arrRes[] = "`product`=".(integer)$this->product;
-			$arrRes[] = "`selling_rate`='".$this->selling_rate."'";
+			$arrRes[] = "`selling_rate`=".(double)$this->selling_rate;
 			$arrRes[] = "`selling_curr`='".$this->selling_curr."'";
-			$arrRes[] = "`buying_rate`='".$this->buying_rate."'";
+			$arrRes[] = "`buying_rate`=".(double)$this->buying_rate;
 			$arrRes[] = "`buying_curr`='".$this->buying_curr."'";
 			$arrRes[] = "`activity`=".(integer)$oProduct->activity;
 			$arrRes[] = "`unit`='".$oProduct->unit."'";
