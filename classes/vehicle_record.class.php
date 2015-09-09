@@ -27,7 +27,7 @@ class vehicle_record{
 		GLOBAL $oSQL;
 		
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+			$month = date('M',time(0,0,0,$m,15));
 			$this->{$month} = 0;
 		}
 		$this->id = $id;
@@ -38,7 +38,7 @@ class vehicle_record{
 		
 		if (count($data)){
 			for($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
+				$month = date('M',time(0,0,0,$m,15));
 				$this->{$month} = $data[strtolower($month)];			
 			}
 			$this->item = $data['item'];
@@ -54,7 +54,7 @@ class vehicle_record{
 	}	
 		
 	public function set_month_value($i, $value){
-		$month = date('M',mktime(0,0,0,(integer)$i,15));
+		$month = date('M',time(0,0,0,(integer)$i,15));
 		$this->{$month} =(double)$value;
 		return(true);
 	}
@@ -69,7 +69,7 @@ class vehicle_record{
 		GLOBAL $Products;
 
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+			$month = date('M',time(0,0,0,$m,15));
 			$arrRes[] = "`$month`=".(integer)$this->{$month};
 		}
 			
@@ -94,7 +94,7 @@ class vehicle_record{
 	
 	public function total(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+			$month = date('M',time(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
 		return ($res);

@@ -80,7 +80,7 @@ if (!isset($_GET['tab'])){
 			<?php
 			while ($rw=$oSQL->f($rs)){	
 				for ($m=$startMonth;$m<13;$m++) {
-					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+					$month = strtolower(date('M',time(0,0,0,$m,15)));
 					$arrGHQ[$rw['prtGHQ']][$rw['pccTitle']][$month] = $rw[$month];
 					$arrSubtotal[$rw['prtGHQ']][$month] += $rw[$month];
 					$arrGrandTotal[$month] += $rw[$month];
@@ -93,7 +93,7 @@ if (!isset($_GET['tab'])){
 			foreach ($arrGHQ as $ghq=>$arrPC){
 				
 				for ($m=$startMonth;$m<13;$m++) {
-					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+					$month = strtolower(date('M',time(0,0,0,$m,15)));
 					if ($arrGrandTotal[$month]) {
 							$arrRatio[$ghq][$month] = $arrSubtotal[$ghq][$month]/$arrGrandTotal[$month]*100;
 					}
@@ -159,7 +159,7 @@ if (!isset($_GET['tab'])){
 			<?php
 			while ($rw=$oSQL->f($rs)){	
 				for ($m=$startMonth;$m<13;$m++) {
-					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+					$month = strtolower(date('M',time(0,0,0,$m,15)));
 					$arrPC[$rw['pccTitle']][$rw['prtGHQ']][$month] = $rw[$month];
 					$arrSubtotal[$rw['pccTitle']][$month] += $rw[$month];
 					$arrGrandTotal[$month] += $rw[$month];
@@ -172,7 +172,7 @@ if (!isset($_GET['tab'])){
 			foreach ($arrPC as $pc=>$arrGHQ){
 				
 				for ($m=$startMonth;$m<13;$m++) {
-					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+					$month = strtolower(date('M',time(0,0,0,$m,15)));
 					if ($arrGrandTotal[$month]) {
 							$arrRatio[$pc][$month] = $arrSubtotal[$pc][$month]/$arrGrandTotal[$month]*100;
 					}
@@ -223,7 +223,7 @@ function echoMonthlyTR($data,$class='', $decimal_places=0){
 	GLOBAL $startMonth;
 
 	for ($m=$startMonth;$m<13;$m++) {
-			$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+			$month = strtolower(date('M',time(0,0,0,$m,15)));
 			echo '<td class="budget-decimal">',number_format($data[$month],$decimal_places,'.',','),'</td>';
 	}
 	echo '<td class="budget-decimal budget-ytd">',number_format(isset($data['YTD'])?$data['YTD']:array_sum($data),$decimal_places,'.',','),'</td>';	

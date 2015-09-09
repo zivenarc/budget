@@ -22,21 +22,21 @@ class table_record {
 	}
 	
 	public function set_month_value($i, $value){
-		$month = date('M',mktime(0,0,0,(integer)$i,15));
+		$month = date('M',time(0,0,0,(integer)$i,15));
 		$this->{$month} =(double)$value;
 		return(true);
 	}
 	
 	public function set_months($rw){
 		for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));				
+				$month = date('M',time(0,0,0,$m,15));				
 				$this->set_month_value($m, $rw[$month]);
 		}
 	}
 	
 	public function total(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+			$month = date('M',time(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
 		return ($res);

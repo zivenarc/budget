@@ -1,6 +1,6 @@
 <?php 
 header("Pragma: public");
-header('Expires: ' . gmdate('D, d M Y H:i:s', mktime(0,0,0,date('m',time()),date('d',time())+1, date('Y',time()))) . ' GMT');
+header('Expires: ' . gmdate('D, d M Y H:i:s', time(0,0,0,date('m',time()),date('d',time())+1, date('Y',time()))) . ' GMT');
 
 require ('common/auth.php');
 /*------ Temporary roles ----------*/

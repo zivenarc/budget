@@ -63,7 +63,7 @@ Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> 
 		<tr>
 		<?php
 		for($m=1;$m<13;$m++){
-			echo '<th>',date('M',mktime(0,0,0,$m,1,2015)),'</th>';
+			echo '<th>',date('M',time(0,0,0,$m,1,2015)),'</th>';
 		}
 		?>
 		</tr>
@@ -72,7 +72,7 @@ Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> 
 		<tr>
 		<?php
 		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,1,2015));
+			$month = date('M',time(0,0,0,$m,1,2015));
 			echo '<td>',number_format($arrRates[$month],4,'.',','),'</td>';
 		}
 		?>

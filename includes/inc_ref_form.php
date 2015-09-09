@@ -78,7 +78,7 @@ if ($_POST) {
 
 		logToScreen($sql,'sql');
 		
-		//file_put_contents("logs/vac_".$usrID."_".date('Ymd_Hi',mktime()).".log"	,"POST: ".var_export($_POST,true)."\r\nSQL: ".var_export($sql,true)."\r\nSQL Dump: ".var_export($myForm->SqlDump,true));
+		//file_put_contents("logs/vac_".$usrID."_".date('Ymd_Hi',time()).".log"	,"POST: ".var_export($_POST,true)."\r\nSQL: ".var_export($sql,true)."\r\nSQL Dump: ".var_export($myForm->SqlDump,true));
 		for($i=0;$i<count($sql);$i++) {
 			if ($_DEBUG) echo "<pre>",$sql[$i],"</pre>\r\n";
 			$rs=$oSQL->do_query($sql[$i]);

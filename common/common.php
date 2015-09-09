@@ -106,7 +106,7 @@ function logToFile ($var, $heading="", $logFile=""){
 	}
 	/*--------------- For logging purposes ----------------*/
 	if ($_LOG) {
-		file_put_contents($logFile,'----'.date('d.m.Y H:i:s,u',mktime()).'--------['.$heading."]---------------------\r\n",FILE_APPEND);
+		file_put_contents($logFile,'----'.date('d.m.Y H:i:s,u',time()).'--------['.$heading."]---------------------\r\n",FILE_APPEND);
 		file_put_contents($logFile,var_export($var, true),FILE_APPEND);
 		file_put_contents($logFile,"\r\n\r\n",FILE_APPEND);
 	}

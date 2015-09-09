@@ -47,7 +47,7 @@ class Distribution extends Document{
 				// print_r($rw);
 				$this->records[$this->gridName][$rw['id']] = new distribution_record($this->GUID, $this->scenario, $rw['id'], $rw);			
 				for($m=1;$m<13;$m++){
-					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+					$month = strtolower(date('M',time(0,0,0,$m,15)));
 					$this->subtotal[$month] += $rw[$month];
 				}				
 			}		
@@ -127,7 +127,7 @@ class Distribution extends Document{
 		
 	
 		for ($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+			$month = date('M',time(0,0,0,$m,15));
 					
 			$grid->Columns[] = Array(
 			'title'=>$month
@@ -193,7 +193,7 @@ class Distribution extends Document{
 						$row->customer = isset($_POST['customer'][$id]) ? $_POST['customer'][$id] : $this->customer;						
 						$row->unit = $_POST['unit'][$id];					
 						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+							$month = date('M',time(0,0,0,$m,15));
 							$row->{$month} = (double)$_POST[strtolower($month)][$id];
 						}					
 					} else {
@@ -265,7 +265,7 @@ class Distribution extends Document{
 							$master_row->account = $item->getYACT($this->profit);
 							$master_row->item = $this->item;
 							for($m=1;$m<13;$m++){
-								$month = date('M',mktime(0,0,0,$m,15));
+								$month = date('M',time(0,0,0,$m,15));
 								$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]*$total[$month];
 							}				
 													
@@ -282,7 +282,7 @@ class Distribution extends Document{
 					$master_row->account = $item->getYACT($this->profit);
 					$master_row->item = $this->item;
 					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+						$month = date('M',time(0,0,0,$m,15));
 						$master_row->{$month} = -$total[$month];
 					}
 				}
@@ -327,7 +327,7 @@ class Distribution extends Document{
 			$row->unit = $rw['unit'];
 			$row->customer = $rw['customer'];			
 			for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));				
+				$month = date('M',time(0,0,0,$m,15));				
 				$row->set_month_value($m, $rw[$month]);
 				$arrSubtotal[$month] += $rw[$month];
 				$arrSum[$month] = $this->total - $arrSubtotal[$month];

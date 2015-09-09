@@ -264,7 +264,7 @@ class Headcount extends Document{
 		}
 		
 		for ($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+			$month = date('M',time(0,0,0,$m,15));
 					
 			$grid->Columns[] = Array(
 			'title'=>''//$month------------------------ Title hidden
@@ -360,9 +360,9 @@ class Headcount extends Document{
 						// $start_date = strtotime($_POST['start_date'][$id]);
 								
 						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
-							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-							$current_month_end = mktime(0,0,0,$m+1,0,$oBudget->year);
+							$month = date('M',time(0,0,0,$m,15));
+							$current_month_start = time(0,0,0,$m,1,$oBudget->year);
+							$current_month_end = time(0,0,0,$m+1,0,$oBudget->year);
 							// echo date('d.m.Y',$row->start_date),';',date('d.m.Y',$current_month_start),"\r\n";
 							if ($this->type=='current'){
 								
@@ -442,7 +442,7 @@ class Headcount extends Document{
 			if(is_array($this->records[$this->gridName])){
 				foreach($this->records[$this->gridName] as $id=>$record){
 				
-					$eligible_date = mktime(0,0,0,10,1,$oMaster->budget->year-1);
+					$eligible_date = time(0,0,0,10,1,$oMaster->budget->year-1);
 					$start_date = strtotime($record->start_date);
 					$probation = $start_date + 91*24*60*60;
 					$eligible = ($start_date < $eligible_date) && ($settings['salary_review_month']>date('m',$oMaster->budget->date_start));
@@ -463,7 +463,7 @@ class Headcount extends Document{
 					$social_tax = Array();					
 					$salarySubtotal = 0;
 					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+						$month = date('M',time(0,0,0,$m,15));
 						
 						
 						if ($eligible) {						
@@ -472,8 +472,8 @@ class Headcount extends Document{
 							if (true || $this->type=='current'){
 								$salary[$month] = ($record->{$month})*$record->salary;
 							} else {
-								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-								$current_month_end = mktime(0,0,0,$m+1,0,$oBudget->year);
+								$current_month_start = time(0,0,0,$m,1,$oBudget->year);
+								$current_month_end = time(0,0,0,$m+1,0,$oBudget->year);
 								if(date('YM',$start_date)==date('YM',$current_month_start)){
 									$record->hc = $record->new_fte*(date('t',$current_month_start)-date('j',$start_date))/date('t',$current_month_start);							 
 								} elseif($start_date<$current_month_start){
@@ -512,7 +512,7 @@ class Headcount extends Document{
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
 					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+						$month = date('M',time(0,0,0,$m,15));
 						$master_row->{$month} = -$social_tax[$month];
 					}
 					
@@ -530,7 +530,7 @@ class Headcount extends Document{
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
 					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+						$month = date('M',time(0,0,0,$m,15));
 						$master_row->{$month} = - $record->{$month}*$record->mobile_limit;
 					}
 					
@@ -548,8 +548,8 @@ class Headcount extends Document{
 						$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 						
 						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
-							$next_month_start = mktime(0,0,0,$m+1,1,$oBudget->year);
+							$month = date('M',time(0,0,0,$m,15));
+							$next_month_start = time(0,0,0,$m+1,1,$oBudget->year);
 							if(date('Ym',$start_date) < date('Ym',$next_month_start)){
 								$master_row->{$month} = - $record->{$month}*$settings['pc_profile_'.$record->pc_profile]*$settings['usd']/36;
 							}
@@ -569,7 +569,7 @@ class Headcount extends Document{
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
 					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+						$month = date('M',time(0,0,0,$m,15));
 						$master_row->{$month} = - $record->{$month}*$record->fuel;
 					}
 					
@@ -586,7 +586,7 @@ class Headcount extends Document{
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
 					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+						$month = date('M',time(0,0,0,$m,15));
 						$master_row->{$month} = - 	$salary[$month]
 													*(0.5*$settings['regular_bonus_avg']/100 
 														+$this->bonus_corporate/100
@@ -614,8 +614,8 @@ class Headcount extends Document{
 					$ins_exp_full = date('t',$insurance_expiry);
 					
 					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
-						$month_start = mktime(0,0,0,$m,1,$oBudget->year);
+						$month = date('M',time(0,0,0,$m,15));
+						$month_start = time(0,0,0,$m,1,$oBudget->year);
 						if ($probation<$month_start){
 							if ($m == $ins_exp_month){
 								$master_row->{$month} = - $record->{$month}
@@ -646,8 +646,8 @@ class Headcount extends Document{
 												
 						
 						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
-							$month_start = mktime(0,0,0,$m,1,$oBudget->year);
+							$month = date('M',time(0,0,0,$m,15));
+							$month_start = time(0,0,0,$m,1,$oBudget->year);
 							if (date('m.Y',$start_date)==date('m.Y',$month_start)){
 								$master_row->{$month} = - abs($record->new_fte) * $settings['hiring'] * $record->salary * 12;							
 							}						
@@ -669,7 +669,7 @@ class Headcount extends Document{
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 
 					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+						$month = date('M',time(0,0,0,$m,15));
 						$master_row->{$month} = - $settings['hiring'] * $payroll[$month] * $this->turnover/100;
 					}
 				}
@@ -684,7 +684,7 @@ class Headcount extends Document{
 				$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
 				for($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+					$month = date('M',time(0,0,0,$m,15));
 					$master_row->{$month} = - $payroll[$month] * $this->overtime/100;
 				}
 				//-----------------------------------------------------------------Unused vacation accrual
@@ -697,7 +697,7 @@ class Headcount extends Document{
 				$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
 				for($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+					$month = date('M',time(0,0,0,$m,15));
 					$master_row->{$month} = - 14/29.6/12 * $payroll[$month];
 				}
 				
@@ -711,7 +711,7 @@ class Headcount extends Document{
 				$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;				
 				
 				for($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+					$month = date('M',time(0,0,0,$m,15));
 					$master_row->{$month} = - $hcCount[$month][1]*$settings['canteen_wc'] - $hcCount[$month][0]*$settings['canteen_bc'];
 				}
 				
@@ -790,7 +790,7 @@ class Headcount extends Document{
 			$row->end_date = strtotime($rw['empEndDate']);
 			
 			for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
+				$month = date('M',time(0,0,0,$m,15));
 				$row->{$month} = $row->getFTE($m, $oBudget->year);
 			}
 		}	

@@ -39,9 +39,9 @@ if ($denominator!=1) {
 
 if ($mthStart!=1 || $mthEnd!=12){
 	if ($mthStart==$mthEnd){
-		echo '<h2>',date('F',mktime(0,0,0,$mthStart)),' only</h2>';
+		echo '<h2>',date('F',time(0,0,0,$mthStart)),' only</h2>';
 	} else {
-		echo '<h2>Period: ',date('M',mktime(0,0,0,$mthStart))," &ndash; ", date('M',mktime(0,0,0,$mthEnd)),'</h2>';
+		echo '<h2>Period: ',date('M',time(0,0,0,$mthStart))," &ndash; ", date('M',time(0,0,0,$mthEnd)),'</h2>';
 	}
 }
 

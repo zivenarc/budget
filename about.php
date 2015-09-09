@@ -29,7 +29,7 @@ $boolPaymentRun = ($oSQL->num_rows($rs));
 $rwPR = $oSQL->fetch_array($rs);
 ?>
 
-<h1><?php echo ($strLocal?"Сегодня ":"Today "),iconv('cp1251','utf-8',strftime("%A %d %B %Y", mktime()))?></h1>
+<h1><?php echo ($strLocal?"Сегодня ":"Today "),iconv('cp1251','utf-8',strftime("%A %d %B %Y", time()))?></h1>
 <h2><?php if ($boolPaymentRun){
 				if ($rwPR['nDaysToPay']){
 					echo "Next event - ",$rwPR['calTitle']," on ",date('d.m.Y',strtotime($rwPR['calDateStart']));

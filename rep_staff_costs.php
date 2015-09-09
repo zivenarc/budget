@@ -17,10 +17,10 @@ $sql[] = "DELETE FROM reg_headcount WHERE scenario=@scnID and source='Actual';";
 
 for($m=1;$m<=$ytd;$m++){
 	$year = date('Y',$oBudget->date_start-1);
-	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
-	$repDateEnd = date('Y-m-d',mktime(0,0,0,$m+1,0,$year));
+	$repDateStart = date('Y-m-d',time(0,0,0,$m,1,$year));
+	$repDateEnd = date('Y-m-d',time(0,0,0,$m+1,0,$year));
 	
-	$month = date('M',mktime(0,0,0,$m,1,$year));
+	$month = date('M',time(0,0,0,$m,1,$year));
 	// echo '<pre>',$repDateStart,' - ',$repDateEnd,'</pre>';
 	// echo $month;
 
@@ -106,7 +106,7 @@ include ('includes/inc-frame_top.php');
 						<td colspan="8">Subtotal <?php echo $pcc;?></td>
 						<?php				
 						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+							$month = date('M',time(0,0,0,$m,15));
 							echo "<td class='budget-decimal budget-$month'>",Reports::render($subtotal[$pcc][$month],1),'</td>';							
 						}
 						?>
@@ -126,7 +126,7 @@ include ('includes/inc-frame_top.php');
 					<td><?php echo $rw['empEndDate']?$rw['empEndDate']:($rw['end_date']?'('.$rw['end_date'].')':'');?></td>				
 				<?php				
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+					$month = date('M',time(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month'>",Reports::render($rw[$month],1),'</td>';
 					$total[$month] += $rw[$month];
 					$subtotal[$rw['pccTitle']][$month] += $rw[$month];
@@ -144,7 +144,7 @@ include ('includes/inc-frame_top.php');
 			<td colspan="8">Total</td>
 			<?php
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+					$month = date('M',time(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month'>",Reports::render($total[$month],1),'</td>';					
 				}
 			?>
