@@ -206,7 +206,7 @@ class Depreciation extends Document{
 
 		
 		for ($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 					
 			$grid->Columns[] = Array(
 			'title'=>''//hidden
@@ -304,8 +304,8 @@ class Depreciation extends Document{
 						
 						$row->comment = $_POST['comment'][$id];				
 						for ($m=1;$m<13;$m++){
-							$month = date('M',time(0,0,0,$m,15));
-							$current_month_start = time(0,0,0,$m,1,$oBudget->year);
+							$month = date('M',mktime(0,0,0,$m,15));
+							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							if ($this->type=='current'){
 								$row->{$month} = (integer)$_POST[strtolower($month)][$id];
 							} else {
@@ -390,7 +390,7 @@ class Depreciation extends Document{
 						
 						
 						for($m=1;$m<13;$m++){
-							$month = date('M',time(0,0,0,$m,15));
+							$month = date('M',mktime(0,0,0,$m,15));
 							$master_row->{$month} = -$record->{$month}*$monthly_depr;
 							
 							switch ($this->type){
@@ -398,7 +398,7 @@ class Depreciation extends Document{
 									$residual_value[$m] += max(0,$record->value_primo - $monthly_depr*$m);
 									break;
 								case 'new':
-									$period = date(time(0,0,0,$m,15)); 
+									$period = date(mktime(0,0,0,$m,15)); 
 									$months_elapsed = floor(($period-$record->periodStart)/86400/30);
 									$residual_value[$m] += max(0,$record->value_start - $monthly_depr*$months_elapsed);
 									break;
@@ -420,7 +420,7 @@ class Depreciation extends Document{
 				$master_row->item = Items::PROPERTY_TAX;
 				
 				for($m=1;$m<13;$m++){
-					$month = date('M',time(0,0,0,$m,15));
+					$month = date('M',mktime(0,0,0,$m,15));
 					$master_row->{$month} = -self::PROPERTY_TAX*$record->{$month}*$residual_value[$m]/12;
 				}
 				
@@ -477,8 +477,8 @@ class Depreciation extends Document{
 			$dateStart = strtotime($row->date_start);
 			
 			for($m=1;$m<13;$m++){
-				$month = date('M',time(0,0,0,$m,15));
-				$bom = time(0,0,0,$m,1, $oBudget->year);
+				$month = date('M',mktime(0,0,0,$m,15));
+				$bom = mktime(0,0,0,$m,1, $oBudget->year);
 				if ($dateStart<$bom){
 					$row->{$month} = 1;
 				} else {

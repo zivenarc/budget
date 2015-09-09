@@ -20,7 +20,7 @@ class sales_record{
 	function __construct($session, $scenario, $id='', $data=Array()){
 		//GLOBAL $Products;
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$this->{$month} = 0;
 		}
 		$this->id = $id;
@@ -30,7 +30,7 @@ class sales_record{
 		
 		if (count($data)){
 			for($m=1;$m<13;$m++){
-				$month = date('M',time(0,0,0,$m,15));
+				$month = date('M',mktime(0,0,0,$m,15));
 				$this->{$month} = $data[strtolower($month)];			
 			}
 			$this->product = $data['product'];
@@ -68,7 +68,7 @@ class sales_record{
 		GLOBAL $Products;
 
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`=".(integer)$this->{$month};
 		}
 			
@@ -100,7 +100,7 @@ class sales_record{
 	
 	public function total(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
 		return ($res);

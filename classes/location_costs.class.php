@@ -167,7 +167,7 @@ class Location_costs extends Document{
 		$grid->Columns[] = parent::getPeriodEG();
 		
 		for ($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 					
 			$grid->Columns[] = Array(
 			'title'=>$month
@@ -242,7 +242,7 @@ class Location_costs extends Document{
 						$row->period = $_POST['period'][$id];				
 						$row->comment = $_POST['comment'][$id];				
 						for ($m=1;$m<13;$m++){
-							$month = date('M',time(0,0,0,$m,15));
+							$month = date('M',mktime(0,0,0,$m,15));
 							$row->{$month} = (double)$_POST[strtolower($month)][$id];
 						}					
 					} else {
@@ -335,7 +335,7 @@ class Location_costs extends Document{
 				$arrLoc[] = $rw;
 				$avg = 0;
 				for($m=1;$m<13;$m++){
-					$month = date('M',time(0,0,0,$m,15));
+					$month = date('M',mktime(0,0,0,$m,15));
 					$headcount[$month] += $rw[$month];
 					$avg +=  $rw[$month];
 				}
@@ -363,7 +363,7 @@ class Location_costs extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $record->item;
 						for($m=1;$m<13;$m++){
-							$month = date('M',time(0,0,0,$m,15));
+							$month = date('M',mktime(0,0,0,$m,15));
 							$master_row->{$month} = -$hc_data[$month]*($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)]/$headcount[$month]/$denominator;
 						}				
 												

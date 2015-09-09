@@ -26,7 +26,7 @@ class headcount_record {
 	public function __construct($session, $scenario, $id='', $data=Array()){
 
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$this->{$month} = 0;
 		}
 		$this->id = $id;
@@ -35,7 +35,7 @@ class headcount_record {
 		
 		if (count($data)){
 			for($m=1;$m<13;$m++){
-				$month = date('M',time(0,0,0,$m,15));
+				$month = date('M',mktime(0,0,0,$m,15));
 				$this->{$month} = $data[strtolower($month)];			
 			}
 			$this->product = $data['product'];
@@ -80,7 +80,7 @@ class headcount_record {
 		}
 	
 		for($m=$mStart;$m<=$mEnd;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`=".(double)$this->{$month};
 		}
 		
@@ -118,7 +118,7 @@ class headcount_record {
 	
 	public function total(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
 		return ($res);
@@ -127,8 +127,8 @@ class headcount_record {
 	public function getFTE($m, $year){
 		$res = 1;
 		
-		$current_month_start = time(0,0,0,$m,1,$year);
-		$current_month_end = time(0,0,0,$m+1,0,$year);
+		$current_month_start = mktime(0,0,0,$m,1,$year);
+		$current_month_end = mktime(0,0,0,$m+1,0,$year);
 		
 		// echo date('d.m.Y',$current_month_start), " - ",date('d.m.Y',$current_month_end), "\r\n";
 		// echo "Start date - ", date('d.m.Y', $this->start_date), "\r\n";

@@ -29,14 +29,14 @@ class table_record {
 	
 	public function set_months($rw){
 		for ($m=1;$m<13;$m++){
-				$month = date('M',time(0,0,0,$m,15));				
+				$month = date('M',mktime(0,0,0,$m,15));				
 				$this->set_month_value($m, $rw[$month]);
 		}
 	}
 	
 	public function total(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
 		return ($res);

@@ -18,7 +18,7 @@ $sql = "SELECT pc, prtGHQ, ".Budget::getMonthlySumSQL()." FROM reg_profit_ghq WH
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrPC[$rw['pc']][$rw['prtGHQ']][$month] += $rw[$month];
 		$arrSubtotal[$rw['pc']][$month] += $rw[$month];
 		$arrGHQSubtotal[$rw['prtGHQ']][$month] += $rw[$month];
@@ -29,7 +29,7 @@ while ($rw = $oSQL->f($rs)){
 foreach($arrPC as $pc=>$arrGhq){
 	foreach ($arrGhq as $ghq=>$values){
 		for($m=1;$m<13;$m++){
-			$month = (date('M',time(0,0,0,$m,15)));
+			$month = (date('M',mktime(0,0,0,$m,15)));
 			$arrRatio[$pc][$ghq][$month] = $arrSubtotal[$pc][$month]?$values[$month]/$arrSubtotal[$pc][$month]:0;
 		}
 	}
@@ -51,7 +51,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
@@ -71,7 +71,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
@@ -84,7 +84,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
@@ -102,7 +102,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
@@ -123,7 +123,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
@@ -137,7 +137,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
@@ -150,7 +150,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
@@ -165,7 +165,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];			
 		} else {
@@ -188,7 +188,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];			
 		} else {
@@ -211,7 +211,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		} else {
@@ -234,7 +234,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		} else {
@@ -256,7 +256,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		} else {
@@ -287,7 +287,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		} else {
@@ -319,7 +319,7 @@ $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		// if ($rw['prtGHQ']){
 			$arrReport['Corporate'][$reportKey][$month] -= $rw[$month];
 		// } else {
@@ -346,7 +346,7 @@ while ($rw = $oSQL->f($rs)){
 	// }
 
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		// if ($rw['prtGHQ']){
 			$arrReport['Corporate'][$reportKey][$month] -= $rw[$month];
 		// } else {
@@ -365,7 +365,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport['Non-op.income'][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
@@ -377,7 +377,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport['Non-op.income'][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
@@ -389,7 +389,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport['Non-op.income'][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
@@ -402,7 +402,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		// if ($rw['prtGHQ']){
 			$arrReport['Non-op. costs'][$reportKey][$month] -= $rw[$month];
 		// } else {
@@ -420,7 +420,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		// if ($rw['prtGHQ']){
 			$arrReport['Non-op. costs'][$reportKey][$month] -= $rw[$month];
 		// } else {
@@ -438,7 +438,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		// if ($rw['prtGHQ']){
 			 $arrReport['Non-op. costs'][$reportKey][$month] -= $rw[$month];
 		// } else {
@@ -462,7 +462,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=1;$m<13;$m++){
-		$month = (date('M',time(0,0,0,$m,15)));
+		$month = (date('M',mktime(0,0,0,$m,15)));
 		$arrReport[$rw['']][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
@@ -490,7 +490,7 @@ foreach ($arrReport as $ghq=>$arrItems){
 		echo '<tr>';
 		echo '<td>',$item,'</td>';
 			for ($m=1;$m<13;$m++){
-				$month = (date('M',time(0,0,0,$m,15)));
+				$month = (date('M',mktime(0,0,0,$m,15)));
 				echo '<td class="budget-decimal">',number_format($values[$month],0,'.',','),'</td>';
 			}
 		echo '<td class="budget-ytd budget-decimal">',number_format(array_sum($values),0,'.',','),'</td>';
@@ -505,7 +505,7 @@ foreach ($arrGrandTotal as $item=>$values){
 		echo '<tr>';
 		echo '<td>',$item,'</td>';
 			for ($m=1;$m<13;$m++){
-				$month = (date('M',time(0,0,0,$m,15)));
+				$month = (date('M',mktime(0,0,0,$m,15)));
 				echo '<td class="budget-decimal">',number_format($values[$month],0,'.',','),'</td>';
 				$arrNRBT[$month] += $values[$month];
 			}
@@ -517,7 +517,7 @@ foreach ($arrGrandTotal as $item=>$values){
 <td>Total NRBT</td>
 <?php
 for ($m=1;$m<13;$m++){
-				$month = (date('M',time(0,0,0,$m,15)));
+				$month = (date('M',mktime(0,0,0,$m,15)));
 				echo '<td class="budget-decimal">',number_format($arrNRBT[$month],0,'.',','),'</td>';				
 }
 echo '<td class="budget-decimal budget-ytd">',number_format(array_sum($arrNRBT),0,'.',','),'</td>';

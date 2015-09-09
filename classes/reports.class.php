@@ -53,7 +53,7 @@ class Reports{
 				echo "<td><a href='javascript:getCustomerKPI({activity:{$rw['prtID']}});'>",$rw['Activity'],'</a></td>';
 				echo '<td class="unit">',$rw['Unit'],'</td>';
 				for ($m=1;$m<13;$m++){
-					$month = date('M',time(0,0,0,$m,15));
+					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",number_format($rw[$month],0,'.',','),'</td>';
 				}
 				$arrQuarter = Array('Q1'=>$rw['Jan']+$rw['Feb']+$rw['Mar'],
@@ -118,7 +118,7 @@ class Reports{
 					<td><?php echo $rw['unit'];?></td>
 				<?php
 				for ($m=1;$m<13;$m++){
-					$month = date('M',time(0,0,0,$m,15));
+					$month = date('M',mktime(0,0,0,$m,15));
 					$arrTotal[$month] += $rw[$month];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",number_format($rw[$month],0,'.',','),'</td>';
 				}
@@ -145,7 +145,7 @@ class Reports{
 					<td colspan="2">Total:</td>
 					<?php
 					for ($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						?>
 						<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($arrTotal[$month]);?></td>
 						<?php
@@ -194,7 +194,7 @@ class Reports{
 				echo '<td>',$rw['Supplier'],'</td>';
 				echo '<td>',$rw['Unit'],'</td>';
 				for ($m=1;$m<13;$m++){
-					$month = date('M',time(0,0,0,$m,15));
+					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month'>",$rw[$month],'</td>';
 				}
 				echo '<td class=\'budget-decimal budget-ytd\'>',$rw['Total'],'</td>';
@@ -244,7 +244,7 @@ class Reports{
 				<?php
 				self::_renderHeadcountArray($rw);
 				for ($m=1;$m<13;$m++){
-					$headcount[$m] += $rw[date('M',time(0,0,0,$m,15))];
+					$headcount[$m] += $rw[date('M',mktime(0,0,0,$m,15))];
 				}
 				$headcount['ytd'] += $rw['Total'];
 			}
@@ -317,7 +317,7 @@ class Reports{
 								<td>Revenue, RUBx1,000</td>
 								<?php
 								for ($m=1;$m<13;$m++){
-									$month = date('M',time(0,0,0,$m,15));
+									$month = date('M',mktime(0,0,0,$m,15));
 									echo '<td class="budget-decimal">',self::render($rw[$month]/1000),'</td>';
 									$arrRevenuePerFTE[$m] = $rw[$month]/$headcount[$m]/1000;									
 								}
@@ -336,7 +336,7 @@ class Reports{
 							<?php
 						}
 						for ($m=1;$m<13;$m++){
-							$month = date('M',time(0,0,0,$m,15));
+							$month = date('M',mktime(0,0,0,$m,15));
 							$arrGP[$month] += $rw[$month];
 						}
 						$arrGP['Total'] += $rw['Total'];
@@ -346,7 +346,7 @@ class Reports{
 						<td>Gross profit, RUBx1,000</td>
 						<?php
 						for ($m=1;$m<13;$m++){
-									$month = date('M',time(0,0,0,$m,15));
+									$month = date('M',mktime(0,0,0,$m,15));
 									echo '<td class="budget-decimal">',self::render($arrGP[$month]/1000),'</td>';
 									$arrGPPerFTE[$m] = $arrGP[$month]/$headcount[$m]/1000;
 						}
@@ -381,7 +381,7 @@ class Reports{
 								<td>Staff costs, RUBx1,000</td>
 								<?php
 								for ($m=1;$m<13;$m++){
-									$month = date('M',time(0,0,0,$m,15));
+									$month = date('M',mktime(0,0,0,$m,15));
 									echo '<td class="budget-decimal">',number_format(-$rw[$month]/1000,0,'.',','),'</td>';
 									$arrSC[$month] = -$rw[$month];
 									$arrSCPerFTE[$m] = -$rw[$month]/$headcount[$m]/1000;									
@@ -397,7 +397,7 @@ class Reports{
 						<td>Gross profit/Staff costs</td>
 						<?php
 						for ($m=1;$m<13;$m++){
-									$month = date('M',time(0,0,0,$m,15));
+									$month = date('M',mktime(0,0,0,$m,15));
 									?>
 									<td class="budget-decimal"><?php self::render_ratio($arrGP[$month]/100,$arrSC[$month],1);?></td>
 									<?php
@@ -429,7 +429,7 @@ class Reports{
 	
 	private function _renderHeadcountArray($rw){
 		for ($m=1;$m<13;$m++){
-					$month = date('M',time(0,0,0,$m,15));
+					$month = date('M',mktime(0,0,0,$m,15));
 					echo "<td class='budget-decimal budget-$month'>",self::render($rw[$month],1),'</td>';
 				
 				}
@@ -469,7 +469,7 @@ class Reports{
 				echo '<th>',$rw['account'],'</th>';
 				echo '<th>',$rw['Title'],'</th>';
 				for ($m=1;$m<13;$m++){
-					$month = date('M',time(0,0,0,$m,15));
+					$month = date('M',mktime(0,0,0,$m,15));
 					?>
 					<td class="budget-decimal"><?php self::render($rw[$month],0);?></td>
 					<?php
@@ -525,7 +525,7 @@ class Reports{
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
 					for ($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$subtotal[$rw['GroupLevel1']][$month]+=$rw[$month];
 						$local_subtotal += $rw[$month];
 						$grandTotal[$month] += $rw[$month];
@@ -594,7 +594,7 @@ class Reports{
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
 					for ($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$subtotal[$rw['GroupLevel1']][$month]+=$rw[$month];
 						$local_subtotal += $rw[$month];
 						$grandTotal[$month] += $rw[$month];
@@ -660,7 +660,7 @@ class Reports{
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
 					for ($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$subtotal[$rw['GroupLevel1']][$month]+=$rw[$month];
 						$local_subtotal += $rw[$month];
 						$grandTotal[$month] += $rw[$month];
@@ -940,7 +940,7 @@ class Reports{
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
 					for ($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$subtotal[$rw['GroupLevel1']][$month]+=$rw[$month];
 						$subtotal[$rw['GroupLevel1']]['Q'.$m]+=$rw['Q'.$m];
 						$local_subtotal += $rw[$month];
@@ -1066,7 +1066,7 @@ class Reports{
 				//------------------------Collecting subtotals---------------------------------------
 				$local_subtotal = 0;
 				for ($m=1;$m<13;$m++){
-					$month = date('M',time(0,0,0,$m,15));
+					$month = date('M',mktime(0,0,0,$m,15));
 					$subtotal[$rw['Group']][$month]+=$rw[$month];					
 					$subtotal[$rw['Group']]['Q'.$m]+=$rw['Q'.$m];					
 					$local_subtotal += $rw[$month];
@@ -1149,7 +1149,7 @@ class Reports{
 				//------------------------Collecting subtotals---------------------------------------
 				$local_subtotal = 0;
 				for ($m=1;$m<13;$m++){
-					$month = date('M',time(0,0,0,$m,15));
+					$month = date('M',mktime(0,0,0,$m,15));
 					$subtotal[$rw['Group']][$month]+=$rw[$month];					
 					$subtotal[$rw['Group']]['Q'.$m]+=$rw['Q'.$m];					
 					$local_subtotal += $rw[$month];
@@ -1361,7 +1361,7 @@ class Reports{
 				$ytd = 0;
 				$roy = 0;
 				for ($m=1;$m<13;$m++){
-					$month = date('M',time(0,0,0,$m,15));
+					$month = date('M',mktime(0,0,0,$m,15));
 					
 					?>
 					<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>

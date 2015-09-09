@@ -27,7 +27,7 @@ class depreciation_record{
 		GLOBAL $oSQL;
 		
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$this->{$month} = 0;
 		}
 		$this->id = $id;
@@ -38,7 +38,7 @@ class depreciation_record{
 		
 		if (count($data)){
 			for($m=1;$m<13;$m++){
-				$month = date('M',time(0,0,0,$m,15));
+				$month = date('M',mktime(0,0,0,$m,15));
 				$this->{$month} = $data[strtolower($month)];			
 			}
 			
@@ -79,7 +79,7 @@ class depreciation_record{
 		GLOBAL $Products;
 
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`=".(double)$this->{$month};
 		}
 			
@@ -116,7 +116,7 @@ class depreciation_record{
 	
 	public function total(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
 		return ($res);

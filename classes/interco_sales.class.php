@@ -184,7 +184,7 @@ class Interco_sales extends Document{
 				
 			);		
 			for ($m=1;$m<13;$m++){
-				$month = date('M',time(0,0,0,$m,15));
+				$month = date('M',mktime(0,0,0,$m,15));
 						
 				$grid->Columns[] = Array(
 					'title'=>$month
@@ -260,7 +260,7 @@ class Interco_sales extends Document{
 						$row->buying_rate = (double)str_replace(',','',$_POST['buying_rate'][$id]);				
 						$row->buying_curr = $_POST['buying_curr'][$id];				
 						for ($m=1;$m<13;$m++){
-							$month = date('M',time(0,0,0,$m,15));
+							$month = date('M',mktime(0,0,0,$m,15));
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
 						}					
 					} else {
@@ -320,7 +320,7 @@ class Interco_sales extends Document{
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_REVENUE;
 					for($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}				
 					
@@ -336,7 +336,7 @@ class Interco_sales extends Document{
 					$master_row->account = $account;
 					$master_row->item = $activity->item_cost;
 					for($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
 					}
 					
@@ -352,7 +352,7 @@ class Interco_sales extends Document{
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_COSTS;
 					for($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$master_row->{$month} = -($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
 					
@@ -368,7 +368,7 @@ class Interco_sales extends Document{
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_REVENUE;
 					for($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$master_row->{$month} = -($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
 					
@@ -384,7 +384,7 @@ class Interco_sales extends Document{
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_COSTS;
 					for($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
 					
@@ -400,7 +400,7 @@ class Interco_sales extends Document{
 					$master_row->account = $account;
 					$master_row->item = $activity->item_cost;
 					for($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
 				}

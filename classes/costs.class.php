@@ -232,7 +232,7 @@ class Indirect_costs extends Document{
 			$grid->Columns[] = parent::getPeriodEG();
 		}				
 		for ($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 					
 			$grid->Columns[] = Array(
 			'title'=>$month
@@ -319,7 +319,7 @@ class Indirect_costs extends Document{
 						$row->period = isset($_POST['period'][$id])?$_POST['period'][$id]:$this->period;				
 						$row->comment = $_POST['comment'][$id];				
 						for ($m=1;$m<13;$m++){
-							$month = date('M',time(0,0,0,$m,15));
+							$month = date('M',mktime(0,0,0,$m,15));
 							$row->{$month} = (double)$_POST[strtolower($month)][$id];
 						}					
 					} else {
@@ -414,7 +414,7 @@ class Indirect_costs extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $record->item;
 						for($m=1;$m<13;$m++){
-							$month = date('M',time(0,0,0,$m,15));
+							$month = date('M',mktime(0,0,0,$m,15));
 							$denominator = $record->period=='annual'?$record->{$month}/$record->total():1;
 							$master_row->{$month} = -$record->{$month}*$record->buying_rate*$settings[strtolower($record->buying_curr)]*$denominator;
 						}				
@@ -497,7 +497,7 @@ class Indirect_costs extends Document{
 			$row->item = $this->data[$this->prefix."ItemGUID"];
 			$row->supplier = $this->data[$this->prefix."SupplierID"];
 			for ($m=1;$m<13;$m++){
-				$month = date('M',time(0,0,0,$m,15));
+				$month = date('M',mktime(0,0,0,$m,15));
 				$row->{$month} = abs($rw[$month]);
 			}
 		}	

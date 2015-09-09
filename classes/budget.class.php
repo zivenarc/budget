@@ -69,7 +69,7 @@ class budget_session {
 	public function read(){
 	
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrSqlMonth[] = "SUM(`$month`) as '$month'";
 			$arrHeader[] = $month;			
 		}
@@ -98,7 +98,7 @@ class budget_session {
 					echo '<tr>';
 					echo '<td>',$values['Profit'],'</td>';
 					for($m=1;$m<13;$m++){
-						$month = date('M',time(0,0,0,$m,15));
+						$month = date('M',mktime(0,0,0,$m,15));
 						$ytd += $values[$month];
 						echo '<td class="budget-decimal '.($values[$month]<0?'budget-negative':'').'">',number_format($values[$month],0,'.',','),'</td>';
 					}
@@ -137,7 +137,7 @@ class master_record{
 	
 	function __construct($session, $scenario){
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$this->{$month} = 0;
 		}
 		
@@ -162,7 +162,7 @@ class master_record{
 		}
 		
 		for($m=$mStart;$m<=$mEnd;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`=".$this->{$month};
 		}
 		
@@ -185,7 +185,7 @@ class master_record{
 	
 	public function total(){
 		for($m=1;$m<13;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$res += $this->{$month};
 		}
 		return ($res);
@@ -265,7 +265,7 @@ class Budget{
 	
 	public function getYTDSQL($mStart=1, $mEnd=12, $arrRates = null){
 		for($m=$mStart;$m<=$mEnd;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			
 			if (is_array($arrRates)){				
 				$arrRes[] = "`$month`/{$arrRates[$month]}";
@@ -320,7 +320,7 @@ class Budget{
 	
 	public function getMonthlySQL($start=1, $end=12){
 		for($m=$start;$m<=$end;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			$arrRes[] = "`$month`";
 		}
 		$res = implode(',',$arrRes);
@@ -328,7 +328,7 @@ class Budget{
 	}
 	public function getMonthlySumSQL($start=1, $end=12, $arrRates = null){
 		for($m=$start;$m<=$end;$m++){
-			$month = date('M',time(0,0,0,$m,15));
+			$month = date('M',mktime(0,0,0,$m,15));
 			if (is_array($arrRates)){				
 				$arrRes[] = "SUM(`$month`)/{$arrRates[$month]} as '$month'";
 			} else {
@@ -389,7 +389,7 @@ class Budget{
 				break;
 			default:
 				for($m=$start;$m<=$end;$m++){
-					$month = date('M',time(0,0,0,$m,15));
+					$month = date('M',mktime(0,0,0,$m,15));
 					$arrRes[] = $month;
 				}
 				$res = '<th class="budget-monthly">'.implode('</th><th class="budget-monthly">',$arrRes).'</th>';
@@ -617,7 +617,7 @@ class Budget{
 		$res = Array('YTD'=>1,'ROY'=>1);
 		
 		for($m=1;$m<=12;$m++){
-				$month = date('M',time(0,0,0,$m,15));
+				$month = date('M',mktime(0,0,0,$m,15));
 				$res[$month] = 1;
 		}
 		
@@ -651,7 +651,7 @@ class Budget{
 			$rw = $this->oSQL->f($rs);
 			
 			for($m=$start_month;$m<=12;$m++){
-				$month = date('M',time(0,0,0,$m,15));
+				$month = date('M',mktime(0,0,0,$m,15));
 				$res[$month] = $rw['Rate'];
 			}
 			
