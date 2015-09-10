@@ -22,7 +22,7 @@ class table_record {
 	}
 	
 	public function set_month_value($i, $value){
-		$month = date('M',time(0,0,0,(integer)$i,15));
+		$month = date('M',mktime(0,0,0,(integer)$i,15));
 		$this->{$month} =(double)$value;
 		return(true);
 	}

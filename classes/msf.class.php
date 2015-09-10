@@ -410,8 +410,7 @@ class MSF extends Document{
 			$row->unit = $rw['unit'];
 			$row->pc = $rw['pc'];			
 			for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));				
-				echo '<pre>',$month,'</pre>';
+				$month = date('M',mktime(0,0,0,$m,15));							
 				$row->set_month_value($m, $rw[$month]);
 				$arrSubtotal[$month] += $rw[$month];
 				$arrSum[$month] = $this->total - $arrSubtotal[$month];
