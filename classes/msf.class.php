@@ -403,6 +403,8 @@ class MSF extends Document{
 			break;
 		}
 			
+		echo '<pre>',$sql,'</pre>';die();
+			
 		$rs = $this->oSQL->q($sql);
 		while ($rw=$this->oSQL->f($rs)){
 			$row = $this->add_record();
