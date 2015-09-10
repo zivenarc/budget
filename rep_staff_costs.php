@@ -4,7 +4,8 @@ require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 
-$budget_scenario='FYE_15_Jul';
+include ('includes/inc_report_settings.php');
+
 $oBudget = new Budget($budget_scenario);
 $ytd = date('m',$oBudget->date_start-1);echo $ytd;
 
@@ -82,7 +83,8 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 			$tableID = md5($sql);
 			
 include ('includes/inc-frame_top.php');			
-			?>			
+			?>
+			<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr>
