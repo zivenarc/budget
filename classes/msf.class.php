@@ -403,8 +403,6 @@ class MSF extends Document{
 			break;
 		}
 			
-		echo '<pre>',$sql,'</pre>';die();
-			
 		$rs = $this->oSQL->q($sql);
 		while ($rw=$this->oSQL->f($rs)){
 			$row = $this->add_record();
@@ -413,6 +411,7 @@ class MSF extends Document{
 			$row->pc = $rw['pc'];			
 			for ($m=1;$m<13;$m++){
 				$month = date('M',mktime(0,0,0,$m,15));				
+				echo '<pre>',$month,'</pre>';
 				$row->set_month_value($m, $rw[$month]);
 				$arrSubtotal[$month] += $rw[$month];
 				$arrSum[$month] = $this->total - $arrSubtotal[$month];
