@@ -209,9 +209,10 @@ class Reports{
 	
 	public function headcountByJob($sqlWhere=''){
 		GLOBAL $oSQL;
+		$denominator = 1000;
 		ob_start();
 			
-			$sqlSelect = "SELECT prtRHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pccTitle,pccTitleLocal , ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
+			$sqlSelect = "SELECT prtRHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pc, pccTitle,pccTitleLocal , ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
 					FROM `reg_headcount`
 					LEFT JOIN vw_function ON funGUID=function
 					LEFT JOIN vw_product_type ON prtID=activity
@@ -259,7 +260,7 @@ class Reports{
 				<tr>
 					<td><?php echo $rw['Location'];?></td>					
 				<?php
-				self::_renderHeadcountArray($rw);
+				self::_renderHeadcountArray($rw, Array('location'=>$rw['location']));
 				
 			}
 			$sql = $sqlSelect." GROUP BY `function` ORDER BY funRHQ, funFlagWC";
@@ -272,11 +273,11 @@ class Reports{
 				<tr>
 					<td><?php echo '<strong>',$rw['funTitle'],'</strong> | ',$rw['funTitleLocal'];?></td>					
 				<?php
-				self::_renderHeadcountArray($rw);
+				self::_renderHeadcountArray($rw, Array('function'=>$rw['function']));
 				
 			}
 			
-			$sql = $sqlSelect." GROUP BY `pc` ORDER BY pccFlagProd";
+			$sql = $sqlSelect." GROUP BY `pc` ORDER BY pccFlagProd, pccParentCode1C";
 			$rs = $oSQL->q($sql);			
 			if ($oSQL->num_rows($rs)>1){
 				?>
@@ -287,7 +288,7 @@ class Reports{
 					<tr>
 						<td><?php echo '<strong>',$rw['pccTitle'],'</strong> | ',$rw['pccTitleLocal'];?></td>					
 					<?php
-					self::_renderHeadcountArray($rw);
+					self::_renderHeadcountArray($rw, Array('pc'=>$rw['pc']));
 					
 				}
 			}
@@ -318,11 +319,11 @@ class Reports{
 								<?php
 								for ($m=1;$m<13;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
-									echo '<td class="budget-decimal">',self::render($rw[$month]/1000),'</td>';
-									$arrRevenuePerFTE[$m] = $rw[$month]/$headcount[$m]/1000;									
+									echo '<td class="budget-decimal">',self::render($rw[$month]/$denominator),'</td>';
+									$arrRevenuePerFTE[$m] = $rw[$month]/$headcount[$m]/$denominator;									
 								}
 								?>
-								<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']/1000);?></td>
+								<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']/$denominator);?></td>
 							</tr>
 							<tr>
 								<td>Revenue per FTE</td>
@@ -331,7 +332,7 @@ class Reports{
 									echo '<td class="budget-decimal">',self::render($arrRevenuePerFTE[$m]),'</td>';									
 								}
 								?>
-								<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']/$headcount['ytd']/1000);?></td>
+								<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']/$headcount['ytd']/$denominator);?></td>
 							</tr>
 							<?php
 						}
@@ -347,22 +348,23 @@ class Reports{
 						<?php
 						for ($m=1;$m<13;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
-									echo '<td class="budget-decimal">',self::render($arrGP[$month]/1000),'</td>';
-									$arrGPPerFTE[$m] = $arrGP[$month]/$headcount[$m]/1000;
+									echo '<td class="budget-decimal">',self::render($arrGP[$month]/$denominator),'</td>';
+									$arrGPPerFTE[$m] = $arrGP[$month]/$headcount[$m]/$denominator;
 						}
 						?>
-						<td class='budget-decimal budget-ytd'><?php self::render($arrGP['Total']/1000);?></td>
+						<td class='budget-decimal budget-ytd'><?php self::render($arrGP['Total']/$denominator);?></td>
 					</tr>
 					<tr class='budget-subtotal'>
 						<td>GP per FTE</td>
 						<?php
-						for ($m=1;$m<13;$m++){									
+						for ($m=1;$m<13;$m++){
+							$month = date('M',mktime(0,0,0,$m,15));						
 							?>
-							<td class="budget-decimal"><?php self::render($arrGPPerFTE[$m]);?></td>
+							<td class="budget-decimal"><?php self::render_ratio($arrGP[$month]/100/$denominator,$headcount[$m],0);?></td>
 							<?php
 						}
 						?>
-						<td class='budget-decimal budget-ytd'><?php self::render_ratio($arrGP['Total']/100000,$headcount['ytd'],0);?></td>
+						<td class='budget-decimal budget-ytd'><?php self::render_ratio($arrGP['Total']/100/$denominator,$headcount['ytd'],0);?></td>
 					</tr>
 					<?php
 				}
@@ -382,12 +384,12 @@ class Reports{
 								<?php
 								for ($m=1;$m<13;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
-									echo '<td class="budget-decimal">',number_format(-$rw[$month]/1000,0,'.',','),'</td>';
+									echo '<td class="budget-decimal">',number_format(-$rw[$month]/$denominator,0,'.',','),'</td>';
 									$arrSC[$month] = -$rw[$month];
-									$arrSCPerFTE[$m] = -$rw[$month]/$headcount[$m]/1000;									
+									//$arrSCPerFTE[$m] = $headcount[$m]?-$rw[$month]/$headcount[$m]/1000:'n/a';									
 								}
 								?>
-								<td class='budget-decimal budget-ytd'><?php echo number_format(-$rw['Total']/1000,0,'.',',');?></td>
+								<td class='budget-decimal budget-ytd'><?php echo number_format(-$rw['Total']/$denominator,0,'.',',');?></td>
 							</tr>							
 							<?php
 							$arrSC['Total'] = -$rw['Total'];
@@ -403,16 +405,17 @@ class Reports{
 									<?php
 						}
 						?>
-						<td class='budget-decimal budget-ytd'><?php echo number_format($arrGP['Total']/$arrSC['Total'],1,'.',',');?></td>
+						<td class='budget-decimal budget-ytd'><?php self::render_ratio($arrGP['Total']/100,$arrSC['Total']);?></td>
 					</tr>
 					<tr class='budget-subtotal'>
 						<td>Cost per FTE</td>
 						<?php
-						for ($m=1;$m<13;$m++){									
-							echo '<td class="budget-decimal">',number_format($arrSCPerFTE[$m],0,'.',','),'</td>';									
+						for ($m=1;$m<13;$m++){
+							$month = date('M',mktime(0,0,0,$m,15));						
+							echo '<td class="budget-decimal">',self::render_ratio($arrSC[$month]/100/$denominator,$headcount[$m],0),'</td>';									
 						}
 						?>
-						<td class='budget-decimal budget-ytd'><?php echo number_format($arrSC['Total']/$headcount['ytd']/1000,0,'.',',');?></td>
+						<td class='budget-decimal budget-ytd'><?php self::render_ratio($arrSC['Total']/100/$denominator,$headcount['ytd'],0);?></td>
 					</tr>
 					<?php
 				}
@@ -427,14 +430,16 @@ class Reports{
 			ob_flush();
 	}
 	
-	private function _renderHeadcountArray($rw){
+	private function _renderHeadcountArray($data, $meta=Array()){
 		for ($m=1;$m<13;$m++){
 					$month = date('M',mktime(0,0,0,$m,15));
-					echo "<td class='budget-decimal budget-$month'>",self::render($rw[$month],1),'</td>';
+					?>
+					<td class="budget-decimal budget-<?php echo $month;?>" data-meta='<?php echo json_encode($meta);?>'><?php self::render($data[$month],1);?></td>
+					<?php
 				
 				}
 				?>
-					<td class='budget-decimal budget-ytd'><?php echo self::render($rw['Total'],1);?></td>
+					<td class='budget-decimal budget-ytd'><?php echo self::render($data['Total'],1);?></td>
 				</tr>
 		<?php
 	}
