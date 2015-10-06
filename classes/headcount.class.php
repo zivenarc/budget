@@ -762,7 +762,7 @@ class Headcount extends Document{
 			$strMaternity = 'NULL';
 		}
 		
-		$sql = "SELECT empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,
+		$sql = "SELECT empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,funMobile,funFuel,
 						IF(empID IN ({$strMaternity}),0,empSalary) as empSalary
 						,(SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
 					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090 AND DATEDIFF(rsgDateEnd,'".date('Y-m-d',$oBudget->date_start)."')>0) as empEndDate
