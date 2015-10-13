@@ -19,7 +19,7 @@ $sql[] = "DELETE FROM reg_headcount WHERE scenario=@scnID and source='Actual';";
 for($m=1;$m<=$ytd;$m++){
 	$year = date('Y',$oBudget->date_start-1);
 	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
-	$repDateEnd = date('Y-m-d',mktime(0,0,0,$m+1,0,$year));
+	$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
 	
 	$month = date('M',mktime(0,0,0,$m,1,$year));
 	// echo '<pre>',$repDateStart,' - ',$repDateEnd,'</pre>';
