@@ -3,7 +3,7 @@
 require ('common/auth.php');
 
 if ($_GET['tab']){
-
+	
 	require ('classes/reports.class.php');
 	$sql = "SELECT *, edit_date as timestamp FROM vw_master 		
 		LEFT JOIN vw_journal ON source=guid
@@ -18,7 +18,10 @@ if ($_GET['tab']){
 		while ($rw=$oSQL->f($rs)){
 			$data[] = $rw;
 		}
-		echo '<h3>Missing YACT</h3>';
+		?>
+		<h3>Missing YACT</h3>
+		<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
+		<?php
 		Reports::getJournalEntries($data);
 		
 		$data = Array();
