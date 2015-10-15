@@ -6,11 +6,10 @@ $arrJS[] = 'js/input_form.js';
 
 $genID=$_GET['genID']?$_GET['genID']:$_POST['genID'];
 
-$oBudget = new Budget($budget_scenario);
 $oDocument = new Indirect_costs ($genID,'general');
 $oDocument->defineEF();
 $oDocument->defineGrid();
-
+$oBudget = new Budget($oDocument->scenario);
 
 if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
