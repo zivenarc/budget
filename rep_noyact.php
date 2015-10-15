@@ -21,8 +21,12 @@ if ($_GET['tab']){
 		?>
 		<h3>Missing YACT</h3>
 		<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
+		<div id='div_<?php echo $_GET['tab'];?>'>
 		<?php
 		Reports::getJournalEntries($data);
+		?>
+		</div>
+		<?php
 		
 		$data = Array();
 		
