@@ -46,6 +46,7 @@ class sales_record{
 			$this->buying_rate= $data['buying_rate'];	
 			$this->formula= $data['formula'];	
 			$this->kpi= $data['kpi'];	
+			$this->sales= $data['sales'];	
 		}		
 		return (true);
 	}	
@@ -88,6 +89,7 @@ class sales_record{
 			$arrRes[] = "`activity`=".(integer)$oProduct->activity;
 			$arrRes[] = "`unit`='".$oProduct->unit."'";
 			$arrRes[] = "`formula`=".$oSQL->e($this->formula);
+			$arrRes[] = "`sales`=".$oSQL->e($this->sales);
 			$arrRes[] = "`kpi`=".(integer)$this->kpi;
 			if ($this->id){
 				$res = "UPDATE `reg_sales` SET ". implode(',',$arrRes)." WHERE id=".$this->id;

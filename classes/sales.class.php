@@ -34,6 +34,8 @@ class Sales extends Document{
 		
 		parent::__construct($id);
 		
+		$this->sales = $this->data['salUserID'];
+		
 	}
 	public function refresh($id){
 		
@@ -88,6 +90,18 @@ class Sales extends Document{
 			,'default'=>22
 			,'disabled'=>!$this->flagUpdate
 		);
+		
+		$this->Columns[] = Array(
+			'title'=>'Responsible'
+			,'field'=>self::Prefix.'UserID'
+			,'type'=>'ajax'
+			,'table'=>'stbl_user'
+			,'prefix'=>'usr'
+			,'sql'=>'stbl_user'
+			,'default'=>$arrData['usrID']
+			,'disabled'=>!$this->flagUpdate
+		);
+		
 		$this->Columns[] = Array(
 			'title'=>'Comments'
 			,'field'=>self::Prefix.'Comment'
@@ -233,6 +247,7 @@ class Sales extends Document{
 			$this->product_folder = isset($_POST[$this->prefix.'ProductFolderID'])?$_POST[$this->prefix.'ProductFolderID']:$this->product_folder;
 			$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
 			$this->customer = isset($_POST[$this->prefix.'CustomerID'])?$_POST[$this->prefix.'CustomerID']:$this->customer;
+			$this->sales = isset($_POST[$this->prefix.'UserID'])?$_POST[$this->prefix.'UserID']:$this->sales;
 
 			if (isset($_POST[$this->prefix.'ProfitID'])){
 				foreach ($this->records[$this->gridName] as $id=>$row){
@@ -253,7 +268,7 @@ class Sales extends Document{
 					}
 				}
 			}
-			
+						
 		}
 		
 		// print_r($this->records[$this->gridName]);die();
@@ -281,6 +296,7 @@ class Sales extends Document{
 						$row->buying_curr = $_POST['buying_curr'][$id];				
 						$row->formula = $_POST['formula'][$id];				
 						$row->kpi = $_POST['kpi'][$id];				
+						$row->sales = $this->sales;				
 						for ($m=1;$m<13;$m++){
 							$month = date('M',mktime(0,0,0,$m,15));
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
@@ -307,6 +323,7 @@ class Sales extends Document{
 				,salComment=".$this->oSQL->e($this->comment)."
 				,salScenario='".$this->scenario."'
 				,salEditBy='".$arrUsrData['usrID']."'
+				,salUserID='".$this->sales."'
 				,salEditDate=NOW()
 				WHERE salID={$this->ID};";
 		if(is_array($this->records[$this->gridName])){			
@@ -341,6 +358,7 @@ class Sales extends Document{
 					$master_row->profit = $this->profit;
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;				
+					$master_row->sales = $record->sales;				
 					
 					$activity = $Activities->getByCode($record->activity);
 					$account = $activity->YACT;
