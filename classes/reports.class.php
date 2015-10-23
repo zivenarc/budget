@@ -729,6 +729,37 @@ class Reports{
 			ob_flush();
 	}
 	
+	public function masterbySalesEst($sqlWhere, $currency=643){
+		
+		GLOBAL $budget_scenario;
+		$oBudget = new Budget($budget_scenario);
+		
+		$strFields = self::_getMonthlyFields($currency);
+		
+		ob_start();
+			$sql = "SELECT usrTitle as 'GroupLevel1', sales as 'level1_code', `Budget item`, `Group`, `item`, 
+			{$strFields}
+			FROM `vw_master` 
+			LEFT JOIN stbl_user ON usrID=sales
+			{$sqlWhere} AND Group_code=94 ## Gross margin only
+			GROUP BY `vw_master`.sales, `vw_master`.item
+			ORDER BY `vw_master`.sales, `Group`, `vw_master`.itmOrder ASC			
+			";
+			
+			self::firstLevelReport($sql, 'BDV', $oBudget);
+			$tableID = "FLR_".md5($sql);
+			//==========================================================================================================================Non-customer-related data
+			self::noFirstLevelReport($sqlWhere, $currency);
+			?>
+			</tbody>
+			</table>
+			<ul class='link-footer'>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
+			<?php			
+			ob_flush();
+	}
+	
 	public function masterbyProfitEst($sqlWhere, $currency=643){
 		
 		$strFields = self::_getMonthlyFields($currency);

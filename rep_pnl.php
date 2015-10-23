@@ -12,6 +12,7 @@ if(!isset($_GET['pccGUID'])){
 	$arrActions[] = Array ('title'=>'By customer','action'=>"?type=customer");
 	$arrActions[] = Array ('title'=>'By activity','action'=>"?type=activity");
 	$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
+	$arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");
 		
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
@@ -50,6 +51,10 @@ if(!isset($_GET['pccGUID'])){
 		case 'ghq':
 			echo "<input type='hidden' id='group' value='activity'/>";
 			Reports::masterByGHQEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
+		break;
+		case 'sales':
+			echo "<input type='hidden' id='group' value='sales'/>";
+			Reports::masterBySalesEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
 		break;
 		// case 'f865e855-d328-102e-9d25-5de97ba9df63':
 			// $sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") OR (customer=9907 AND Group_code=94))";

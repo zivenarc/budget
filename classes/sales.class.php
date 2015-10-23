@@ -98,6 +98,7 @@ class Sales extends Document{
 			,'table'=>'stbl_user'
 			,'prefix'=>'usr'
 			,'sql'=>'stbl_user'
+			,'mandatory'=>true
 			,'default'=>$arrData['usrID']
 			,'disabled'=>!$this->flagUpdate
 		);

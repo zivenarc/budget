@@ -130,54 +130,60 @@ function budget_save(arg){
 	arg=arg||'update';
 	$('#DataAction').val(arg);
 	var data = $( "input, textarea, select" ).serialize();
-	//console.log(data);
-	$('#loader').show();
-	$.post(location.pathname,data, function(responseText){
-		console.log(responseText);
+	
+	if (validate()){
 		
-		if (responseText.status=='success'){
+		//console.log(data);
+		$('#loader').show();
+		$.post(location.pathname,data, function(responseText){
+			console.log(responseText);
+			
+			if (responseText.status=='success'){
 
-			
-			$gridUpdated = $("input[name='inp_"+doc.gridName+"_updated[]']");
-			var flagUpdated = false;
-			$gridUpdated.each(function(){
-				if ($(this).val()) flagUpdated = true;
-			});
-			
-			
-			$gridDeleted = $("input[name='inp_"+doc.gridName+"_deleted']");
-			
-			console.log($gridUpdated);
-			console.log($gridDeleted);
-			
-			if (flagUpdated || $gridDeleted.val()){
-				$gridUpdated.val('');
-				$gridDeleted.val('');		
 				
-				$('#tabs-input').load(location.href+' #tabs-input', function(){
-					eiseGridInitialize();
-					rowTotalsInitialize();
-					formulaInitialize();
+				$gridUpdated = $("input[name='inp_"+doc.gridName+"_updated[]']");
+				var flagUpdated = false;
+				$gridUpdated.each(function(){
+					if ($(this).val()) flagUpdated = true;
 				});
-			}
+				
+				
+				$gridDeleted = $("input[name='inp_"+doc.gridName+"_deleted']");
+				
+				console.log($gridUpdated);
+				console.log($gridDeleted);
+				
+				if (flagUpdated || $gridDeleted.val()){
+					$gridUpdated.val('');
+					$gridDeleted.val('');		
+					
+					$('#tabs-input').load(location.href+' #tabs-input', function(){
+						eiseGridInitialize();
+						rowTotalsInitialize();
+						formulaInitialize();
+					});
+				}
+				
+				$('#timestamp').text(responseText.timestamp);
+				$menu = $('ul.menu-h');
+				$menu.children('li').detach();
 			
-			$('#timestamp').text(responseText.timestamp);
-			$menu = $('ul.menu-h');
-			$menu.children('li').detach();
-		
-			if(doc.flagPosted!=responseText.flagPosted || doc.ID!=responseText.ID || doc.flagDeleted!=responseText.flagDeleted){
-				location.href = location.pathname+'?'+responseText.prefix+'ID='+responseText.ID;
+				if(doc.flagPosted!=responseText.flagPosted || doc.ID!=responseText.ID || doc.flagDeleted!=responseText.flagDeleted){
+					location.href = location.pathname+'?'+responseText.prefix+'ID='+responseText.ID;
+				}
+				
+				
+				for(i=0;i<responseText.arrActions.length;i++){
+					//console.log(responseText.arrActions[i]);
+					var $li = $('<li>').append($('<a>',{'class':responseText.arrActions[i].class,'href':responseText.arrActions[i].action,'text':responseText.arrActions[i].title}))
+					$menu.append($li);
+				}
 			}
-			
-			
-			for(i=0;i<responseText.arrActions.length;i++){
-				//console.log(responseText.arrActions[i]);
-				var $li = $('<li>').append($('<a>',{'class':responseText.arrActions[i].class,'href':responseText.arrActions[i].action,'text':responseText.arrActions[i].title}))
-				$menu.append($li);
-			}
-		}
-		$('#loader').hide();
-	});
+			$('#loader').hide();
+		});
+	} else {
+		return false;
+	}
 }
 
 function fillGrid(type){
@@ -339,4 +345,18 @@ function initialize_autocomplete(oForm){
 			}
 		});
 	});
+}
+
+function validate(){
+
+	var res = true;
+
+	$('.mandatory').each(function(){
+		if (!$(this).val()){
+			$(this).addClass('error_field');
+			res = false;
+		}
+	});
+	
+	return (res);
 }
