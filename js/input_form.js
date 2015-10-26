@@ -351,7 +351,7 @@ function validate(){
 
 	var res = true;
 
-	$('.mandatory').each(function(){
+	$('input.mandatory').each(function(){
 		if (!$(this).val()){
 			$(this).addClass('error_field');
 			res = false;
