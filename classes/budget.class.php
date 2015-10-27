@@ -597,7 +597,7 @@ class Budget{
 				break;
 		}
 		
-		$sql = "SELECT * FROM tbl_scenario {$sqlWhere}";
+		$sql = "SELECT * FROM `vw_active_scenario` {$sqlWhere}";
 		$rs = $oSQL->q($sql);
 		ob_start();
 		?>
