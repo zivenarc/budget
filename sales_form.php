@@ -66,6 +66,8 @@ if ($_POST['DataAction']){
 		}		
 	}
 	
+	// $oSQL->startProfiling();
+	
 	if ($oDocument->save($_POST['DataAction'])){
 		$oDocument->refresh($oDocument->ID);
 		
@@ -76,6 +78,9 @@ if ($_POST['DataAction']){
 		header("Content-type: application/json");
 		$oDocument->getJSON();
 	}
+	
+	// $oSQL->showProfileInfo();
+	
 	die();
 }
 

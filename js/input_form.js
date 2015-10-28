@@ -158,9 +158,7 @@ function budget_save(arg){
 					$gridDeleted.val('');		
 					
 					$('#tabs-input').load(location.href+' #tabs-input', function(){
-						eiseGridInitialize();
-						rowTotalsInitialize();
-						formulaInitialize();
+						$('#'+doc.gridName).eiseGrid();
 					});
 				}
 				
@@ -234,8 +232,7 @@ function send(action){
 					console.log($(this).attr('id'));
 					$(this).val($('#'+$(this).attr('id'),html).val());
 				});
-				eiseGridInitialize();
-				rowTotalsInitialize();
+				$('#'+doc.gridName).eiseGrid();
 				$('#loader').hide();	
 			});
 
