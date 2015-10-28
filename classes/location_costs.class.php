@@ -92,13 +92,6 @@ class Location_costs extends Document{
 			,'default'=>'all'
 			, 'disabled'=>!$this->flagUpdate
 		);
-		$this->Columns[] = Array(
-			'title'=>'Comments'
-			,'field'=>self::Prefix.'Comment'
-			,'type'=>'text'
-			, 'disabled'=>!$this->flagUpdate
-		);
-		// echo '<pre>';print_r($this->Columns);echo '</pre>';
 	}
 	
 	public function defineGrid(){
@@ -205,10 +198,7 @@ class Location_costs extends Document{
 		GLOBAL $YACT;
 		GLOBAL $Items;
 		
-		if (!$this->ID){
-			$this->Update();
-			return(true);
-		}
+		parent::save($mode);
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		if ($mode=='update' || $mode=='post'){
@@ -280,15 +270,7 @@ class Location_costs extends Document{
 		$sql[] = 'COMMIT;';				
 		//echo '<pre>';print_r($sql);echo '</pre>';die();
 		$sqlSuccess = $this->doSQL($sql);
-
-		if ($mode=='delete'){
-			$this->delete();
-		}
-		
-		if ($mode=='unpost'){
-			$this->unpost();
-		}
-		
+	
 		if($mode=='post'){
 			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new budget_session($this->scenario, $this->GUID);

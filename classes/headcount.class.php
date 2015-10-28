@@ -109,12 +109,6 @@ class Headcount extends Document{
 			);
 		}
 		
-		$this->Columns[] = Array(
-			'title'=>'Comments'
-			,'field'=>$this->prefix.'Comment'
-			,'type'=>'text'
-			, 'disabled'=>!$this->flagUpdate
-		);
 	}
 	
 	public function defineGrid(){
@@ -305,10 +299,7 @@ class Headcount extends Document{
 		GLOBAL $oBudget;
 		GLOBAL $ProfitCenters;
 		
-		if (!$this->ID){
-			$this->Update();
-			return(true);
-		}
+		parent::save($mode);
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		if ($mode=='update' || $mode=='post') {
@@ -426,15 +417,7 @@ class Headcount extends Document{
 		$sql[] = 'COMMIT;';				
 		// echo '<pre>';print_r($sql);echo '</pre>';
 		$sqlSuccess = $this->doSQL($sql);
-		
-		if ($mode=='delete'){
-			$this->delete();
-		}
-		
-		if ($mode=='unpost'){
-			$this->unpost();
-		}
-		
+				
 		if($mode=='post'){
 			$this->refresh($this->ID);
 			$oMaster = new budget_session($this->scenario, $this->GUID);

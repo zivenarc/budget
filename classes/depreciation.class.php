@@ -66,20 +66,7 @@ class Depreciation extends Document{
 		}
 	}
 	
-	public function defineEF(){
-	
-		global $arrUsrData;
-			
-		parent::defineEF();
-	
-		$this->Columns[] = Array(
-			'title'=>'Comments'
-			,'field'=>$this->prefix.'Comment'
-			,'type'=>'text'
-			, 'disabled'=>!$this->flagUpdate
-		);
-	}
-	
+
 	public function defineGrid(){
 		
 		GLOBAL $Items;
@@ -248,18 +235,13 @@ class Depreciation extends Document{
 		GLOBAL $Items;
 		GLOBAL $oBudget;
 		
-		$budget_year_start = time(0,0,0,1,1,$oBudget->year);
+		parent::save($mode);
 		
-		if (!$this->ID){
-			$this->Update();
-			return(true);
-		}
+		$budget_year_start = time(0,0,0,1,1,$oBudget->year);
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		if ($mode=='update' || $mode=='post'){
-			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
-			$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
-			$this->scenario = isset($_POST[$this->prefix.'Scenario'])?$_POST[$this->prefix.'Scenario']:$this->scenario;
+			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;			
 		}
 		
 		//-------------------Updating grid records---------------------------------
@@ -353,11 +335,7 @@ class Depreciation extends Document{
 		$sql[] = 'COMMIT;';				
 		//echo '<pre>';print_r($sql);echo '</pre>';die();
 		$sqlSuccess = $this->doSQL($sql);
-		
-		if ($mode=='unpost'){
-			$this->unpost();
-		}
-		
+			
 		if($mode=='post'){
 			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new budget_session($this->scenario, $this->GUID);

@@ -350,7 +350,7 @@ class Entity {
 			
 
 		} else {
-			$sql = '';//$_SESSION[$this->prefix.'_where'];
+			$sql = "{$this->prefix}Scenario IN (SELECT scnID FROM tbl_scenario WHERE scnFlagArchive=0)";//$_SESSION[$this->prefix.'_where'];
 		}
 		return ($sql);
 	}

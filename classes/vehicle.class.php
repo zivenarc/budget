@@ -139,12 +139,7 @@ class Vehicle extends Document{
 			,'disabled'=>!$this->flagUpdate
 		);
 		
-		$this->Columns[] = Array(
-			'title'=>'Comments'
-			,'field'=>$this->prefix.'Comment'
-			,'type'=>'text'
-			,'disabled'=>!$this->flagUpdate
-		);
+
 	}
 	
 	public function defineGrid(){
@@ -248,16 +243,11 @@ class Vehicle extends Document{
 		
 		$budget_year_start = time(0,0,0,1,1,$oBudget->year);
 		
-		if (!$this->ID){
-			$this->Update();
-			return(true);
-		}
+		parent::save($mode);
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		if ($mode=='update' || $mode=='post'){
-			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
-			$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
-			$this->scenario = isset($_POST[$this->prefix.'Scenario'])?$_POST[$this->prefix.'Scenario']:$this->scenario;
+			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;			
 			$this->casco = isset($_POST[$this->prefix.'CASCO'])?$_POST[$this->prefix.'CASCO']:$this->casco;
 			$this->osago = isset($_POST[$this->prefix.'OSAGO'])?$_POST[$this->prefix.'OSAGO']:$this->osago;
 			$this->fuelprice = isset($_POST[$this->prefix.'FuelPrice'])?$_POST[$this->prefix.'FuelPrice']:$this->fuelprice;

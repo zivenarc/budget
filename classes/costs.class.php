@@ -16,6 +16,8 @@ $arrCSS[] = '../common/eiseGrid/eiseGrid.css';
 
 class Indirect_costs extends Document{
 	
+	const EMPTY_CUSTOMER = 1894;
+	
 	function __construct($id='',$type='indirect'){
 		GLOBAL $strLocal;
 		//GLOBAL $arrUsrData;
@@ -142,12 +144,6 @@ class Indirect_costs extends Document{
 				break;
 		}
 	
-		$this->Columns[] = Array(
-			'title'=>'Comments'
-			,'field'=>$this->prefix.'Comment'
-			,'type'=>'text'
-			, 'disabled'=>!$this->flagUpdate
-		);
 	}
 	
 	public function defineGrid(){
@@ -266,20 +262,15 @@ class Indirect_costs extends Document{
 	
 	public function save($mode='update'){
 		
+		parent::save($mode);
+		
 		GLOBAL $arrUsrData;
 		GLOBAL $Activities;
 		GLOBAL $YACT;
 		GLOBAL $Items;
 		
-		if (!$this->ID){
-			$this->Update();
-			return(true);
-		}
-		
 		//echo '<pre>';print_r($_POST);die('</pre>');
-		if($mode=='update' || $mode=='post'){			
-			$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
-			$this->scenario = isset($_POST[$this->prefix.'Scenario'])?$_POST[$this->prefix.'Scenario']:$this->scenario;
+		if($mode=='update' || $mode=='post'){						
 			switch ($this->type){
 				case 'indirect':
 					$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
@@ -385,15 +376,7 @@ class Indirect_costs extends Document{
 		$sql[] = 'COMMIT;';				
 		//echo '<pre>';print_r($sql);echo '</pre>';die();
 		$sqlSuccess = $this->doSQL($sql);
-		
-		if ($mode=='delete'){
-			$this->delete();
-		}
-		
-		if ($mode=='unpost'){
-			$this->unpost();
-		}
-		
+			
 		if($mode=='post'){
 			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new budget_session($this->scenario, $this->GUID);
@@ -403,7 +386,7 @@ class Indirect_costs extends Document{
 				foreach($this->records[$this->gridName] as $id=>$record){
 						
 						if ($record->item == Items::WH_RENT) {
-							$record->customer = 1894;
+							$record->customer = self::EMPTY_CUSTOMER;
 						}
 						
 						$master_row = $oMaster->add_master();

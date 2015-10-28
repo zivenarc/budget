@@ -72,6 +72,40 @@ class Document extends easyForm{
 		};		
 	}
 	
+	protected function save($mode='update'){
+		GLOBAL $arrUsrData;
+		
+		if (!$this->ID){
+			$this->Update();
+			return(true);
+		}
+		
+		if (!$this->flagUpdate){
+			return(false);
+		}
+		
+		switch ($mode){
+			case 'update':
+			case 'post':
+				$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
+				$this->scenario = isset($_POST[$this->prefix.'Scenario'])?$_POST[$this->prefix.'Scenario']:$this->scenario;
+				break;
+			case 'delete':
+				$this->delete();
+				break;
+			case 'restore':
+				$this->restore();
+				break;
+			case 'unpost':
+				$this->unpost();
+				break;				
+			case 'repost':
+				$this->unpost();
+				$this->post();
+				break;				
+		}		
+	}
+	
 	public function defineEF(){
 		
 		GLOBAL $arrUsrData;
@@ -95,6 +129,13 @@ class Document extends easyForm{
 			,'disabled'=>!$this->flagUpdate
 		);
 		$this->Columns[] = self::getProfitEG();
+		
+		$this->Columns[] = Array(
+			'title'=>'Comments'
+			,'field'=>$this->prefix.'Comment'
+			,'type'=>'text'
+			, 'disabled'=>!$this->flagUpdate
+		);
 	}
 		
 	
@@ -263,10 +304,15 @@ class Document extends easyForm{
 	}
 	
 	protected function unpost(){
-		$oMaster = new budget_session($this->scenario, $this->GUID);
-		$oMaster->clear();
-		$oMaster->save();
-		$this->unmarkPosted();
+		if($this->flagDeleted){
+			return(false);
+		} else {
+			$oMaster = new budget_session($this->scenario, $this->GUID);
+			$oMaster->clear();
+			$oMaster->save();
+			$res = $this->unmarkPosted();
+			return ($res);
+		}
 	}
 	
 	protected function getProfitEG(){
@@ -275,7 +321,7 @@ class Document extends easyForm{
 			'title'=>'Profit center'
 			,'field'=>$this->prefix.'ProfitID'
 			,'type'=>'combobox'
-			,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit'
+			,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit WHERE pccFlagFolder=0'
 			,'default'=>$arrUsrData['empProfitID']
 			,'disabled'=>!$this->flagUpdate
 		);

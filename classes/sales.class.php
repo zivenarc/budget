@@ -103,12 +103,6 @@ class Sales extends Document{
 			,'disabled'=>!$this->flagUpdate
 		);
 		
-		$this->Columns[] = Array(
-			'title'=>'Comments'
-			,'field'=>self::Prefix.'Comment'
-			,'type'=>'text'
-			,'disabled'=>!$this->flagUpdate
-		);
 	}
 	
 	//==========================================Definition of document GRID ===================================================
@@ -237,16 +231,12 @@ class Sales extends Document{
 		GLOBAL $YACT;
 		GLOBAL $Items;
 		
-		if (!$this->ID){
-			$this->Update();
-			return(true);
-		}
+		parent::save($mode);
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		if ($mode=='update' || $mode=='post'){
 			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
-			$this->product_folder = isset($_POST[$this->prefix.'ProductFolderID'])?$_POST[$this->prefix.'ProductFolderID']:$this->product_folder;
-			$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
+			$this->product_folder = isset($_POST[$this->prefix.'ProductFolderID'])?$_POST[$this->prefix.'ProductFolderID']:$this->product_folder;			
 			$this->customer = isset($_POST[$this->prefix.'CustomerID'])?$_POST[$this->prefix.'CustomerID']:$this->customer;
 			$this->sales = isset($_POST[$this->prefix.'UserID'])?$_POST[$this->prefix.'UserID']:$this->sales;
 
@@ -340,15 +330,7 @@ class Sales extends Document{
 		$sql[] = 'COMMIT;';				
 
 		$sqlSuccess = $this->doSQL($sql);
-		
-		if ($mode=='delete'){
-			$this->delete();
-		}
-		
-		if ($mode=='unpost'){
-			$this->unpost();
-		}
-		
+				
 		if($mode=='post'){
 			$this->refresh($this->ID);
 			$oMaster = new budget_session($this->scenario, $this->GUID);

@@ -109,12 +109,7 @@ class Interco_sales extends Document{
 			,'default'=>22
 			, 'disabled'=>!$this->flagUpdate
 		);
-		$this->Columns[] = Array(
-			'title'=>'Comments'
-			,'field'=>self::Prefix.'Comment'
-			,'type'=>'text'
-			, 'disabled'=>!$this->flagUpdate
-		);
+
 	}
 	
 	public function defineGrid(){
@@ -227,16 +222,12 @@ class Interco_sales extends Document{
 		GLOBAL $Activities;
 		GLOBAL $YACT;
 		
-		if (!$this->ID){
-			$this->Update();
-			return(true);
-		}
+		parent::save($mode);
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		if ($mode=='update' || $mode=='post'){
 			$this->profit = isset($_POST[self::Prefix.'ProfitID'])?$_POST[self::Prefix.'ProfitID']:$this->profit;
-			$this->product_folder = isset($_POST[self::Prefix.'ProductFolderID'])?$_POST[self::Prefix.'ProductFolderID']:$this->product_folder;
-			$this->comment = isset($_POST[self::Prefix.'Comment'])?$_POST[self::Prefix.'Comment']:$this->comment;
+			$this->product_folder = isset($_POST[self::Prefix.'ProductFolderID'])?$_POST[self::Prefix.'ProductFolderID']:$this->product_folder;			
 			$this->customer = isset($_POST[self::Prefix.'CustomerID'])?$_POST[self::Prefix.'CustomerID']:$this->customer;
 		}
 		
@@ -298,11 +289,7 @@ class Interco_sales extends Document{
 		$sql[] = "SET AUTOCOMMIT = 1;";
 		$sql[] = 'COMMIT;';				
 
-		$sqlSuccess = $this->doSQL($sql);
-		
-		if ($mode=='unpost'){
-			$this->unpost();
-		}
+		$sqlSuccess = $this->doSQL($sql);		
 		
 		if($mode=='post'){
 			$this->refresh($this->ID);

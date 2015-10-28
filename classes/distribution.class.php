@@ -78,12 +78,6 @@ class Distribution extends Document{
 					, 'disabled'=>!$this->flagUpdate
 				);
 			
-		$this->Columns[] = Array(
-			'title'=>'Comments'
-			,'field'=>$this->prefix.'Comment'
-			,'type'=>'text'
-			, 'disabled'=>!$this->flagUpdate
-		);
 	}
 	
 	public function defineGrid(){
