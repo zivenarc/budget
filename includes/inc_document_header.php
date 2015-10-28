@@ -33,7 +33,10 @@ if ($oDocument->classified) {
 
 ?>
 <script>
-	var doc = <?php $oDocument->getJSON(); ?>
+	var doc = <?php $oDocument->getJSON(); ?>;
+	$(document).ready(function(){
+		$('#<?php echo $oDocument->gridName;?>').eiseGrid();
+	});
 </script>
 <div>
 <table style='width:100%'>
