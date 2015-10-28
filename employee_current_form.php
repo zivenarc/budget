@@ -126,33 +126,33 @@ require ('includes/inc_document_header.php');
 <script>
 
 $(document).ready(function(){
-	eiseGridInitialize();
-	rowTotalsInitialize();
+
 	$('#cemTurnover, #cemOvertime').filter(':text').spinner({min:0,max:100});
-	var grid=eiseGrid_find(doc.gridName);
-    if (grid!=null){  
-		grid.change ("particulars[]", function(oTr, input){ 
-			console.log(oTr);
-			$.post("ajax_details.php"
-				, {table:'vw_employee_select',empGUID1C:oTr.find("[name='particulars[]']").val()}
-				, function(data, textStatus){
-					console.log(data);
-					oTr.find("[name='salary[]']").val(parseFloat(data.empSalary));
-					oTr.find("[name='function[]']").val(data.empFunctionGUID);
-					oTr.find("[name='function_text[]']").val(data.funTitle);
-					oTr.find("[name='location[]']").val(data.empLocationID);
-					oTr.find("[name='location_text[]']").val(data.locTitle);
-					oTr.find("[name='activity[]']").val(data.empProductTypeID);
-					oTr.find("[name='activity_text[]']").val(data.prtTitle);
-					oTr.find("[name='mobile_limit[]']").val(parseFloat(data.funMobile));
-					oTr.find("[name='fuel[]']").val(parseFloat(data.funFuel));
-					oTr.find("[name='wc[]']").val(data.funFlagWC);
-					oTr.find("[name='wc_chk[]']").val(data.funFlagWC?'on':'');
-				}
-				,'json'
-			);
-		})
-    }
+
+	// var grid=eiseGrid_find(doc.gridName);
+    // if (grid!=null){  
+		// grid.change ("particulars[]", function(oTr, input){ 
+			// console.log(oTr);
+			// $.post("ajax_details.php"
+				// , {table:'vw_employee_select',empGUID1C:oTr.find("[name='particulars[]']").val()}
+				// , function(data, textStatus){
+					// console.log(data);
+					// oTr.find("[name='salary[]']").val(parseFloat(data.empSalary));
+					// oTr.find("[name='function[]']").val(data.empFunctionGUID);
+					// oTr.find("[name='function_text[]']").val(data.funTitle);
+					// oTr.find("[name='location[]']").val(data.empLocationID);
+					// oTr.find("[name='location_text[]']").val(data.locTitle);
+					// oTr.find("[name='activity[]']").val(data.empProductTypeID);
+					// oTr.find("[name='activity_text[]']").val(data.prtTitle);
+					// oTr.find("[name='mobile_limit[]']").val(parseFloat(data.funMobile));
+					// oTr.find("[name='fuel[]']").val(parseFloat(data.funFuel));
+					// oTr.find("[name='wc[]']").val(data.funFlagWC);
+					// oTr.find("[name='wc_chk[]']").val(data.funFlagWC?'on':'');
+				// }
+				// ,'json'
+			// );
+		// })
+    // }
 	
 });
 </script>

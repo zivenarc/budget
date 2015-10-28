@@ -85,7 +85,7 @@ if ($oDocument->classified) {
 		</form>
 		<ul class='link-footer'>
 			<?php if ($oDocument->flagUpdate) { ?>
-			<li><a href='javascript:grids["<?php echo $oDocument->gridName;?>"].addRow(null);'>Add row</a></li>
+			<li><a href="javascript:$('#<?php echo $oDocument->gridName;?>').eiseGrid('addRow');">Add row</a></li>
 			<?php } ?>
 			<li><a href='javascript:SelectContent("<?php echo $oDocument->gridName;?>");'>Select table</a></li>
 		</ul>

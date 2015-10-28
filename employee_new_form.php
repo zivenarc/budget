@@ -75,26 +75,25 @@ require ('includes/inc_document_header.php');
 <script>
 
 $(document).ready(function(){
-	eiseGridInitialize();
-	rowTotalsInitialize();	
-	var grid=eiseGrid_find(doc.gridName);
-    if (grid!=null){  
-		grid.change ("function[]", function(oTr, input){ 
-			console.log(oTr);
-			$.post("ajax_details.php"
-				, {table:'vw_function',funGUID:oTr.find("[name='function[]']").val()}
-				, function(data, textStatus){
-					console.log(data);
-					oTr.find("[name='mobile_limit[]']").val(data.funMobile);
-					oTr.find("[name='fuel[]']").val(data.funFuel);
-					oTr.find("[name='new_fte[]']").val(1);
-					oTr.find("[name='wc[]']").val(data.funFlagWC==1);
-					oTr.find("[name='wc_chk[]']").attr('checked',data.funFlagWC==1);
-				}
-				,'json'
-			);
-		})
-    }
+		
+	// var grid=eiseGrid_find(doc.gridName);
+    // if (grid!=null){  
+		// grid.change ("function[]", function(oTr, input){ 
+			// console.log(oTr);
+			// $.post("ajax_details.php"
+				// , {table:'vw_function',funGUID:oTr.find("[name='function[]']").val()}
+				// , function(data, textStatus){
+					// console.log(data);
+					// oTr.find("[name='mobile_limit[]']").val(data.funMobile);
+					// oTr.find("[name='fuel[]']").val(data.funFuel);
+					// oTr.find("[name='new_fte[]']").val(1);
+					// oTr.find("[name='wc[]']").val(data.funFlagWC==1);
+					// oTr.find("[name='wc_chk[]']").attr('checked',data.funFlagWC==1);
+				// }
+				// ,'json'
+			// );
+		// })
+    // }
 	
 });
 

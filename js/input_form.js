@@ -360,3 +360,33 @@ function validate(){
 	
 	return (res);
 }
+
+function init_monthlyCopy(){
+	// var grid=eiseGrid_find(doc.gridName);
+    // if (grid!=null){  
+		// grid.change ("jan[]", function(oTr, input){
+			// for (m=1;m<months.length;m++){
+				// oTr.find("input[name='"+months[m]+"[]']").val(input.val());
+			// }
+		// })
+    // };
+}
+
+function init_productProperties(){
+// var grid=eiseGrid_find(doc.gridName);
+    // if (grid!=null){  
+		// grid.change ("product[]", function(oTr, input){ 
+			// console.log(oTr);
+			// $.post("ajax_details.php"
+				// , {table:'vw_product',prdID:oTr.find("[name='product[]']").val()}
+				// , function(data, textStatus){
+					// console.log(data);
+					// oTr.find("[name='unit[]']").val(data.prtUnit);
+					// oTr.find("[name='prdExternalID[]']").val(data.prdExternalID);
+					// oTr.find("div").text(data.prdExternalID);
+				// }
+				// ,'json'
+			// );
+		// })
+    // }
+}

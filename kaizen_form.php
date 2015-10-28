@@ -99,8 +99,6 @@ while ($rw=$oSQL->f($rs)){
 var arrGHQ = <?php echo json_encode($arrGHQ);?>;
 
 $(document).ready(function(){
-	eiseGridInitialize();
-	rowTotalsInitialize();
 	
 	$('#kznRate').filter(':text').spinner({
 		min:-100,
@@ -108,14 +106,14 @@ $(document).ready(function(){
 		step:0.01
 	});
 		
-	var grid=eiseGrid_find(doc.gridName);
-    if (grid!=null){  
-		grid.change ("jan[]", function(oTr, input){
-			for (m=1;m<months.length;m++){
-				oTr.find("input[name='"+months[m]+"[]']").val(input.val());
-			}
-		})
-    }
+	// var grid=eiseGrid_find(doc.gridName);
+    // if (grid!=null){  
+		// grid.change ("jan[]", function(oTr, input){
+			// for (m=1;m<months.length;m++){
+				// oTr.find("input[name='"+months[m]+"[]']").val(input.val());
+			// }
+		// })
+    // }
 	
 });
 

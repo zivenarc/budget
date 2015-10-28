@@ -118,26 +118,9 @@ require ('includes/inc_document_header.php');
 <script>
 
 $(document).ready(function(){
-	eiseGridInitialize();
-	rowTotalsInitialize();
-	formulaInitialize();
-	
-	var grid=eiseGrid_find(doc.gridName);
-    if (grid!=null){  
-		grid.change ("product[]", function(oTr, input){ 
-			console.log(oTr);
-			$.post("ajax_details.php"
-				, {table:'vw_product',prdID:oTr.find("[name='product[]']").val()}
-				, function(data, textStatus){
-					console.log(data);
-					oTr.find("[name='unit[]']").val(data.prtUnit);
-					oTr.find("[name='prdExternalID[]']").val(data.prdExternalID);
-					oTr.find("div").text(data.prdExternalID);
-				}
-				,'json'
-			);
-		})
-    }
+		
+	init_productProperties();
+	init_monthlyCopy();
 	
 });
 </script>

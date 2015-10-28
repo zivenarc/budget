@@ -81,17 +81,15 @@ require ('includes/inc_document_header.php');
 var arrGHQ = <?php echo json_encode($arrGHQ);?>;
 
 $(document).ready(function(){
-	eiseGridInitialize();
-	rowTotalsInitialize();
-	
-	var grid=eiseGrid_find(doc.gridName);
-    if (grid!=null){  
-		grid.change ("jan[]", function(oTr, input){
-			for (m=1;m<months.length;m++){
-				oTr.find("input[name='"+months[m]+"[]']").val(input.val());
-			}
-		})
-    }
+
+	// var grid=eiseGrid_find(doc.gridName);
+    // if (grid!=null){  
+		// grid.change ("jan[]", function(oTr, input){
+			// for (m=1;m<months.length;m++){
+				// oTr.find("input[name='"+months[m]+"[]']").val(input.val());
+			// }
+		// })
+    // }
 	
 });
 
