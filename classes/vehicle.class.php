@@ -332,14 +332,6 @@ class Vehicle extends Document{
 		//echo '<pre>';print_r($sql);echo '</pre>';die();
 		$sqlSuccess = $this->doSQL($sql);
 		
-		if ($mode=='delete'){
-			$this->delete();
-		}
-		
-		
-		if ($mode=='unpost'){
-			$this->unpost();
-		}
 		
 		if($mode=='post'){
 			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
