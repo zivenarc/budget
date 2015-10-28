@@ -83,23 +83,7 @@ class Indirect_costs extends Document{
 		global $budget_scenario;
 		global $Items;
 	
-		$this->Columns = Array();
-		
-		$this->Columns[] = Array(
-			'field'=>$this->prefix.'ID'	
-		);
-		$this->Columns[] = Array(
-			'field'=>$this->prefix.'GUID'
-			,'type'=>'guid'
-		);
-		$this->Columns[] = Array(
-			'title'=>'Scenario'
-			,'field'=>$this->prefix.'Scenario'
-			,'type'=>'combobox'
-			,'sql'=>'SELECT scnID as optValue, scnTitle as optText FROM tbl_scenario'
-			,'default'=>$budget_scenario	
-			, 'disabled'=>!$this->flagUpdate
-		);
+		parent::defineEF();
 		
 		switch ($this->type) {
 			case 'general':
