@@ -8,25 +8,10 @@ class msf_record extends table_record{
 	const TABLE = 'reg_msf';
 	
 	function __construct($session, $scenario, $id='', $data=Array()){
-		//GLOBAL $Products;
 		
-		GLOBAL $oSQL;
+		parent::__construct($session, $scenario, $id='', $data=Array());
 		
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$this->{$month} = 0;
-		}
-		$this->id = $id;
-		$this->source = $session;
-		$this->scenario = $scenario;
-		//$this->product_ref = $Products;
-		$this->oSQL = $oSQL;
-		
-		if (count($data)){
-			for($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
-				$this->{$month} = $data[strtolower($month)];			
-			}
+		if (count($data)){			
 			$this->customer = $data['customer'];
 			$this->comment = $data['comment'];
 			$this->unit = $data['unit'];			

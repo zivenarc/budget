@@ -138,12 +138,7 @@ class Document extends easyForm{
 		);
 		$this->Columns[] = self::getProfitEG();
 		
-		$this->Columns[] = Array(
-			'title'=>'Comments'
-			,'field'=>$this->prefix.'Comment'
-			,'type'=>'text'
-			, 'disabled'=>!$this->flagUpdate
-		);
+		$this->Columns[] = Array('title'=>'Comments','field'=>$this->prefix.'Comment','type'=>'text', 'disabled'=>!$this->flagUpdate);
 	}
 		
 	

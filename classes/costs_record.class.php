@@ -1,47 +1,15 @@
 <?php
-class costs_record{
-	public $Jan;
-	public $Feb;
-	public $Mar;
-	public $Apr;
-	public $May;
-	public $Jun;
-	public $Jul;
-	public $Aug;
-	public $Sep;
-	public $Oct;
-	public $Nov;
-	public $Dec;
-	
-	public $flagUpdated;
-	public $flagDeleted;
-	public $id;
-	
-	private $oSQL;
-	
+require_once('table_record.class.php');
+
+class costs_record extends table_record{
+
 	function __construct($session, $scenario, $id='', $data=Array()){
-		//GLOBAL $Products;
 		
-		GLOBAL $oSQL;
-		
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$this->{$month} = 0;
-		}
-		$this->id = $id;
-		$this->source = $session;
-		$this->scenario = $scenario;
-		//$this->product_ref = $Products;
-		$this->oSQL = $oSQL;
+		parent::__construct($session, $scenario, $id='', $data=Array());
 		
 		if (count($data)){
-			for($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
-				$this->{$month} = $data[strtolower($month)];			
-			}
 			$this->product = $data['product'];
-			$this->item = $data['item'];
-			$this->company = $data['company'];
+			$this->item = $data['item'];			
 			$this->profit = $data['pc'];
 			$this->activity = $data['activity'];
 			$this->customer = $data['customer'];
@@ -56,12 +24,6 @@ class costs_record{
 		return (true);
 	}	
 		
-	public function set_month_value($i, $value){
-		$month = date('M',time(0,0,0,(integer)$i,15));
-		$this->{$month} =(double)$value;
-		return(true);
-	}
-	
 	public function getSQLstring(){
 		
 		if ($this->flagDeleted && $this->id){
@@ -101,13 +63,6 @@ class costs_record{
 			//echo '<pre>',$res,'</pre>';
 			return $res;
 	}
-	
-	public function total(){
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$res += $this->{$month};
-		}
-		return ($res);
-	}
+
 }
 ?>

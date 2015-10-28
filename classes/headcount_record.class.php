@@ -1,45 +1,22 @@
 <?php
-class headcount_record {
-	public $Jan;
-	public $Feb;
-	public $Mar;
-	public $Apr;
-	public $May;
-	public $Jun;
-	public $Jul;
-	public $Aug;
-	public $Sep;
-	public $Oct;
-	public $Nov;
-	public $Dec;
-	public $company;
+require_once('table_record.class.php');
+
+class headcount_record extends table_record{
+
 	public $account;
 	public $item;
 	public $customer;
 	public $activity;
-	public $source;
 	public $employee;
 	public $job;
 	public $salary;
-	private $session_id;
 	
 	public function __construct($session, $scenario, $id='', $data=Array()){
 
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$this->{$month} = 0;
-		}
-		$this->id = $id;
-		$this->source = $session;
-		$this->scenario = $scenario;
+		parent::__construct($session, $scenario, $id='', $data=Array());
 		
-		if (count($data)){
-			for($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
-				$this->{$month} = $data[strtolower($month)];			
-			}
-			$this->product = $data['product'];
-			$this->company = $data['company'];
+		if (count($data)){			
+			$this->product = $data['product'];			
 			$this->profit = $data['profit'];
 			$this->activity = $data['activity'];
 			$this->customer = $data['customer'];
@@ -60,12 +37,6 @@ class headcount_record {
 		return (true);
 	}	
 		
-	public function set_month_value($i, $value){
-		$month = date('M',time(0,0,0,(integer)$i,15));
-		$this->{$month} =(double)$value;
-		return(true);
-	}
-	
 	public function getSQLstring($mStart=1, $mEnd=12, $flagPostActualPeriods = false){
 		
 		GLOBAL $oSQL;
@@ -116,19 +87,11 @@ class headcount_record {
 		}
 	}
 	
-	public function total(){
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$res += $this->{$month};
-		}
-		return ($res);
-	}
-	
 	public function getFTE($m, $year){
 		$res = 1;
 		
 		$current_month_start = mktime(0,0,0,$m,1,$year);
-		$current_month_end = mktime(0,0,0,$m+1,0,$year);
+		$current_month_end = mktime(23,59,59,$m+1,0,$year);
 		
 		// echo date('d.m.Y',$current_month_start), " - ",date('d.m.Y',$current_month_end), "\r\n";
 		// echo "Start date - ", date('d.m.Y', $this->start_date), "\r\n";

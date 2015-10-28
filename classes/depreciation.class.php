@@ -2,7 +2,6 @@
 include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
 include_once ('classes/depreciation_record.class.php');
-include_once ('../common/eiseGrid/inc_eiseGrid.php');
 include_once ('classes/yact_coa.class.php');
 include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
@@ -12,9 +11,6 @@ include_once ('classes/fixedassets.class.php');
 $YACT = new YACT_COA();
 $Items = new Items();
 $FixedAssets = new FixedAssets();
-
-$arrJS[] = '../common/eiseGrid/eiseGrid.js';
-$arrCSS[] = '../common/eiseGrid/eiseGrid.css';
 
 class Depreciation extends Document{
 	

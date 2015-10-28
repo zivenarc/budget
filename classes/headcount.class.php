@@ -1,7 +1,6 @@
 <?php
 include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
-include_once ('../common/eiseGrid/inc_eiseGrid.php');
 include_once ('classes/headcount_record.class.php');
 include_once ('classes/product.class.php');
 include_once ('classes/item.class.php');
@@ -12,9 +11,6 @@ include_once ('classes/profit.class.php');
 $YACT = new YACT_COA();
 $Items = new Items();
 $ProfitCenters = new ProfitCenters();
-
-$arrJS[] = '../common/eiseGrid/eiseGrid.js';
-$arrCSS[] = '../common/eiseGrid/eiseGrid.css';
 
 class Headcount extends Document{
 

@@ -1,40 +1,14 @@
 <?php
-class sales_record{
-	public $Jan;
-	public $Feb;
-	public $Mar;
-	public $Apr;
-	public $May;
-	public $Jun;
-	public $Jul;
-	public $Aug;
-	public $Sep;
-	public $Oct;
-	public $Nov;
-	public $Dec;
-	
-	public $flagUpdated;
-	public $flagDeleted;
-	public $id;
+require_once('table_record.class.php');
+
+class sales_record extends table_record{
 	
 	function __construct($session, $scenario, $id='', $data=Array()){
-		//GLOBAL $Products;
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$this->{$month} = 0;
-		}
-		$this->id = $id;
-		$this->source = $session;
-		$this->scenario = $scenario;
-		//$this->product_ref = $Products;
+
+		parent::__construct($session, $scenario, $id='', $data=Array());
 		
-		if (count($data)){
-			for($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
-				$this->{$month} = $data[strtolower($month)];			
-			}
-			$this->product = $data['product'];
-			$this->company = $data['company'];
+		if (count($data)){			
+			$this->product = $data['product'];			
 			$this->profit = $data['profit'];
 			$this->activity = $data['activity'];
 			$this->customer = $data['customer'];
@@ -51,12 +25,6 @@ class sales_record{
 		return (true);
 	}	
 		
-	public function set_month_value($i, $value){
-		$month = date('M',time(0,0,0,(integer)$i,15));
-		$this->{$month} =(double)$value;
-		return(true);
-	}
-	
 	public function getSQLstring(){
 		
 		GLOBAL $oSQL;
@@ -100,13 +68,6 @@ class sales_record{
 			return $res;
 	}
 	
-	public function total(){
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$res += $this->{$month};
-		}
-		return ($res);
-	}
 }
 
 

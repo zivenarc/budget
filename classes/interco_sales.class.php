@@ -2,7 +2,6 @@
 include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
 include_once ('classes/sales_record.class.php');
-include_once ('../common/eiseGrid/inc_eiseGrid.php');
 include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
 include_once ('classes/yact_coa.class.php');
@@ -10,9 +9,6 @@ include_once ('classes/yact_coa.class.php');
 $Products = new Products ();
 $Activities = new Activities ();
 $YACT = new YACT_COA();
-
-$arrJS[] = '../common/eiseGrid/eiseGrid.js';
-$arrCSS[] = '../common/eiseGrid/eiseGrid.css';
 
 class Interco_sales extends Document{
 

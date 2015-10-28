@@ -2,13 +2,9 @@
 include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
 include_once ('classes/distribution_record.class.php');
-include_once ('../common/eiseGrid/inc_eiseGrid.php');
 include_once ('classes/item.class.php');
 
 $Items = new Items();
-
-$arrJS[] = '../common/eiseGrid/eiseGrid.js';
-$arrCSS[] = '../common/eiseGrid/eiseGrid.css';
 
 class Distribution extends Document{
 	
