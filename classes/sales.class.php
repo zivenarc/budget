@@ -114,7 +114,7 @@ class Sales extends Document{
                             'flagKeepLastRow' => false
                             , 'arrPermissions' => Array("FlagWrite" => $this->flagUpdate)
                             , 'flagStandAlone' => true
-							, 'controlBarButtons' => "add"
+							, 'controlBarButtons' => "add|delete"
                             )
                     );
 		$grid->Columns[]=Array(

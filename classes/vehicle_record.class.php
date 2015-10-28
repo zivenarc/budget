@@ -7,7 +7,7 @@ class vehicle_record extends table_record{
 	
 	function __construct($session, $scenario, $id='', $data=Array()){
 		
-		parent::__construct($session, $scenario, $id='', $data=Array());
+		parent::__construct($session, $scenario, $id, $data);
 		
 		if (count($data)){
 			$this->item = $data['item'];
