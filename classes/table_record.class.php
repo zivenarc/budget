@@ -1,7 +1,7 @@
 <?php
 include_once ('../common/eiseGrid2/inc_eiseGrid.php');
-$arrJS[] = '../common/eiseGrid2/eiseGrid.jquery.js';
-$arrCSS[] = '../common/eiseGrid2/eiseGrid.css';
+$arrJS[] ='/common/eiseGrid2/eiseGrid.jQuery.js';
+$arrCSS[] = '/common/eiseGrid2/themes/default/screen.css';
 
 class table_record {
 	public $Jan;

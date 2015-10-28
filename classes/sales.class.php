@@ -176,13 +176,9 @@ class Sales extends Document{
 		);	
 		
 		if (!$this->flagPosted){		
-			$grid->Columns[] =Array(
-				'title'=>"Formula"
-				,'field'=>'formula'
-				,'type'=>'text'
-				,'mandatory'=>false
-				
-			);		
+			
+			// $grid->Columns[] =Array('title'=>"Formula",'field'=>'formula','type'=>'text','mandatory'=>false);		
+			
 			for ($m=1;$m<13;$m++){
 				$month = date('M',mktime(0,0,0,$m,15));
 						
