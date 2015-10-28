@@ -46,7 +46,7 @@ function repost(tab, event){
 					tr.find('#amount_'+guid).next().text('0.00');
 					$.post(href,{DataAction:'post'},function(data){
 						// console.log(data);
-						if (data.flagPosted==1){
+						if (data.flagPosted=="1"){
 							td_posted.addClass('budget-icon-posted');
 							tr.find('#amount_'+guid).next().html($('<span>',{text:number_format(data.amount,0,'.',','), class:(data.amount<0?'budget-negative':'')}));
 							tr.find('#usrTitle_'+guid).text(data.editor);

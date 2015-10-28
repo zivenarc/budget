@@ -87,10 +87,6 @@ class Document extends easyForm{
 			return(true);
 		}
 		
-		if (!$this->flagUpdate){
-			return(false);
-		}
-		
 		switch ($mode){
 			case 'update':
 			case 'post':
@@ -105,7 +101,11 @@ class Document extends easyForm{
 				$this->restore();
 				break;
 			case 'unpost':
-				$this->unpost();
+				if ($this->flagDeleted){
+					return (false);
+				} else {
+					$this->unpost();
+				}
 				break;				
 			case 'repost':
 				$this->unpost();
