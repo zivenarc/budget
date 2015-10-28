@@ -20,6 +20,7 @@ class Distribution extends Document{
 		
 		$this->register = 'reg_rent';
 		$this->gridName = 'rent';
+		$this->gridClass = 'distribution_record';
 		$this->table = 'tbl_rent';
 		$this->prefix = 'rnt';
 		
@@ -146,13 +147,6 @@ class Distribution extends Document{
 	}
 	
 
-	
-	public function add_record(){		
-		$oBR = new distribution_record($this->GUID,$this->scenario);
-		$this->records[$this->gridName][] = $oBR;
-		return ($oBR);	
-	}
-	
 	public function save($mode='update'){
 		
 		GLOBAL $arrUsrData;
@@ -160,15 +154,10 @@ class Distribution extends Document{
 		GLOBAL $YACT;
 		GLOBAL $Items;
 		
-		if (!$this->ID){
-			$this->Update();
-			return(true);
-		}
+		parent::save($mode);
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
-		if($mode=='update' || $mode=='post'){			
-			$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
-			$this->scenario = isset($_POST[$this->prefix.'Scenario'])?$_POST[$this->prefix.'Scenario']:$this->scenario;
+		if($mode=='update' || $mode=='post'){						
 			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
 			$this->item = isset($_POST[$this->prefix.'ItemGUID'])?$_POST[$this->prefix.'ItemGUID']:$this->item;
 			$this->total = isset($_POST[$this->prefix.'Total'])?$_POST[$this->prefix.'Total']:$this->rate;
@@ -226,15 +215,7 @@ class Distribution extends Document{
 		$sql[] = 'COMMIT;';				
 		//echo '<pre>';print_r($sql);echo '</pre>';die();
 		$sqlSuccess = $this->doSQL($sql);
-		
-		if ($mode=='delete'){
-			$this->delete();
-		}
-		
-		if ($mode=='unpost'){
-			$this->unpost();
-		}
-		
+			
 		if($mode=='post'){
 			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new budget_session($this->scenario, $this->GUID);

@@ -72,6 +72,13 @@ class Document extends easyForm{
 		};		
 	}
 	
+	protected function add_record(){		
+		$reflector = new ReflectionClass($this->gridClass);
+		$oBR = $reflector->newInstance ($this->GUID,$this->scenario);
+		$this->records[$this->gridName][] = $oBR;
+		return ($oBR);	
+	}
+	
 	protected function save($mode='update'){
 		GLOBAL $arrUsrData;
 		
@@ -89,6 +96,7 @@ class Document extends easyForm{
 			case 'post':
 				$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
 				$this->scenario = isset($_POST[$this->prefix.'Scenario'])?$_POST[$this->prefix.'Scenario']:$this->scenario;
+				$this->_updateSpecificFields();
 				break;
 			case 'delete':
 				$this->delete();
@@ -313,6 +321,22 @@ class Document extends easyForm{
 			$res = $this->unmarkPosted();
 			return ($res);
 		}
+	}
+	
+	protected function _updateSpecificFields(){
+		//to be defined in specific class
+	}
+	
+	protected function _updateGrid(){
+		//to be defined in specific class
+	}
+	
+	protected function post(){
+		
+	}
+	
+	protected function _specificPost(){
+		//to be defined in specific class
 	}
 	
 	protected function getProfitEG(){

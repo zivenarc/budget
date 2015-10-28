@@ -26,6 +26,7 @@ class Location_costs extends Document{
 		//GLOBAL $arrUsrData;
 		
 		$this->gridName = self::GridName;
+		$this->gridClass = 'costs_record';
 		$this->table = self::Table;
 		$this->prefix = self::Prefix;
 		$this->register = self::Register;
@@ -181,14 +182,6 @@ class Location_costs extends Document{
 		);
 		$this->grid = $grid;
 		return ($grid);
-	}
-	
-
-	
-	public function add_record(){		
-		$oBR = new costs_record($this->GUID,$this->scenario);
-		$this->records[$this->gridName][] = $oBR;
-		return ($oBR);	
 	}
 	
 	public function save($mode='update'){

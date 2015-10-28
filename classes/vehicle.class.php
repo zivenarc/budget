@@ -30,6 +30,7 @@ class Vehicle extends Document{
 
 		} else {
 			$this->gridName = 'vehicle';
+			$this->gridClass = 'vehicle_record';
 			$this->table = 'tbl_vehicle';
 			$this->prefix = 'veh';
 		}
@@ -227,11 +228,6 @@ class Vehicle extends Document{
 		parent::fillGrid($this->grid, Array('fixPlateNo','fixVIN'),'reg_vehicles LEFT JOIN vw_fixed_assets ON fixGUID=particulars');
 	}
 	
-	public function add_record(){		
-		$oBR = new vehicle_record($this->GUID,$this->scenario);
-		$this->records[$this->gridName][] = $oBR;
-		return ($oBR);	
-	}
 	
 	public function save($mode='update'){
 		

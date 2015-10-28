@@ -26,6 +26,7 @@ class Interco_sales extends Document{
 		GLOBAL $arrUsrData;
 		
 		$this->gridName = self::GridName;
+		$this->gridClass = 'sales_record';
 		$this->table = self::Table;
 		$this->prefix = self::Prefix;
 		$this->register = self::Register;
@@ -208,12 +209,6 @@ class Interco_sales extends Document{
 	
 	public function fillGrid(){
 		parent::fillGrid($this->grid,Array('prdExternalID'),'reg_sales LEFT JOIN vw_product ON prdID=product');
-	}
-	
-	public function add_record(){		
-		$oBR = new sales_record($this->GUID,$this->scenario);
-		$this->records[$this->gridName][] = $oBR;
-		return ($oBR);	
 	}
 	
 	public function save($mode='update'){

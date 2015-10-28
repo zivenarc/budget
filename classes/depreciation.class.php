@@ -42,6 +42,8 @@ class Depreciation extends Document{
 			$this->prefix = 'dep';
 		}
 		
+		$this->gridClass = 'depreciation_record';
+		
 		$this->type=$type;
 		
 		parent::__construct($id);	
@@ -219,12 +221,6 @@ class Depreciation extends Document{
 	
 	public function fillGrid(){
 		parent::fillGrid($this->grid, Array('fixID'),'reg_depreciation LEFT JOIN vw_fixed_assets ON fixGUID=particulars');
-	}
-	
-	public function add_record(){		
-		$oBR = new depreciation_record($this->GUID,$this->scenario);
-		$this->records[$this->gridName][] = $oBR;
-		return ($oBR);	
 	}
 	
 	public function save($mode='update'){

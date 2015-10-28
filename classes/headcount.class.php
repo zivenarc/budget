@@ -28,6 +28,7 @@ class Headcount extends Document{
 		GLOBAL $arrUsrData;
 		
 		$this->gridName = self::GridName;		
+		$this->gridClass = 'headcount_record';		
 		$this->register = self::Register;
 		
 		switch($type){
@@ -284,12 +285,6 @@ class Headcount extends Document{
 	}
 	
 
-	public function add_record(){		
-		$oBR = new headcount_record($this->GUID,$this->scenario);
-		$this->records[$this->gridName][] = $oBR;
-		return ($oBR);	
-	}
-	
 	public function save($mode='update'){
 		
 		GLOBAL $arrUsrData;

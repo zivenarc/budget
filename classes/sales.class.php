@@ -22,6 +22,7 @@ class Sales extends Document{
 	const GridName = 'sales';
 	const Prefix = 'sal';
 	const Table = 'tbl_sales';
+	const GridClass = 'sales_record';
 	
 	function __construct($id=''){
 		GLOBAL $strLocal;
@@ -31,6 +32,7 @@ class Sales extends Document{
 		$this->table = self::Table;
 		$this->prefix = self::Prefix;
 		$this->register = self::Register;
+		$this->gridClass = self::GridClass;
 		
 		parent::__construct($id);
 		
@@ -218,11 +220,6 @@ class Sales extends Document{
 		parent::fillGrid($this->grid,Array('prdExternalID'),'reg_sales LEFT JOIN vw_product ON prdID=product');
 	}
 	
-	public function add_record(){		
-		$oBR = new sales_record($this->GUID,$this->scenario);
-		$this->records[$this->gridName][] = $oBR;
-		return ($oBR);	
-	}
 	
 	public function save($mode='update'){
 		

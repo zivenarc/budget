@@ -20,6 +20,7 @@ class MSF extends Document{
 		
 		$this->register = 'reg_msf';
 		$this->gridName = 'msf';
+		$this->gridClass = 'msf_record';
 		$this->table = 'tbl_msf';
 		$this->prefix = 'msf';
 		
@@ -146,15 +147,7 @@ class MSF extends Document{
 		$this->grid = $grid;
 		return ($grid);
 	}
-	
-
-	
-	public function add_record(){		
-		$oBR = new msf_record($this->GUID,$this->scenario);
-		$this->records[$this->gridName][] = $oBR;
-		return ($oBR);	
-	}
-	
+		
 	public function save($mode='update'){
 		
 		GLOBAL $arrUsrData;
