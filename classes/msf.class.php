@@ -72,9 +72,9 @@ class MSF extends Document{
 		$this->Columns[] =Array(
 					'title'=>'Total'
 					,'field'=>$this->prefix."Total"
-					,'type'=>'decimal'
+					,'type'=>'money'
 					,'mandatory'=>true
-					, 'disabled'=>!$this->flagUpdate
+					, 'disabled'=>true //!$this->flagUpdate
 				);
 			
 	}
