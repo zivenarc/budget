@@ -381,20 +381,22 @@ class Headcount extends Document{
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
 		$sql[] = "START TRANSACTION;";
-		$sql[] = "UPDATE `{$this->table}` 
-				SET {$this->prefix}ProfitID=".(integer)$this->profit."
-				,{$this->prefix}Comment=".$this->oSQL->e($this->comment)."				
-				,{$this->prefix}Scenario='".$this->scenario."'
-				,{$this->prefix}EditBy='".$arrUsrData['usrID']."'
-				,{$this->prefix}EditDate=NOW()				
-				WHERE {$this->prefix}ID={$this->ID};";
-		if ($this->type=='current'){
+		if	($mode!='new'){
 			$sql[] = "UPDATE `{$this->table}` 
-				SET {$this->prefix}Turnover=".(integer)$this->turnover."
-				,{$this->prefix}Overtime=".(integer)$this->overtime."				
-				,{$this->prefix}BonusCorporate=".(integer)$this->bonus_corporate."				
-				,{$this->prefix}BonusDepartment=".(integer)$this->bonus_department."				
-				WHERE {$this->prefix}ID={$this->ID};";
+					SET {$this->prefix}ProfitID=".(integer)$this->profit."
+					,{$this->prefix}Comment=".$this->oSQL->e($this->comment)."				
+					,{$this->prefix}Scenario='".$this->scenario."'
+					,{$this->prefix}EditBy='".$arrUsrData['usrID']."'
+					,{$this->prefix}EditDate=NOW()				
+					WHERE {$this->prefix}ID={$this->ID};";
+			if ($this->type=='current'){
+				$sql[] = "UPDATE `{$this->table}` 
+					SET {$this->prefix}Turnover=".(integer)$this->turnover."
+					,{$this->prefix}Overtime=".(integer)$this->overtime."				
+					,{$this->prefix}BonusCorporate=".(integer)$this->bonus_corporate."				
+					,{$this->prefix}BonusDepartment=".(integer)$this->bonus_department."				
+					WHERE {$this->prefix}ID={$this->ID};";
+			}
 		}
 		if(is_array($this->records[$this->gridName])){			
 			foreach ($this->records[$this->gridName] as $i=>$row){				

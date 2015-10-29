@@ -41,6 +41,7 @@ class Location_costs extends Document{
 		parent::refresh($sql);
 		
 		$this->distribution = $this->data[$this->prefix.'Distribution'];
+		$this->location = $this->data[$this->prefix.'LocationID'];
 		
 		if($this->GUID){
 			$sql = "SELECT * FROM `".$this->register."` WHERE `source`='".$this->GUID."';";

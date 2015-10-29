@@ -294,23 +294,25 @@ class Vehicle extends Document{
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
 		$sql[] = "START TRANSACTION;";
-		$sql[] = "UPDATE `".$this->table."` 
-				SET ".$this->prefix."ProfitID=".(integer)$this->profit."				
-				,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
-				,".$this->prefix."Scenario='".$this->scenario."'
-				,".$this->prefix."CASCO='".(double)$this->casco."'
-				,".$this->prefix."OSAGO='".(double)$this->osago."'
-				,".$this->prefix."Consumption='".(double)$this->consumption."'
-				,".$this->prefix."FuelPrice='".(double)$this->fuelprice."'
-				,".$this->prefix."Wash='".(double)$this->wash."'
-				,".$this->prefix."Maintenance='".(double)$this->maintenance."'
-				,".$this->prefix."Consumables='".(double)$this->consumables."'
-				,".$this->prefix."Power='".(double)$this->power."'
-				,".$this->prefix."Rate='".(double)$this->rate."'
-				,".$this->prefix."FlagOffice='".$this->flagoffice."'
-				,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
-				,".$this->prefix."EditDate=NOW()
-				WHERE ".$this->prefix."ID={$this->ID};";
+		if ($mode!='new'){
+			$sql[] = "UPDATE `".$this->table."` 
+					SET ".$this->prefix."ProfitID=".(integer)$this->profit."				
+					,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
+					,".$this->prefix."Scenario='".$this->scenario."'
+					,".$this->prefix."CASCO='".(double)$this->casco."'
+					,".$this->prefix."OSAGO='".(double)$this->osago."'
+					,".$this->prefix."Consumption='".(double)$this->consumption."'
+					,".$this->prefix."FuelPrice='".(double)$this->fuelprice."'
+					,".$this->prefix."Wash='".(double)$this->wash."'
+					,".$this->prefix."Maintenance='".(double)$this->maintenance."'
+					,".$this->prefix."Consumables='".(double)$this->consumables."'
+					,".$this->prefix."Power='".(double)$this->power."'
+					,".$this->prefix."Rate='".(double)$this->rate."'
+					,".$this->prefix."FlagOffice='".$this->flagoffice."'
+					,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
+					,".$this->prefix."EditDate=NOW()
+					WHERE ".$this->prefix."ID={$this->ID};";
+		}
 		if(is_array($this->records[$this->gridName])){			
 			foreach ($this->records[$this->gridName] as $i=>$row){				
 				if ($row->flagUpdated || $row->flagDeleted){

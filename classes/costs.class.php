@@ -326,42 +326,42 @@ class Indirect_costs extends Document{
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
 		$sql[] = "START TRANSACTION;";
-		switch ($this->type){
-			case 'general':
-				$sql[] = "UPDATE `".$this->table."` 
-						SET ".$this->prefix."SupplierID=".(integer)$this->supplier."				
-						,".$this->prefix."ItemGUID=".$this->oSQL->e($this->item)."
-						,".$this->prefix."Rate=".(double)$this->rate."
-						,".$this->prefix."CurrencyID=".$this->oSQL->e($this->currency)."
-						,".$this->prefix."Period=".$this->oSQL->e($this->period)."
-						,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
-						,".$this->prefix."Scenario='".$this->scenario."'
-						,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
-						,".$this->prefix."EditDate=NOW()
-						WHERE ".$this->prefix."ID={$this->ID};";
+		// switch ($this->type){
+			// case 'general':
+				// $sql[] = "UPDATE `".$this->table."` 
+						// SET ".$this->prefix."SupplierID=".(integer)$this->supplier."				
+						// ,".$this->prefix."ItemGUID=".$this->oSQL->e($this->item)."
+						// ,".$this->prefix."Rate=".(double)$this->rate."
+						// ,".$this->prefix."CurrencyID=".$this->oSQL->e($this->currency)."
+						// ,".$this->prefix."Period=".$this->oSQL->e($this->period)."
+						// ,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
+						// ,".$this->prefix."Scenario='".$this->scenario."'
+						// ,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
+						// ,".$this->prefix."EditDate=NOW()
+						// WHERE ".$this->prefix."ID={$this->ID};";
 			
-				break;
-			case 'kaizen':
-				$sql[] = "UPDATE `".$this->table."` 
-						SET ".$this->prefix."ItemGUID=".$this->oSQL->e($this->item)."
-						,".$this->prefix."Rate=".(double)$this->rate."						
-						,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
-						,".$this->prefix."Scenario='".$this->scenario."'
-						,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
-						,".$this->prefix."EditDate=NOW()
-						WHERE ".$this->prefix."ID={$this->ID};";
+				// break;
+			// case 'kaizen':
+				// $sql[] = "UPDATE `".$this->table."` 
+						// SET ".$this->prefix."ItemGUID=".$this->oSQL->e($this->item)."
+						// ,".$this->prefix."Rate=".(double)$this->rate."						
+						// ,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
+						// ,".$this->prefix."Scenario='".$this->scenario."'
+						// ,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
+						// ,".$this->prefix."EditDate=NOW()
+						// WHERE ".$this->prefix."ID={$this->ID};";
 			
-				break;
-			default:
-				$sql[] = "UPDATE `".$this->table."` 
-						SET ".$this->prefix."ProfitID=".(integer)$this->profit."				
-						,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
-						,".$this->prefix."Scenario='".$this->scenario."'
-						,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
-						,".$this->prefix."EditDate=NOW()
-						WHERE ".$this->prefix."ID={$this->ID};";
-				break;
-		}
+				// break;
+			// default:
+				// $sql[] = "UPDATE `".$this->table."` 
+						// SET ".$this->prefix."ProfitID=".(integer)$this->profit."				
+						// ,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
+						// ,".$this->prefix."Scenario='".$this->scenario."'
+						// ,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
+						// ,".$this->prefix."EditDate=NOW()
+						// WHERE ".$this->prefix."ID={$this->ID};";
+				// break;
+		// }
 		if(is_array($this->records[$this->gridName])){			
 			foreach ($this->records[$this->gridName] as $i=>$row){				
 				if ($row->flagUpdated || $row->flagDeleted){

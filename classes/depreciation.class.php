@@ -308,13 +308,13 @@ class Depreciation extends Document{
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
 		$sql[] = "START TRANSACTION;";
-		$sql[] = "UPDATE `".$this->table."` 
-				SET ".$this->prefix."ProfitID=".(integer)$this->profit."				
-				,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
-				,".$this->prefix."Scenario='".$this->scenario."'
-				,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
-				,".$this->prefix."EditDate=NOW()
-				WHERE ".$this->prefix."ID={$this->ID};";
+		// $sql[] = "UPDATE `".$this->table."` 
+				// SET ".$this->prefix."ProfitID=".(integer)$this->profit."				
+				// ,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
+				// ,".$this->prefix."Scenario='".$this->scenario."'
+				// ,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
+				// ,".$this->prefix."EditDate=NOW()
+				// WHERE ".$this->prefix."ID={$this->ID};";
 		if(is_array($this->records[$this->gridName])){			
 			foreach ($this->records[$this->gridName] as $i=>$row){				
 				if ($row->flagUpdated || $row->flagDeleted){

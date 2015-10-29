@@ -55,9 +55,9 @@ class Document extends easyForm{
 		$this->flagPosted = $this->data[$this->prefix.'FlagPosted'];
 		$this->scenario = $this->data[$this->prefix.'Scenario'];
 		$this->profit = $this->data[$this->prefix.'ProfitID'];
+		$this->company = $this->data[$this->prefix.'CompanyID'];
 		$this->customer = $this->data[$this->prefix.'CustomerID'];
-		$this->supplier = $this->data[$this->prefix.'SupplierID'];
-		$this->location = $this->data[$this->prefix.'LocationID'];
+		$this->supplier = $this->data[$this->prefix.'SupplierID'];		
 		$this->product_folder = $this->data[$this->prefix.'ProductFolderID'];
 		$this->comment = $this->data[$this->prefix.'Comment'];
 		$this->amount = $this->data[$this->prefix.'Amount'];
@@ -81,17 +81,24 @@ class Document extends easyForm{
 	
 	protected function save($mode='update'){
 		GLOBAL $arrUsrData;
+				
+		$this->scenario = isset($_POST[$this->prefix.'Scenario'])?$_POST[$this->prefix.'Scenario']:$this->scenario;
+		$this->company = isset($_POST[$this->prefix.'CompanyID'])?$_POST[$this->prefix.'CompanyID']:$this->company;
+		$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
 		
-		if (!$this->ID){
-			$this->Update();
-			return(true);
-		}
+		$this->Update();
+		
+		// if (!$this->ID){
+			// $this->Update();
+			// return(true);
+		// }
 		
 		switch ($mode){
+			case 'new':
+				return (true);
+				break;
 			case 'update':
 			case 'post':
-				$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
-				$this->scenario = isset($_POST[$this->prefix.'Scenario'])?$_POST[$this->prefix.'Scenario']:$this->scenario;
 				$this->_updateSpecificFields();
 				break;
 			case 'delete':
@@ -328,6 +335,7 @@ class Document extends easyForm{
 	
 	protected function post(){
 		
+		$this->_specificPost();
 	}
 	
 	protected function _specificPost(){

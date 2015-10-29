@@ -190,14 +190,14 @@ class Distribution extends Document{
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
 		$sql[] = "START TRANSACTION;";
-		$sql[] = "UPDATE `".$this->table."` 
-						SET ".$this->prefix."ItemGUID=".$this->oSQL->e($this->item)."
-						,".$this->prefix."Total=".(double)$this->total."						
-						,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
-						,".$this->prefix."Scenario='".$this->scenario."'
-						,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
-						,".$this->prefix."EditDate=NOW()
-						WHERE ".$this->prefix."ID={$this->ID};";
+		// $sql[] = "UPDATE `".$this->table."` 
+						// SET ".$this->prefix."ItemGUID=".$this->oSQL->e($this->item)."
+						// ,".$this->prefix."Total=".(double)$this->total."						
+						// ,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
+						// ,".$this->prefix."Scenario='".$this->scenario."'
+						// ,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
+						// ,".$this->prefix."EditDate=NOW()
+						// WHERE ".$this->prefix."ID={$this->ID};";
 
 		if(is_array($this->records[$this->gridName])){			
 			foreach ($this->records[$this->gridName] as $i=>$row){				

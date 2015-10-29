@@ -71,6 +71,7 @@ class Sales extends Document{
 			,'sql'=>'vw_customer'
 			,'default'=>9022
 			,'disabled'=>!$this->flagUpdate
+			,'mandatory'=>true
 		);
 		
 		$this->Columns[] = Array(
@@ -229,7 +230,7 @@ class Sales extends Document{
 			$this->customer = isset($_POST[$this->prefix.'CustomerID'])?$_POST[$this->prefix.'CustomerID']:$this->customer;
 			$this->sales = isset($_POST[$this->prefix.'UserID'])?$_POST[$this->prefix.'UserID']:$this->sales;
 
-			if (isset($_POST[$this->prefix.'ProfitID'])){
+			if (isset($_POST[$this->prefix.'ProfitID']) && count($this->records[$this->gridName])){
 				foreach ($this->records[$this->gridName] as $id=>$row){
 					$row = $this->get_record($id); 
 					if ($row->profit!=$this->profit){		
@@ -239,7 +240,7 @@ class Sales extends Document{
 				}	 			
 			}
 
-			if ($this->customer){
+			if ($this->customer && count($this->records[$this->gridName])){
 				foreach ($this->records[$this->gridName] as $id=>$row){
 					$row = $this->get_record($id);
 					if ($row->customer!=$this->customer){
@@ -296,16 +297,18 @@ class Sales extends Document{
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
 		$sql[] = "START TRANSACTION;";
-		$sql[] = "UPDATE `tbl_sales` 
-				SET salProfitID=".(integer)$this->profit."
-				,salProductFolderID=".(integer)$this->product_folder."
-				,salCustomerID=".(integer)$this->customer."
-				,salComment=".$this->oSQL->e($this->comment)."
-				,salScenario='".$this->scenario."'
-				,salEditBy='".$arrUsrData['usrID']."'
-				,salUserID='".$this->sales."'
-				,salEditDate=NOW()
-				WHERE salID={$this->ID};";
+		// if ($mode!='new'){
+			// $sql[] = "UPDATE `tbl_sales` 
+					// SET salProfitID=".(integer)$this->profit."
+					// ,salProductFolderID=".(integer)$this->product_folder."
+					// ,salCustomerID=".(integer)$this->customer."
+					// ,salComment=".$this->oSQL->e($this->comment)."
+					// ,salScenario='".$this->scenario."'
+					// ,salEditBy='".$arrUsrData['usrID']."'
+					// ,salUserID='".$this->sales."'
+					// ,salEditDate=NOW()
+					// WHERE salID={$this->ID};";
+		// };
 		if(is_array($this->records[$this->gridName])){			
 			foreach ($this->records[$this->gridName] as $i=>$row){				
 				if ($row->flagUpdated || $row->flagDeleted){
