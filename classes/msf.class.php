@@ -154,9 +154,7 @@ class MSF extends Document{
 		parent::save($mode);			
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
-		if($mode=='update' || $mode=='post'){			
-			$this->comment = isset($_POST[$this->prefix.'Comment'])?$_POST[$this->prefix.'Comment']:$this->comment;
-			$this->scenario = isset($_POST[$this->prefix.'Scenario'])?$_POST[$this->prefix.'Scenario']:$this->scenario;
+		if($mode=='update' || $mode=='post'){						
 			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
 			$this->item = isset($_POST[$this->prefix.'ItemGUID'])?$_POST[$this->prefix.'ItemGUID']:$this->item;
 			

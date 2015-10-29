@@ -3,8 +3,6 @@ require_once ('table_record.class.php');
 
 class msf_record extends table_record{
 	
-	private $oSQL;
-	
 	const TABLE = 'reg_msf';
 	
 	function __construct($session, $scenario, $id='', $data=Array()){
