@@ -89,7 +89,7 @@ class MSF extends Document{
                             'flagKeepLastRow' => false
                             , 'arrPermissions' => Array("FlagWrite" => !$this->flagPosted)
                             , 'flagStandAlone' => true
-							, 'controlBarButtons' => "add"
+							, 'controlBarButtons' => "add|delete"
                             )
                     );
 		$grid->Columns[]=Array(
