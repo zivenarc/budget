@@ -96,16 +96,17 @@ function getTabSheets($arrData, $strIdName, $activeID, $class="tabsheet"){
 function logToFile ($var, $heading="", $logFile=""){
 	global $_LOG;
 	
-	if ($logFile==""){
-		if (!file_exists("logs")) mkdir ('logs');
-		$curDate = getdate($_SERVER['REQUEST_TIME']);
-		if (!file_exists('logs/'.$curDate['year'])) mkdir ('logs/'.$curDate['year']);
-		if (!file_exists('logs/'.$curDate['year'].'/'.$curDate['mon'])) mkdir ('logs/'.$curDate['year'].'/'.$curDate['mon']);
-		if (!file_exists('logs/'.$curDate['year'].'/'.$curDate['mon'].'/'.$curDate['mday'])) mkdir ('logs/'.$curDate['year'].'/'.$curDate['mon'].'/'.$curDate['mday']);
-		$logFile = "logs/".$curDate['year'].'/'.$curDate['mon'].'/'.$curDate['mday']."/".basename($_SERVER['PHP_SELF']).".".date('H-i-s',$_SERVER['REQUEST_TIME']).".log";
-	}
-	/*--------------- For logging purposes ----------------*/
 	if ($_LOG) {
+		if ($logFile==""){
+			if (!file_exists("logs")) mkdir ('logs');
+			$curDate = getdate($_SERVER['REQUEST_TIME']);
+			if (!file_exists('logs/'.$curDate['year'])) mkdir ('logs/'.$curDate['year']);
+			if (!file_exists('logs/'.$curDate['year'].'/'.$curDate['mon'])) mkdir ('logs/'.$curDate['year'].'/'.$curDate['mon']);
+			if (!file_exists('logs/'.$curDate['year'].'/'.$curDate['mon'].'/'.$curDate['mday'])) mkdir ('logs/'.$curDate['year'].'/'.$curDate['mon'].'/'.$curDate['mday']);
+			$logFile = "logs/".$curDate['year'].'/'.$curDate['mon'].'/'.$curDate['mday']."/".basename($_SERVER['PHP_SELF']).".".date('H-i-s',$_SERVER['REQUEST_TIME']).".log";
+		}
+	/*--------------- For logging purposes ----------------*/
+
 		file_put_contents($logFile,'----'.date('d.m.Y H:i:s,u',time()).'--------['.$heading."]---------------------\r\n",FILE_APPEND);
 		file_put_contents($logFile,var_export($var, true),FILE_APPEND);
 		file_put_contents($logFile,"\r\n\r\n",FILE_APPEND);
