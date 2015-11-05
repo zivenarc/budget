@@ -44,24 +44,23 @@ if(!isset($_GET['pccGUID'])){
 		$sqlWhere .= " AND pc NOT in (5,15)";
 	}
 	
+	
+	$sqlWhere .= " AND scenario='$budget_scenario'";
+	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator));
+	
 	switch ($type){
 		case 'activity':		
-			Reports::masterByActivityEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity'));	
 			break;
 		case 'ghq':
-			echo "<input type='hidden' id='group' value='activity'/>";
-			Reports::masterByGHQEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
-		break;
-		case 'sales':
-			echo "<input type='hidden' id='group' value='sales'/>";
-			Reports::masterBySalesEst($sqlWhere." AND scenario='$budget_scenario'",$currency);	
-		break;
-		// case 'f865e855-d328-102e-9d25-5de97ba9df63':
-			// $sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") OR (customer=9907 AND Group_code=94))";
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
+			break;
+		case 'sales':			
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'sales','field_title'=>'usrTitle','title'=>'Responsible'));	
+			break;
 		case 'customer':
-		default:
-			echo "<input type='hidden' id='group' value='customer'/>";
-			Reports::masterByCustomerEst($sqlWhere." AND scenario='$budget_scenario'",$currency);
+		default:			
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'customer','field_title'=>'Customer_name','title'=>'Customer'));
 			break;
 	}
 

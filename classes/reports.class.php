@@ -1,4 +1,6 @@
 <?php
+require_once ('budget.class.php');
+
 class Reports{
 	
 	private $ID;
@@ -7,9 +9,19 @@ class Reports{
 	public $Denominator;
 	private $oSQL;
 	
-	function __construct(){
+	const GP_CODE = 94;
+	
+	function __construct($params){
+		
 		GLOBAL $oSQL;
 		$this->oSQL = $oSQL;
+		
+		$this->oBudget = new Budget($params['budget_scenario']);
+		$this->Currency = $params['currency']?$params['currency']:643;
+		$this->Denominator = $params['denominator']?$params['denominator']:1;
+		$this->ID = md5(time());
+		// echo '<pre>';print_r($this);echo '</pre>';
+	
 	}
 	
 	public function salesByActivity($sqlWhere=''){
@@ -499,7 +511,7 @@ class Reports{
 		global $oSQL;
 		
 		ob_start();
-			$sql = "SELECT Profit as 'GroupLevel1', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total 
+			$sql = "SELECT Profit as 'Level1_title', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total 
 			FROM `vw_master`
 			$sqlWhere
 			GROUP BY `vw_master`.Profit, `vw_master`.item
@@ -520,38 +532,38 @@ class Reports{
 			</thead>			
 			<tbody>
 			<?php
-			$GroupLevel1 = '';		
+			$Level1_title = '';		
 				while ($rw=$oSQL->f($rs)){
-					if($GroupLevel1 && $GroupLevel1!=$rw['GroupLevel1']){
-						$data = $subtotal[$GroupLevel1];
+					if($Level1_title && $Level1_title!=$rw['Level1_title']){
+						$data = $subtotal[$Level1_title];
 						$data['Budget item']=$group;
-						self::echoBudgetItemString($data,'budget-subtotal');
+						$this->echoBudgetItemString($data,'budget-subtotal');
 					}
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
 					for ($m=1;$m<13;$m++){
 						$month = date('M',mktime(0,0,0,$m,15));
-						$subtotal[$rw['GroupLevel1']][$month]+=$rw[$month];
+						$subtotal[$rw['Level1_title']][$month]+=$rw[$month];
 						$local_subtotal += $rw[$month];
 						$grandTotal[$month] += $rw[$month];
 					}
-					$subtotal[$rw['GroupLevel1']]['Total'] += $local_subtotal;
+					$subtotal[$rw['Level1_title']]['Total'] += $local_subtotal;
 					$grandTotal['Total'] += $local_subtotal;	
 					
 					$data = $rw;
-					if ($data['GroupLevel1']==$GroupLevel1 && $GroupLevel1) $data['GroupLevel1']="&nbsp;";
-					self::echoBudgetItemString($data,$tr_class);
+					if ($data['Level1_title']==$Level1_title && $Level1_title) $data['Level1_title']="&nbsp;";
+					$this->echoBudgetItemString($data,$tr_class);
 					
-					$GroupLevel1 = $rw['GroupLevel1'];
+					$Level1_title = $rw['Level1_title'];
 					$group = $rw['Group'];
 				}
-				$data = $subtotal[$GroupLevel1];
+				$data = $subtotal[$Level1_title];
 				$data['Budget item']=$group;
-				self::echoBudgetItemString($data,'budget-subtotal');
+				$this->echoBudgetItemString($data,'budget-subtotal');
 				
 				$data = $grandTotal;
 				$data['Budget item']='Grand total';
-				self::echoBudgetItemString($data,'budget-grandtotal');
+				$this->echoBudgetItemString($data,'budget-grandtotal');
 			?>
 			</tbody>
 			</table>
@@ -566,7 +578,7 @@ class Reports{
 		global $oSQL;
 		
 		ob_start();
-			$sql = "SELECT CONCAT(Activity_title,' (',Activity_title_local,')') as 'GroupLevel1', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total
+			$sql = "SELECT CONCAT(Activity_title,' (',Activity_title_local,')') as 'Level1_title', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total
 			FROM `vw_master`
 			$sqlWhere
 			GROUP BY `vw_master`.activity, `vw_master`.item
@@ -589,38 +601,38 @@ class Reports{
 			</thead>			
 			<tbody>
 			<?php
-			$GroupLevel1 = '';		
+			$Level1_title = '';		
 				while ($rw=$oSQL->f($rs)){
-					if($GroupLevel1 && $GroupLevel1!=$rw['GroupLevel1']){
-						$data = $subtotal[$GroupLevel1];
+					if($Level1_title && $Level1_title!=$rw['Level1_title']){
+						$data = $subtotal[$Level1_title];
 						$data['Budget item']=$group;
-						self::echoBudgetItemString($data,'budget-subtotal');
+						$this->echoBudgetItemString($data,'budget-subtotal');
 					}
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
 					for ($m=1;$m<13;$m++){
 						$month = date('M',mktime(0,0,0,$m,15));
-						$subtotal[$rw['GroupLevel1']][$month]+=$rw[$month];
+						$subtotal[$rw['Level1_title']][$month]+=$rw[$month];
 						$local_subtotal += $rw[$month];
 						$grandTotal[$month] += $rw[$month];
 					}
-					$subtotal[$rw['GroupLevel1']]['Total'] += $local_subtotal;
+					$subtotal[$rw['Level1_title']]['Total'] += $local_subtotal;
 					$grandTotal['Total'] += $local_subtotal;	
 					
 					$data = $rw;
-					if ($data['GroupLevel1']==$GroupLevel1 && $GroupLevel1) $data['GroupLevel1']="&nbsp;";
-					self::echoBudgetItemString($data,$tr_class);
+					if ($data['Level1_title']==$Level1_title && $Level1_title) $data['Level1_title']="&nbsp;";
+					$this->echoBudgetItemString($data,$tr_class);
 					
-					$GroupLevel1 = $rw['GroupLevel1'];
+					$Level1_title = $rw['Level1_title'];
 					$group = $rw['Group'];
 				}
-				$data = $subtotal[$GroupLevel1];
+				$data = $subtotal[$Level1_title];
 				$data['Budget item']=$group;
-				self::echoBudgetItemString($data,'budget-subtotal');
+				$this->echoBudgetItemString($data,'budget-subtotal');
 				
 				$data = $grandTotal;
 				$data['Budget item']='Grand total';
-				self::echoBudgetItemString($data,'budget-grandtotal');
+				$this->echoBudgetItemString($data,'budget-grandtotal');
 			?>
 			</tbody>
 			</table>
@@ -635,7 +647,7 @@ class Reports{
 		global $oSQL;
 		
 		ob_start();
-			$sql = "SELECT Customer_name as 'GroupLevel1', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total FROM `vw_master`
+			$sql = "SELECT Customer_name as 'Level1_title', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total FROM `vw_master`
 			$sqlWhere
 			GROUP BY `vw_master`.customer, `vw_master`.item
 			ORDER BY `vw_master`.customer,`vw_master`.item DESC
@@ -655,38 +667,38 @@ class Reports{
 			</thead>			
 			<tbody>
 			<?php
-				$GroupLevel1 = '';		
+				$Level1_title = '';		
 				while ($rw=$oSQL->f($rs)){
-					if($GroupLevel1 && $GroupLevel1!=$rw['GroupLevel1']){
-						$data = $subtotal[$GroupLevel1];
+					if($Level1_title && $Level1_title!=$rw['Level1_title']){
+						$data = $subtotal[$Level1_title];
 						$data['Budget item']=$group;
-						self::echoBudgetItemString($data,'budget-subtotal');
+						$this->echoBudgetItemString($data,'budget-subtotal');
 					}
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
 					for ($m=1;$m<13;$m++){
 						$month = date('M',mktime(0,0,0,$m,15));
-						$subtotal[$rw['GroupLevel1']][$month]+=$rw[$month];
+						$subtotal[$rw['Level1_title']][$month]+=$rw[$month];
 						$local_subtotal += $rw[$month];
 						$grandTotal[$month] += $rw[$month];
 					}
-					$subtotal[$rw['GroupLevel1']]['Total'] += $local_subtotal;
+					$subtotal[$rw['Level1_title']]['Total'] += $local_subtotal;
 					$grandTotal['Total'] += $local_subtotal;	
 					
 					$data = $rw;
-					if ($data['GroupLevel1']==$GroupLevel1 && $GroupLevel1) $data['GroupLevel1']="&nbsp;";
-					self::echoBudgetItemString($data,$tr_class);
+					if ($data['Level1_title']==$Level1_title && $Level1_title) $data['Level1_title']="&nbsp;";
+					$this->echoBudgetItemString($data,$tr_class);
 					
-					$GroupLevel1 = $rw['GroupLevel1'];
+					$Level1_title = $rw['Level1_title'];
 					$group = $rw['Group'];
 				}
-				$data = $subtotal[$GroupLevel1];
+				$data = $subtotal[$Level1_title];
 				$data['Budget item']=$group;
-				self::echoBudgetItemString($data,'budget-subtotal');
+				$this->echoBudgetItemString($data,'budget-subtotal');
 				
 				$data = $grandTotal;
 				$data['Budget item']='Grand total';
-				self::echoBudgetItemString($data,'budget-grandtotal');
+				$this->echoBudgetItemString($data,'budget-grandtotal');
 			?>
 			</tbody>
 			</table>
@@ -698,120 +710,33 @@ class Reports{
 	}
 		
 	
-	public function masterbyCustomerEst($sqlWhere, $currency=643){
-		
-		GLOBAL $budget_scenario;
-		$oBudget = new Budget($budget_scenario);
-		
-		$strFields = self::_getMonthlyFields($currency);
-		
-		ob_start();
-			$sql = "SELECT Customer_name as 'GroupLevel1', customer as 'level1_code', `Budget item`, `Group`, `item`, 
-			{$strFields}
-			FROM `vw_master` 
-			LEFT JOIN tbl_scenario ON scnID=scenario
-			{$sqlWhere} AND Group_code=94 ## Gross margin only
-			GROUP BY `vw_master`.customer, `vw_master`.item
-			ORDER BY `vw_master`.customer, `Group`, `vw_master`.itmOrder ASC			
-			";
-			
-			self::firstLevelReport($sql, 'Customer', $oBudget);
-			$tableID = "FLR_".md5($sql);
-			//==========================================================================================================================Non-customer-related data
-			self::noFirstLevelReport($sqlWhere, $currency);
-			?>
-			</tbody>
-			</table>
-			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
-			</ul>
-			<?php			
-			ob_flush();
-	}
+
 	
-	public function masterbySalesEst($sqlWhere, $currency=643){
+	public function periodicPnL($sqlWhere, $params = Array('field_data','field_title','title')){
 		
-		GLOBAL $budget_scenario;
-		$oBudget = new Budget($budget_scenario);
-		
-		$strFields = self::_getMonthlyFields($currency);
+		$strFields = $this->_getMonthlyFields();
 		
 		ob_start();
-			$sql = "SELECT usrTitle as 'GroupLevel1', sales as 'level1_code', `Budget item`, `Group`, `item`, 
-			{$strFields}
-			FROM `vw_master` 
-			LEFT JOIN stbl_user ON usrID=sales
-			{$sqlWhere} AND Group_code=94 ## Gross margin only
-			GROUP BY `vw_master`.sales, `vw_master`.item
-			ORDER BY `vw_master`.sales, `Group`, `vw_master`.itmOrder ASC			
-			";
-			
-			self::firstLevelReport($sql, 'BDV', $oBudget);
-			$tableID = "FLR_".md5($sql);
-			//==========================================================================================================================Non-customer-related data
-			self::noFirstLevelReport($sqlWhere, $currency);
-			?>
-			</tbody>
-			</table>
-			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
-			</ul>
-			<?php			
-			ob_flush();
-	}
-	
-	public function masterbyProfitEst($sqlWhere, $currency=643){
-		
-		$strFields = self::_getMonthlyFields($currency);
-		
-		ob_start();
-			$sql = "SELECT `Budget item` as 'GroupLevel1', `item` as 'level1_code', `Profit` as 'Budget item', `Group`, `pc` as 'item', 
-			{$strFields}
-			FROM `vw_master` 
-			##LEFT JOIN tbl_scenario ON scnID=scenario
-			{$sqlWhere}
-			GROUP BY `item`, `pc`
-			ORDER BY `Group`, level1_code, item
-			";
-			
-			self::firstLevelReport($sql, 'Items');
-			
-			?>
-			</tbody>
-			</table>
-			<?php			
-			ob_flush();
-	}
-	
-	public function masterbyActivityEst($sqlWhere, $currency=643){
-		
-		GLOBAL $budget_scenario;
-		$oBudget = new Budget($budget_scenario);
-		
-		$strFields = self::_getMonthlyFields($currency);
-		
-		ob_start();
-			$sql = "SELECT Activity_title as 'GroupLevel1', activity as 'level1_code', `Budget item`, `Group`, `item`,
+		$sql = "SELECT `{$params['field_title']}` as 'Level1_title', `{$params['field_data']}` as 'level1_code', `Budget item`, `Group`, `item`,
 					{$strFields}
-			FROM `vw_master` 
-			##LEFT JOIN tbl_scenario ON scnID=scenario
-			$sqlWhere AND Group_code=94 ## Gross margin only
-			GROUP BY `vw_master`.activity, `vw_master`.item
-			ORDER BY prtRHQ, prtGHQ,`vw_master`.activity, `Group`, `vw_master`.itmOrder ASC			
+			FROM `vw_master` 			
+			{$sqlWhere} AND Group_code=".self::GP_CODE." ## Gross margin only
+			GROUP BY `vw_master`.`{$params['field_data']}`, `vw_master`.item
+			ORDER BY prtRHQ, `{$params['field_data']}`, `Group`, `vw_master`.itmOrder ASC			
 			";
-			
-			self::firstLevelReport($sql, 'Activity', $oBudget);
-			$tableID = "FLR_".md5($sql);
-			//==========================================================================================================================Non-customer-related data
-			self::noFirstLevelReport($sqlWhere, $currency);
-			?>
-			</tbody>
-			</table>
-			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
-			</ul>
-			<?php			
-			ob_flush();
+		
+		$this->_firstLevelPeriodic($sql, $params['title'], $this->oBudget);
+				
+		//==========================================================================================================================Non-customer-related data
+		$this->no_firstLevelPeriodic($sqlWhere);
+		?>
+		</tbody>
+		</table>
+		<ul class='link-footer'>
+			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
+		</ul>
+		<?php			
+		ob_flush();
 	}
 	
 	public function monthlyReport($sqlWhere, $currency=643,$type='ghq'){
@@ -821,39 +746,39 @@ class Reports{
 		
 		switch($type){
 			case 'activity':
-				$sqlMeasure = "Activity_title as 'GroupLevel1', activity as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$sqlMeasure = "Activity_title as 'Level1_title', activity as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
 				break;
 			case 'customer':
-				$sqlMeasure = "Customer_name as 'GroupLevel1', customer as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$sqlMeasure = "Customer_name as 'Level1_title', customer as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
 				break;
 			case 'ghq':
 			default:
-				$sqlMeasure = "prtGHQ as 'GroupLevel1', prtGHQ as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$sqlMeasure = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
 				break;
 		}
 		
-		$strFields = self::_getMonthlyFields($currency);
+		$strFields = $this->_getMonthlyFields();
 		
-		$strFields = self::_getMRFields($currency);
+		$strFields = $this->_getMRFields();
 		
-		$sqlGroup = "GROUP BY GroupLevel1, level1_code, `Budget item`, `item`, `Group`";
+		$sqlGroup = "GROUP BY Level1_title, level1_code, `Budget item`, `item`, `Group`";
 		
 		ob_start();
 		
 		$sql = "SELECT {$sqlMeasure}
 					{$strFields['actual']}
 			FROM `vw_master`			
-			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND Group_code=94 
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND Group_code=".self::GP_CODE." 
 			{$sqlGroup}	
 			UNION ALL
 				SELECT {$sqlMeasure}
 				{$strFields['budget']}
 			FROM `vw_master`				
-			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND Group_code=94 
+			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND Group_code=".self::GP_CODE."  
 			{$sqlGroup}			
 			ORDER BY `Group`, `itmOrder` ASC";
 		
-		$sql = "SELECT `GroupLevel1`, `level1_code`, `Budget item`, `Group`, `item`,`itmOrder`,
+		$sql = "SELECT `Level1_title`, `level1_code`, `Budget item`, `Group`, `item`,`itmOrder`,
 					SUM(CM_A) as CM_A,
 					SUM(CM_B) as CM_B,
 					SUM(YTD_A) as YTD_A,
@@ -878,31 +803,6 @@ class Reports{
 			ob_flush();
 	}
 	
-	public function masterbyGHQEst($sqlWhere, $currency=643){
-		
-		GLOBAL $budget_scenario;
-		$oBudget = new Budget($budget_scenario);
-		
-		$strFields = self::_getMonthlyFields($currency);
-		
-		ob_start();
-			$sql = "SELECT prtGHQ as 'GroupLevel1', prtGHQ as 'level1_code', `Budget item`, `Group`, `item`,
-					{$strFields}
-			FROM `vw_master` 			
-			{$sqlWhere} AND Group_code=94 ## Gross margin only
-			GROUP BY `vw_master`.prtGHQ, `vw_master`.item
-			ORDER BY prtGHQ, `Group`, `vw_master`.itmOrder ASC			
-			";
-			
-			self::firstLevelReport($sql, 'Activity', $oBudget);
-			//==========================================================================================================================Non-customer-related data
-			self::noFirstLevelReport($sqlWhere, $currency);
-			?>
-			</tbody>
-			</table>
-			<?php			
-			ob_flush();
-	}
 	
 	public function masterYactbyActivityEst($sqlWhere){
 		global $oSQL;
@@ -910,7 +810,7 @@ class Reports{
 		$strFields = self::_getMonthlyFields($currency);
 		
 		ob_start();
-			$sql = "SELECT prtGHQ as 'GroupLevel1', activity as 'level1_code', CONCAT(`account`,': ',`Title`) as `Budget item`, Yact_group as `Group`, account as `item`,
+			$sql = "SELECT prtGHQ as 'Level1_title', activity as 'level1_code', CONCAT(`account`,': ',`Title`) as `Budget item`, Yact_group as `Group`, account as `item`,
 					{$strFields}				
 			FROM `vw_master` 
 			{$sqlWhere} 
@@ -919,7 +819,7 @@ class Reports{
 			ORDER BY prtGHQ,`vw_master`.activity, `Yact_group`, `vw_master`.account ASC			
 			";
 			
-			self::firstLevelReport($sql, 'Activity');
+			self::_firstLevelPeriodic($sql, 'Activity');
 			//==========================================================================================================================Non-customer-related data
 			self::noFirstLevelReport_YACT($sqlWhere, $currency);
 			?>
@@ -929,14 +829,13 @@ class Reports{
 			ob_flush();
 	}
 	
-	private function firstLevelReport($sql, $firstLevelTitle, $oBudget=null){
-		global $oSQL;				
+	private function _firstLevelPeriodic($sql, $firstLevelTitle){	
 		
-		$tableID = "FLR_".md5($sql);
+		$tableID = $this->ID?$this->ID:"FLR_".md5($sql);
 		
-		if (!$rs = $oSQL->q($sql)){
+		if (!$rs = $this->oSQL->q($sql)){
 				echo "<div class='error'>SQL error:</div>";
-				echo "<pre>$sql</pre>";
+				echo "<pre>",$sql,"</pre>";
 				return (false);
 			};
 			?>
@@ -946,13 +845,21 @@ class Reports{
 					<th><?php echo $firstLevelTitle; ?></th>
 					<th>Account</th>					
 					<?php 
-						echo $oBudget->getTableHeader();
-						echo $oBudget->getTableHeader('quarterly');
+						echo $this->oBudget->getTableHeader();
+						echo $this->oBudget->getTableHeader('quarterly');
 					?>		
-					<th class='budget-ytd'><?php echo $oBudget->type=='Budget'?'Budget':'FYE';?></th>
-					<th><?php echo $oBudget->type=='Budget'?'Estimate':'Budget';?></th>
+					<th class='budget-ytd'><?php echo $this->oBudget->type=='Budget'?'Budget':'FYE';?></th>
+					<th><?php echo $this->oBudget->type=='Budget'?$this->oBudget->reference_scenario->id:'Budget';?></th>
 					<th>Diff</th>
 					<th>%</th>
+					<?php 
+					if ($this->oBudget->length>12){
+					?>
+						<th>Q5(Jan-Mar)</th>
+					<?php
+					}					
+					if ($this->oBudget->type=='FYE'){
+					?>
 					<th class='budget-ytd FYE_analysis'>YTD Actual</th>
 					<th class='FYE_analysis'>YTD Budget</th>
 					<th class='FYE_analysis'>Diff</th>
@@ -961,48 +868,96 @@ class Reports{
 					<th class='FYE_analysis'>ROY Budget</th>
 					<th class='FYE_analysis'>Diff</th>
 					<th>%</th>
+					<?php
+					}
+					?>
 				</tr>
 			</thead>			
 			<tbody>
 			<?php
-			if ($oSQL->num_rows($rs)){
-				$GroupLevel1 = '';		
-				while ($rw=$oSQL->f($rs)){
-					if($GroupLevel1 && $GroupLevel1!=$rw['GroupLevel1']){
-						$data = $subtotal[$GroupLevel1];
+			if ($this->oSQL->num_rows($rs)){
+				$Level1_title = '';		
+				
+				while ($rw=$this->oSQL->f($rs)){
+					
+					$l1Code = (string)$rw['level1_code'];
+					$arrSubreport[$l1Code][$rw['item']] = Array('Level1_title'=>$rw['Level1_title'],'Budget item'=>$rw['Budget item'],'level1_code'=>$l1Code);
+			
+					for ($m=1;$m<=15;$m++){
+						// $month = date('M',mktime(0,0,0,$m,15));
+						$month = $this->oBudget->arrPeriod[$m];
+						
+						$arrSubreport[$l1Code][$rw['item']][$month]+=$rw[$month];
+						if ($m<=5){
+							$arrSubreport[$l1Code][$rw['item']]['Q'.$m]+=$rw['Q'.$m];
+						};
+						// $local_subtotal += $rw[$month];
+						
+					};
+					
+					$arrSubreport[$l1Code][$rw['item']]['YTD_A']+=$rw['YTD_A'];
+					$arrSubreport[$l1Code][$rw['item']]['YTD']+=$rw['YTD'];
+					$arrSubreport[$l1Code][$rw['item']]['ROY_A']+=$rw['ROY_A'];
+					$arrSubreport[$l1Code][$rw['item']]['ROY']+=$rw['ROY'];
+					$arrSubreport[$l1Code][$rw['item']]['Total']+=$rw['Total'];
+					$arrSubreport[$l1Code][$rw['item']]['estimate']+=$rw['estimate'];
+					$arrSubreport[$l1Code][$rw['item']]['Total_AprMar']+=$rw['Total_AprMar'];
+					$arrSubreport[$l1Code][$rw['item']]['Total_15']+=$rw['Total_15'];
+										
+					$arrSort[$l1Code]['value'] += $rw['Total'];
+					
+					if (!$template) $template = $rw;
+					
+				}
+							
+				arsort($arrSort);
+				foreach ($arrSort as $key=>$value){
+					$arrReport[$key] = $arrSubreport[$key];
+				}
+				
+				// echo '<pre>';print_r($arrReport);echo '</pre>';die();
+				foreach ($arrReport as $key=>$data){
+					$this->echoBudgetItemString($data);
+				}
+				/*
+				while ($rw=$this->oSQL->f($rs)){
+					if($Level1_title && $Level1_title!=$rw['Level1_title']){
+						$data = $subtotal[$Level1_title];
 						$data['Budget item']=$group;
-						self::echoBudgetItemString($data,'budget-subtotal', $oBudget);
+						$this->echoBudgetItemString($data,'budget-subtotal', $this->oBudget);
 					}
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
 					for ($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
-						$subtotal[$rw['GroupLevel1']][$month]+=$rw[$month];
-						$subtotal[$rw['GroupLevel1']]['Q'.$m]+=$rw['Q'.$m];
+						// $month = date('M',mktime(0,0,0,$m,15));
+						$month = $this->oBudget->arrPeriod[$m];
+						$subtotal[$rw['Level1_title']][$month]+=$rw[$month];
+						$subtotal[$rw['Level1_title']]['Q'.$m]+=$rw['Q'.$m];
 						$local_subtotal += $rw[$month];
 						
 					}
 						
-					$subtotal[$rw['GroupLevel1']]['YTD_A'] += $rw['YTD_A'];
-					$subtotal[$rw['GroupLevel1']]['YTD'] += $rw['YTD'];
-					$subtotal[$rw['GroupLevel1']]['ROY_A'] += $rw['ROY_A'];
-					$subtotal[$rw['GroupLevel1']]['ROY'] += $rw['ROY'];
+					$subtotal[$rw['Level1_title']]['YTD_A'] += $rw['YTD_A'];
+					$subtotal[$rw['Level1_title']]['YTD'] += $rw['YTD'];
+					$subtotal[$rw['Level1_title']]['ROY_A'] += $rw['ROY_A'];
+					$subtotal[$rw['Level1_title']]['ROY'] += $rw['ROY'];
 					
-					$subtotal[$rw['GroupLevel1']]['Total'] += $local_subtotal;
-					$subtotal[$rw['GroupLevel1']]['estimate'] += $rw['estimate'];
+					$subtotal[$rw['Level1_title']]['Total'] += $local_subtotal;
+					$subtotal[$rw['Level1_title']]['estimate'] += $rw['estimate'];
 														
+					$tr_class = 'budget-item';
 					
 					$data = $rw;
-					if ($data['GroupLevel1']==$GroupLevel1 && $GroupLevel1) $data['GroupLevel1']="&nbsp;";
-					self::echoBudgetItemString($data,$tr_class, $oBudget);
+					if ($data['Level1_title']==$Level1_title && $Level1_title) $data['Level1_title']="&nbsp;";
+					$this->echoBudgetItemString($data,$tr_class, $this->oBudget);
 					
-					$GroupLevel1 = $rw['GroupLevel1'];
+					$Level1_title = $rw['Level1_title'];
 					$group = $rw['Group'];
 				}
-				$data = $subtotal[$GroupLevel1];
+				$data = $subtotal[$Level1_title];
 				$data['Budget item']=$group;
-				self::echoBudgetItemString($data,'budget-subtotal', $oBudget);
-				
+				$this->echoBudgetItemString($data,'budget-subtotal budget-item', $this->oBudget);
+				*/
 				
 			}
 	}
@@ -1029,34 +984,34 @@ class Reports{
 			<tbody>
 			<?php
 			if ($oSQL->num_rows($rs)){
-				$GroupLevel1 = '';		
+				$Level1_title = '';		
 				while ($rw=$oSQL->f($rs)){
-					if($GroupLevel1 && $GroupLevel1!=$rw['GroupLevel1']){
-						$data = $subtotal[$GroupLevel1];
+					if($Level1_title && $Level1_title!=$rw['Level1_title']){
+						$data = $subtotal[$Level1_title];
 						$data['Budget item']=$group;
 						self::echoMRItemString($data,'budget-subtotal', $oBudget);
 					}
 						
-					$subtotal[$rw['GroupLevel1']]['CM_A'] += $rw['CM_A'];
-					$subtotal[$rw['GroupLevel1']]['CM_B'] += $rw['CM_B'];
-					$subtotal[$rw['GroupLevel1']]['YTD_A'] += $rw['YTD_A'];
-					$subtotal[$rw['GroupLevel1']]['YTD_B'] += $rw['YTD_B'];
-					$subtotal[$rw['GroupLevel1']]['NM_A'] += $rw['NM_A'];
-					$subtotal[$rw['GroupLevel1']]['NM_B'] += $rw['NM_B'];
+					$subtotal[$rw['Level1_title']]['CM_A'] += $rw['CM_A'];
+					$subtotal[$rw['Level1_title']]['CM_B'] += $rw['CM_B'];
+					$subtotal[$rw['Level1_title']]['YTD_A'] += $rw['YTD_A'];
+					$subtotal[$rw['Level1_title']]['YTD_B'] += $rw['YTD_B'];
+					$subtotal[$rw['Level1_title']]['NM_A'] += $rw['NM_A'];
+					$subtotal[$rw['Level1_title']]['NM_B'] += $rw['NM_B'];
 					
 														
 					
 					$data = $rw;
-					if ($data['GroupLevel1']==$GroupLevel1 && $GroupLevel1) $data['GroupLevel1']="&nbsp;";
+					if ($data['Level1_title']==$Level1_title && $Level1_title) $data['Level1_title']="&nbsp;";
 					
 					// echo '<pre>';print_r($data);echo '</pre>';
 					
 					self::echoMRItemString($data,$tr_class, $oBudget);
 					
-					$GroupLevel1 = $rw['GroupLevel1'];
+					$Level1_title = $rw['Level1_title'];
 					$group = $rw['Group'];
 				}
-				$data = $subtotal[$GroupLevel1];
+				$data = $subtotal[$Level1_title];
 				$data['Budget item']=$group;
 				self::echoMRItemString($data,'budget-subtotal', $oBudget);
 				
@@ -1096,7 +1051,7 @@ class Reports{
 				if($group && $group!=$rw['Group']){
 					$data = $subtotal[$group];
 					$data['Budget item']=$group;
-					self::echoBudgetItemString($data,'budget-subtotal');
+					$this->echoBudgetItemString($data,'budget-subtotal');
 				}
 				
 				//------------------------Collecting subtotals---------------------------------------
@@ -1123,17 +1078,17 @@ class Reports{
 				$grandTotal['ROY_A'] += $rw['ROY_A'];
 				$grandTotal['ROY'] += $rw['ROY'];
 				
-				self::echoBudgetItemString($rw,$tr_class);				
+				$this->echoBudgetItemString($rw,$tr_class);				
 				$group = $rw['Group'];
 			}
 			//last group subtotal
 			$data = $subtotal[$group];
 			$data['Budget item']=$group;
-			self::echoBudgetItemString($data,'budget-subtotal');
+			$this->echoBudgetItemString($data,'budget-subtotal');
 			//Grand total
 			$data = $grandTotal;
 			$data['Budget item']='Grand total';
-			self::echoBudgetItemString($data,'budget-grandtotal');
+			$this->echoBudgetItemString($data,'budget-grandtotal');
 			
 		//------ Operating income -------
 		
@@ -1142,15 +1097,13 @@ class Reports{
 		$rs = $oSQL->q($sqlOps);
 		$rw = $oSQL->f($rs);
 		$rw['Budget item'] = "Operating income";
-		self::echoBudgetItemString($rw,'budget-subtotal');
+		$this->echoBudgetItemString($rw,'budget-subtotal');
 		
 	}
 	
-	private function noFirstLevelReport($sqlWhere, $currency=643){
+	private function no_firstLevelPeriodic($sqlWhere){
 				
-		global $oSQL;		
-		
-		$strFields = self::_getMonthlyFields($currency);
+		$strFields = $this->_getMonthlyFields();
 		
 		$sqlGroup = "GROUP BY `Group`, `Budget item`";
 		
@@ -1167,8 +1120,8 @@ class Reports{
 			$group = '';
 			$subtotal = Array();
 			$grandTotal = Array();
-			$rs = $oSQL->q($sql);
-			while ($rw=$oSQL->f($rs)){
+			$rs = $this->oSQL->q($sql);
+			while ($rw=$this->oSQL->f($rs)){
 				
 				if ($rw['Group_code']==94){
 					$tr_class = "budget-total";
@@ -1179,13 +1132,14 @@ class Reports{
 				if($group && $group!=$rw['Group']){
 					$data = $subtotal[$group];
 					$data['Budget item']=$group;
-					self::echoBudgetItemString($data,'budget-subtotal');
+					$this->echoBudgetItemString($data,'budget-subtotal');
 				}
 				
 				//------------------------Collecting subtotals---------------------------------------
 				$local_subtotal = 0;
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+					// $month = date('M',mktime(0,0,0,$m,15));
+					$month = $this->oBudget->arrPeriod[$m];
 					$subtotal[$rw['Group']][$month]+=$rw[$month];					
 					$subtotal[$rw['Group']]['Q'.$m]+=$rw['Q'.$m];					
 					$local_subtotal += $rw[$month];
@@ -1206,26 +1160,26 @@ class Reports{
 				$grandTotal['ROY_A'] += $rw['ROY_A'];
 				$grandTotal['ROY'] += $rw['ROY'];
 				
-				self::echoBudgetItemString($rw,$tr_class);				
+				$this->echoBudgetItemString($rw,$tr_class);				
 				$group = $rw['Group'];
 			}
 			//last group subtotal
 			$data = $subtotal[$group];
 			$data['Budget item']=$group;
-			self::echoBudgetItemString($data,'budget-subtotal');
+			$this->echoBudgetItemString($data,'budget-subtotal');
 			//Grand total
 			$data = $grandTotal;
 			$data['Budget item']='Profit before tax';
-			self::echoBudgetItemString($data,'budget-total');
+			$this->echoBudgetItemString($data,'budget-total');
 			
 		//------ Operating income -------
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND account NOT LIKE '6%'", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
-		$rs = $oSQL->q($sqlOps);
-		while ($rw = $oSQL->f($rs)){
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Operating income";
-			self::echoBudgetItemString($rw,'budget-subtotal');
+			$this->echoBudgetItemString($rw,'budget-subtotal');
 		}
 			
 	}
@@ -1312,18 +1266,19 @@ class Reports{
 			
 	}
 	
-	private function _getMonthlyFields($currency){
-		GLOBAL $budget_scenario;
-		$oBudget = new Budget($budget_scenario);
-		$arrRates = $oBudget->getMonthlyRates($currency);
+	private function _getMonthlyFields(){
+		// GLOBAL $budget_scenario;
+		// $oBudget = new Budget($budget_scenario);
 		
-		$res=	Budget::getMonthlySumSQL(1,12,$arrRates).", ".
-				Budget::getQuarterlySumSQL($arrRates).", 
-				SUM(".Budget::getYTDSQL(1,12,$arrRates).") as Total ,
+		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
+		
+		$res=	$this->oBudget->getMonthlySumSQL(1,12,$arrRates).", ".
+				$this->oBudget->getQuarterlySumSQL($arrRates).", 
+				SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total ,
 				SUM(estimate/{$arrRates['YTD']}) as estimate, 
-				SUM(".Budget::getYTDSQL(1, (integer)date('n',$oBudget->date_start)-1,$arrRates).") as YTD_A, 
+				SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD_A, 
 				SUM(YTD/{$arrRates['YTD']}) as YTD, 
-				SUM(".Budget::getYTDSQL((integer)date('n',$oBudget->date_start),12,$arrRates).") as ROY_A, 
+				SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates).") as ROY_A, 
 				SUM(ROY/{$arrRates['YTD']}) as ROY";
 		
 		return ($res);
@@ -1362,25 +1317,94 @@ class Reports{
 		
 	}
 	
-	private function echoBudgetItemString($data, $strClass=''){					
-		
+	private function _echoNumericTDs($data){
+		$local_subtotal = 0;
+		$ytd = 0;
+		$roy = 0;
+				for ($m=1;$m<13;$m++){
+					// $month = date('M',mktime(0,0,0,$m,15));
+					$month = $this->oBudget->arrPeriod[$m];
+					?>
+					<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
+					<?php
+				}
+				
+				//--------------------- quarterly data -----------------------
+				if(isset($data['Q1'])){
+					for ($q=1;$q<5;$q++){
+						?>
+						<td class='budget-decimal budget-quarterly budget-<?php echo 'q'.$m;?>'><?php self::render($data['Q'.$q],0);?></td>
+						<?php
+					}
+				}
+			?>
+			<td class='budget-decimal budget-ytd'><?php self::render($data['Total'],0);?></td>			
+			<?php 
+			if (isset($data['estimate'])){
+				?>
+				<td class='budget-decimal'><?php self::render($data['estimate'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['Total']-$data['estimate'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['Total'],$data['estimate']);?></em></td>
+				<?php 
+				if ($this->oBudget->length>12){ ?>
+					<td class='budget-decimal'><?php self::render($data['Q5'],0);?></td>				
+				<?php };
+				if ($this->oBudget->type == 'FYE'){ ?>
+					<!--Data for YTD actual-->
+					<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
+					<td class='budget-decimal'><?php self::render($data['YTD'],0);?></td>
+					<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD'],0);?></td>
+					<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD']);?></em></td>
+					<!--Data for rest-of-year-->
+					<td class='budget-decimal budget-ytd'><?php self::render($data['ROY_A'],0);?></td>
+					<td class='budget-decimal'><?php self::render($data['ROY'],0);?></td>
+					<td class='budget-decimal'><?php self::render($data['ROY_A']-$data['ROY'],0);?></td>
+					<td class='budget-decimal'><em><?php self::render_ratio($data['ROY_A'],$data['ROY']);?></em></td>
+				<?php
+				}
+			}			
+	}
+	
+	private function echoBudgetItemString($data, $strClass=''){							
+		GLOBAL $arrUsrData;
 		ob_start();
-		static $GroupLevel1;
+		static $Level1_title;
 		?>
 		<tr class='<?php echo $strClass;?>'>
 			<?php 			
-			if (strlen($data['GroupLevel1'])){				
-			?>
-			<td class='budget-tdh code-<?php echo urlencode($data['level1_code']);?>' data-code='<?php echo $data['level1_code'];?>'><span><?php echo $data['GroupLevel1'];?></span></td>
-			<td><?php echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\',\'level1\':\''.$data['level1_code'].'\'})">'.$data['Budget item'].'</a>';?></td>
-			<?php 
-			} 
-			else 			
-			{	
+			$first = reset($data);
+			if (is_array($first)){				
+				?>
+				<td class="budget-tdh code-<?php echo urlencode($first['level1_code']);?>" data-code="<?php echo $first['metadata'];?>" rowspan="<?php echo count($data);?>">
+					<?php 
+					if ($first['level1_code']==$arrUsrData['usrID']) echo '<strong>';
+					echo $first['Level1_title'];
+					if ($first['level1_code']==$arrUsrData['usrID']) echo '</strong>';
+					?>
+				</td>				
+				<?php
+				$row = 1;				
+				foreach ($data as $item=>$values){
+					if ($row>1){ ?>
+						</tr>
+						<tr class="">					
+					<?php };
+					?>
+					<td><?php echo $values['Budget item'];?></td>
+					<?php
+					$this->_echoNumericTDs($values);
+					$row++;
+					foreach ($values as $column=>$value){						
+						$arrSubtotal[$column] += $value;
+					};	
+				}
+				$arrSubtotal['Budget item'] = "Subtotal";
+				$this->echoBudgetItemString($arrSubtotal,'budget-subtotal');
+			} else {	
 			?>
 			<td colspan="2">
 			<?php
-				if ($data['Group_code']==94) {
+				if ($data['Group_code']==self::GP_CODE) {
 					echo 'Total '.strtolower($data['Budget item']); 
 				} else {
 					if (strpos($strClass,'total') || !isset($data['item'])){
@@ -1392,45 +1416,7 @@ class Reports{
 			?>
 			</td>
 			<?php
-			}
-				$local_subtotal = 0;
-				$ytd = 0;
-				$roy = 0;
-				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
-					
-					?>
-					<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
-					<?php
-				}
-				
-				//--------------------- quarterly data -----------------------
-				if(isset($data['Q1'])){
-					for ($m=1;$m<5;$m++){
-						?>
-						<td class='budget-decimal budget-quarterly budget-<?php echo 'q'.$m;?>'><?php self::render($data['Q'.$m],0);?></td>
-						<?php
-					}
-				}
-			?>
-			<td class='budget-decimal budget-ytd'><?php self::render($data['Total'],0);?></td>			
-			<?php 
-			if (isset($data['estimate'])){
-			?>
-			<td class='budget-decimal'><?php self::render($data['estimate'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['Total']-$data['estimate'],0);?></td>
-			<td class='budget-decimal'><em><?php self::render_ratio($data['Total'],$data['estimate']);?></em></td>
-			<!--Data for YTD actual-->
-			<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['YTD'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD'],0);?></td>
-			<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD']);?></em></td>
-			<!--Data for rest-of-year-->
-			<td class='budget-decimal budget-ytd'><?php self::render($data['ROY_A'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['ROY'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['ROY_A']-$data['ROY'],0);?></td>
-			<td class='budget-decimal'><em><?php self::render_ratio($data['ROY_A'],$data['ROY']);?></em></td>
-			<?php
+				$this->_echoNumericTDs($data);
 			}
 			?>
 		</tr>
@@ -1441,13 +1427,13 @@ class Reports{
 	private function echoMRItemString($data, $strClass=''){					
 		
 		ob_start();
-		static $GroupLevel1;
+		static $Level1_title;
 		?>
 		<tr class='<?php echo $strClass;?>'>
 			<?php 			
-			if (strlen($data['GroupLevel1'])){				
+			if (strlen($data['Level1_title'])){				
 			?>
-			<td class='budget-tdh code-<?php echo urlencode($data['level1_code']);?>' data-code='<?php echo $data['level1_code'];?>'><span><?php echo $data['GroupLevel1'];?></span></td>
+			<td class='budget-tdh code-<?php echo urlencode($data['level1_code']);?>' data-code='<?php echo $data['level1_code'];?>'><span><?php echo $data['Level1_title'];?></span></td>
 			<td><?php echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\',\'level1\':\''.$data['level1_code'].'\'})">'.$data['Budget item'].'</a>';?></td>
 			<?php 
 			} 
@@ -1456,7 +1442,7 @@ class Reports{
 			?>
 			<td colspan="2">
 			<?php
-				if ($data['Group_code']==94) {
+				if ($data['Group_code']==self::GP_CODE) {
 					echo 'Total '.strtolower($data['Budget item']); 
 				} else {
 					if (strpos($strClass,'total') || !isset($data['item'])){

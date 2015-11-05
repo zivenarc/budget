@@ -197,7 +197,8 @@ class Budget{
 	public $year;
 	public $settings;
 	public $title;
-	protected $oSQL;
+	protected $oSQL;	
+	public static $arrPeriod;
 	
 	function __construct($scenario){
 		global $strLocal;
@@ -210,7 +211,8 @@ class Budget{
 				WHERE scnID='$scenario'";
 		$rs = $this->oSQL->q($sql);
 		$rw = $this->oSQL->f($rs);
-				
+			
+		$this->arrPeriod = Array(1=>'jan',2=>'feb',3=>'mar',4=>'apr',5=>'may',6=>'jun',7=>'jul',8=>'aug',9=>'sep',10=>'oct',11=>'nov',12=>'dec',13=>'jan_1',14=>'feb_1',15=>'mar_1');
 		$this->year = $rw['scnYear'];
 		$this->date_start = strtotime($rw['scnDateStart']);
 		$this->title = $rw["scnTitle$strLocal"];
@@ -218,6 +220,7 @@ class Budget{
 		$this->id = $scenario;
 		$this->timestamp = "Updated by ".$rw['usrTitle']." on ".date('d.m.Y H:i',strtotime($rw['scnEditDate'])).", <a href='{$rw['script']}?{$rw['prefix']}ID={$rw['id']}'>".$rw['title']." #".$rw['id']."</a>";
 		$this->type = $rw['scnType'];
+		$this->length = $rw['scnLength'];
 		
 		$this->flagUpdate = !$rw['scnFlagReadOnly'];
 		$this->flagArchive = (integer)$rw['scnFlagArchive'];
@@ -227,9 +230,7 @@ class Budget{
 		
 		if ($rw['scnLastID']) {
 			$this->reference_scenario = new Budget($rw['scnLastID']);
-		};
-		
-		
+		};				
 	}
 	
 	public function getSettings($oSQL=null, $scenario=''){
@@ -266,7 +267,8 @@ class Budget{
 	
 	public function getYTDSQL($mStart=1, $mEnd=12, $arrRates = null){
 		for($m=$mStart;$m<=$mEnd;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+			// $month = date('M',mktime(0,0,0,$m,15));			
+			$month = $this->arrPeriod[$m];
 			
 			if (is_array($arrRates)){				
 				$arrRes[] = "`$month`/{$arrRates[$month]}";
@@ -312,6 +314,9 @@ class Budget{
 			case 'q4':
 				return($this->getYTDSQL(10,12,$arrRates));
 				break;
+			case 'q5':
+				return($this->getYTDSQL(13,15,$arrRates));
+				break;
 			default:
 				return($this->getYTDSQL(1,12,$arrRates));
 				break;
@@ -321,7 +326,8 @@ class Budget{
 	
 	public function getMonthlySQL($start=1, $end=12){
 		for($m=$start;$m<=$end;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+			// $month = date('M',mktime(0,0,0,$m,15));
+			$month = $this->arrPeriod[$m];
 			$arrRes[] = "`$month`";
 		}
 		$res = implode(',',$arrRes);
@@ -329,7 +335,8 @@ class Budget{
 	}
 	public function getMonthlySumSQL($start=1, $end=12, $arrRates = null){
 		for($m=$start;$m<=$end;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+			// $month = date('M',mktime(0,0,0,$m,15));			
+			$month = $this->arrPeriod[$m];
 			if (is_array($arrRates)){				
 				$arrRes[] = "SUM(`$month`)/{$arrRates[$month]} as '$month'";
 			} else {
@@ -343,13 +350,14 @@ class Budget{
 	
 	public function getQuarterlySumSQL($arrRates = null){
 			if(is_array($arrRates)){
-				$arrRes[] = "SUM(`Jan`/{$arrRates['Jan']}+`Feb`/{$arrRates['Feb']}+`Mar`/{$arrRates['Mar']}) as 'Q1'";
-				$arrRes[] = "SUM(`Apr`/{$arrRates['Apr']}+`May`/{$arrRates['May']}+`Jun`/{$arrRates['Jun']}) as 'Q2'";
-				$arrRes[] = "SUM(`Jul`/{$arrRates['Jul']}+`Aug`/{$arrRates['Aug']}+`Sep`/{$arrRates['Sep']}) as 'Q3'";
-				$arrRes[] = "SUM(`Oct`/{$arrRates['Oct']}+`Nov`/{$arrRates['Nov']}+`Dec`/{$arrRates['Dec']}) as 'Q4'";
+				$arrRes[] = "SUM(`jan`/{$arrRates['jan']}+`feb`/{$arrRates['feb']}+`mar`/{$arrRates['mar']}) as 'Q1'";
+				$arrRes[] = "SUM(`apr`/{$arrRates['apr']}+`may`/{$arrRates['may']}+`jun`/{$arrRates['jun']}) as 'Q2'";
+				$arrRes[] = "SUM(`jul`/{$arrRates['jul']}+`aug`/{$arrRates['aug']}+`sep`/{$arrRates['sep']}) as 'Q3'";
+				$arrRes[] = "SUM(`oct`/{$arrRates['oct']}+`nov`/{$arrRates['nov']}+`dec`/{$arrRates['dec']}) as 'Q4'";
+				$arrRes[] = "SUM(`jan_1`/{$arrRates['jan_1']}+`feb_1`/{$arrRates['feb_1']}+`mar_1`/{$arrRates['mar_1']}) as 'Q5'";
 			} else {
-				for($m=1;$m<5;$m++){			
-					$arrRes[] = "SUM(`Q$m`) as 'Q$m'";
+				for($q=1;$q<=5;$q++){			
+					$arrRes[] = "SUM(`Q$q`) as 'Q$q'";
 				}
 			}
 		$res = implode(',',$arrRes);
@@ -359,8 +367,8 @@ class Budget{
 	public function getTableHeader($type='monthly', $start=1, $end=12){
 		switch($type){
 			case 'quarterly':
-				for($m=1;$m<5;$m++){
-					$arrRes[] = 'Q'.$m;
+				for($q=1;$q<5;$q++){
+					$arrRes[] = 'Q'.$q;
 				}
 				$res = '<th class="budget-quarterly">'.implode('</th><th class="budget-quarterly">',$arrRes).'</th>';
 				return($res);
@@ -390,8 +398,9 @@ class Budget{
 				break;
 			default:
 				for($m=$start;$m<=$end;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
-					$arrRes[] = $month;
+					// $month = date('M',mktime(0,0,0,$m,15));
+					$month = $this->arrPeriod[$m];
+					$arrRes[] = ucfirst($month);
 				}
 				$res = '<th class="budget-monthly">'.implode('</th><th class="budget-monthly">',$arrRes).'</th>';
 				return($res);
@@ -617,8 +626,9 @@ class Budget{
 		
 		$res = Array('YTD'=>1,'ROY'=>1);
 		
-		for($m=1;$m<=12;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
+		for($m=1;$m<=15;$m++){
+				// $month = date('M',mktime(0,0,0,$m,15));
+				$month = $this->arrPeriod[$m];
 				$res[$month] = 1;
 		}
 		
