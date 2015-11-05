@@ -44,8 +44,9 @@ class MSF extends Document{
 			while($rw = $this->oSQL->f($rs)){
 				// print_r($rw);
 				$this->records[$this->gridName][$rw['id']] = new msf_record($this->GUID, $this->scenario, $rw['id'], $rw);			
-				for($m=1;$m<13;$m++){
-					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+				for($m=1;$m<=15;$m++){
+					// $month = strtolower(date('M',mktime(0,0,0,$m,15)));
+					$month = $this->budget->arrPeriod[$m];
 					$this->subtotal[$month] += $rw[$month];
 				}				
 			}		
@@ -179,8 +180,9 @@ class MSF extends Document{
 						$row->flagUpdated = true;				
 						$row->pc = isset($_POST['pc'][$id]) ? $_POST['pc'][$id] : $this->profit;						
 						$row->unit = $_POST['unit'][$id];					
-						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for ($m=1;$m<=15;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];
 							$row->{$month} = (double)$_POST[strtolower($month)][$id];
 						}					
 					} else {
@@ -238,8 +240,9 @@ class MSF extends Document{
 							GROUP BY pc, activity";
 					$rs = $this->oSQL->q($sql);
 					while ($rw = $this->oSQL->f($rs)){
-						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for($m=1;$m<=15;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];
 							$arrDistribution[$rw['pc']][$rw['activity']][$month] = $rw[$month];
 							$arrPCSubtotal[$rw['pc']][$month] += $rw[$month];
 						}						
@@ -258,8 +261,10 @@ class MSF extends Document{
 						} else {
 							$item = $this->item;							
 						}
-						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for($m=1;$m<=15;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];
+							
 							if ($rw[$month]!=0){
 								$arrAccounts[$item][$month] += $rw[$month];
 							}
@@ -282,8 +287,9 @@ class MSF extends Document{
 								$master_row->account = $item->getYACT($record->pc);
 								// $master_row->item = $this->item;
 								$master_row->item = $item_code;
-								for($m=1;$m<13;$m++){
+								for($m=1;$m<=15;$m++){
 									$month = date('M',mktime(0,0,0,$m,15));
+									$month = $this->budget->arrPeriod[$m];
 									// $master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]
 															// *$total[$month]															
 															// *($values[$month]/$arrPCSubtotal[$record->pc][$month]);	
@@ -313,8 +319,9 @@ class MSF extends Document{
 						$master_row->account = $item->getYACT($this->profit);
 						// $master_row->item = $this->item;
 						$master_row->item = $item_code;
-						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for($m=1;$m<=15;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];
 							//$master_row->{$month} = -$total[$month];
 							$master_row->{$month} = -$item_values[$month];
 						}
