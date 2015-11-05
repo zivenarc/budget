@@ -50,10 +50,7 @@ class headcount_record extends table_record{
 			$mStart = 1;
 		}
 	
-		for($m=$mStart;$m<=$mEnd;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$arrRes[] = "`$month`=".(double)$this->{$month};
-		}
+			$arrRes = $this->getMonthlySQL();	
 		
 		if($this->salary+$this->insurance){
 			$arrRes[] = "`company`='OOO'";

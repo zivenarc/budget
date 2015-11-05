@@ -38,7 +38,7 @@ class budget_session {
 		$sql[] = "DELETE FROM `reg_master` WHERE `source`='".$this->id."'";
 		
 		for ($i=0;$i<count($this->records['master']);$i++){
-			$sql[] = $this->records['master'][$i]->getSQLstring(date('m',$this->budget->date_start),12,$flagPostActualPeriods);
+			$sql[] = $this->records['master'][$i]->getSQLstring(date('m',$this->budget->date_start),15,$flagPostActualPeriods);
 		}
 		
 		// $sql[] = "DELETE FROM `tbl_headcount` WHERE `source`='".$this->id."'";
@@ -68,10 +68,11 @@ class budget_session {
 	
 	public function read(){
 	
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+		for($m=1;$m<=15;$m++){
+			// $month = date('M',mktime(0,0,0,$m,15));
+			$month = $this->budget->arrPeriod[$m];
 			$arrSqlMonth[] = "SUM(`$month`) as '$month'";
-			$arrHeader[] = $month;			
+			$arrHeader[] = ucfirst($month);			
 		}
 		
 		$strHeader = '<tr><th>Profit</th><th>'.implode('</th><th>',$arrHeader).'</th><th class="budget-ytd">Total</th></tr>';

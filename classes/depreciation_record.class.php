@@ -39,10 +39,7 @@ class depreciation_record extends table_record{
 		
 		GLOBAL $Products;
 
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-			$arrRes[] = "`$month`=".(double)$this->{$month};
-		}
+			$arrRes = $this->getMonthlySQL();	
 			
 			//$oProduct = $Products->getByCode($this->product);
 			
