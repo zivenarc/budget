@@ -18,10 +18,10 @@ if ($denominator!=1) {
 }
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 ?>
-<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
+<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
 <?php
 
-$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".Budget::getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
+$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM vw_master
 		WHERE scenario='$budget_scenario' AND pccFlagProd=0
 		GROUP BY Profit, `Budget item`,`item`
@@ -29,7 +29,7 @@ $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 
-	// $keyProfit = Budget::getProfitAlias($rw);
+	// $keyProfit = $oBudget->getProfitAlias($rw);
 	$keyProfit = $rw['Profit'];
 	
 	if ($rw['item']==Items::REVENUE || $rw['item']==Items::INTERCOMPANY_REVENUE){
