@@ -533,7 +533,7 @@ class Reports{
 	
 	public function masterByCustomer($sqlWhere=''){
 	
-		$this->_documentPnL($sqlWhere, Array('field_data'=>'customer','field_title'=>'Customer_title','title'=>'Customer'));
+		$this->_documentPnL($sqlWhere, Array('field_data'=>'customer','field_title'=>'Customer_name','title'=>'Customer'));
 	
 	}
 		
