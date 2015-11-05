@@ -139,7 +139,10 @@ function budget_save(arg){
 			console.log(responseText);
 			
 			if (responseText.status=='success'){
-
+				
+				$('input.error_field').each(function(){
+					$(this).removeClass('error_field');											
+				});
 				
 				$gridUpdated = $("input[name='inp_"+doc.gridName+"_updated[]']");
 				var flagUpdated = false;
