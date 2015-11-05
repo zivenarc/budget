@@ -47,18 +47,18 @@ if ($mthStart!=1 || $mthEnd!=12){
 
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 ?>
-<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
+<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
 
 <?php
 
 
 
-$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, SUM(".Budget::getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
+$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
 		FROM vw_master
 		WHERE scenario='{$oBudget->id}'
 		GROUP BY Profit, `Budget item`,`item`
 		UNION ALL
-		SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, 0 as Total, SUM(".Budget::getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
+		SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
 		FROM vw_master
 		WHERE scenario='{$oBudget->reference_scenario->id}'
 		GROUP BY Profit, `Budget item`,`item`
@@ -69,7 +69,7 @@ $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `G
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 
-	$keyProfit = Budget::getProfitAlias($rw);
+	$keyProfit = $oBudget->getProfitAlias($rw);
 	
 	if ($rw['item']==Items::REVENUE || $rw['item']==Items::INTERCOMPANY_REVENUE){
 		$arrRevenue[$keyProfit] += $rw['Total'];
@@ -84,13 +84,13 @@ while ($rw=$oSQL->f($rs)){
 	$arrProfit[$keyProfit] = $rw['pccFlagProd'];
 }
 
-$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL($mthStart,$mthEnd).")/".($mthEnd-$mthStart+1)." as Total, 0 as Estimate
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd).")/".($mthEnd-$mthStart+1)." as Total, 0 as Estimate
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$oBudget->id}' and posted=1 and salary>50
 		GROUP BY Profit
 		UNION ALL
-		SELECT pccTitle as Profit, pccFlagProd, 0 as Total, SUM(".Budget::getYTDSQL($mthStart,$mthEnd).")/".($mthEnd-$mthStart+1)." as Estimate
+		SELECT pccTitle as Profit, pccFlagProd, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd).")/".($mthEnd-$mthStart+1)." as Estimate
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$oBudget->reference_scenario->id}' and posted=1 and salary>50
@@ -98,19 +98,19 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL($mthStar
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	$keyProfit = Budget::getProfitAlias($rw);
+	$keyProfit = $oBudget->getProfitAlias($rw);
 	$arrHeadcount['FTE'][$keyProfit] += $rw['Total'];	
 	$arrHeadcountBudget['FTE'][$keyProfit] += $rw['Estimate'];	
 }
 
-$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$oBudget->id}' and active=1
 			AND account='J00400'
 		GROUP BY Profit
 		UNION ALL
-		SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".Budget::getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
+		SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$oBudget->reference_scenario->id}' and active=1
@@ -119,19 +119,19 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL($mthStar
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	$keyProfit = Budget::getProfitAlias($rw);
+	$keyProfit = $oBudget->getProfitAlias($rw);
 	$arrGrossRevenue[$keyProfit] += $rw['Total'];	
 	$arrGrossRevenueEstimate += $rw['Estimate'];	
 }
 
-$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$oBudget->id}' and active=1
 			AND (account NOT LIKE '6%' AND account NOT LIKE '7%')
 		GROUP BY Profit
 		UNION ALL
-		SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".Budget::getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
+		SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$oBudget->reference_scenario->id}' and active=1
@@ -140,7 +140,7 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".Budget::getYTDSQL($mthStar
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	$keyProfit = Budget::getProfitAlias($rw);
+	$keyProfit = $oBudget->getProfitAlias($rw);
 	$arrOpIncome[$keyProfit] += $rw['Total'];	
 	$arrOpIncomeEstimate[$keyProfit] += $rw['Estimate'];	
 }
