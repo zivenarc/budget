@@ -54,7 +54,7 @@ class table_record {
 	}
 	
 	public function set_months($rw){
-		for ($m=1;$m<13;$m++){
+		for ($m=1;$m<=15;$m++){
 				// $month = date('M',mktime(0,0,0,$m,15));	
 				$month = $this->arrPeriod[$m];				
 				$this->set_month_value($m, $rw[$month]);
@@ -72,7 +72,7 @@ class table_record {
 	
 	public function getMonthlySQL(){
 	
-		for($m=1;$m<15;$m++){
+		for($m=1;$m<=15;$m++){
 			// $month = date('M',mktime(0,0,0,$m,15));
 			$month = $this->arrPeriod[$m];
 			$arrRes[] = "`$month`=".(double)$this->{$month};

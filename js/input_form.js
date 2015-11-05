@@ -1,4 +1,4 @@
-var months = Array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec');
+var months = Array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec','jan_1','feb_1','mar_1');
 var cache = {},	lastXhr;
 
 var tabs_options = {beforeLoad: function( event, ui ) {
