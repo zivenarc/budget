@@ -61,6 +61,13 @@ class table_record {
 		}		
 	}
 	
+	public function setMonthsFromPOST(){
+		for ($m=1;$m<=15;$m++){
+			$month = $this->arrPeriod[$m];				
+			$this->set_month_value($m, $_POST[$month][$this->id]);
+		}	
+	}
+	
 	public function total(){
 		for($m=1;$m<=15;$m++){
 			// $month = date('M',mktime(0,0,0,$m,15));
