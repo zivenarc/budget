@@ -32,12 +32,14 @@ class table_record {
 		
 		$this->oSQL = $oSQL;
 		$this->source = $session;
-		$this->scenario = $scenario;
+		$this->scenario = $scenario;		
 		$this->id=$id;
+		$this->arrPeriod = Array(1=>'jan',2=>'feb',3=>'mar',4=>'apr',5=>'may',6=>'jun',7=>'jul',8=>'aug',9=>'sep',10=>'oct',11=>'nov',12=>'dec',13=>'jan_1',14=>'feb_1',15=>'mar_1');
 		
 		if (count($data)){
-			for($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
+			for($m=1;$m<=15;$m++){
+				// $month = date('M',mktime(0,0,0,$m,15));
+				$month = $this->arrPeriod[$m];
 				$this->{$month} = $data[strtolower($month)];			
 			}
 			$this->company = $data['company'];
@@ -45,21 +47,24 @@ class table_record {
 	}
 	
 	public function set_month_value($i, $value){
-		$month = date('M',mktime(0,0,0,(integer)$i,15));
+		// $month = date('M',mktime(0,0,0,(integer)$i,15));
+		$month = $this->arrPeriod[$m];
 		$this->{$month} =(double)$value;
 		return(true);
 	}
 	
 	public function set_months($rw){
 		for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));				
+				// $month = date('M',mktime(0,0,0,$m,15));	
+				$month = $this->arrPeriod[$m];				
 				$this->set_month_value($m, $rw[$month]);
-		}
+		}		
 	}
 	
 	public function total(){
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+		for($m=1;$m<=15;$m++){
+			// $month = date('M',mktime(0,0,0,$m,15));
+			$month = $this->arrPeriod[$m];
 			$res += $this->{$month};
 		}
 		return ($res);

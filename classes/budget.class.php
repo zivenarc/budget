@@ -114,18 +114,6 @@ class budget_session {
 }
 
 class master_record{
-	public $Jan;
-	public $Feb;
-	public $Mar;
-	public $Apr;
-	public $May;
-	public $Jun;
-	public $Jul;
-	public $Aug;
-	public $Sep;
-	public $Oct;
-	public $Nov;
-	public $Dec;
 	public $company;
 	public $account;
 	public $item;
@@ -136,10 +124,14 @@ class master_record{
 	//private $session_id;
 	
 	function __construct($session, $scenario){
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+		
+		$this->arrPeriod = Array(1=>'jan',2=>'feb',3=>'mar',4=>'apr',5=>'may',6=>'jun',7=>'jul',8=>'aug',9=>'sep',10=>'oct',11=>'nov',12=>'dec',13=>'jan_1',14=>'feb_1',15=>'mar_1');
+	
+		for($m=1;$m<=15;$m++){
+			// $month = date('M',mktime(0,0,0,$m,15));
+			$month = $this->arrPeriod[$m];
 			$this->{$month} = 0;
-		}
+		}		
 		
 		$this->source = $session;
 		$this->scenario = $scenario;
@@ -148,7 +140,8 @@ class master_record{
 	}	
 		
 	public function set_month_value($i, $value){
-		$month = date('M',time(0,0,0,(integer)$i,15));
+		//$month = date('M',time(0,0,0,(integer)$i,15));
+		$month = $this->arrPeriod[$m];
 		$this->{$month} =(double)$value;
 		return(true);
 	}
@@ -162,7 +155,8 @@ class master_record{
 		}
 		
 		for($m=$mStart;$m<=$mEnd;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+			// $month = date('M',mktime(0,0,0,$m,15));
+			$month = $this->arrPeriod[$m];
 			$arrRes[] = "`$month`=".$this->{$month};
 		}
 		
@@ -185,12 +179,32 @@ class master_record{
 	}
 	
 	public function total(){
-		for($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+		for($m=1;$m<=15;$m++){
+			// $month = date('M',mktime(0,0,0,$m,15));
+			$month = $this->arrPeriod[$m];
 			$res += $this->{$month};
 		}
 		return ($res);
 	}
+	
+	public function total_am(){
+		for($m=4;$m<=15;$m++){
+			// $month = date('M',mktime(0,0,0,$m,15));
+			$month = $this->arrPeriod[$m];
+			$res += $this->{$month};
+		}
+		return ($res);
+	}
+	
+	public function total_jd(){
+		for($m=4;$m<=12;$m++){
+			// $month = date('M',mktime(0,0,0,$m,15));
+			$month = $this->arrPeriod[$m];
+			$res += $this->{$month};
+		}
+		return ($res);
+	}
+	
 }
 
 class Budget{
