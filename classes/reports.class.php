@@ -515,13 +515,17 @@ class Reports{
 		
 	}
 	
+	public function allocation($sqlWhere=''){
+		echo "<div class='warning>Under construction</div>";
+	}
+	
 	public function masterByProfit($sqlWhere=''){
 		global $oSQL;
 		
 		ob_start();
-			$sql = "SELECT Profit as 'Level1_title', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total 
+			$sql = "SELECT Profit as 'Level1_title', `Budget item`, `Group`, ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().") as Total 
 			FROM `vw_master`
-			$sqlWhere
+			{$sqlWhere}
 			GROUP BY `vw_master`.Profit, `vw_master`.item
 			ORDER BY `vw_master`.Profit,`vw_master`.item DESC
 			
@@ -536,7 +540,7 @@ class Reports{
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
-				<tr><th>Profit center</th><th>Account</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
+				<tr><th>Profit center</th><th>Account</th><?php echo $this->oBudget->getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
 			</thead>			
 			<tbody>
 			<?php
