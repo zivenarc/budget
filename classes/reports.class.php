@@ -516,215 +516,51 @@ class Reports{
 	}
 	
 	public function allocation($sqlWhere=''){
-		echo "<div class='warning>Under construction</div>";
+		echo "<div class='warning'>Under construction</div>";
 	}
 	
 	public function masterByProfit($sqlWhere=''){
-		global $oSQL;
 		
-		ob_start();
-			$sql = "SELECT Profit as 'Level1_title', `Budget item`, `Group`, ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().") as Total 
-			FROM `vw_master`
-			{$sqlWhere}
-			GROUP BY `vw_master`.Profit, `vw_master`.item
-			ORDER BY `vw_master`.Profit,`vw_master`.item DESC
-			
-			";
-			$rs = $oSQL->q($sql);
-			$tableID = "byProfit_".md5($sql);
-			if (!$oSQL->num_rows($rs)){
-				echo "<div class='warning'>No data found</div>";
-				//echo "<pre>$sql</pre>";
-				return (false);
-			}
-			?>
-			<table id='<?php echo $tableID;?>' class='budget'>
-			<thead>
-				<tr><th>Profit center</th><th>Account</th><?php echo $this->oBudget->getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
-			</thead>			
-			<tbody>
-			<?php
-			$Level1_title = '';		
-				while ($rw=$oSQL->f($rs)){
-					if($Level1_title && $Level1_title!=$rw['Level1_title']){
-						$data = $subtotal[$Level1_title];
-						$data['Budget item']=$group;
-						$this->echoBudgetItemString($data,'budget-subtotal');
-					}
-					//------------------------Collecting subtotals---------------------------------------
-					$local_subtotal = 0;
-					for ($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
-						$subtotal[$rw['Level1_title']][$month]+=$rw[$month];
-						$local_subtotal += $rw[$month];
-						$grandTotal[$month] += $rw[$month];
-					}
-					$subtotal[$rw['Level1_title']]['Total'] += $local_subtotal;
-					$grandTotal['Total'] += $local_subtotal;	
-					
-					$data = $rw;
-					if ($data['Level1_title']==$Level1_title && $Level1_title) $data['Level1_title']="&nbsp;";
-					$this->echoBudgetItemString($data,$tr_class);
-					
-					$Level1_title = $rw['Level1_title'];
-					$group = $rw['Group'];
-				}
-				$data = $subtotal[$Level1_title];
-				$data['Budget item']=$group;
-				$this->echoBudgetItemString($data,'budget-subtotal');
-				
-				$data = $grandTotal;
-				$data['Budget item']='Grand total';
-				$this->echoBudgetItemString($data,'budget-grandtotal');
-			?>
-			</tbody>
-			</table>
-			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
-			</ul>
-			<?php			
-			ob_flush();
+		$this->_documentPnL($sqlWhere, Array('field_data'=>'pc','field_title'=>'Profit','title'=>'Profit center'));
+	
 	}
 	
 	public function masterByActivity($sqlWhere=''){
-		global $oSQL;
 		
-		ob_start();
-			$sql = "SELECT CONCAT(Activity_title,' (',Activity_title_local,')') as 'Level1_title', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total
-			FROM `vw_master`
-			$sqlWhere
-			GROUP BY `vw_master`.activity, `vw_master`.item
-			ORDER BY `vw_master`.activity,`vw_master`.item DESC
-			
-			";
-			$rs = $oSQL->q($sql);
-			$tableID = "byAct_".md5($sql);
-			if (!$oSQL->num_rows($rs)){
-				echo "<div class='warning'>No data found</div>";
-				//echo "<pre>$sql</pre>";
-				return (false);
-			}
-			?>
-			<table id='<?php echo $tableID;?>' class='budget'>
-			<thead>
-				<tr>
-					<th>Activity</th><th>Account</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th>
-				</tr>
-			</thead>			
-			<tbody>
-			<?php
-			$Level1_title = '';		
-				while ($rw=$oSQL->f($rs)){
-					if($Level1_title && $Level1_title!=$rw['Level1_title']){
-						$data = $subtotal[$Level1_title];
-						$data['Budget item']=$group;
-						$this->echoBudgetItemString($data,'budget-subtotal');
-					}
-					//------------------------Collecting subtotals---------------------------------------
-					$local_subtotal = 0;
-					for ($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
-						$subtotal[$rw['Level1_title']][$month]+=$rw[$month];
-						$local_subtotal += $rw[$month];
-						$grandTotal[$month] += $rw[$month];
-					}
-					$subtotal[$rw['Level1_title']]['Total'] += $local_subtotal;
-					$grandTotal['Total'] += $local_subtotal;	
-					
-					$data = $rw;
-					if ($data['Level1_title']==$Level1_title && $Level1_title) $data['Level1_title']="&nbsp;";
-					$this->echoBudgetItemString($data,$tr_class);
-					
-					$Level1_title = $rw['Level1_title'];
-					$group = $rw['Group'];
-				}
-				$data = $subtotal[$Level1_title];
-				$data['Budget item']=$group;
-				$this->echoBudgetItemString($data,'budget-subtotal');
-				
-				$data = $grandTotal;
-				$data['Budget item']='Grand total';
-				$this->echoBudgetItemString($data,'budget-grandtotal');
-			?>
-			</tbody>
-			</table>
-			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
-			</ul>
-			<?php			
-			ob_flush();
+		$this->_documentPnL($sqlWhere, Array('field_data'=>'activity','field_title'=>"CONCAT(Activity_title,' (',Activity_title_local,')')",'title'=>'Activity'));
+		
 	}
 	
 	public function masterByCustomer($sqlWhere=''){
-		global $oSQL;
-		
-		ob_start();
-			$sql = "SELECT Customer_name as 'Level1_title', `Budget item`, `Group`, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
-			FROM `vw_master`
-			$sqlWhere
-			GROUP BY `vw_master`.customer, `vw_master`.item
-			ORDER BY `vw_master`.customer,`vw_master`.item DESC
-			
-			";
-			$rs = $oSQL->q($sql);
-			$tableID = "byCust_".md5($sql);
-			if (!$oSQL->num_rows($rs)){
-				echo "<div class='warning'>No data found</div>";
-				//echo "<pre>$sql</pre>";
-				return (false);
-			}
-			?>
-			<table id='<?php echo $tableID;?>' class='budget'>
-			<thead>
-				<tr><th>Customer</th><th>Account</th><?php echo $this->oBudget->getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
-			</thead>			
-			<tbody>
-			<?php
-				$Level1_title = '';		
-				while ($rw=$oSQL->f($rs)){
-					if($Level1_title && $Level1_title!=$rw['Level1_title']){
-						$data = $subtotal[$Level1_title];
-						$data['Budget item']=$group;
-						$this->echoBudgetItemString($data,'budget-subtotal');
-					}
-					//------------------------Collecting subtotals---------------------------------------
-					$local_subtotal = 0;
-					for ($m=1;$m<13;$m++){
-						// $month = date('M',mktime(0,0,0,$m,15));
-						$month = $this->oBudget->arrPeriod[$m];
-						$subtotal[$rw['Level1_title']][$month]+=$rw[$month];
-						$local_subtotal += $rw[$month];
-						$grandTotal[$month] += $rw[$month];
-					}
-					$subtotal[$rw['Level1_title']]['Total'] += $local_subtotal;
-					$grandTotal['Total'] += $local_subtotal;	
-					
-					$data = $rw;
-					if ($data['Level1_title']==$Level1_title && $Level1_title) $data['Level1_title']="&nbsp;";
-					$this->echoBudgetItemString($data,$tr_class);
-					
-					$Level1_title = $rw['Level1_title'];
-					$group = $rw['Group'];
-				}
-				$data = $subtotal[$Level1_title];
-				$data['Budget item']=$group;
-				$this->echoBudgetItemString($data,'budget-subtotal');
-				
-				$data = $grandTotal;
-				$data['Budget item']='Grand total';
-				$this->echoBudgetItemString($data,'budget-grandtotal');
-			?>
-			</tbody>
-			</table>
-			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
-			</ul>
-			<?php			
-			ob_flush();
+	
+		$this->_documentPnL($sqlWhere, Array('field_data'=>'customer','field_title'=>'Customer_title','title'=>'Customer'));
+	
 	}
 		
-	
+	private function _documentPnL($sqlWhere, $params = Array('field_data','field_title','title')){
 
+		$strFields = $this->_getMonthlyFields();
+		
+		ob_start();
+		$sql = "SELECT `{$params['field_title']}` as 'Level1_title', `{$params['field_data']}` as 'level1_code', `Budget item`, `Group`, `item`,
+					{$strFields}
+			FROM `vw_master` 			
+			{$sqlWhere} 
+			GROUP BY `vw_master`.`{$params['field_data']}`, `vw_master`.item
+			ORDER BY `{$params['field_data']}`, `Group`, `vw_master`.itmOrder ASC			
+			";
+		
+		$this->_firstLevelPeriodic($sql, $params['title'], $this->oBudget);
+		?>
+		</tbody>
+		</table>
+		<ul class='link-footer'>
+			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
+		</ul>
+		<?php			
+		ob_flush();
+		
+	}
 	
 	public function periodicPnL($sqlWhere, $params = Array('field_data','field_title','title')){
 		

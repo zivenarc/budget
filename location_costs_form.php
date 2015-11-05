@@ -33,14 +33,16 @@ if ($_GET['tab']){
 		case 'kpi':
 			require_once ('classes/reports.class.php');
 			$sqlWhere = "WHERE source='".$oDocument->GUID."'";
-			Reports::costsBySupplier($sqlWhere);
+			$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id));
+			$oReport->costsBySupplier($sqlWhere);
 			die();
 			break;
 		case 'financials':
 			require_once ('classes/reports.class.php');
 			$sqlWhere= "WHERE source='".$oDocument->GUID."'";			
-			Reports::masterByProfit($sqlWhere);
-			Reports::masterByYACT($sqlWhere);
+			$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id));
+			$oReport->masterByProfit($sqlWhere);
+			$oReport->masterByYACT($sqlWhere);
 			die();
 			break;
 		default:
