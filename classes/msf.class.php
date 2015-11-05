@@ -119,11 +119,11 @@ class MSF extends Document{
 		);
 		
 	
-		for ($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-					
+		for ($m=1;$m<=$this->budget->length;$m++){
+			// $month = date('M',mktime(0,0,0,$m,15));
+			$month = $this->budget->arrPeriod[$m];			
 			$grid->Columns[] = Array(
-			'title'=>$month
+			'title'=>ucfirst($month)
 			,'field'=>strtolower($month)
 			,'class'=>'budget-month'
 			,'type'=>'money'
@@ -158,7 +158,7 @@ class MSF extends Document{
 			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
 			$this->item = isset($_POST[$this->prefix.'ItemGUID'])?$_POST[$this->prefix.'ItemGUID']:$this->item;
 			
-			$sql = "SELECT SUM(".Budget::getYTDSQL().") as Total, ".Budget::getMonthlySumSQL()." 
+			$sql = "SELECT SUM(".$this->budget->getYTDSQL().") as Total, ".$this->budget->getMonthlySumSQL()." 
 						FROM reg_master 
 						WHERE active=1 AND scenario='{$this->scenario}' AND pc={$this->profit} AND source NOT IN ('Estimate')";
 			$rs = $this->oSQL->q($sql);	
@@ -231,7 +231,7 @@ class MSF extends Document{
 			// print_r($this->subtotal);
 			if(is_array($this->records[$this->gridName])){
 					// echo '<pre>';print_r($this->records[$this->gridName]);echo '</pre>';die();					
-					$sql = "SELECT pc, activity, ".Budget::getMonthlySumSQL()."
+					$sql = "SELECT pc, activity, ".$this->budget->getMonthlySumSQL()."
 							FROM reg_master							
 							WHERE account='J00400'
 							AND scenario =  '{$this->scenario}' AND source NOT IN ('Estimate')
@@ -245,7 +245,7 @@ class MSF extends Document{
 						}						
 					}
 					
-					$sql = "SELECT account, item, SUM(".Budget::getYTDSQL().") as Total, ".Budget::getMonthlySumSQL()." 
+					$sql = "SELECT account, item, SUM(".$this->budget->getYTDSQL().") as Total, ".$this->budget->getMonthlySumSQL()." 
 						FROM reg_master 
 						WHERE active=1 AND scenario='{$this->scenario}' AND pc={$this->profit} AND source NOT IN ('Estimate')
 						GROUP BY account, item"; 
@@ -343,7 +343,7 @@ class MSF extends Document{
 		
 		switch ($type) {
 			case 'fte':
-				$sql = "SELECT 'FTE' as unit, pc, ".Budget::getMonthlySumSQL()." FROM reg_headcount
+				$sql = "SELECT 'FTE' as unit, pc, ".$this->budget->getMonthlySumSQL()." FROM reg_headcount
 						LEFT JOIN vw_profit ON pccID=pc
 						WHERE scenario='".$oBudget->id."' 
 							AND posted=1 
@@ -352,7 +352,7 @@ class MSF extends Document{
 						GROUP BY pc"; 
 			break;
 			case 'sales':
-				$sql = "SELECT 'RUB' as unit, pc, ".Budget::getMonthlySumSQL()." FROM reg_master
+				$sql = "SELECT 'RUB' as unit, pc, ".$this->budget->getMonthlySumSQL()." FROM reg_master
 						LEFT JOIN vw_profit ON pccID=pc
 						WHERE scenario='".$oBudget->id."' 
 							AND active=1 
@@ -362,7 +362,7 @@ class MSF extends Document{
 						GROUP BY pc"; 
 			break;
 			case 'users':
-				$sql = "SELECT pc, wc, 'user' as unit, ".Budget::getMonthlySumSQL()." FROM reg_headcount
+				$sql = "SELECT pc, wc, 'user' as unit, ".$this->budget->getMonthlySumSQL()." FROM reg_headcount
 					LEFT JOIN vw_profit ON pccID=pc				
 					WHERE scenario='".$oBudget->id."' 
 						AND posted=1 AND wc=1 
@@ -380,8 +380,9 @@ class MSF extends Document{
 			$row->flagUpdated = true;				
 			$row->unit = $rw['unit'];
 			$row->pc = $rw['pc'];			
-			for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));							
+			for ($m=1;$m<=$this->budget->length;$m++){
+				// $month = date('M',mktime(0,0,0,$m,15));							
+				$month = $this->budget->arrPeriod[$m];
 				$row->set_month_value($m, $rw[$month]);
 				$arrSubtotal[$month] += $rw[$month];
 				$arrSum[$month] = $this->total - $arrSubtotal[$month];
