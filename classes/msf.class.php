@@ -45,7 +45,7 @@ class MSF extends Document{
 				// print_r($rw);
 				$this->records[$this->gridName][$rw['id']] = new msf_record($this->GUID, $this->scenario, $rw['id'], $rw);			
 				for($m=1;$m<=15;$m++){
-					// $month = strtolower(date('M',mktime(0,0,0,$m,15)));
+					// $month = strtolower(date('M',mktime(0,0,0,$m,15)));					
 					$month = $this->budget->arrPeriod[$m];
 					$this->subtotal[$month] += $rw[$month];
 				}				
@@ -179,12 +179,8 @@ class MSF extends Document{
 					if ($arrUpdated[$id]){				
 						$row->flagUpdated = true;				
 						$row->pc = isset($_POST['pc'][$id]) ? $_POST['pc'][$id] : $this->profit;						
-						$row->unit = $_POST['unit'][$id];					
-						for ($m=1;$m<=15;$m++){
-							// $month = date('M',mktime(0,0,0,$m,15));
-							$month = $this->budget->arrPeriod[$m];
-							$row->{$month} = (double)$_POST[strtolower($month)][$id];
-						}					
+						$row->unit = $_POST['unit'][$id];	
+						$row->setMonthsFromPOST();
 					} else {
 						$row->flagUpdated = false;
 					}
