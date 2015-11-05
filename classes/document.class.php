@@ -150,15 +150,19 @@ class Document extends easyForm{
 		
 	
 	public function fillGrid($grid, $arrFields = Array(), $sqlFrom=""){
-		$sqlFields = implode(', ',$arrFields);
-		$sqlFrom = $sqlFrom?$sqlFrom:"`".$this->register."`";
-		
-		$sql = "SELECT *, ".$this->budget->getYTDSQL(1,$this->budget->length)." as YTD, (".$this->budget->getYTDSQL(1,$this->budget->length).")/".$this->budget->length." as 'AVG'".($sqlFields?",".$sqlFields:"")."
-					FROM $sqlFrom 
-					WHERE source='{$this->GUID}'";//to add where
-		$rs = $this->oSQL->q($sql);
-		while ($rw = $this->oSQL->f($rs)){
-			$grid->Rows[] = $rw;
+		if ($this->ID){
+			$sqlFields = implode(', ',$arrFields);
+			$sqlFrom = $sqlFrom?$sqlFrom:"`".$this->register."`";
+			
+			$sql = "SELECT *, ".$this->budget->getYTDSQL(1,$this->budget->length)." as YTD, (".$this->budget->getYTDSQL(1,$this->budget->length).")/".$this->budget->length." as 'AVG'".($sqlFields?",".$sqlFields:"")."
+						FROM $sqlFrom 
+						WHERE source='{$this->GUID}'";//to add where
+			$rs = $this->oSQL->q($sql);
+			while ($rw = $this->oSQL->f($rs)){
+				$grid->Rows[] = $rw;
+			}
+		} else {
+			return (false);
 		}
 	}
 	
