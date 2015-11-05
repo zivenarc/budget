@@ -180,11 +180,12 @@ class Sales extends Document{
 			
 			// $grid->Columns[] =Array('title'=>"Formula",'field'=>'formula','type'=>'text','mandatory'=>false);		
 			
-			for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
-						
+			for ($m=1;$m<=$this->budget->length;$m++){
+				// $month = date('M',mktime(0,0,0,$m,15));
+				$month = $this->budget->arrPeriod[$m];		
+				
 				$grid->Columns[] = Array(
-					'title'=>$month
+					'title'=>ucfirst($month)
 					,'field'=>strtolower($month)
 					,'class'=>'budget-month'
 					,'type'=>'int'
@@ -278,8 +279,9 @@ class Sales extends Document{
 						$row->formula = $_POST['formula'][$id];				
 						$row->kpi = $_POST['kpi'][$id];				
 						$row->sales = $this->sales;				
-						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for ($m=1;$m<=$this->budget->length;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];	
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
 						}					
 					} else {
@@ -340,8 +342,9 @@ class Sales extends Document{
 					
 					$master_row->account = $account;
 					$master_row->item = $activity->item_income;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=$this->budget->length;$m++){
+						// $month = date('M',mktime(0,0,0,$m,15));
+						$month = $this->budget->arrPeriod[$m];	
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}				
 					
@@ -356,8 +359,9 @@ class Sales extends Document{
 						
 						$master_row->account = $account;
 						$master_row->item = $activity->item_cost;
-						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for($m=1;$m<=$this->budget->length;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
 						}
 					}
@@ -376,8 +380,9 @@ class Sales extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item->id;
 						
-						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for($m=1;$m<=$this->budget->length;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$settings[strtolower($record->selling_curr)]-$record->buying_rate*$settings[strtolower($record->buying_curr)])/2;
 						}
 					}

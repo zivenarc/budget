@@ -153,7 +153,7 @@ class Document extends easyForm{
 		$sqlFields = implode(', ',$arrFields);
 		$sqlFrom = $sqlFrom?$sqlFrom:"`".$this->register."`";
 		
-		$sql = "SELECT *, ".Budget::getYTDSQL()." as YTD, (".Budget::getYTDSQL().")/12 as 'AVG'".($sqlFields?",".$sqlFields:"")."
+		$sql = "SELECT *, ".$this->budget->getYTDSQL(1,$this->budget->length)." as YTD, (".$this->budget->getYTDSQL(1,$this->budget->length).")/".$this->budget->length." as 'AVG'".($sqlFields?",".$sqlFields:"")."
 					FROM $sqlFrom 
 					WHERE source='{$this->GUID}'";//to add where
 		$rs = $this->oSQL->q($sql);
