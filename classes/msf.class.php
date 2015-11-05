@@ -180,7 +180,11 @@ class MSF extends Document{
 						$row->flagUpdated = true;				
 						$row->pc = isset($_POST['pc'][$id]) ? $_POST['pc'][$id] : $this->profit;						
 						$row->unit = $_POST['unit'][$id];	
-						$row->setMonthsFromPOST();
+						for ($m=1;$m<=$this->budget->length;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];	
+							$row->{$month} = (double)$_POST[strtolower($month)][$id];
+						}
 					} else {
 						$row->flagUpdated = false;
 					}
