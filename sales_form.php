@@ -93,10 +93,11 @@ if ($_GET['tab']){
 			die();
 			break;
 		case 'financials':
-			require_once ('classes/reports.class.php');
-			$sqlWhere= "WHERE source='".$oDocument->GUID."'";			
-			Reports::masterByCustomer($sqlWhere);
-			Reports::masterByYACT($sqlWhere);
+			echo '<h2>Report is under maintenance, will be back soon. Sorry</h2>';
+			// require_once ('classes/reports.class.php');
+			// $sqlWhere= "WHERE source='".$oDocument->GUID."'";			
+			// Reports::masterByCustomer($sqlWhere);
+			// Reports::masterByYACT($sqlWhere);
 			die();
 			break;
 		default:
