@@ -476,5 +476,23 @@ class Document extends easyForm{
 		echo json_encode($jsonData);
 	}
 	
+	public function setMonthlyEG($type='decimal'){
+		
+		if(!$this->grid) return (false);
+		
+		for ($m=1;$m<=$this->budget->length;$m++){
+			$month = $this->budget->arrPeriod[$m];					
+			$this->grid->Columns[] = Array(
+				'title'=>ucfirst($month)
+				,'field'=>strtolower($month)
+				,'class'=>'budget-month'
+				,'type'=>$type
+				, 'mandatory' => true
+				, 'disabled'=>!$this->flagUpdate
+				,'totals'=>true
+			);
+		}
+	}
+	
 }
 ?>

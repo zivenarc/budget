@@ -157,13 +157,15 @@ class Indirect_costs extends Document{
 							, 'controlBarButtons' => "add"
                             )
                     );
-		$grid->Columns[]=Array(
+		$this->grid = $grid;
+		
+		$this->grid->Columns[]=Array(
 			'field'=>"id"
 			,'type'=>'row_id'
 		);
 		
 		if ($this->type=='indirect'){
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'Supplier'
 				,'field'=>'supplier'
 				,'type'=>'ajax_dropdown'
@@ -177,7 +179,7 @@ class Indirect_costs extends Document{
 				, 'class'=>'costs_supplier'
 			);		
 			
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'Item'
 				,'field'=>'item'
 				,'type'=>'combobox'
@@ -187,7 +189,7 @@ class Indirect_costs extends Document{
 			);
 		} else {
 			
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'Profit center'
 				,'field'=>'pc'
 				,'type'=>'combobox'
@@ -196,16 +198,16 @@ class Indirect_costs extends Document{
 			);
 		}
 		
-		$grid->Columns[] = parent::getActivityEG();
+		$this->grid->Columns[] = parent::getActivityEG();
 		
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Description'
 			,'field'=>'comment'
 			,'type'=>'text'
 			, 'disabled'=>false
 		);
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Unit'
 			,'field'=>'unit'
 			,'type'=>'text'
@@ -213,7 +215,7 @@ class Indirect_costs extends Document{
 		);
 		
 		if ($this->type=='indirect'){
-			$grid->Columns[] =Array(
+			$this->grid->Columns[] =Array(
 				'title'=>'Rate'
 				,'field'=>'buying_rate'
 				,'type'=>'decimal'
@@ -221,33 +223,23 @@ class Indirect_costs extends Document{
 				
 			);
 			
-			$grid->Columns[] = parent::getCurrencyEG('buying_curr');
+			$this->grid->Columns[] = parent::getCurrencyEG('buying_curr');
 			
-			$grid->Columns[] = parent::getPeriodEG();
-		}				
-		for ($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-					
-			$grid->Columns[] = Array(
-			'title'=>$month
-			,'field'=>strtolower($month)
-			,'class'=>'budget-month'
-			,'type'=>'decimal'
-			, 'mandatory' => true
-			, 'disabled'=>false
-			,'totals'=>true
-		);
-		}
-		$grid->Columns[] =Array(
-			'title'=>'Total'
-			,'field'=>'YTD'
+			$this->grid->Columns[] = parent::getPeriodEG();
+		}		
+
+		$this->setMonthlyEG('decimal');
+		
+		$this->grid->Columns[] =Array(
+			'title'=>'Average'
+			,'field'=>'AVG'
 			,'type'=>'decimal'
 			,'totals'=>true
 			,'disabled'=>true
 		);
 		
-		$this->grid = $grid;
-		return ($grid);
+		
+		return ($this->grid);
 	}
 	
 
@@ -307,8 +299,8 @@ class Indirect_costs extends Document{
 						$row->activity = $_POST['activity'][$id];				
 						$row->period = isset($_POST['period'][$id])?$_POST['period'][$id]:$this->period;				
 						$row->comment = $_POST['comment'][$id];				
-						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for ($m=1;$m<=15;$m++){
+							$month = $this->budget->arrPeriod[$m];
 							$row->{$month} = (double)$_POST[strtolower($month)][$id];
 						}					
 					} else {
@@ -394,8 +386,8 @@ class Indirect_costs extends Document{
 						$item = $Items->getById($record->item);
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $record->item;
-						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for($m=1;$m<=15;$m++){
+							$month = $this->budget->arrPeriod[$m];
 							$denominator = $record->period=='annual'?$record->{$month}/$record->total():1;
 							$master_row->{$month} = -$record->{$month}*$record->buying_rate*$settings[strtolower($record->buying_curr)]*$denominator;
 						}				
@@ -426,37 +418,37 @@ class Indirect_costs extends Document{
 		
 		switch ($type) {
 			case 'all':
-				$sql = "SELECT pc, wc, activity, 'fte' as unit, ".Budget::getMonthlySumSQL()." FROM reg_headcount WHERE scenario='".$this->budget->id."' AND active=1 GROUP BY pc, activity";
+				$sql = "SELECT pc, wc, activity, 'fte' as unit, ".$this->budget->getMonthlySumSQL()." FROM reg_headcount WHERE scenario='".$this->budget->id."' AND active=1 GROUP BY pc, activity";
 				break;
 			case 'users':
-				$sql = "SELECT pc, wc, activity, 'user' as unit, ".Budget::getMonthlySumSQL()." FROM reg_headcount 
+				$sql = "SELECT pc, wc, activity, 'user' as unit, ".$this->budget->getMonthlySumSQL()." FROM reg_headcount 
 					WHERE scenario='".$oBudget->id."' AND posted=1 AND wc=1 GROUP BY pc, activity";
 				break;
 			case 'bc':
-				$sql = "SELECT pc, wc, activity, funTitleLocal as comment, 'fte' as unit, ".Budget::getMonthlySumSQL()." FROM reg_headcount 
+				$sql = "SELECT pc, wc, activity, funTitleLocal as comment, 'fte' as unit, ".$this->budget->getMonthlySumSQL()." FROM reg_headcount 
 					LEFT JOIN vw_function ON funGUID=function
 					WHERE scenario='".$oBudget->id."' AND posted=1 AND wc=0 GROUP BY pc, function, activity";
 				break;				
 			case 'teu':
-				$sql =  "SELECT pc, activity, customer, cntTitle as comment, unit, ".Budget::getMonthlySumSQL()." FROM reg_sales 
+				$sql =  "SELECT pc, activity, customer, cntTitle as comment, unit, ".$this->budget->getMonthlySumSQL()." FROM reg_sales 
 					JOIN vw_product ON product=prdID
 					LEFT JOIN vw_customer ON customer=cntID
 					WHERE scenario='".$oBudget->id."' AND posted=1 AND prdGDS='OFT' GROUP BY pc, activity, customer";
 				break;
 			case 'revenue':
-				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".Budget::getMonthlySumSQL()." FROM reg_master 
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL()." FROM reg_master 
 					LEFT JOIN vw_customer ON customer=cntID
 					WHERE scenario='".$oBudget->id."' AND item='".Items::REVENUE."' AND source<>'estimate' 
 					GROUP BY pc, activity";
 				break;
 			case 'kaizen':
-				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".Budget::getMonthlySumSQL()." FROM reg_master
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL()." FROM reg_master
 					JOIN vw_product_type ON prtID=activity AND prtGHQ='{$params['prtGHQ']}'
 					WHERE scenario='".$this->budget->id."' AND item='".Items::DIRECT_COSTS."' AND source NOT IN ('estimate','Actual')
 					GROUP BY pc, activity";
 				break;
 			case 'kaizen_revenue':
-				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".Budget::getMonthlySumSQL()." FROM reg_master
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL()." FROM reg_master
 					JOIN vw_product_type ON prtID=activity AND prtGHQ='{$params['prtGHQ']}'
 					WHERE scenario='".$oBudget->id."' AND item IN('".Items::REVENUE."','".Items::INTERCOMPANY_REVENUE."') AND source<>'estimate'
 					GROUP BY pc, activity";
@@ -477,8 +469,8 @@ class Indirect_costs extends Document{
 			$row->buying_curr = $this->currency;
 			$row->item = $this->data[$this->prefix."ItemGUID"];
 			$row->supplier = $this->data[$this->prefix."SupplierID"];
-			for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
+			for ($m=1;$m<=15;$m++){
+				$month = $this->budget->arrPeriod[$m];
 				$row->{$month} = abs($rw[$month]);
 			}
 		}	

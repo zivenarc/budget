@@ -736,7 +736,7 @@ class Reports{
 			FROM `vw_master` 			
 			{$sqlWhere} AND Group_code=".self::GP_CODE." ## Gross margin only
 			GROUP BY `vw_master`.`{$params['field_data']}`, `vw_master`.item
-			ORDER BY prtRHQ, `{$params['field_data']}`, `Group`, `vw_master`.itmOrder ASC			
+			ORDER BY `{$params['field_data']}`, `Group`, `vw_master`.itmOrder ASC			
 			";
 		
 		$this->_firstLevelPeriodic($sql, $params['title'], $this->oBudget);

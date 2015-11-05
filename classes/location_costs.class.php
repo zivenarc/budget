@@ -106,11 +106,13 @@ class Location_costs extends Document{
 							, 'controlBarButtons' => "add"
                             )
                     );
-		$grid->Columns[]=Array(
+		$this->grid = $grid;
+		
+		$this->grid->Columns[]=Array(
 			'field'=>"id"
 			,'type'=>'row_id'
 		);
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Supplier'
 			,'field'=>'supplier'
 			,'type'=>'ajax_dropdown'
@@ -124,7 +126,7 @@ class Location_costs extends Document{
 			, 'class'=>'costs_supplier'
 		);		
 
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Item'
 			,'field'=>'item'
 			,'type'=>'combobox'
@@ -133,20 +135,20 @@ class Location_costs extends Document{
 			, 'disabled'=>false
 		);
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Description'
 			,'field'=>'comment'
 			,'type'=>'text'
 			, 'disabled'=>false
 		);
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Unit'
 			,'field'=>'unit'
 			,'type'=>'text'
 			,'mandatory'=>true
 		);
 
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Rate'
 			,'field'=>'buying_rate'
 			,'type'=>'money'
@@ -154,32 +156,21 @@ class Location_costs extends Document{
 			
 		);
 		
-		$grid->Columns[] = parent::getCurrencyEG('buying_curr');
+		$this->grid->Columns[] = parent::getCurrencyEG('buying_curr');
 		
-		$grid->Columns[] = parent::getPeriodEG();
+		$this->grid->Columns[] = parent::getPeriodEG();
 		
-		for ($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-					
-			$grid->Columns[] = Array(
-			'title'=>$month
-			,'field'=>strtolower($month)
-			,'class'=>'budget-month'
-			,'type'=>'decimal'
-			, 'mandatory' => true
-			, 'disabled'=>false
-			,'totals'=>true
-		);
-		}
-		$grid->Columns[] =Array(
-			'title'=>'Total'
-			,'field'=>'YTD'
+		$this->setMonthlyEG('decimal');
+		
+		$this->grid->Columns[] =Array(
+			'title'=>'Average'
+			,'field'=>'AVG'
 			,'type'=>'decimal'
 			,'totals'=>true
 			,'disabled'=>true
 		);
-		$this->grid = $grid;
-		return ($grid);
+		
+		return ($this->grid);
 	}
 	
 	public function save($mode='update'){
@@ -222,8 +213,8 @@ class Location_costs extends Document{
 						$row->unit = $_POST['unit'][$id];				
 						$row->period = $_POST['period'][$id];				
 						$row->comment = $_POST['comment'][$id];				
-						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for ($m=1;$m<=15;$m++){
+							$month = $this->budget->arrPeriod[$m];
 							$row->{$month} = (double)$_POST[strtolower($month)][$id];
 						}					
 					} else {
@@ -267,7 +258,7 @@ class Location_costs extends Document{
 			$oMaster = new budget_session($this->scenario, $this->GUID);
 			
 			
-			$sqlSelect = "SELECT pc,pccTitle, activity, prtTitle, ".Budget::getMonthlySumSQL();
+			$sqlSelect = "SELECT pc,pccTitle, activity, prtTitle, ".$this->budget->getMonthlySumSQL(1,15);
 			$sqlFrom = " FROM reg_headcount 
 							LEFT JOIN vw_profit ON pccID=pc
 							LEFT JOIN vw_product_type ON prtID=activity";
@@ -307,12 +298,12 @@ class Location_costs extends Document{
 			while ($rw = $this->oSQL->f($rs)){
 				$arrLoc[] = $rw;
 				$avg = 0;
-				for($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+				for($m=1;$m<=15;$m++){
+					$month = $this->budget->arrPeriod[$m];
 					$headcount[$month] += $rw[$month];
 					$avg +=  $rw[$month];
 				}
-				$avg = $avg/12;
+				$avg = $avg/$this->budget->length;
 				$arrPostComment[] = "{$rw['pccTitle']} ({$rw['prtTitle']}) - ".number_format($avg,1,'.',',');
 			}
 						
@@ -335,8 +326,8 @@ class Location_costs extends Document{
 						$item = $Items->getById($record->item);
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $record->item;
-						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for($m=1;$m<=15;$m++){
+							$month = $this->budget->arrPeriod[$m];
 							$master_row->{$month} = -$hc_data[$month]*($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)]/$headcount[$month]/$denominator;
 						}				
 												
