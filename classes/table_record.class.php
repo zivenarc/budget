@@ -46,7 +46,7 @@ class table_record {
 		}
 	}
 	
-	public function set_month_value($i, $value){
+	public function set_month_value($m, $value){
 		// $month = date('M',mktime(0,0,0,(integer)$i,15));
 		$month = $this->arrPeriod[$m];
 		$this->{$month} =(double)$value;
