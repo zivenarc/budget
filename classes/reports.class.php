@@ -467,7 +467,7 @@ class Reports{
 		global $oSQL;
 		
 		ob_start();
-			$sql = "SELECT prtGHQ, account, Title, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total 
+			$sql = "SELECT prtGHQ, account, Title, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
 			FROM `vw_master`
 			$sqlWhere
 			GROUP BY prtGHQ, account
@@ -483,7 +483,7 @@ class Reports{
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
-				<tr><th>Activity</th><th>Account</th><th>Title</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
+				<tr><th>Activity</th><th>Account</th><th>Title</th><?php echo $this->oBudget->getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
 			</thead>			
 			<tbody>
 			<?php			
@@ -493,7 +493,8 @@ class Reports{
 				echo '<th>',$rw['account'],'</th>';
 				echo '<th>',$rw['Title'],'</th>';
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+					// $month = date('M',mktime(0,0,0,$m,15));
+					$month = $this->oBudget->arrPeriod[$m];
 					?>
 					<td class="budget-decimal"><?php self::render($rw[$month],0);?></td>
 					<?php
@@ -654,7 +655,8 @@ class Reports{
 		global $oSQL;
 		
 		ob_start();
-			$sql = "SELECT Customer_name as 'Level1_title', `Budget item`, `Group`, ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total FROM `vw_master`
+			$sql = "SELECT Customer_name as 'Level1_title', `Budget item`, `Group`, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
+			FROM `vw_master`
 			$sqlWhere
 			GROUP BY `vw_master`.customer, `vw_master`.item
 			ORDER BY `vw_master`.customer,`vw_master`.item DESC
@@ -670,7 +672,7 @@ class Reports{
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
-				<tr><th>Customer</th><th>Account</th><?php echo Budget::getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
+				<tr><th>Customer</th><th>Account</th><?php echo $this->oBudget->getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
 			</thead>			
 			<tbody>
 			<?php
@@ -684,7 +686,8 @@ class Reports{
 					//------------------------Collecting subtotals---------------------------------------
 					$local_subtotal = 0;
 					for ($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+						// $month = date('M',mktime(0,0,0,$m,15));
+						$month = $this->oBudget->arrPeriod[$m];
 						$subtotal[$rw['Level1_title']][$month]+=$rw[$month];
 						$local_subtotal += $rw[$month];
 						$grandTotal[$month] += $rw[$month];

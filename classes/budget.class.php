@@ -38,7 +38,7 @@ class budget_session {
 		$sql[] = "DELETE FROM `reg_master` WHERE `source`='".$this->id."'";
 		
 		for ($i=0;$i<count($this->records['master']);$i++){
-			$sql[] = $this->records['master'][$i]->getSQLstring(date('m',$this->budget->date_start),15,$flagPostActualPeriods);
+			$sql[] = $this->records['master'][$i]->getSQLstring(date('n',$this->budget->date_start),15,$flagPostActualPeriods);
 		}
 		
 		// $sql[] = "DELETE FROM `tbl_headcount` WHERE `source`='".$this->id."'";
@@ -155,15 +155,17 @@ class master_record{
 			$mStart = 1;
 		}
 		
+		$arrRes = Array();
+		
+		// echo '<pre>';print_r($this);echo '</pre>';die();
+		
 		for($m=$mStart;$m<=$mEnd;$m++){
 			// $month = date('M',mktime(0,0,0,$m,15));
-			$month = $this->arrPeriod[$m];
+			$month = $this->arrPeriod[$m];			
 			$arrRes[] = "`$month`=".$this->{$month};
 		}
-		
 				
-		//========= Быдлокод
-		$arrRes[] = "`company`='OOO'";
+		$arrRes[] = "`company`='OOO'"; //========= Быдлокод
 		$arrRes[] = "`account`='".$this->account."'";		
 		$arrRes[] = "`item`='".$this->item."'";		
 		$arrRes[] = "`pc`=".$this->profit;
