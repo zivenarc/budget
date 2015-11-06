@@ -119,45 +119,48 @@ class Interco_sales extends Document{
 							, 'controlBarButtons' => "add"
                             )
                     );
-		$grid->Columns[]=Array(
+		
+		$this->grid = $grid;
+		
+		$this->grid->Columns[]=Array(
 			'field'=>"id"
 			,'type'=>'row_id'
 		);
 		
-		$grid->Columns[] = parent::getCustomerEG();
+		$this->grid->Columns[] = parent::getCustomerEG();
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Code'
 			,'field'=>'prdExternalID'
 			,'type'=>'text'
 			,'disabled'=>true
 		);
 		
-		$grid->Columns[] = parent::getProductEG();
+		$this->grid->Columns[] = parent::getProductEG();
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Description'
 			,'field'=>'comment'
 			,'type'=>'text'
 			, 'disabled'=>false
 		);
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Unit'
 			,'field'=>'unit'
 			,'type'=>'text'
 			,'mandatory'=>true
 		);
 
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Selling rate'
 			,'field'=>'selling_rate'
 			,'type'=>'money'
 			,'mandatory'=>true
 		);
 		
-		$grid->Columns[] = parent::getCurrencyEG('selling_curr');
+		$this->grid->Columns[] = parent::getCurrencyEG('selling_curr');
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Buying rate'
 			,'field'=>'buying_rate'
 			,'type'=>'money'
@@ -165,42 +168,23 @@ class Interco_sales extends Document{
 			
 		);
 		
-		$grid->Columns[] = parent::getCurrencyEG('buying_curr');		
+		$this->grid->Columns[] = parent::getCurrencyEG('buying_curr');		
 		
 		if (!$this->flagPosted){		
-			$grid->Columns[] =Array(
-				'title'=>"Formula"
-				,'field'=>'formula'
-				,'type'=>'text'
-				,'mandatory'=>false
-				
-			);		
-			for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
-						
-				$grid->Columns[] = Array(
-					'title'=>$month
-					,'field'=>strtolower($month)
-					,'class'=>'budget-month'
-					,'type'=>'int'
-					, 'mandatory' => true
-					, 'disabled'=>false
-					,'totals'=>true
-				);
-			}
+			$this->setMonthlyEG('int');
 		} else {
 			$grid->Columns[] = parent::getActivityEG();
 		}
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Total'
 			,'field'=>'YTD'
 			,'type'=>'integer'
 			,'totals'=>true
 			,'disabled'=>true
 		);
-		$this->grid = $grid;
-		return ($grid);
+		
+		return ($this->grid);
 	}
 	
 	public function fillGrid(){
@@ -297,8 +281,8 @@ class Interco_sales extends Document{
 					$account = 'J00400';			
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_REVENUE;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}				
 					
@@ -313,8 +297,8 @@ class Interco_sales extends Document{
 					
 					$master_row->account = $account;
 					$master_row->item = $activity->item_cost;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
 					}
 					
@@ -329,8 +313,8 @@ class Interco_sales extends Document{
 					
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_COSTS;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
 					
@@ -345,8 +329,8 @@ class Interco_sales extends Document{
 					
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_REVENUE;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
 					
@@ -361,8 +345,8 @@ class Interco_sales extends Document{
 					
 					$master_row->account = $account;
 					$master_row->item = Items::INTERCOMPANY_COSTS;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
 					
@@ -377,8 +361,8 @@ class Interco_sales extends Document{
 					
 					$master_row->account = $account;
 					$master_row->item = $activity->item_cost;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
 				}
