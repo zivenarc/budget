@@ -6,7 +6,6 @@ require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
-include ('includes/inc_report_buttons.php');
 
 $oBudget = new Budget($budget_scenario);
 $arrJS[]='js/rep_pnl.js';
@@ -33,6 +32,7 @@ $arrUsrData["pagTitle$strLocal"] = 'Sales by '.($rw['usrTitle']?$rw['usrTitle']:
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
+// include ('includes/inc_report_buttons.php');
 ?>
 <div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 <?php
