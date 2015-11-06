@@ -118,96 +118,92 @@ class Sales extends Document{
 							, 'controlBarButtons' => "add|delete"
                             )
                     );
-		$grid->Columns[]=Array(
+		
+		$this->grid = $grid;
+		
+		$this->grid->Columns[]=Array(
 			'field'=>"id"
 			,'type'=>'row_id'
 		);
 		
 		if (!$this->data[self::Prefix.'CustomerID']){
-			$grid->Columns[] = parent::getCustomerEG();
+			$this->grid->Columns[] = parent::getCustomerEG();
 		}
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Code'
 			,'field'=>'prdExternalID'
+			,'width'=>'20px'
 			,'type'=>'text'
 			,'disabled'=>true
 		);
 		
-		$grid->Columns[] = parent::getProductEG();
+		$this->grid->Columns[] = parent::getProductEG();
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Description'
 			,'field'=>'comment'
+			,'width'=>'120px'
 			,'type'=>'text'
 			, 'disabled'=>false
 		);
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Unit'
 			,'field'=>'unit'
+			,'width'=>'30px'
 			,'type'=>'text'
 			,'mandatory'=>true
 		);
 
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Selling rate'
 			,'field'=>'selling_rate'
+			,'width'=>'60px'
 			,'type'=>'money'
 			,'mandatory'=>true
 		);
 		
-		$grid->Columns[] = parent::getCurrencyEG('selling_curr');
+		$this->grid->Columns[] = parent::getCurrencyEG('selling_curr');
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Buying rate'
 			,'field'=>'buying_rate'
 			,'type'=>'money'
+			,'width'=>'60px'
 			,'mandatory'=>true
 			
 		);
 		
-		$grid->Columns[] = parent::getCurrencyEG('buying_curr');		
+		$this->grid->Columns[] = parent::getCurrencyEG('buying_curr');		
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 				'title'=>"KPI"
 				,'field'=>'kpi'
 				,'type'=>'boolean'
+				,'width'=>'28px'
 				,'mandatory'=>false
 				, 'disabled'=>$this->flagPosted
 		);	
 		
 		if (!$this->flagPosted){		
 			
-			// $grid->Columns[] =Array('title'=>"Formula",'field'=>'formula','type'=>'text','mandatory'=>false);		
+			$this->setMonthlyEG('int');
 			
-			for ($m=1;$m<=$this->budget->length;$m++){
-				// $month = date('M',mktime(0,0,0,$m,15));
-				$month = $this->budget->arrPeriod[$m];		
-				
-				$grid->Columns[] = Array(
-					'title'=>ucfirst($month)
-					,'field'=>strtolower($month)
-					,'class'=>'budget-month'
-					,'type'=>'int'
-					, 'mandatory' => true
-					, 'disabled'=>false
-					,'totals'=>true
-				);
-			}
 		} else {
-			$grid->Columns[] = parent::getActivityEG();
+			$this->grid->Columns[] = parent::getActivityEG();
 		}
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Total'
 			,'field'=>'YTD'
 			,'type'=>'integer'
+			,'width'=>'100px'
 			,'totals'=>true
 			,'disabled'=>true
 		);
 		
-		$this->grid = $grid;
-		return ($grid);
+		
+		return ($this->grid);
 	}
 	
 	public function fillGrid(){

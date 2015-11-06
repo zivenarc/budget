@@ -352,6 +352,7 @@ class Document extends easyForm{
 			'title'=>'Profit center'
 			,'field'=>$this->prefix.'ProfitID'
 			,'type'=>'combobox'
+			,'width'=>'80px'
 			,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit WHERE pccFlagFolder=0'
 			,'default'=>$arrUsrData['empProfitID']
 			,'disabled'=>!$this->flagUpdate
@@ -367,6 +368,7 @@ class Document extends easyForm{
 				,'table'=>'vw_supplier'
 				,'source'=>'vw_supplier'
 				,'prefix'=>'cnt'
+				,'width'=>'100px'
 				,'sql'=>"SELECT cntID as optValue, cntTitle as optText FROM vw_supplier"				
 				, 'disabled'=>!$this->flagUpdate
 				, 'default'=>0
@@ -383,6 +385,7 @@ class Document extends easyForm{
 			,'table'=>'vw_customer'
 			,'source'=>'vw_customer'
 			,'prefix'=>'cnt'
+			,'width'=>'100px'
 			,'sql'=>"SELECT cntID as optValue, cntTitle as optText FROM vw_customer"
 			, 'mandatory' => true
 			, 'disabled'=>!$this->flagUpdate
@@ -396,6 +399,7 @@ class Document extends easyForm{
 			'title'=>'Curr'
 			,'field'=>$field
 			,'type'=>'combobox'
+			,'width'=>'40px'
 			,'sql'=>"SELECT curTitle as optValue, curTitle as optText FROM vw_currency"
 			,'mandatory'=>true
 			,'default'=>'RUB'
@@ -409,6 +413,7 @@ class Document extends easyForm{
 			'title'=>'Period'
 			,'field'=>$field
 			,'type'=>'combobox'
+			,'width'=>'40px'
 			,'arrValues'=>Array('monthly'=>'per month','annual'=>'per annum')
 			,'sql'=>Array('monthly'=>'per month','annual'=>'per annum')
 			,'mandatory'=>true
@@ -423,6 +428,7 @@ class Document extends easyForm{
 			'title'=>'Activity'
 			,'field'=>$field
 			,'type'=>'combobox'
+			,'width'=>'100px'
 			,'arrValues'=>Activities::getStructuredRef()
 			// ,'sql'=>"SELECT prtID as optValue, prtTitle as optText FROM vw_product_type ORDER BY prtRHQ, prtTitle"
 			, 'disabled'=>!$this->flagUpdate
@@ -439,6 +445,7 @@ class Document extends easyForm{
 			'title'=>'Product'
 			,'field'=>'product'
 			,'type'=>'combobox'
+			,'width'=>'100px'
 			,'arrValues'=>$Products->getStructuredRef($this->data["prdIdxLeft"],$this->data["prdIdxRight"])
 			,'source'=>"vw_product_select"      							
 			, 'mandatory' => true
