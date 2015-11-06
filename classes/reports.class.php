@@ -104,11 +104,11 @@ class Reports{
 		GLOBAL $budget_scenario;
 		
 		ob_start();
-			$sql = "SELECT unit, cntTitle as 'Customer', ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total FROM `reg_sales`
+			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().") as Total FROM `reg_sales`
 					LEFT JOIN vw_customer ON customer=cntID					
 					LEFT JOIN vw_profit ON pc=pccID					
 					WHERE posted=1 AND scenario='{$budget_scenario}' $sqlWhere
-					GROUP BY `reg_sales`.`customer`
+					GROUP BY `reg_sales`.`customer`, unit
 					ORDER BY Total DESC"; 
 			//echo $sql;
 			$rs = $oSQL->q($sql);
@@ -123,8 +123,8 @@ class Reports{
 			<thead>
 				<tr><th>Customer</th><th>Unit</th>
 					<?php 
-					echo Budget::getTableHeader(); 
-					echo Budget::getTableHeader('quarterly'); 
+					echo $this->oBudget->getTableHeader(); 
+					echo $this->oBudget->getTableHeader('quarterly'); 
 					?>
 				<th class='budget-ytd'>Total</th></tr>
 			</thead>			
@@ -137,18 +137,19 @@ class Reports{
 					<td><?php echo $rw['unit'];?></td>
 				<?php
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
-					$arrTotal[$month] += $rw[$month];
+					$month = $this->oBudget->arrPeriod[$m];
+					$arrTotal[$rw['unit']][$month] += $rw[$month];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",number_format($rw[$month],0,'.',','),'</td>';
 				}
-				$arrQuarter = Array('Q1'=>$rw['Jan']+$rw['Feb']+$rw['Mar'],
-									'Q2'=>$rw['Apr']+$rw['May']+$rw['Jun'],
-									'Q3'=>$rw['Jul']+$rw['Aug']+$rw['Sep'],
-									'Q4'=>$rw['Oct']+$rw['Nov']+$rw['Dec']);
+				$arrQuarter = Array('Q1'=>$rw['jan']+$rw['feb']+$rw['mar'],
+									'Q2'=>$rw['apr']+$rw['may']+$rw['jun'],
+									'Q3'=>$rw['jul']+$rw['Aug']+$rw['sep'],
+									'Q4'=>$rw['oct']+$rw['nov']+$rw['dec'],
+									'Q5'=>$rw['jan_1']+$rw['feb_1']+$rw['mar_1']);
 				
 				for ($q=1;$q<5;$q++){		
 					$quarter = 'Q'.$q;
-					$arrQTotal[$quarter] += $arrQuarter[$quarter];
+					$arrQTotal[$rw['unit']][$quarter] += $arrQuarter[$quarter];
 					?>
 					<td class='budget-decimal budget-quarterly budget-$quarter'><?php self::render($arrQuarter[$quarter])?></td>
 					<?php
@@ -160,24 +161,30 @@ class Reports{
 			?>
 			</tbody>
 			<tfoot>
+				<?php 
+				foreach ($arrTotal as $unit=>$data){
+				?>
 				<tr class="budget-subtotal">
-					<td colspan="2">Total:</td>
+					<td colspan="2">Total <?php echo $unit?$unit:"<...>";?></td>
 					<?php
 					for ($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+						$month = $this->oBudget->arrPeriod[$m];
 						?>
-						<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($arrTotal[$month]);?></td>
+						<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month]);?></td>
 						<?php
 					}
 					for ($q=1;$q<5;$q++){		
 						$quarter = 'Q'.$q;						
 						?>
-						<td class='budget-decimal budget-quarterly budget-<?php echo $quarter;?>'><?php self::render($arrQTotal[$quarter])?></td>
+						<td class='budget-decimal budget-quarterly budget-<?php echo $quarter;?>'><?php self::render($arrQTotal[$unit][$quarter])?></td>
 						<?php
 					}
 					?>
-					<td class='budget-decimal budget-ytd'><?php self::render(array_sum($arrTotal));?></td>
+					<td class='budget-decimal budget-ytd'><?php self::render(array_sum($data));?></td>
 				</tr>
+				<?php 
+				}
+				?>
 			</tfoot>
 			</table>
 			<ul class='link-footer'>

@@ -490,6 +490,7 @@ class Document extends easyForm{
 				, 'mandatory' => true
 				, 'disabled'=>!$this->flagUpdate
 				,'totals'=>true
+				,'witdh'=>'10%'
 			);
 		}
 	}
