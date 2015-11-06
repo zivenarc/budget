@@ -14,7 +14,7 @@ echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
 
 ?>
-<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
+<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
 <?php
 
 if(true || !isset($_GET['ghq'])){
