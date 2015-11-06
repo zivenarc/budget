@@ -43,7 +43,7 @@ class Products extends Reference{
 			WHERE prdIdxLeft BETWEEN  '{$prdIdxLeft}' AND '{$prdIdxRight}'
 			AND prdFlagFolder=0
 			GROUP BY prdID
-			ORDER BY prtGHQ, prdIdxLeft, prdIdxRight, prdTitleLocal
+			ORDER BY prtGHQ, prdTitleLocal
 		";
 		$rs = $this->oSQL->q($sql);
 		

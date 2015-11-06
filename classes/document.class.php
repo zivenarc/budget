@@ -439,23 +439,8 @@ class Document extends easyForm{
 			'title'=>'Product'
 			,'field'=>'product'
 			,'type'=>'combobox'
-			, 'arrValues'=>$Products->getStructuredRef($this->data["prdIdxLeft"],$this->data["prdIdxRight"])
-			// ,'sql'=>"SELECT PRD.prdID as optValue
-				// ".
-				   // (!empty($this->data["prdIdxLeft"]) 
-				   // ? "
-					// , GROUP_CONCAT(PRD_P.prdTitle SEPARATOR ' / ') as optText
-					// FROM vw_product PRD 
-					// INNER JOIN vw_product PRD_P ON PRD_P.prdIdxLeft<=PRD.prdIdxLeft 
-						// AND PRD_P.prdIdxRight>=PRD.prdIdxRight AND PRD_P.prdParentID >0 
-					// WHERE PRD.prdIdxLeft BETWEEN  '{$this->data["prdIdxLeft"]}' AND '{$this->data["prdIdxRight"]}'
-						// AND PRD.prdFlagFolder=0
-					// GROUP BY PRD.prdID
-					// ORDER BY PRD.prdParentID"
-				   // : "
-				   // , prdTitle as optText, prdFlagDeleted as optDeleted
-				   // FROM vw_product PRD")."      
-				// "
+			,'arrValues'=>$Products->getStructuredRef($this->data["prdIdxLeft"],$this->data["prdIdxRight"])
+			,'source'=>"vw_product_select"      							
 			, 'mandatory' => true
 			, 'disabled'=>!$this->flagUpdate
 		);
