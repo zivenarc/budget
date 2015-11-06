@@ -28,7 +28,7 @@ if(isset($currency)){
 $sql = "SELECT * FROM stbl_user WHERE usrID=".$oSQL->e($usrID);
 $rs = $oSQL->q($sql);
 $rw = $oSQL->f($rs);
-$arrUsrData["pagTitle$strLocal"] .= ' by '.($rw['usrTitle']?$rw['usrTitle']:'<Unknown>');
+$arrUsrData["pagTitle$strLocal"] = 'Sales by '.($rw['usrTitle']?$rw['usrTitle']:'<Unknown>');
 	
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';

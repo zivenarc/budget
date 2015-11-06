@@ -107,7 +107,7 @@ class Reports{
 			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().") as Total FROM `reg_sales`
 					LEFT JOIN vw_customer ON customer=cntID					
 					LEFT JOIN vw_profit ON pc=pccID					
-					WHERE posted=1 AND scenario='{$budget_scenario}' $sqlWhere
+					WHERE posted=1 AND scenario='{$budget_scenario}' and kpi=1 $sqlWhere
 					GROUP BY `reg_sales`.`customer`, unit
 					ORDER BY Total DESC"; 
 			//echo $sql;
