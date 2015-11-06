@@ -104,7 +104,8 @@ class Reports{
 		GLOBAL $budget_scenario;
 		
 		ob_start();
-			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().") as Total FROM `reg_sales`
+			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().") as Total 
+					FROM `reg_sales`
 					LEFT JOIN vw_customer ON customer=cntID					
 					LEFT JOIN vw_profit ON pc=pccID					
 					WHERE posted=1 AND scenario='{$budget_scenario}' and kpi=1 $sqlWhere
