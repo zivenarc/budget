@@ -550,7 +550,7 @@ class Reports{
 		$strFields = $this->_getMonthlyFields();
 		
 		ob_start();
-		$sql = "SELECT `{$params['field_title']}` as 'Level1_title', `{$params['field_data']}` as 'level1_code', `Budget item`, `Group`, `item`,
+		$sql = "SELECT {$params['field_title']} as 'Level1_title', {$params['field_data']} as 'level1_code', `Budget item`, `Group`, `item`,
 					{$strFields}
 			FROM `vw_master` 			
 			{$sqlWhere} 

@@ -254,11 +254,11 @@ class Headcount extends Document{
 				);	
 		}
 		
-		for ($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+		for ($m=1;$m<=15;$m++){
+			$month = $this->budget->arrPeriod[$m];
 					
 			$grid->Columns[] = Array(
-			'title'=>''//$month------------------------ Title hidden
+			'title'=>''//ucfirst($month)------------------------ Title hidden
 			,'field'=>strtolower($month)
 			,'class'=>'budget-month'
 			,'type'=>'int'
@@ -341,8 +341,8 @@ class Headcount extends Document{
 								
 						// $start_date = strtotime($_POST['start_date'][$id]);
 								
-						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for ($m=1;$m<=15;$m++){
+							$month = $this->budget->arrPeriod[$m];
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							$current_month_end = mktime(0,0,0,$m+1,0,$oBudget->year);
 							// echo date('d.m.Y',$row->start_date),';',date('d.m.Y',$current_month_start),"\r\n";
@@ -375,8 +375,8 @@ class Headcount extends Document{
 		
 		$this->deleteGridRecords();
 		
-		$settings = Budget::getSettings($this->oSQL,$this->scenario);
-		// echo '<pre>';print_r($settings);echo '</pre>';	
+		$this->settings = Budget::getSettings($this->oSQL,$this->scenario);
+		// echo '<pre>';print_r($this->settings);echo '</pre>';	
 		
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
@@ -421,7 +421,7 @@ class Headcount extends Document{
 					$eligible_date = time(0,0,0,10,1,$oMaster->budget->year-1);
 					$start_date = strtotime($record->start_date);
 					$probation = $start_date + 91*24*60*60;
-					$eligible = ($start_date < $eligible_date) && ($settings['salary_review_month']>date('m',$oMaster->budget->date_start));
+					$eligible = ($start_date < $eligible_date) && ($this->settings['salary_review_month']>date('m',$oMaster->budget->date_start));
 
 					//-----------------------------------------------------------------Salary, gross
 					$master_row = $oMaster->add_master();
@@ -438,12 +438,12 @@ class Headcount extends Document{
 					
 					$social_tax = Array();					
 					$salarySubtotal = 0;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						
 						
 						if ($eligible) {						
-							$salary[$month] = ($record->{$month})*$record->salary*($m<$settings['salary_review_month']?1:1+$settings['salary_increase_ratio']);
+							$salary[$month] = ($record->{$month})*$record->salary*($m<$this->settings['salary_review_month']?1:1+$this->settings['salary_increase_ratio']);
 						} else {
 							if (true || $this->type=='current'){
 								$salary[$month] = ($record->{$month})*$record->salary;
@@ -462,14 +462,15 @@ class Headcount extends Document{
 						}
 						
 						$salarySubtotal += $salary[$month];
-						$master_row->{$month} = -$salary[$month];
-						if ($salarySubtotal<$settings['social_cap']){
-							$social_tax[$month] = ($settings['social_tax_1']*(1-$record->vks)+$settings['social_tax_accident']) * $salary[$month];
-						} else {
-							$social_tax[$month] = $settings['social_tax_accident'] * $salary[$month] 
-												+ $settings['social_tax_1']*(1-$record->vks) * max(0,$settings['social_cap'] - ($salarySubtotal - $salary[$month])) 
-												+ $settings['social_tax_2']*(1-$record->vks)* min($salary[$month],($salarySubtotal - $settings['social_cap']));
-						}
+						$master_row->{$month} = -$salary[$month]*(20.5-1.67)/20.5;
+						$social_tax[$month] = $this->_getSocialTax($salary[$month],$m)*(1-$record->vks) + $this->settings['social_tax_accident'] * $salary[$month] ;
+						// if ($salarySubtotal<$this->settings['social_cap']){
+							// $social_tax[$month] = ($this->settings['social_tax_1']*(1-$record->vks)+$this->settings['social_tax_accident']) * $salary[$month];
+						// } else {
+							// $social_tax[$month] = $this->settings['social_tax_accident'] * $salary[$month] 
+												// + $this->settings['social_tax_1']*(1-$record->vks) * max(0,$this->settings['social_cap'] - ($salarySubtotal - $salary[$month])) 
+												// + $this->settings['social_tax_2']*(1-$record->vks)* min($salary[$month],($salarySubtotal - $this->settings['social_cap']));
+						// }
 
 						$hcCount[$month][$record->wc] += $record->{$month};
 						$payroll[$month] += $salary[$month];
@@ -487,8 +488,8 @@ class Headcount extends Document{
 					$oItem = $Items->getById($master_row->item);
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -$social_tax[$month];
 					}
 					
@@ -505,8 +506,8 @@ class Headcount extends Document{
 					$oItem = $Items->getById($master_row->item);
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = - $record->{$month}*$record->mobile_limit;
 					}
 					
@@ -523,11 +524,11 @@ class Headcount extends Document{
 						$oItem = $Items->getById($master_row->item);
 						$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 						
-						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for($m=1;$m<=15;$m++){
+							$month = $this->budget->arrPeriod[$m];
 							$next_month_start = mktime(0,0,0,$m+1,1,$oBudget->year);
 							if(date('Ym',$start_date) < date('Ym',$next_month_start)){
-								$master_row->{$month} = - $record->{$month}*$settings['pc_profile_'.$record->pc_profile]*$settings['usd']/36;
+								$master_row->{$month} = - $record->{$month}*$this->settings['pc_profile_'.$record->pc_profile]*$this->settings['usd']/36;
 							}
 							
 						}
@@ -544,8 +545,8 @@ class Headcount extends Document{
 					$oItem = $Items->getById($master_row->item);
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = - $record->{$month}*$record->fuel;
 					}
 					
@@ -561,13 +562,13 @@ class Headcount extends Document{
 					$oItem = $Items->getById($master_row->item);
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = - 	$salary[$month]
-													*(0.5*$settings['regular_bonus_avg']/100 
+													*(0.5*$this->settings['regular_bonus_avg']/100 
 														+$this->bonus_corporate/100
 														+$this->bonus_department/100)
-													*$settings['regular_bonus_base']/100/3;
+													*$this->settings['regular_bonus_base']/100/3;
 					}
 					
 					//-----------------------------------------------------------------Medical insurance
@@ -583,14 +584,14 @@ class Headcount extends Document{
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
 					$insurance_base = $record->insurance/12;
-					$insurance_roy = $insurance_base*(1+$settings['medical_insurance_index']);
-					$insurance_expiry = strtotime($settings['medical_insurance_expiry']);
+					$insurance_roy = $insurance_base*(1+$this->settings['medical_insurance_index']);
+					$insurance_expiry = strtotime($this->settings['medical_insurance_expiry']);
 					$ins_exp_day = date('j',$insurance_expiry);
 					$ins_exp_month = date('n',$insurance_expiry);
 					$ins_exp_full = date('t',$insurance_expiry);
 					
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$month_start = mktime(0,0,0,$m,1,$oBudget->year);
 						if ($probation<$month_start){
 							if ($m == $ins_exp_month){
@@ -621,11 +622,11 @@ class Headcount extends Document{
 						$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 												
 						
-						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for($m=1;$m<=15;$m++){
+							$month = $this->budget->arrPeriod[$m];
 							$month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							if (date('m.Y',$start_date)==date('m.Y',$month_start)){
-								$master_row->{$month} = - abs($record->new_fte) * $settings['hiring'] * $record->salary * 12;							
+								$master_row->{$month} = - abs($record->new_fte) * $this->settings['hiring'] * $record->salary * 12;							
 							}						
 						}
 					}
@@ -644,9 +645,9 @@ class Headcount extends Document{
 					$oItem = $Items->getById($master_row->item);
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
-						$master_row->{$month} = - $settings['hiring'] * $payroll[$month] * $this->turnover/100;
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
+						$master_row->{$month} = - $this->settings['hiring'] * $payroll[$month] * $this->turnover/100;
 					}
 				}
 				//-----------------------------------------------------------------Overtime
@@ -659,8 +660,8 @@ class Headcount extends Document{
 				$oItem = $Items->getById($master_row->item);
 				$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
-				for($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+				for($m=1;$m<=15;$m++){
+					$month = $this->budget->arrPeriod[$m];
 					$master_row->{$month} = - $payroll[$month] * $this->overtime/100;
 				}
 				//-----------------------------------------------------------------Unused vacation accrual
@@ -672,9 +673,9 @@ class Headcount extends Document{
 				$oItem = $Items->getById($master_row->item);
 				$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
 					
-				for($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
-					$master_row->{$month} = - 14/29.6/12 * $payroll[$month];
+				for($m=1;$m<=15;$m++){
+					$month = $this->budget->arrPeriod[$m];
+					$master_row->{$month} = - 2.33/29.4 * $payroll[$month];
 				}
 				
 				//-----------------------------------------------------------------Canteen
@@ -686,9 +687,9 @@ class Headcount extends Document{
 				$oItem = $Items->getById($master_row->item);
 				$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;				
 				
-				for($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
-					$master_row->{$month} = - $hcCount[$month][1]*$settings['canteen_wc'] - $hcCount[$month][0]*$settings['canteen_bc'];
+				for($m=1;$m<=15;$m++){
+					$month = $this->budget->arrPeriod[$m];
+					$master_row->{$month} = - $hcCount[$month][1]*$this->settings['canteen_wc'] - $hcCount[$month][0]*$this->settings['canteen_bc'];
 				}
 				
 				$oMaster->save();
@@ -765,11 +766,35 @@ class Headcount extends Document{
 			$row->start_date = strtotime($rw['empStartDate']);
 			$row->end_date = strtotime($rw['empEndDate']);
 			
-			for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
+			for ($m=1;$m<=15;$m++){
+				$month = $this->budget->arrPeriod[$m];
 				$row->{$month} = $row->getFTE($m, $oBudget->year);
 			}
 		}	
+	}
+
+	private function _getSocialTaxYTD($salary, $period){
+		
+		if ($period>12) $period = $period - 12;
+		if ($period <= 0) return (0);
+		
+		if ($this->budget->year >= 2016){
+			$tax_base['pfr'] = min ($salary * $period, $this->settings['social_cap_pfr']);
+			$tax_base['fss'] = min ($salary * $period, $this->settings['social_cap_fss']);
+			$tax_base['foms'] = $salary * $period;
+			$res = $this->settings['social_rate_pfr']*$tax_base['pfr'] + $this->settings['social_rate_fss']*$tax_base['fss'] + $this->settings['social_rate_foms']*$tax_base['foms'];			
+		} else {
+			$tax_base =  min ($salary * $period, $this->settings['social_cap']);
+			$res = max(0,$salary*$period - $tax_base)*$this->settings['social_tax_2'] + $tax_base * $this->settings['social_tax_1'];
+		}
+		
+		return ($res);
+	}
+	
+	private function _getSocialTax($salary, $period){
+		if ($period>12) $period = $period - 12;
+		$res = $this->_getSocialTaxYTD($salary, $period) - $this->_getSocialTaxYTD($salary, $period-1);
+		return ($res);
 	}
 	
 }
