@@ -115,7 +115,7 @@ class Headcount extends Document{
                             'flagKeepLastRow' => false
                             , 'arrPermissions' => Array("FlagWrite" => !$this->flagPosted)
                             , 'flagStandAlone' => true
-							, 'controlBarButtons' => "add"
+							, 'controlBarButtons' => "add|delete"
                             )
                     );
 		$grid->Columns[]=Array(
@@ -138,6 +138,7 @@ class Headcount extends Document{
 				'title'=>'Employee'
 				,'field'=>'particulars'
 				,'type'=>'combobox'
+				,'width'=>'200px'
 				,'source'=>'vw_employee_select'
 				,'prefix'=>'emp'
 				,'sql'=>"SELECT empGUID1C as optValue, empTitleLocal as optText FROM vw_employee_select WHERE empProfitID={$this->profit}"
@@ -149,7 +150,8 @@ class Headcount extends Document{
 			$grid->Columns[] = Array(
 				'title'=>'Start date'
 				,'field'=>'start_date'
-				,'type'=>'date'				
+				,'type'=>'date'	
+				,'width'=>'60px'				
 				, 'disabled'=>false
 			);
 		}
@@ -159,6 +161,7 @@ class Headcount extends Document{
 				'title'=>'End date'
 				,'field'=>'end_date'
 				,'type'=>'date'				
+				,'width'=>'60px'				
 				, 'disabled'=>false
 			);
 		}
@@ -167,6 +170,7 @@ class Headcount extends Document{
 			'title'=>'Function'
 			,'field'=>'function'
 			,'type'=>'combobox'
+			,'width'=>'180px'				
 			,'sql'=>"SELECT funGUID as optValue, funTitle as optText FROM vw_function"
 			, 'disabled'=>false
 		);
@@ -174,7 +178,8 @@ class Headcount extends Document{
 		$grid->Columns[] = Array(
 			'title'=>'W/collar'
 			,'field'=>'wc'
-			,'type'=>'boolean'			
+			,'type'=>'boolean'		
+			,'width'=>'30px'							
 			, 'disabled'=>false//($this->type=='current')
 		);
 		
@@ -182,6 +187,7 @@ class Headcount extends Document{
 			'title'=>'VKS'
 			,'field'=>'vks'
 			,'type'=>'boolean'			
+			,'width'=>'30px'							
 			, 'disabled'=>false
 		);
 		
@@ -189,6 +195,7 @@ class Headcount extends Document{
 			'title'=>'Location'
 			,'field'=>'location'
 			,'type'=>'combobox'
+			,'width'=>'70px'							
 			,'sql'=>"SELECT locID as optValue, locTitle as optText FROM vw_location"
 			,'default'=>$this->pc->location
 			, 'disabled'=>false
@@ -201,6 +208,7 @@ class Headcount extends Document{
 				'title'=>'PC'
 				,'field'=>'pc_profile'
 				,'type'=>'combobox'				
+				,'width'=>'80px'							
 				,'arrValues'=>Array(1=>'Desktop',2=>'Laptop',3=>'Full laptop set',0=>'None')
 				,'default'=>1
 				, 'disabled'=>false
@@ -211,6 +219,7 @@ class Headcount extends Document{
 			'title'=>'Salary'
 			,'field'=>'salary'
 			,'type'=>'money'
+			,'width'=>'70px'							
 			,'mandatory'=>true
 			,'totals'=>true
 		);
@@ -219,6 +228,7 @@ class Headcount extends Document{
 			'title'=>'Mobile'
 			,'field'=>'mobile_limit'
 			,'type'=>'money'
+			,'width'=>'70px'							
 			,'totals'=>true
 			,'disabled'=>false
 			,'totals'=>true
@@ -228,6 +238,7 @@ class Headcount extends Document{
 			'title'=>'Fuel'
 			,'field'=>'fuel'
 			,'type'=>'money'
+			,'width'=>'70px'							
 			,'totals'=>true
 			,'disabled'=>false
 			,'totals'=>true
@@ -237,6 +248,7 @@ class Headcount extends Document{
 			'title'=>'DMS'
 			,'field'=>'insurance'
 			,'type'=>'money'
+			,'width'=>'70px'							
 			,'totals'=>true
 			,'disabled'=>false
 			,'totals'=>true
@@ -247,6 +259,7 @@ class Headcount extends Document{
 				'title'=>'FTE'
 				,'field'=>'new_fte'
 				,'type'=>'int'
+				,'width'=>'40px'							
 				, 'mandatory' => true
 				, 'disabled'=>false
 				,'totals'=>true
@@ -273,6 +286,7 @@ class Headcount extends Document{
 			'title'=>'Average FTE'
 			,'field'=>'AVG'
 			,'type'=>'decimal'
+			,'width'=>'90px'							
 			,'totals'=>true
 			,'disabled'=>true
 		);
@@ -710,10 +724,14 @@ class Headcount extends Document{
 		}
 		
 		$dateEstStart = ($oBudget->year-2).'-10-01';
-		$dateEstEnd = ($oBudget->year-1).'-09-30';
+		$dateEstEnd = ($oBudget->year-1).'-09-30 23:59:59';
 		
 		$dateBudgetStart = ($oBudget->year).'-01-01';
-		$dateBudgetEnd = ($oBudget->year).'-12-31';
+		if ($oBudget->length ==15){
+			$dateBudgetEnd = ($oBudget->year+1).'-03-31 23:59:59';
+		} else {
+			$dateBudgetEnd = ($oBudget->year).'-12-31 23:59:59';
+		}
 		
 		$sql = "select empProfitID, SUM(case when (datediff(empStartDate, '{$dateEstStart}')<0 and datediff (ifnull(empEndDate, '9999-12-31'), '{$dateEstStart}')>0) THEN 1 ELSE 0 END) AS hc_opening,
 				SUM(case when (datediff(empStartDate, '{$dateEstEnd}')<0 and datediff (ifnull(empEndDate, '9999-12-31'), '{$dateEstEnd}')>0) THEN 1 ELSE 0 END) AS hc_closing,
