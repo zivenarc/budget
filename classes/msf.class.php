@@ -350,7 +350,7 @@ class MSF extends Document{
 		
 		switch ($type) {
 			case 'fte':
-				$sql = "SELECT 'FTE' as unit, pc, ".$this->budget->getMonthlySumSQL()." FROM reg_headcount
+				$sql = "SELECT 'FTE' as unit, pc, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_headcount
 						LEFT JOIN vw_profit ON pccID=pc
 						WHERE scenario='".$oBudget->id."' 
 							AND posted=1 
@@ -359,7 +359,7 @@ class MSF extends Document{
 						GROUP BY pc"; 
 			break;
 			case 'sales':
-				$sql = "SELECT 'RUB' as unit, pc, ".$this->budget->getMonthlySumSQL()." FROM reg_master
+				$sql = "SELECT 'RUB' as unit, pc, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_master
 						LEFT JOIN vw_profit ON pccID=pc
 						WHERE scenario='".$oBudget->id."' 
 							AND active=1 
@@ -369,7 +369,7 @@ class MSF extends Document{
 						GROUP BY pc"; 
 			break;
 			case 'users':
-				$sql = "SELECT pc, wc, 'user' as unit, ".$this->budget->getMonthlySumSQL()." FROM reg_headcount
+				$sql = "SELECT pc, wc, 'user' as unit, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_headcount
 					LEFT JOIN vw_profit ON pccID=pc				
 					WHERE scenario='".$oBudget->id."' 
 						AND posted=1 AND wc=1 
