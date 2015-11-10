@@ -359,7 +359,7 @@ class MSF extends Document{
 						GROUP BY pc"; 
 			break;
 			case 'sales':
-				$sql = "SELECT 'RUB' as unit, pc, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_master
+				$sql = "SELECT 'RUB' as unit, pc, ".$this->budget->getMonthlySumSQL(1,15, null, 1000)." FROM reg_master
 						LEFT JOIN vw_profit ON pccID=pc
 						WHERE scenario='".$oBudget->id."' 
 							AND active=1 

@@ -350,14 +350,14 @@ class Budget{
 		$res = implode(',',$arrRes);
 		return($res);
 	}
-	public function getMonthlySumSQL($start=1, $end=12, $arrRates = null){
+	public function getMonthlySumSQL($start=1, $end=12, $arrRates = null, $denominator=1){
 		for($m=$start;$m<=$end;$m++){
 			// $month = date('M',mktime(0,0,0,$m,15));			
 			$month = $this->arrPeriod[$m];
 			if (is_array($arrRates)){				
-				$arrRes[] = "SUM(`$month`)/{$arrRates[$month]} as '$month'";
+				$arrRes[] = "SUM(`$month`)/{$arrRates[$month]}/{$denominator} as '$month'";
 			} else {
-				$arrRes[] = "SUM(`$month`) as '$month'";
+				$arrRes[] = "SUM(`$month`)/{$denominator} as '$month'";
 			}			
 			
 		}
