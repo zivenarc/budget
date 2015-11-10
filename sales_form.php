@@ -97,7 +97,11 @@ if ($_GET['tab']){
 			require_once ('classes/reports.class.php');
 			$sqlWhere= "WHERE source='".$oDocument->GUID."'";
 			$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id));			
-			$oReport->masterByCustomer($sqlWhere);
+			if ($oDocument->ps_profit){
+				$oReport->masterByProfit($sqlWhere);
+			} else {
+				$oReport->masterByCustomer($sqlWhere);
+			}			
 			$oReport->masterByYACT($sqlWhere);
 			die();
 			break;

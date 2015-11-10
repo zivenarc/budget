@@ -33,6 +33,8 @@ class Sales extends Document{
 		parent::__construct($id);
 		
 		$this->sales = $this->data['salUserID'];
+		$this->ps_profit = $this->data['salPSProfitID'];
+		$this->ps_rate = $this->data['salPSRate'];
 		
 	}
 	public function refresh($id){
@@ -102,6 +104,26 @@ class Sales extends Document{
 			,'disabled'=>!$this->flagUpdate
 		);
 		
+		$this->Columns[] = Array(
+			'title'=>'Profit share with'
+			,'field'=>self::Prefix.'PSProfitID'
+			,'type'=>'combobox'			
+			,'prefix'=>'pcc'
+			,'sql'=>'vw_profit'
+			,'mandatory'=>false
+			,'default'=>null
+			,'defaultText'=>'---NONE---'
+			,'disabled'=>!$this->flagUpdate
+		);
+		
+		$this->Columns[] = Array(
+			'title'=>'P/S rate, %'
+			,'field'=>self::Prefix.'PSRate'
+			,'type'=>'int'						
+			,'mandatory'=>false
+			,'default'=>0			
+			,'disabled'=>!$this->flagUpdate
+		);
 	}
 	
 	//==========================================Definition of document GRID ===================================================
@@ -383,6 +405,45 @@ class Sales extends Document{
 						}
 					}
 					
+					if ($this->ps_profit && $this->ps_rate){
+						$master_row = $oMaster->add_master();	
+						$master_row->profit = $this->profit;
+						$master_row->activity = $record->activity;
+						$master_row->customer = $record->customer;				
+						
+						$activity = $Activities->getByCode($record->activity);
+						$account = $activity->YACT;
+						
+						//$master_row->item = Items::PROFIT_SHARE;
+						$item = $Items->getById(Items::INTERCOMPANY_COSTS);
+						$master_row->account = $item->getYACT($master_row->profit);
+						$master_row->item = $item->id;
+						
+						for($m=1;$m<=$this->budget->length;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];	
+							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$settings[strtolower($record->selling_curr)]-$record->buying_rate*$settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
+						}
+						
+						$master_row = $oMaster->add_master();	
+						$master_row->profit = $this->ps_profit;
+						$master_row->activity = $record->activity;
+						$master_row->customer = $record->customer;				
+						
+						$activity = $Activities->getByCode($record->activity);
+						$account = $activity->YACT;
+						
+						//$master_row->item = Items::PROFIT_SHARE;
+						$item = $Items->getById(Items::INTERCOMPANY_REVENUE);
+						$master_row->account = $item->getYACT($master_row->profit);
+						$master_row->item = $item->id;
+						
+						for($m=1;$m<=$this->budget->length;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];	
+							$master_row->{$month} = ($record->{$month})*($record->selling_rate*$settings[strtolower($record->selling_curr)]-$record->buying_rate*$settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
+						}
+					}
 					
 				}
 				$oMaster->save();
