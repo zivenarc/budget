@@ -476,16 +476,18 @@ class Document extends easyForm{
 		for ($m=1;$m<=$this->budget->length;$m++){
 			
 			$flagDisabled = !$this->flagUpdate;
+			$strClassDisabled = '';
 			
 			if ($this->budget->type=='FYE'){				
 				if ($m < $start) $flagDisabled = true;
+				$strClassDisabled = ' budget-inactive';
 			}
 			
 			$month = $this->budget->arrPeriod[$m];					
 			$this->grid->Columns[] = Array(
 				'title'=>ucfirst($month)
 				,'field'=>strtolower($month)
-				,'class'=>'budget-month'
+				,'class'=>'budget-month'.$strClassDisabled
 				,'type'=>$type
 				, 'mandatory' => true
 				, 'disabled'=>$flagDisabled
