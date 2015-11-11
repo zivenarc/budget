@@ -479,8 +479,10 @@ class Document extends easyForm{
 			$strClassDisabled = '';
 			
 			if ($this->budget->type=='FYE'){				
-				if ($m < $start) $flagDisabled = true;
-				$strClassDisabled = ' budget-inactive';
+				if ($m < $start) {
+					$flagDisabled = true;
+					$strClassDisabled = ' budget-inactive';
+				}
 			}
 			
 			$month = $this->budget->arrPeriod[$m];					
