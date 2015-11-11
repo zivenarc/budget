@@ -85,7 +85,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 			
 include ('includes/inc-frame_top.php');			
 			?>
-			<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
+			<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr>
@@ -97,7 +97,7 @@ include ('includes/inc-frame_top.php');
 					<th>Salary</th>		
 					<th>Start date</th>		
 					<th>Resignation date</th>					
-				<?php echo Budget::getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
+				<?php echo $oBudget->getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
 			</thead>			
 			<tbody>
 			<?php
