@@ -130,7 +130,8 @@ include ('includes/inc-frame_top.php');
 					<td><?php echo $rw['empEndDate']?$rw['empEndDate']:($rw['end_date']?'('.$rw['end_date'].')':'');?></td>				
 				<?php				
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+					// $month = date('M',mktime(0,0,0,$m,15));
+					$month = $oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-$month'>",Reports::render($rw[$month],1),'</td>';
 					$total[$month] += $rw[$month];
 					$subtotal[$rw['pccTitle']][$month] += $rw[$month];
