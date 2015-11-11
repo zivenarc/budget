@@ -558,9 +558,14 @@ class Reports{
 			ORDER BY `{$params['field_data']}`, `Group`, `vw_master`.itmOrder ASC			
 			";
 		
-		$this->_firstLevelPeriodic($sql, $params['title'], $this->oBudget);
+		$arrGT = $this->_firstLevelPeriodic($sql, $params['title'], $this->oBudget);
 		?>
 		</tbody>
+		<tfoot>
+		<?php
+			$this->echoBudgetItemString($arrGT, 'budget-total');
+		?>
+		</tfoot>
 		</table>
 		<ul class='link-footer'>
 			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
@@ -597,7 +602,7 @@ class Reports{
 		ob_flush();
 	}
 	
-	public function monthlyReport($sqlWhere, $currency=643,$type='ghq'){
+	public function monthlyReport($sqlWhere, $type='ghq'){
 		
 		GLOBAL $budget_scenario;
 		$oBudget = new Budget($budget_scenario);
@@ -650,7 +655,7 @@ class Reports{
 			self::firstLevelReportMR($sql, 'Activity', $oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
-			self::noFirstLevelReportMR($sqlWhere, $currency);
+			self::noFirstLevelReportMR($sqlWhere, $this->currency);
 			?>
 			</tbody>
 			</table>
@@ -738,6 +743,10 @@ class Reports{
 				
 				while ($rw=$this->oSQL->f($rs)){
 					
+					foreach ($rw as $key=>$value){
+						$arrGrandTotal[$key] += $value;
+					}
+					
 					$l1Code = (string)$rw['level1_code'];
 					$arrSubreport[$l1Code][$rw['item']] = Array('Level1_title'=>$rw['Level1_title'],'Budget item'=>$rw['Budget item'],'level1_code'=>$l1Code);
 			
@@ -777,46 +786,9 @@ class Reports{
 				foreach ($arrReport as $key=>$data){
 					$this->echoBudgetItemString($data);
 				}
-				/*
-				while ($rw=$this->oSQL->f($rs)){
-					if($Level1_title && $Level1_title!=$rw['Level1_title']){
-						$data = $subtotal[$Level1_title];
-						$data['Budget item']=$group;
-						$this->echoBudgetItemString($data,'budget-subtotal', $this->oBudget);
-					}
-					//------------------------Collecting subtotals---------------------------------------
-					$local_subtotal = 0;
-					for ($m=1;$m<13;$m++){
-						// $month = date('M',mktime(0,0,0,$m,15));
-						$month = $this->oBudget->arrPeriod[$m];
-						$subtotal[$rw['Level1_title']][$month]+=$rw[$month];
-						$subtotal[$rw['Level1_title']]['Q'.$m]+=$rw['Q'.$m];
-						$local_subtotal += $rw[$month];
-						
-					}
-						
-					$subtotal[$rw['Level1_title']]['YTD_A'] += $rw['YTD_A'];
-					$subtotal[$rw['Level1_title']]['YTD'] += $rw['YTD'];
-					$subtotal[$rw['Level1_title']]['ROY_A'] += $rw['ROY_A'];
-					$subtotal[$rw['Level1_title']]['ROY'] += $rw['ROY'];
-					
-					$subtotal[$rw['Level1_title']]['Total'] += $local_subtotal;
-					$subtotal[$rw['Level1_title']]['estimate'] += $rw['estimate'];
-														
-					$tr_class = 'budget-item';
-					
-					$data = $rw;
-					if ($data['Level1_title']==$Level1_title && $Level1_title) $data['Level1_title']="&nbsp;";
-					$this->echoBudgetItemString($data,$tr_class, $this->oBudget);
-					
-					$Level1_title = $rw['Level1_title'];
-					$group = $rw['Group'];
-				}
-				$data = $subtotal[$Level1_title];
-				$data['Budget item']=$group;
-				$this->echoBudgetItemString($data,'budget-subtotal budget-item', $this->oBudget);
-				*/
 				
+					$arrGrandTotal['Budget item'] = 'Grand total';
+					return ($arrGrandTotal);
 			}
 	}
 	
@@ -1129,7 +1101,7 @@ class Reports{
 		// $oBudget = new Budget($budget_scenario);
 		
 		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
-		
+		// echo '<pre>';print_r($arrRates);echo '</pre>';
 		$res=	$this->oBudget->getMonthlySumSQL(1,12,$arrRates).", ".
 				$this->oBudget->getQuarterlySumSQL($arrRates).", 
 				SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total ,
@@ -1143,31 +1115,30 @@ class Reports{
 		
 	}
 	
-	private function _getMRFields($currency){
-		GLOBAL $budget_scenario;
-		$oBudget = new Budget($budget_scenario);
-		$arrRates = $oBudget->getMonthlyRates($currency);
-		
-		$cm = date('M',$oBudget->date_start - 1);
-		$nm = date('M',$oBudget->date_start);
+	private function _getMRFields(){
 				
-		$nCurrent = (integer)date('m',$oBudget->date_start - 1);
+		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
+		
+		$cm = $this->oBudget->arrPeriod[date('n',$this->oBudget->date_start - 1)];
+		$nm = $this->oBudget->arrPeriod[date('n',$this->oBudget->date_start)];
+				
+		$nCurrent = (integer)date('m',$this->oBudget->date_start - 1);
 		
 		$res['actual']=	"SUM(`{$cm}`)/{$arrRates[$cm]} as CM_A, 
 						0 as CM_B,								
-						SUM(".Budget::getYTDSQL(1,$nCurrent,$arrRates).") as YTD_A ,
+						SUM(".$this->oBudget->getYTDSQL(1,$nCurrent,$arrRates).") as YTD_A ,
 						0 as YTD_B, 
 						SUM(`$nm`)/{$arrRates[$nm]} as NM_A , 
 						0 as NM_B";
 		$res['budget'] = "0 as CM_A, 
 						SUM(`{$cm}`)/{$arrRates[$cm]} as CM_B,								
 						0 as YTD_A,
-						SUM(".Budget::getYTDSQL(1,$nCurrent,$arrRates).") as YTD_B, 
+						SUM(".$this->oBudget->getYTDSQL(1,$nCurrent,$arrRates).") as YTD_B, 
 						0 as NM_A , 
 						SUM(`$nm`)/{$arrRates[$nm]} as NM_B";
 		
-		$res['from_a'] = $oBudget->id;
-		$res['from_b'] = $oBudget->reference_scenario->id;
+		$res['from_a'] = $this->oBudget->id;
+		$res['from_b'] = $this->oBudget->reference_scenario->id;
 		
 		// echo '<pre>',$res,'</pre>'; 
 		
