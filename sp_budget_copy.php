@@ -76,7 +76,7 @@ foreach ($arrEntity as $entity=>$entity_data){
 	$rs = $oSQL->q($sqlFields);
 	while ($rw=$oSQL->f($rs)){
 		//echo '<pre>';print_r($rw);echo '</pre>';
-		$arrFields[] = $rw['Field'];
+		$arrFields[$rw['Field']] = $rw;
 		
 	}
 	
@@ -98,26 +98,34 @@ foreach ($arrEntity as $entity=>$entity_data){
 		$arrSet = Array();
 		$new_guid = $oSQL->get_new_guid();
 		$strSQL = "INSERT INTO `$entity` SET ";
-		for($f=0;$f<count($arrFields);$f++){
-			switch ($arrFields[$f]){
+		foreach ($arrFields as $field=>$fieldData){
+			switch ($field){
 				case $prefix."ID":
-					$arrSet[] = "`{$arrFields[$f]}`=NULL";
+					$arrSet[] = "`{$field}`=NULL";
 					break;
 				case $prefix."GUID":
-					$arrSet[] = "`{$arrFields[$f]}`='{$new_guid}'";
+					$arrSet[] = "`{$field}`='{$new_guid}'";
 					break;
 				case $prefix."Scenario":
-					$arrSet[] = "`{$arrFields[$f]}`='{$new_budget}'";
+					$arrSet[] = "`{$field}`='{$new_budget}'";
 					break;
 				case $prefix."FlagPosted":
-					$arrSet[] = "`{$arrFields[$f]}`=0";
+					$arrSet[] = "`{$field}`=0";
 					break;					
 				case $prefix."InsertDate":
 				case $prefix."EditDate":
-					$arrSet[] = "`{$arrFields[$f]}`=NOW()";
+					$arrSet[] = "`{$field}`=NOW()";
 					break;						
-				default:
-					$arrSet[] = "`{$arrFields[$f]}`=".$oSQL->e($rw[$arrFields[$f]]);
+				default:									
+					if ($fieldData['Null']=='YES' && !$rw[$field]){
+						$arrSet[] = "`{$field}`=NULL";						
+					} else {
+						if (strpos($fieldData['Type'],'int') === false){
+							$arrSet[] = "`{$field}`=".$oSQL->e($rw[$field]);
+						} else {
+							$arrSet[] = "`{$field}`=".(integer)$rw[$field];
+						}
+					}
 			}		
 		}
 		$strSQL .= implode(", ",$arrSet); 
