@@ -473,6 +473,14 @@ class Document extends easyForm{
 		if(!$this->grid) return (false);
 		
 		for ($m=1;$m<=$this->budget->length;$m++){
+			
+			$flagDisabled = !$this->flagUpdate;
+			
+			if ($this->budget->type=='FYE'){
+				$start = date('n',$this->budget->date_start);
+				if ($m < $start) $flagDisabled = true;
+			}
+			
 			$month = $this->budget->arrPeriod[$m];					
 			$this->grid->Columns[] = Array(
 				'title'=>ucfirst($month)
@@ -480,7 +488,7 @@ class Document extends easyForm{
 				,'class'=>'budget-month'
 				,'type'=>$type
 				, 'mandatory' => true
-				, 'disabled'=>!$this->flagUpdate
+				, 'disabled'=>$flagDisabled
 				,'totals'=>true
 				,'witdh'=>'10%'
 			);
