@@ -427,7 +427,7 @@ class Headcount extends Document{
 				
 		if($mode=='post'){
 			$this->refresh($this->ID);
-			$oMaster = new budget_session($this->scenario, $this->GUID);
+			$oMaster = new Master($this->scenario, $this->GUID);
 			
 			if(is_array($this->records[$this->gridName])){
 				foreach($this->records[$this->gridName] as $id=>$record){

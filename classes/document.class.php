@@ -1,5 +1,6 @@
 <?php
 require_once ('../common/easyForm/inc_easyForm.php');
+require_once ('master.class.php');
 
 class Document extends easyForm{
 	
@@ -321,7 +322,7 @@ class Document extends easyForm{
 		if($this->flagDeleted){
 			return(false);
 		} else {
-			$oMaster = new budget_session($this->scenario, $this->GUID);
+			$oMaster = new Master($this->scenario, $this->GUID);
 			$oMaster->clear();
 			$oMaster->save();
 			$res = $this->unmarkPosted();
