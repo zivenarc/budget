@@ -149,7 +149,8 @@ include ('includes/inc-frame_top.php');
 			<td colspan="8">Total</td>
 			<?php
 				for ($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+					// $month = date('M',mktime(0,0,0,$m,15));
+					$month = $oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-$month'>",Reports::render($total[$month],1),'</td>';					
 				}
 			?>
