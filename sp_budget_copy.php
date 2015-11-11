@@ -6,6 +6,8 @@ require ('classes/budget.class.php');
 $old_budget = $_GET['old_budget'];
 $new_budget = $_GET['new_budget'];
 
+$oBudget = new Budget($old_budget);
+
 if (!isset($_GET['old_budget'])){
 	die ('ERROR: Old budget scenario is not set');
 }
@@ -44,9 +46,9 @@ $sql [] = "SELECT @refID:=scnLastID FROM tbl_scenario WHERE scnID='{$new_budget}
 
 $sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item, source, estimate, ytd, roy, scenario, active)
 			SELECT company, pc, activity, customer, account, item, 'Estimate', 
-					SUM(".Budget::getYTDSQL().") as FYE,
-					SUM(".Budget::getYTDSQL(1,date('m',$oNewBudget->date_start)-1).") as YTD, 
-					SUM(".Budget::getYTDSQL(date('m',$oNewBudget->date_start),12).") as ROY, 
+					SUM(".$oBudget->getYTDSQL().") as FYE,
+					SUM(".$oBudget->getYTDSQL(1,date('m',$oNewBudget->date_start)-1).") as YTD, 
+					SUM(".$oBudget->getYTDSQL(date('m',$oNewBudget->date_start),12).") as ROY, 
 					'{$new_budget}', active
 				FROM reg_master WHERE scenario=@refID AND active=1 AND estimate=0
 				GROUP BY company, pc, activity, customer, account, item
