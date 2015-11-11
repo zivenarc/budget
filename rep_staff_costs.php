@@ -7,7 +7,7 @@ require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
-$ytd = date('m',$oBudget->date_start-1);echo $ytd;
+$ytd = date('n',$oBudget->date_start-1);echo $ytd;
 
 //------------------------------------Fill in the actual data-------------------
 $sql = Array();
@@ -21,7 +21,8 @@ for($m=1;$m<=$ytd;$m++){
 	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
 	$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
 	
-	$month = date('M',mktime(0,0,0,$m,1,$year));
+	// $month = date('M',mktime(0,0,0,$m,1,$year));
+	$month = $oBudget->arrPeriod[$m];
 	// echo '<pre>',$repDateStart,' - ',$repDateEnd,'</pre>';
 	// echo $month;
 
@@ -62,7 +63,7 @@ for ($i=0;$i<count($sql);$i++){
 }
 
 $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empTitleLocal, empFunction, empSalary, empStartDate, empEndDate, end_date, 
-						locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pccTitle,pccTitleLocal , ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().")/12 as Total 
+						locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pccTitle,pccTitleLocal , ".$oBudget->getMonthlySumSQL().", SUM(".$oBudget->getYTDSQL().")/12 as Total 
 					FROM `reg_headcount`
 					LEFT JOIN vw_function ON funGUID=function
 					LEFT JOIN vw_product_type ON prtID=activity
