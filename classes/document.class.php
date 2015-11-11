@@ -471,13 +471,13 @@ class Document extends easyForm{
 	public function setMonthlyEG($type='decimal'){
 		
 		if(!$this->grid) return (false);
+		$start = (integer)date('n',$this->budget->date_start);
 		
 		for ($m=1;$m<=$this->budget->length;$m++){
 			
 			$flagDisabled = !$this->flagUpdate;
 			
-			if ($this->budget->type=='FYE'){
-				$start = date('n',$this->budget->date_start);
+			if ($this->budget->type=='FYE'){				
 				if ($m < $start) $flagDisabled = true;
 			}
 			
