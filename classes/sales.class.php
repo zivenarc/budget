@@ -309,7 +309,7 @@ class Sales extends Document{
 		
 		$this->deleteGridRecords();
 		
-		$settings = Budget::getSettings($this->oSQL,$this->scenario);
+		
 		// echo '<pre>';print_r($settings);echo '</pre>';	
 		
 		$sql = Array();
@@ -354,9 +354,10 @@ class Sales extends Document{
 		GLOBAL $Activities;
 		GLOBAL $YACT;
 		GLOBAL $Items;
-	
+		
 		$this->refresh($this->ID);
-			$oMaster = new Master($this->scenario, $this->GUID);
+		$settings = Budget::getSettings($this->oSQL,$this->scenario);
+		$oMaster = new Master($this->scenario, $this->GUID);
 			
 			if(is_array($this->records[$this->gridName])){
 				foreach($this->records[$this->gridName] as $id=>$record){
@@ -457,13 +458,9 @@ class Sales extends Document{
 					}
 					
 				}
-				if ($oMaster->save()){
-					$res = $this->markPosted();
-				} else {
-					return (false);
-				}
-			}
-		return ($res);
+				$oMaster->save();
+				$this->markPosted();				
+			}		
 	}
 	
 }
