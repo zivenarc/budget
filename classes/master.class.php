@@ -59,13 +59,18 @@ class Master {
 		
 		// $this->oSQL->startProfiling();		
 		// echo '<pre>',implode(";\r\n",$sql),'</pre>';
+		$res = true;
+		
 		for($i=0;$i<count($sql);$i++){
-			if ($sql[$i]) $this->oSQL->q($sql[$i]);
+			if ($sql[$i]) {
+				$res &= $this->oSQL->q($sql[$i]);
+			}
 		}
 		
-		$res = $this->read();
+		//$res = $this->read();
 		//echo $res['html'];
 		// $this->oSQL->showProfileInfo();
+		return ($res);
 	}
 	
 	public function read(){
