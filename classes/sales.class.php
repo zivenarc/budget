@@ -236,9 +236,7 @@ class Sales extends Document{
 	public function save($mode='update'){
 		
 		GLOBAL $arrUsrData;
-		GLOBAL $Activities;
-		GLOBAL $YACT;
-		GLOBAL $Items;
+
 		
 		parent::save($mode);
 		
@@ -352,6 +350,11 @@ class Sales extends Document{
 	}
 	
 	function post(){
+	
+		GLOBAL $Activities;
+		GLOBAL $YACT;
+		GLOBAL $Items;
+	
 		$this->refresh($this->ID);
 			$oMaster = new Master($this->scenario, $this->GUID);
 			
