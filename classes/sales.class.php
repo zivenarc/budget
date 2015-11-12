@@ -155,7 +155,7 @@ class Sales extends Document{
 		$this->grid->Columns[] = Array(
 			'title'=>'Code'
 			,'field'=>'prdExternalID'
-			,'width'=>'40px'
+			,'width'=>'60px'
 			,'type'=>'text'
 			,'disabled'=>true
 		);
@@ -165,14 +165,14 @@ class Sales extends Document{
 		$this->grid->Columns[] = Array(
 			'title'=>'Description'
 			,'field'=>'comment'
-			,'width'=>'120px'
+			,'width'=>'160px'
 			,'type'=>'text'
 			, 'disabled'=>false
 		);
 		$this->grid->Columns[] =Array(
 			'title'=>'Unit'
 			,'field'=>'unit'
-			,'width'=>'30px'
+			,'width'=>'50px'
 			,'type'=>'text'
 			,'mandatory'=>true
 		);
