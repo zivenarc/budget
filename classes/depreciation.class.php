@@ -191,7 +191,7 @@ class Depreciation extends Document{
 
 		
 		for ($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
+			$month = $this->budget->arrPeriod[$m];
 					
 			$grid->Columns[] = Array(
 			'title'=>''//hidden
@@ -278,7 +278,7 @@ class Depreciation extends Document{
 						
 						$row->comment = $_POST['comment'][$id];				
 						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							if ($this->type=='current'){
 								$row->{$month} = (integer)$_POST[strtolower($month)][$id];
@@ -360,7 +360,7 @@ class Depreciation extends Document{
 						
 						
 						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];
 							$master_row->{$month} = -$record->{$month}*$monthly_depr;
 							
 							switch ($this->type){
@@ -390,7 +390,7 @@ class Depreciation extends Document{
 				$master_row->item = Items::PROPERTY_TAX;
 				
 				for($m=1;$m<13;$m++){
-					$month = date('M',mktime(0,0,0,$m,15));
+					$month = $this->budget->arrPeriod[$m];
 					$master_row->{$month} = -self::PROPERTY_TAX*$record->{$month}*$residual_value[$m]/12;
 				}
 				
@@ -447,7 +447,7 @@ class Depreciation extends Document{
 			$dateStart = strtotime($row->date_start);
 			
 			for($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
+				$month = $this->budget->arrPeriod[$m];
 				$bom = mktime(0,0,0,$m,1, $oBudget->year);
 				if ($dateStart<$bom){
 					$row->{$month} = 1;
