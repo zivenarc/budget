@@ -155,7 +155,7 @@ class Sales extends Document{
 		$this->grid->Columns[] = Array(
 			'title'=>'Code'
 			,'field'=>'prdExternalID'
-			,'width'=>'20px'
+			,'width'=>'40px'
 			,'type'=>'text'
 			,'disabled'=>true
 		);
@@ -454,9 +454,13 @@ class Sales extends Document{
 					}
 					
 				}
-				$oMaster->save();
-				$this->markPosted();
+				if ($oMaster->save()){
+					$res = $this->markPosted();
+				} else {
+					return (false);
+				}
 			}
+		return ($res);
 	}
 	
 }
