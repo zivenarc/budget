@@ -253,12 +253,7 @@ class Indirect_costs extends Document{
 	public function save($mode='update'){
 		
 		parent::save($mode);
-		
-		GLOBAL $arrUsrData;
-		GLOBAL $Activities;
-		GLOBAL $YACT;
-		GLOBAL $Items;
-		
+						
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		if($mode=='update' || $mode=='post'){						
 			switch ($this->type){
@@ -311,49 +306,11 @@ class Indirect_costs extends Document{
 		}
 		
 		$this->deleteGridRecords();
-		
-		$settings = Budget::getSettings($this->oSQL,$this->scenario);
-		// echo '<pre>';print_r($settings);echo '</pre>';			
-		
+				
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
 		$sql[] = "START TRANSACTION;";
-		// switch ($this->type){
-			// case 'general':
-				// $sql[] = "UPDATE `".$this->table."` 
-						// SET ".$this->prefix."SupplierID=".(integer)$this->supplier."				
-						// ,".$this->prefix."ItemGUID=".$this->oSQL->e($this->item)."
-						// ,".$this->prefix."Rate=".(double)$this->rate."
-						// ,".$this->prefix."CurrencyID=".$this->oSQL->e($this->currency)."
-						// ,".$this->prefix."Period=".$this->oSQL->e($this->period)."
-						// ,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
-						// ,".$this->prefix."Scenario='".$this->scenario."'
-						// ,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
-						// ,".$this->prefix."EditDate=NOW()
-						// WHERE ".$this->prefix."ID={$this->ID};";
-			
-				// break;
-			// case 'kaizen':
-				// $sql[] = "UPDATE `".$this->table."` 
-						// SET ".$this->prefix."ItemGUID=".$this->oSQL->e($this->item)."
-						// ,".$this->prefix."Rate=".(double)$this->rate."						
-						// ,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
-						// ,".$this->prefix."Scenario='".$this->scenario."'
-						// ,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
-						// ,".$this->prefix."EditDate=NOW()
-						// WHERE ".$this->prefix."ID={$this->ID};";
-			
-				// break;
-			// default:
-				// $sql[] = "UPDATE `".$this->table."` 
-						// SET ".$this->prefix."ProfitID=".(integer)$this->profit."				
-						// ,".$this->prefix."Comment=".$this->oSQL->e($this->comment)."
-						// ,".$this->prefix."Scenario='".$this->scenario."'
-						// ,".$this->prefix."EditBy='".$arrUsrData['usrID']."'
-						// ,".$this->prefix."EditDate=NOW()
-						// WHERE ".$this->prefix."ID={$this->ID};";
-				// break;
-		// }
+		
 		if(is_array($this->records[$this->gridName])){			
 			foreach ($this->records[$this->gridName] as $i=>$row){				
 				if ($row->flagUpdated || $row->flagDeleted){
@@ -368,37 +325,7 @@ class Indirect_costs extends Document{
 		$sqlSuccess = $this->doSQL($sql);
 			
 		if($mode=='post'){
-			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
-			$oMaster = new Master($this->scenario, $this->GUID);
-					
-			if(is_array($this->records[$this->gridName])){
-			
-				foreach($this->records[$this->gridName] as $id=>$record){
-						
-						if ($record->item == Items::WH_RENT) {
-							$record->customer = self::EMPTY_CUSTOMER;
-						}
-						
-						$master_row = $oMaster->add_master();
-						$master_row->profit = $record->profit;
-						$master_row->activity = $record->activity;
-						$master_row->customer = $record->customer;					
-						$item = $Items->getById($record->item);
-						$master_row->account = $item->getYACT($master_row->profit);
-						$master_row->item = $record->item;
-						for($m=1;$m<=15;$m++){
-							$month = $this->budget->arrPeriod[$m];
-							$denominator = $record->period=='annual'?$record->{$month}/$record->total():1;
-							$master_row->{$month} = -$record->{$month}*$record->buying_rate*$settings[strtolower($record->buying_curr)]*$denominator;
-						}				
-												
-						
-						//echo '<pre>';print_r($master_row);echo '</pre>';
-	
-				}
-				$oMaster->save();
-				$this->markPosted();
-			}
+			$this->post();			
 		}
 		
 		return($sqlSuccess);
@@ -475,7 +402,46 @@ class Indirect_costs extends Document{
 			}
 		}	
 	}
-	
+		
+	function post(){
+		
+		GLOBAL $Activities;
+		GLOBAL $YACT;
+		GLOBAL $Items;		
+		
+		$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
+		$oMaster = new Master($this->scenario, $this->GUID);
+				
+		if(is_array($this->records[$this->gridName])){
+		
+			foreach($this->records[$this->gridName] as $id=>$record){
+					
+					if ($record->item == Items::WH_RENT) {
+						$record->customer = self::EMPTY_CUSTOMER;
+					}
+					
+					$master_row = $oMaster->add_master();
+					$master_row->profit = $record->profit;
+					$master_row->activity = $record->activity;
+					$master_row->customer = $record->customer;					
+					$item = $Items->getById($record->item);
+					$master_row->account = $item->getYACT($master_row->profit);
+					$master_row->item = $record->item;
+					$currency_rate = $this->settings[strtolower($record->buying_curr)];
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
+						$denominator = $record->period=='annual'?$record->{$month}/$record->total():1;						
+						$master_row->{$month} = -$record->{$month}*$record->buying_rate*$currency_rate*$denominator;
+					}				
+											
+					
+					//echo '<pre>';print_r($master_row);echo '</pre>';
+
+			}
+			$oMaster->save();
+			$this->markPosted();
+		}
+	}
 }
 
 ?>

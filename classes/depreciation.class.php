@@ -222,14 +222,10 @@ class Depreciation extends Document{
 	public function save($mode='update'){
 		
 		GLOBAL $arrUsrData;
-		GLOBAL $Activities;
-		GLOBAL $YACT;
-		GLOBAL $Items;
-		GLOBAL $oBudget;
-		
+			
 		parent::save($mode);
 		
-		$budget_year_start = time(0,0,0,1,1,$oBudget->year);
+		$budget_year_start = time(0,0,0,1,1,$this->budget->year);
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		if ($mode=='update' || $mode=='post'){
@@ -279,7 +275,7 @@ class Depreciation extends Document{
 						$row->comment = $_POST['comment'][$id];				
 						for ($m=1;$m<13;$m++){
 							$month = $this->budget->arrPeriod[$m];
-							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
+							$current_month_start = mktime(0,0,0,$m,1,$this->budget->year);
 							if ($this->type=='current'){
 								$row->{$month} = (integer)$_POST[strtolower($month)][$id];
 							} else {
@@ -329,7 +325,76 @@ class Depreciation extends Document{
 		$sqlSuccess = $this->doSQL($sql);
 			
 		if($mode=='post'){
-			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
+			$this->post();			
+		}
+		
+		return($sqlSuccess);
+				
+	}
+	
+	public function fill_replacement($oBudget){
+		
+		if (is_array($this->records[$this->gridName])){
+			foreach($this->records[$this->gridName] as $id=>$record){
+				$record->flagDeleted = true;
+			}
+		}
+		
+		$dateReplacementStart = ($oBudget->year-1).'-12-01';
+		$dateReplacementEnd = $oBudget->year.'-12-01';
+		
+		$sql = "SELECT *, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart)) AS months,
+				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValuePrimo,
+				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetEnd}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValueUltimo
+				FROM vw_fixed_assets 
+				LEFT JOIN vw_item ON itmID=fixItemID
+				WHERE fixProfitID=".$this->profit." AND DATEDIFF(fixDeprEnd,'{$dateReplacementStart}')>0 AND DATEDIFF(fixDeprEnd,'{$dateReplacementEnd}')<0 AND fixFlagDeleted=0
+				ORDER BY fixItemID";//die($sql);
+		$rs = $this->oSQL->q($sql);
+		while ($rw=$this->oSQL->f($rs)){
+			$row = $this->add_record();
+			$row->flagUpdated = true;				
+			$row->replace = true;				
+			$row->profit = $this->profit;
+			$row->particulars = $rw['fixGUID'];				
+			$row->item = $rw['itmGUID'];				
+			$row->duration = $rw['fixDeprDuration'];				
+			$row->activity = $rw['fixProductTypeID'];				
+			$row->date_start = $rw['fixDeprEnd'];				
+			$row->date_end = date('Y-m-d',strtotime($rw['fixDeprEnd'])+24*60*60*30*$rw['fixDeprDuration']);
+			$row->value_start = (double)$rw['fixValueStart'];				
+			$row->value_primo = (double)$rw['fixValuePrimo'];				
+			$row->value_ultimo = max(0,(double)$rw['fixValueUltimo']);				
+			$row->count = 1;				
+			
+			$arrDescr = null;
+			if ($rw['fixPlateNo']) $arrDescr[] = $rw['fixPlateNo'];
+			if ($rw['fixVIN']) $arrDescr[] = $rw['fixVIN'];
+			$row->comment = "Replacement: [".trim($rw['fixID'])."] ".$rw['fixTitleLocal']." ".(is_array($arrDescr)?implode('|',$arrDescr):'');				
+			
+			$dateEnd = strtotime($row->date_end);
+			$dateStart = strtotime($row->date_start);
+			
+			for($m=1;$m<13;$m++){
+				$month = $this->budget->arrPeriod[$m];
+				$bom = mktime(0,0,0,$m,1, $oBudget->year);
+				if ($dateStart<$bom){
+					$row->{$month} = 1;
+				} else {
+					$row->{$month} = 0;
+				}
+			}
+			
+		}
+	}
+	
+	function post(){
+	
+		GLOBAL $Activities;
+		GLOBAL $YACT;
+		GLOBAL $Items;
+		
+		$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new Master($this->scenario, $this->GUID);
 					
 			if(is_array($this->records[$this->gridName])){
@@ -397,68 +462,8 @@ class Depreciation extends Document{
 				$oMaster->save();
 				$this->markPosted();
 			}
-		}
-		
-		return($sqlSuccess);
-				
 	}
 	
-	public function fill_replacement($oBudget){
-		
-		if (is_array($this->records[$this->gridName])){
-			foreach($this->records[$this->gridName] as $id=>$record){
-				$record->flagDeleted = true;
-			}
-		}
-		
-		$dateReplacementStart = ($oBudget->year-1).'-12-01';
-		$dateReplacementEnd = $oBudget->year.'-12-01';
-		
-		$sql = "SELECT *, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart)) AS months,
-				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValuePrimo,
-				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetEnd}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValueUltimo
-				FROM vw_fixed_assets 
-				LEFT JOIN vw_item ON itmID=fixItemID
-				WHERE fixProfitID=".$this->profit." AND DATEDIFF(fixDeprEnd,'{$dateReplacementStart}')>0 AND DATEDIFF(fixDeprEnd,'{$dateReplacementEnd}')<0 AND fixFlagDeleted=0
-				ORDER BY fixItemID";//die($sql);
-		$rs = $this->oSQL->q($sql);
-		while ($rw=$this->oSQL->f($rs)){
-			$row = $this->add_record();
-			$row->flagUpdated = true;				
-			$row->replace = true;				
-			$row->profit = $this->profit;
-			$row->particulars = $rw['fixGUID'];				
-			$row->item = $rw['itmGUID'];				
-			$row->duration = $rw['fixDeprDuration'];				
-			$row->activity = $rw['fixProductTypeID'];				
-			$row->date_start = $rw['fixDeprEnd'];				
-			$row->date_end = date('Y-m-d',strtotime($rw['fixDeprEnd'])+24*60*60*30*$rw['fixDeprDuration']);
-			$row->value_start = (double)$rw['fixValueStart'];				
-			$row->value_primo = (double)$rw['fixValuePrimo'];				
-			$row->value_ultimo = max(0,(double)$rw['fixValueUltimo']);				
-			$row->count = 1;				
-			
-			$arrDescr = null;
-			if ($rw['fixPlateNo']) $arrDescr[] = $rw['fixPlateNo'];
-			if ($rw['fixVIN']) $arrDescr[] = $rw['fixVIN'];
-			$row->comment = "Replacement: [".trim($rw['fixID'])."] ".$rw['fixTitleLocal']." ".(is_array($arrDescr)?implode('|',$arrDescr):'');				
-			
-			$dateEnd = strtotime($row->date_end);
-			$dateStart = strtotime($row->date_start);
-			
-			for($m=1;$m<13;$m++){
-				$month = $this->budget->arrPeriod[$m];
-				$bom = mktime(0,0,0,$m,1, $oBudget->year);
-				if ($dateStart<$bom){
-					$row->{$month} = 1;
-				} else {
-					$row->{$month} = 0;
-				}
-			}
-			
-		}
-	}
-
 }
 
 ?>

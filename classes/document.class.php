@@ -22,6 +22,8 @@ class Document extends easyForm{
 				$this->ID=$id;
 				$this->refresh($id);
 				
+				$this->settings = $this->budget->getSettings();
+				
 				if ($this->flagDeleted || $this->flagPosted){
 					$this->flagUpdate = false;
 				}
@@ -318,10 +320,13 @@ class Document extends easyForm{
 		return($sql);
 	}
 	
-	protected function unpost(){
+	protected function unpost(){		
 		if($this->flagDeleted){
 			return(false);
 		} else {
+			if (!$this->flagPosted){
+				return (true);
+			}			
 			$oMaster = new Master($this->scenario, $this->GUID);
 			$oMaster->clear();
 			$oMaster->save();

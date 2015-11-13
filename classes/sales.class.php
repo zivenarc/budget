@@ -355,8 +355,7 @@ class Sales extends Document{
 		GLOBAL $YACT;
 		GLOBAL $Items;
 		
-		$this->refresh($this->ID);
-		$settings = Budget::getSettings($this->oSQL,$this->scenario);
+		$this->refresh($this->ID);		
 		$oMaster = new Master($this->scenario, $this->GUID);
 			
 			if(is_array($this->records[$this->gridName])){
@@ -375,7 +374,7 @@ class Sales extends Document{
 					for($m=1;$m<=$this->budget->length;$m++){
 						// $month = date('M',mktime(0,0,0,$m,15));
 						$month = $this->budget->arrPeriod[$m];	
-						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
+						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
 					}				
 					
 					if ($record->buying_rate!=0){
@@ -392,7 +391,7 @@ class Sales extends Document{
 						for($m=1;$m<=$this->budget->length;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
-							$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
+							$master_row->{$month} = -($record->{$month})*$record->buying_rate*$this->settings[strtolower($record->buying_curr)];
 						}
 					}
 					
@@ -413,7 +412,7 @@ class Sales extends Document{
 						for($m=1;$m<=$this->budget->length;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
-							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$settings[strtolower($record->selling_curr)]-$record->buying_rate*$settings[strtolower($record->buying_curr)])/2;
+							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])/2;
 						}
 					}
 					
@@ -434,7 +433,7 @@ class Sales extends Document{
 						for($m=1;$m<=$this->budget->length;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
-							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$settings[strtolower($record->selling_curr)]-$record->buying_rate*$settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
+							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
 						}
 						
 						$master_row = $oMaster->add_master();	
@@ -453,7 +452,7 @@ class Sales extends Document{
 						for($m=1;$m<=$this->budget->length;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
-							$master_row->{$month} = ($record->{$month})*($record->selling_rate*$settings[strtolower($record->selling_curr)]-$record->buying_rate*$settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
+							$master_row->{$month} = ($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
 						}
 					}
 					

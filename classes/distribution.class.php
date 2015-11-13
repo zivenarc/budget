@@ -87,15 +87,18 @@ class Distribution extends Document{
                             'flagKeepLastRow' => false
                             , 'arrPermissions' => Array("FlagWrite" => !$this->flagPosted)
                             , 'flagStandAlone' => true
-							, 'controlBarButtons' => "add"
+							, 'controlBarButtons' => "add|delete"
                             )
                     );
-		$grid->Columns[]=Array(
+					
+		$this->grid = $grid;
+		
+		$this->grid->Columns[]=Array(
 			'field'=>"id"
 			,'type'=>'row_id'
 		);
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 				'title'=>'Customer'
 				,'field'=>'customer'
 				,'type'=>'ajax_dropdown'
@@ -109,37 +112,25 @@ class Distribution extends Document{
 				, 'class'=>'costs_supplier'
 			);		
 
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Unit'
 			,'field'=>'unit'
 			,'type'=>'text'
 			,'mandatory'=>true
 		);
 		
-	
-		for ($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-					
-			$grid->Columns[] = Array(
-			'title'=>$month
-			,'field'=>strtolower($month)
-			,'class'=>'budget-month'
-			,'type'=>'money'
-			, 'mandatory' => true
-			, 'disabled'=>!$this->flagUpdate
-			,'totals'=>true
-		);
-		}
-		$grid->Columns[] =Array(
-			'title'=>'Total'
-			,'field'=>'YTD'
+		
+		$this->setMonthlyEG('int');
+		
+		$this->grid->Columns[] =Array(
+			'title'=>'Average'
+			,'field'=>'AVG'
 			,'type'=>'money'
 			,'totals'=>true
 			,'disabled'=>true
 		);
-		
-		$this->grid = $grid;
-		return ($grid);
+				
+		return ($this->grid);
 	}
 	
 
@@ -171,8 +162,8 @@ class Distribution extends Document{
 						$row->flagUpdated = true;				
 						$row->customer = isset($_POST['customer'][$id]) ? $_POST['customer'][$id] : $this->customer;						
 						$row->unit = $_POST['unit'][$id];					
-						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+						for ($m=1;$m<=$this->budget->length;$m++){
+							$month = $this->budget->arrPeriod[$m];
 							$row->{$month} = (double)$_POST[strtolower($month)][$id];
 						}					
 					} else {
@@ -183,9 +174,6 @@ class Distribution extends Document{
 		}
 		
 		$this->deleteGridRecords();
-		
-		$settings = Budget::getSettings($this->oSQL,$this->scenario);
-		// echo '<pre>';print_r($settings);echo '</pre>';			
 		
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
@@ -213,7 +201,61 @@ class Distribution extends Document{
 		$sqlSuccess = $this->doSQL($sql);
 			
 		if($mode=='post'){
-			$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
+			$this->post();			
+		}
+		
+		return($sqlSuccess);
+				
+	}
+	
+	public function fill_distribution($oBudget,$type='sqm',$params=Array()){
+		
+		if (is_array($this->records[$this->gridName])){
+			foreach($this->records[$this->gridName] as $id=>$record){
+				$record->flagDeleted = true;
+			}
+		}
+		
+		$dateEstStart = ($oBudget->year-2).'-10-01';
+		$dateEstEnd = ($oBudget->year-1).'-09-30';
+		
+		switch ($type) {
+			case 'sqm':
+				$sql = "SELECT unit, customer, ".str_replace('SUM','MAX',$this->budget->getMonthlySumSQL())." FROM reg_sales
+						WHERE scenario='".$this->budget->id."' 
+							AND active=1 
+							AND pc='{$this->profit}'
+							AND unit='sqm'
+						GROUP BY customer"; 
+			break;
+			default:
+				return (false);
+			break;
+		}
+		 	
+		$rs = $this->oSQL->q($sql);
+		while ($rw=$this->oSQL->f($rs)){
+			$row = $this->add_record();
+			$row->flagUpdated = true;				
+			$row->unit = $rw['unit'];
+			$row->customer = $rw['customer'];			
+			for ($m=1;$m<=$this->budget->length;$m++){
+				$month = $this->budget->arrPeriod[$m];				
+				$row->set_month_value($m, $rw[$month]);
+				$arrSubtotal[$month] += $rw[$month];
+				$arrSum[$month] = $this->total - $arrSubtotal[$month];
+			}
+		}
+		$row = $this->add_record();
+		$row->flagUpdated = true;				
+		$row->unit = 'sqm';
+		$row->customer = 0;
+		$row->set_months($arrSum);
+		
+	}
+	
+	function post(){
+		$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new Master($this->scenario, $this->GUID);
 			// print_r($this->subtotal);
 			if(is_array($this->records[$this->gridName])){
@@ -235,8 +277,8 @@ class Distribution extends Document{
 							$item = $Items->getById($this->item);
 							$master_row->account = $item->getYACT($this->profit);
 							$master_row->item = $this->item;
-							for($m=1;$m<13;$m++){
-								$month = date('M',mktime(0,0,0,$m,15));
+							for($m=1;$m<=$this->budget->length;$m++){
+								$month = $this->budget->arrPeriod[$m];
 								$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]*$total[$month];
 							}				
 													
@@ -252,64 +294,14 @@ class Distribution extends Document{
 					$item = $Items->getById($this->item);
 					$master_row->account = $item->getYACT($this->profit);
 					$master_row->item = $this->item;
-					for($m=1;$m<13;$m++){
-						$month = date('M',mktime(0,0,0,$m,15));
+					for($m=1;$m<=$this->budget->length;$m++){
+						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -$total[$month];
 					}
 				}
 				$oMaster->save();
 				$this->markPosted();
 			}
-		}
-		
-		return($sqlSuccess);
-				
-	}
-	
-	public function fill_distribution($oBudget,$type='sqm',$params=Array()){
-		
-		if (is_array($this->records[$this->gridName])){
-			foreach($this->records[$this->gridName] as $id=>$record){
-				$record->flagDeleted = true;
-			}
-		}
-		
-		$dateEstStart = ($oBudget->year-2).'-10-01';
-		$dateEstEnd = ($oBudget->year-1).'-09-30';
-		
-		switch ($type) {
-			case 'sqm':
-				$sql = "SELECT unit, customer, ".str_replace('SUM','MAX',Budget::getMonthlySumSQL())." FROM reg_sales
-						WHERE scenario='".$oBudget->id."' 
-							AND active=1 
-							AND pc='{$this->profit}'
-							AND unit='sqm'
-						GROUP BY customer"; 
-			break;
-			default:
-				return (false);
-			break;
-		}
-		 	
-		$rs = $this->oSQL->q($sql);
-		while ($rw=$this->oSQL->f($rs)){
-			$row = $this->add_record();
-			$row->flagUpdated = true;				
-			$row->unit = $rw['unit'];
-			$row->customer = $rw['customer'];			
-			for ($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));				
-				$row->set_month_value($m, $rw[$month]);
-				$arrSubtotal[$month] += $rw[$month];
-				$arrSum[$month] = $this->total - $arrSubtotal[$month];
-			}
-		}
-		$row = $this->add_record();
-		$row->flagUpdated = true;				
-		$row->unit = 'sqm';
-		$row->customer = 0;
-		$row->set_months($arrSum);
-		
 	}
 	
 }
