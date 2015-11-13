@@ -92,17 +92,7 @@ class Sales extends Document{
 			,'disabled'=>!$this->flagUpdate
 		);
 		
-		$this->Columns[] = Array(
-			'title'=>'Responsible'
-			,'field'=>self::Prefix.'UserID'
-			,'type'=>'ajax'
-			,'table'=>'stbl_user'
-			,'prefix'=>'usr'
-			,'sql'=>'stbl_user'
-			,'mandatory'=>true
-			,'default'=>$arrData['usrID']
-			,'disabled'=>!$this->flagUpdate
-		);
+		$this->Columns[] = getResponsibleEF();
 		
 		$this->Columns[] = Array(
 			'title'=>'Profit share with'

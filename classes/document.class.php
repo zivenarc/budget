@@ -352,6 +352,23 @@ class Document extends easyForm{
 		//to be defined in specific class
 	}
 	
+	protected function getResponsibleEF(){
+		GLOBAL $arrUsrData;
+		$res = Array(
+			'title'=>'Responsible'
+			,'field'=>$this->Prefix.'UserID'
+			,'type'=>'ajax'
+			,'table'=>'stbl_user'
+			,'prefix'=>'usr'
+			,'sql'=>'stbl_user'
+			,'mandatory'=>true
+			,'default'=>$arrData['usrID']
+			,'disabled'=>!$this->flagUpdate
+		);
+		
+		return ($res);
+	}
+	
 	protected function getProfitEG(){
 		GLOBAL $arrUsrData;
 		$res = Array(

@@ -140,6 +140,8 @@ class Indirect_costs extends Document{
 				break;
 		}
 		
+		$this->Columns[] = getResponsibleEF();
+		
 		$this->Columns[] = Array('title'=>'Comments','field'=>$this->prefix.'Comment','type'=>'text', 'disabled'=>!$this->flagUpdate);
 	
 	}

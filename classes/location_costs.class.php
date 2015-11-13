@@ -90,6 +90,9 @@ class Location_costs extends Document{
 			,'default'=>'all'
 			, 'disabled'=>!$this->flagUpdate
 		);
+		
+		$this->Columns[] = getResponsibleEF();
+		
 		$this->Columns[] = Array('title'=>'Comments','field'=>$this->prefix.'Comment','type'=>'text', 'disabled'=>!$this->flagUpdate);
 	}
 	
