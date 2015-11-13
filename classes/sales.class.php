@@ -92,7 +92,7 @@ class Sales extends Document{
 			,'disabled'=>!$this->flagUpdate
 		);
 		
-		$this->Columns[] = getResponsibleEF();
+		$this->Columns[] = $this->getResponsibleEF();
 		
 		$this->Columns[] = Array(
 			'title'=>'Profit share with'
