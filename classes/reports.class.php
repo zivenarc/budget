@@ -1328,10 +1328,11 @@ class Reports{
 					<td class="td-posted <?php echo ($data[$i]['posted']?'budget-icon-posted':'');?>">&nbsp;</td>
 					<td class="td-deleted <?php echo ($data[$i]['deleted']?'budget-icon-deleted':'');?>">&nbsp;</td>
 					<td id="amount_<?php echo $data[$i]['guid'];?>" class="journal-current budget-decimal"><?php self::render($data[$i]['amount']);?></td>
-					<td><?php echo $data[$i]['pccTitle'];?></td>
+					<td><?php echo $data[$i]['pccTitle']?$data[$i]['pccTitle']:$data[$i]['locTitle'];?></td>
 					<td><?php echo $data[$i]['comment'];?></td>
 					<td id="usrTitle_<?php echo $data[$i]['guid'];?>"><?php echo $data[$i]['usrTitle'];?></td>
 					<td id="timestamp_<?php echo $data[$i]['guid'];?>"><?php echo date('d.m.Y H:i',strtotime($data[$i]['timestamp']));?></td>
+					<td id="responsible_<?php echo $data[$i]['guid'];?>"><?php echo $data[$i]['responsible'];?></td>
 				</tr>
 				<?php
 		}
@@ -1354,6 +1355,7 @@ class Reports{
 						<th>Comment</th>
 						<th>Editor</th>
 						<th>Timestamp</th>
+						<th>Responsible</th>
 					</tr>
 				</thead>
 				<tfoot>
