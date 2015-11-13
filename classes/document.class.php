@@ -356,7 +356,7 @@ class Document extends easyForm{
 		GLOBAL $arrUsrData;
 		$res = Array(
 			'title'=>'Responsible'
-			,'field'=>$this->Prefix.'UserID'
+			,'field'=>$this->prefix.'UserID'
 			,'type'=>'ajax'
 			,'table'=>'stbl_user'
 			,'prefix'=>'usr'
