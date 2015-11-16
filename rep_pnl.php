@@ -64,7 +64,7 @@ if(!isset($_GET['pccGUID'])){
 			break;
 		case 'customer':
 		default:			
-			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'customer','field_title'=>'Customer_name','title'=>'Customer'));
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'CASE WHEN Customer_group_code=723 THEN customer ELSE Customer_group_code END','field_title'=>'CASE WHEN Customer_group_code=723 THEN Customer_name ELSE Customer_group_title END','title'=>'Customer'));
 			break;
 	}
 

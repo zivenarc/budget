@@ -580,12 +580,12 @@ class Reports{
 		$strFields = $this->_getMonthlyFields();
 		
 		ob_start();
-		$sql = "SELECT `{$params['field_title']}` as 'Level1_title', `{$params['field_data']}` as 'level1_code', `Budget item`, `Group`, `item`,
+		$sql = "SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `Budget item`, `Group`, `item`,
 					{$strFields}
 			FROM `vw_master` 			
 			{$sqlWhere} AND Group_code=".self::GP_CODE." ## Gross margin only
-			GROUP BY `vw_master`.`{$params['field_data']}`, `vw_master`.item
-			ORDER BY `{$params['field_data']}`, `Group`, `vw_master`.itmOrder ASC			
+			GROUP BY ({$params['field_data']}), `vw_master`.item
+			ORDER BY ({$params['field_data']}), `Group`, `vw_master`.itmOrder ASC			
 			";
 		
 		$this->_firstLevelPeriodic($sql, $params['title'], $this->oBudget);
