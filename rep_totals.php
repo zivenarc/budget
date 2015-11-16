@@ -312,7 +312,7 @@ foreach($arrProfit as $pc=>$flag){
 	<td class='budget-decimal'><?php Reports::render(array_sum($arrHeadcount['FTE'])-array_sum($arrHeadcountBudget['FTE']),1);?></td>
 </tr>
 <tr>
-	<td>Headcount, budget</td>
+	<td>Headcount, <?php echo $oBudget->type=='FYE'?'Budget':'Last';?></td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
@@ -371,7 +371,7 @@ foreach($arrProfit as $pc=>$flag){
 	<td class='budget-decimal'><?php Reports::render(array_sum($arrOpIncome)-array_sum($arrOpIncomeEstimate));?></td>
 </tr>
 <tr>
-	<td>Operating income, budget</td>
+	<td>Operating income, <?php echo $oBudget->type=='FYE'?'Budget':'Last';?></td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
@@ -426,6 +426,17 @@ foreach($arrProfit as $pc=>$flag){
 }
 ?>
 	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOpIncome)/100,array_sum($arrHeadcount['FTE']),0);?></td>
+</tr>
+<tr class="budget-subtotal">
+	<td>OP costs</td>
+	<?php
+	foreach($arrProfit as $pc=>$flag){
+	?>
+	<td class='budget-decimal'><?php Reports::render($arrOpIncome[$pc]-$arrTotal[GROSS_PROFIT][$pc]);?></td>
+	<?php
+}
+?>
+<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome) - array_sum($arrTotal[GROSS_PROFIT]));?></td>	
 </tr>
 </tfoot>
 </table>
