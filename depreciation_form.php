@@ -54,8 +54,9 @@ if ($_POST['DataAction']){
 			
 			$dateEnd = strtotime($rw['fixDeprEnd']);
 			
-			for($m=1;$m<13;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
+			for($m=1;$m<=$oBudget->length;$m++){
+				// $month = date('M',mktime(0,0,0,$m,15));
+				$month = $oBudget->arrPeriod[$m];
 				$eom = mktime(0,0,0,$m+1,0, $oBudget->year);
 				if ($dateEnd>=$eom){
 					$row->{$month} = 1;
