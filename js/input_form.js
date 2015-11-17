@@ -17,8 +17,10 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 				},
 				spinner:'',
 				load: function (event, ui) {
-					
 				},	
+				activate: function(event, ui){
+					ui.newPanel.find('.eiseGrid').eiseGrid();
+				}
 			};
 
 function spinner_div(){

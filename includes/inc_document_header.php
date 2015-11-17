@@ -34,8 +34,8 @@ if ($oDocument->classified) {
 ?>
 <script>
 	var doc = <?php $oDocument->getJSON(); ?>;
-	$(document).ready(function(){
-		$('#<?php echo $oDocument->gridName;?>').eiseGrid();
+	$(window).load(function(){
+		//$('#<?php echo $oDocument->gridName;?>').eiseGrid();
 	});
 </script>
 <div>
