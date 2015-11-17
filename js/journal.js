@@ -24,7 +24,7 @@ function repost(tab, event){
 		var total = 0;
 		$(event.srcElement).addClass('spinner');
 		
-		$('#sources').find('tr').each(function(){
+		$('#sources',$('#div_'+tab)).find('tr').each(function(){
 			$(this).find('td.journal-current').eq(0).after('<td class="budget-decimal"></td>');
 			$(this).find('th.journal-current').eq(0).after('<th class="budget-ytd">New result</th>');
 		});

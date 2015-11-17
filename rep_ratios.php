@@ -14,7 +14,7 @@ if($_GET['DataAction']=='update'){
 	$sql = Array();
 	$sql[] = "DELETE FROM reg_profit_ghq WHERE scenario = '$budget_scenario'";
 	$sql[] = "INSERT INTO reg_profit_ghq
-				SELECT scenario, pc, prtGHQ, ".Budget::getMonthlySumSQL().", SUM(`estimate`) as estimate
+				SELECT scenario, pc, prtGHQ, ".$oBudget->getMonthlySumSQL(1,15).", SUM(`estimate`) as estimate
 				FROM reg_master
 				LEFT JOIN vw_product_type ON prtID = activity
 				##WHERE item =  '".Items::REVENUE."'
@@ -38,7 +38,7 @@ if (!isset($_GET['tab'])){
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'::',$oBudget->title,'</h1>';
 		?>
-	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
+	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
 	<?php
 	
 	?>
@@ -58,7 +58,7 @@ if (!isset($_GET['tab'])){
 	<?php
 	switch($_GET['tab']){
 		case 'activity':
-			$sql = "SELECT *, ".Budget::getYTDSQL()." FROM reg_profit_ghq 
+			$sql = "SELECT *, ".$oBudget->getYTDSQL()." FROM reg_profit_ghq 
 					LEFT JOIN vw_profit ON pccID=pc
 					WHERE scenario='$budget_scenario' 
 					order by prtGHQ, `dec` DESC";
@@ -71,7 +71,7 @@ if (!isset($_GET['tab'])){
 					<th>Activity</th>
 					<th>PC</th>
 					<?php
-					echo Budget::getTableHeader('monthly',$startMonth);
+					echo $oBudget->getTableHeader('monthly',$startMonth);
 					?>
 					<th>Total</th>
 				</tr>
@@ -137,7 +137,7 @@ if (!isset($_GET['tab'])){
 			<?php
 			break;
 			case 'pc':
-				$sql = "SELECT *, ".Budget::getYTDSQL()." FROM reg_profit_ghq 
+				$sql = "SELECT *, ".$oBudget->getYTDSQL()." FROM reg_profit_ghq 
 					LEFT JOIN vw_profit ON pccID=pc
 					WHERE scenario='$budget_scenario' 
 					order by pc, `dec` DESC";
@@ -150,7 +150,7 @@ if (!isset($_GET['tab'])){
 					<th>PC</th>
 					<th>Activity</th>
 					<?php
-					echo Budget::getTableHeader('monthly',$startMonth);
+					echo $oBudget->getTableHeader('monthly',$startMonth);
 					?>
 					<th>Total</th>
 				</tr>

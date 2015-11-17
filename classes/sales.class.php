@@ -372,6 +372,7 @@ class Sales extends Document{
 						$master_row->profit = $this->profit;
 						$master_row->activity = $record->activity;
 						$master_row->customer = $record->customer;				
+						$master_row->sales = $record->sales;
 						
 						$activity = $Activities->getByCode($record->activity);
 						$account = 'J00802';
@@ -390,6 +391,7 @@ class Sales extends Document{
 						$master_row->profit = $this->profit;
 						$master_row->activity = $record->activity;
 						$master_row->customer = $record->customer;				
+						$master_row->sales = $record->sales;
 						
 						$activity = $Activities->getByCode($record->activity);
 						$account = $activity->YACT;
@@ -407,10 +409,13 @@ class Sales extends Document{
 					}
 					
 					if ($this->ps_profit && $this->ps_rate){
+					
+						//------------------------------------------Deduct PS from main department-----------------
 						$master_row = $oMaster->add_master();	
 						$master_row->profit = $this->profit;
 						$master_row->activity = $record->activity;
 						$master_row->customer = $record->customer;				
+						$master_row->sales = $record->sales;
 						
 						$activity = $Activities->getByCode($record->activity);
 						$account = $activity->YACT;
@@ -426,10 +431,33 @@ class Sales extends Document{
 							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
 						}
 						
+						//------------------------------------------Elimination of costs-----------------
+						$master_row = $oMaster->add_master();	
+						$master_row->profit = 99;
+						$master_row->activity = $record->activity;
+						$master_row->customer = $record->customer;				
+						$master_row->sales = $record->sales;
+						
+						$activity = $Activities->getByCode($record->activity);
+						$account = $activity->YACT;
+						
+						//$master_row->item = Items::PROFIT_SHARE;
+						$item = $Items->getById(Items::INTERCOMPANY_COSTS);
+						$master_row->account = $item->getYACT($master_row->profit);
+						$master_row->item = $item->id;
+						
+						for($m=1;$m<=$this->budget->length;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];	
+							$master_row->{$month} = ($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
+						}
+						
+						//------------------------------------------Create income for supplementary department-----------------
 						$master_row = $oMaster->add_master();	
 						$master_row->profit = $this->ps_profit;
 						$master_row->activity = $record->activity;
 						$master_row->customer = $record->customer;				
+						$master_row->sales = $record->sales;
 						
 						$activity = $Activities->getByCode($record->activity);
 						$account = $activity->YACT;
@@ -444,6 +472,28 @@ class Sales extends Document{
 							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = ($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
 						}
+						
+						//------------------------------------------Elimination of income-----------------
+						$master_row = $oMaster->add_master();	
+						$master_row->profit = 99;
+						$master_row->activity = $record->activity;
+						$master_row->customer = $record->customer;				
+						$master_row->sales = $record->sales;
+						
+						$activity = $Activities->getByCode($record->activity);
+						$account = $activity->YACT;
+						
+						//$master_row->item = Items::PROFIT_SHARE;
+						$item = $Items->getById(Items::INTERCOMPANY_REVENUE);
+						$master_row->account = $item->getYACT($master_row->profit);
+						$master_row->item = $item->id;
+						
+						for($m=1;$m<=$this->budget->length;$m++){
+							// $month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];	
+							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
+						}
+						
 					}
 					
 				}

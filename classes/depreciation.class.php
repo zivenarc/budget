@@ -38,11 +38,12 @@ class Depreciation extends Document{
 			$this->prefix = 'dep';
 		}
 		
-		$this->gridClass = 'depreciation_record';
+		// $this->gridClass = 'depreciation_record';
 		
 		$this->type=$type;
 		
 		parent::__construct($id);	
+		$this->gridClass = 'depreciation_record';
 
 	}
 	public function refresh($id){

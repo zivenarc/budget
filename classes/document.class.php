@@ -75,7 +75,7 @@ class Document extends easyForm{
 		};		
 	}
 	
-	protected function add_record(){		
+	public function add_record(){		
 		$reflector = new ReflectionClass($this->gridClass);
 		$oBR = $reflector->newInstance ($this->GUID,$this->scenario);
 		$this->records[$this->gridName][] = $oBR;

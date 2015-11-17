@@ -153,20 +153,22 @@ class Vehicle extends Document{
 							, 'controlBarButtons' => "add"
                             )
                     );
-		$grid->Columns[]=Array(
+		$this->grid = $grid;
+		
+		$this->grid->Columns[]=Array(
 			'field'=>"id"
 			,'type'=>'row_id'
 		);
 		
 		if ($this->type=='current'){
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'Code'
 				,'field'=>'fixID'
 				,'type'=>'text'
 				, 'disabled'=>true
 			);	
 			
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'Asset'
 				,'field'=>'particulars'
 				,'type'=>'combobox'
@@ -176,16 +178,16 @@ class Vehicle extends Document{
 			);		
 		};
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Description'
 			,'field'=>'comment'
 			,'type'=>'text'
 			, 'disabled'=>false
 		);
 			
-		$grid->Columns[] = parent::getActivityEG();
+		$this->grid->Columns[] = parent::getActivityEG();
 			
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Value Jan'
 			,'field'=>'value_primo'
 			,'type'=>'money'
@@ -195,20 +197,9 @@ class Vehicle extends Document{
 				
 
 		
-		for ($m=1;$m<13;$m++){
-			$month = date('M',mktime(0,0,0,$m,15));
-					
-			$grid->Columns[] = Array(
-			'title'=>$month
-			,'field'=>strtolower($month)
-			,'class'=>'budget-month'
-			,'type'=>'integer'
-			, 'mandatory' => true
-			, 'disabled'=>!$this->flagUpdate
-			,'totals'=>true
-		);
-		}
-		$grid->Columns[] =Array(
+		$this->setMonthlyEG('int');
+		
+		$this->grid->Columns[] =Array(
 			'title'=>'Total'
 			,'field'=>'YTD'
 			,'type'=>'integer'
@@ -216,8 +207,8 @@ class Vehicle extends Document{
 			,'disabled'=>true
 		);
 		
-		$this->grid = $grid;
-		return ($grid);
+		
+		return ($this->grid);
 	}
 	
 	public function fillGrid(){
@@ -275,9 +266,9 @@ class Vehicle extends Document{
 								
 						
 						$row->comment = $_POST['comment'][$id];				
-						for ($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
-								$row->{$month} = (integer)$_POST[strtolower($month)][$id];
+						for ($m=1;$m<=15;$m++){
+							$month = $this->budget->arrPeriod[$m];
+							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
 						}					
 					} else {
 						$row->flagUpdated = false;
@@ -348,7 +339,7 @@ class Vehicle extends Document{
 						$master_row->item = $item_guid;						
 						
 						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = -$record->{$month}*$this->fuelprice*$this->consumption/100;							
 							
 						}				
@@ -364,7 +355,7 @@ class Vehicle extends Document{
 						$master_row->item = $item_guid;						
 						
 						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];							
 							$master_row->{$month} = -($record->{$month}?1:0)*
 								($this->maintenance/12 + $this->consumables + $this->wash);							
 							
@@ -382,7 +373,7 @@ class Vehicle extends Document{
 						$master_row->item = $item_guid;						
 						
 						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = - ($record->value_primo*$this->casco/100 + $this->osago)/12;							
 							
 						}
@@ -398,7 +389,7 @@ class Vehicle extends Document{
 						$master_row->item = $item_guid;						
 						
 						for($m=1;$m<13;$m++){
-							$month = date('M',mktime(0,0,0,$m,15));
+							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} =	- $this->power*$this->rate/12;															
 						}
 	

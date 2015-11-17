@@ -43,8 +43,8 @@ class Distribution extends Document{
 			while($rw = $this->oSQL->f($rs)){
 				// print_r($rw);
 				$this->records[$this->gridName][$rw['id']] = new distribution_record($this->GUID, $this->scenario, $rw['id'], $rw);			
-				for($m=1;$m<13;$m++){
-					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+				for($m=1;$m<=$this->budget->length;$m++){
+					$month = $this->budget->arrPeriod[$m];
 					$this->subtotal[$month] += $rw[$month];
 				}				
 			}		
@@ -136,11 +136,7 @@ class Distribution extends Document{
 
 	public function save($mode='update'){
 		
-		GLOBAL $arrUsrData;
-		GLOBAL $Activities;
-		GLOBAL $YACT;
-		GLOBAL $Items;
-		
+	
 		parent::save($mode);
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
@@ -255,12 +251,18 @@ class Distribution extends Document{
 	}
 	
 	function post(){
+	
+		GLOBAL $arrUsrData;
+		GLOBAL $Activities;
+		GLOBAL $YACT;
+		GLOBAL $Items;
+	
 		$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new Master($this->scenario, $this->GUID);
 			// print_r($this->subtotal);
 			if(is_array($this->records[$this->gridName])){
 				
-				$sql = "SELECT activity, ".Budget::getMonthlySumSQL()." FROM reg_master
+				$sql = "SELECT activity, ".$this->budget->getMonthlySumSQL()." FROM reg_master
 						WHERE scenario='{$this->scenario}'
 							AND pc='{$this->profit}'
 							AND item='{$this->item}'
