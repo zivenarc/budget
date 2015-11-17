@@ -1,5 +1,6 @@
 <?php
-ini_set("zlib.output_compression","1");
+if(!$noCompression)
+	ini_set("zlib.output_compression","1");
 header("Content-Type: text/html; charset=UTF-8");
 header("Expires: 0");
 header("Cache-Control: must-revalidate, post-check=0, pre-check=0");

@@ -12,7 +12,10 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 					if(doc){
 						if(doc.flagPosted==1){
 							$(this).tabs('option','active',2);
+						} else {
+							$('#tabs-input').find('.eiseGrid').eiseGrid();
 						}
+
 					}
 				},
 				spinner:'',
