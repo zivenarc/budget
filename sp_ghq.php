@@ -22,7 +22,7 @@ while ($rw = $oSQL->f($rs)){
 // $startMonth = date('n',$oBudget->date_start);
 $startMonth = 1;
 
-$sql = "SELECT pc, prtGHQ, ".Budget::getMonthlySumSQL($startMonth,12, $arrRates)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
+$sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,12, $arrRates)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
 		GROUP BY prtGHQ, pc";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -47,7 +47,7 @@ foreach($arrPC as $pc=>$arrGhq){
 // echo '<pre>';print_r($arrRatio);echo '</pre>';
 
 $sqlFields = "CONCAT(account,': ',title) as account, prtGHQ, pc, pccFlagProd, 
-				SUM(".Budget::getYTDSQL($startMonth,12, $arrRates).") as Total, ".Budget::getMonthlySumSQL($startMonth,12, $arrRates);
+				SUM(".$oBudget->getYTDSQL($startMonth,12, $arrRates).") as Total, ".$oBudget->getMonthlySumSQL($startMonth,12, $arrRates);
 $sqlGroupBy = "account, pc, prtGHQ";
 
 $arrFilter = Array(
@@ -270,11 +270,11 @@ if ($denominator!=1) {
 
 
 ?>
-<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
+<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
 <table id='report' class='budget'>
 <thead>
 	<th>Item</th>
-	<?php echo Budget::getTableHeader('monthly', $startMonth,12); ?>
+	<?php echo $oBudget->getTableHeader('monthly', $startMonth,12); ?>
 	<th>Total</th>
 </thead>
 <tbody>
