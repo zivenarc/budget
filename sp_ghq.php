@@ -459,7 +459,7 @@ function error_distribution($params){
 }
 
 function distribute($reportKey, $sql){
-	GLOBAL $oSQL;
+	GLOBAL $oSQL, $oBudget;	
 	GLOBAl $startMonth;
 	GLOBAl $arrReport;
 	GLOBAL $arrGrandTotal;
