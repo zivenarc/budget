@@ -103,13 +103,14 @@ class Reports{
 	public function salesByCustomer($sqlWhere=''){
 		
 		ob_start();
-			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().") as Total 
+			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().") as Total, usrTitle as responsible
 					FROM `reg_sales`
 					LEFT JOIN vw_customer ON customer=cntID					
-					LEFT JOIN vw_profit ON pc=pccID					
+					LEFT JOIN vw_profit ON pc=pccID	
+					LEFT JOIN stbl_user ON sales=usrID
 					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 $sqlWhere
 					GROUP BY `reg_sales`.`customer`, unit
-					ORDER BY Total DESC"; 
+					ORDER BY sales, Total DESC"; 
 			//echo $sql;
 			$rs = $this->oSQL->q($sql);
 			if (!$this->oSQL->num_rows($rs)){
@@ -130,7 +131,15 @@ class Reports{
 			</thead>			
 			<tbody>
 			<?php
+			$responsible = null;
 			while ($rw=$this->oSQL->f($rs)){
+				if ($rw['responsible']!=$responsible){
+					?>
+					<tr>
+						<th colspan="20">By <?php echo $rw['responsible'];?></th>
+					</tr>
+					<?php 
+				}				
 				?>
 				<tr>
 					<td><?php echo $rw['Customer'];?></td>
@@ -139,7 +148,7 @@ class Reports{
 				for ($m=1;$m<13;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
 					$arrTotal[$rw['unit']][$month] += $rw[$month];
-					echo "<td class='budget-decimal budget-monthly budget-$month'>",number_format($rw[$month],0,'.',','),'</td>';
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
 				}
 				$arrQuarter = Array('Q1'=>$rw['jan']+$rw['feb']+$rw['mar'],
 									'Q2'=>$rw['apr']+$rw['may']+$rw['jun'],
@@ -151,12 +160,15 @@ class Reports{
 					$quarter = 'Q'.$q;
 					$arrQTotal[$rw['unit']][$quarter] += $arrQuarter[$quarter];
 					?>
-					<td class='budget-decimal budget-quarterly budget-$quarter'><?php self::render($arrQuarter[$quarter])?></td>
+					<td class='budget-decimal budget-quarterly budget-<?php echo $quarter;?>'><?php self::render($arrQuarter[$quarter])?></td>
 					<?php
 				}				
-									
-				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';
-				echo "</tr>\r\n";
+				
+				?>
+				<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']);?></td>				
+				</tr>
+				<?php
+				$responsible = $rw['responsible'];
 			}
 			?>
 			</tbody>
