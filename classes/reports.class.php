@@ -109,7 +109,7 @@ class Reports{
 					LEFT JOIN vw_profit ON pc=pccID	
 					LEFT JOIN stbl_user ON sales=usrID
 					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 $sqlWhere
-					GROUP BY `reg_sales`.`customer`, unit
+					GROUP BY sales, `reg_sales`.`customer`, unit
 					ORDER BY sales, Total DESC"; 
 			//echo $sql;
 			$rs = $this->oSQL->q($sql);
