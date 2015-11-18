@@ -1,11 +1,10 @@
 <?php
 require ('common/auth.php');
 require ('classes/budget.class.php');
-
-$budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
+include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
-
+$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator));
 
 if(!isset($_GET['pccGUID'])){
 	$arrJS[] = 'https://www.google.com/jsapi';
@@ -26,7 +25,7 @@ if(!isset($_GET['pccGUID'])){
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND scenario='$budget_scenario'";
 	}
 	
-	Reports::salesByActivity($sqlWhere);
+	$oReport->salesByActivity($sqlWhere);
 	?>
 		<!--<input id='pccGUID' type="hidden" value="<?php echo $_GET['pccGUID'];?>"/>-->
 		<div id='graph'/>
