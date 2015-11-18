@@ -10,6 +10,17 @@ if (isset($_GET['budget_scenario'])) {
 
 SetCookie('report_scenario',$budget_scenario,0,'/budget/');
 
+//------------------------------------------- Determine reference scenario ------------------------------------//
+if (isset($_GET['reference'])) {
+	$reference = $_GET['reference'];
+} elseif (isset($_COOKIE['reference'])) {
+	$reference = $_COOKIE['reference'];
+} else {
+	$reference = null; //--to use default reference from budget settings
+}
+
+SetCookie('reference',$reference,0,'/budget/');
+
 //------------------------------------------- Determine report currency ----------------------------------//
 if (isset($_GET['currency'])) {
 	$currency = $_GET['currency'];
@@ -46,6 +57,7 @@ if (isset($_GET['type'])){
 }
 SetCookie('pnl_type',$type,0,'/budget/');
 
+//------------------------------------- denominator -------------------------------------------//
 if (isset($_GET['denominator'])) {
 	$denominator = $_GET['denominator'];
 } elseif (isset($_COOKIE['report_denominator'])){

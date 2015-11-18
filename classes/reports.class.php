@@ -17,6 +17,7 @@ class Reports{
 		$this->oSQL = $oSQL;
 		
 		$this->oBudget = new Budget($params['budget_scenario']);
+		$this->oReference = $params['reference']?new Budget($params['reference']):$this->oBudget->reference_scenario;
 		$this->Currency = $params['currency']?$params['currency']:643;
 		$this->Denominator = $params['denominator']?$params['denominator']:1;
 		$this->ID = md5(time());
@@ -614,6 +615,9 @@ class Reports{
 			case 'customer':
 				$sqlMeasure = "Customer_name as 'Level1_title', customer as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
 				break;
+			case 'pc':
+				$sqlMeasure = "Profit as 'Level1_title', pc as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				break;
 			case 'ghq':
 			default:
 				$sqlMeasure = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
@@ -712,7 +716,7 @@ class Reports{
 						echo $this->oBudget->getTableHeader('quarterly');
 					?>		
 					<th class='budget-ytd'><?php echo $this->oBudget->type=='Budget'?'Budget':'FYE';?></th>
-					<th><?php echo $this->oBudget->type=='Budget'?$this->oBudget->reference_scenario->id:'Budget';?></th>
+					<th><?php echo $this->oBudget->type=='Budget'?$this->oReference->id:'Budget';?></th>
 					<th>Diff</th>
 					<th>%</th>
 					<?php 
@@ -1138,7 +1142,7 @@ class Reports{
 						SUM(`$nm`)/{$arrRates[$nm]} as NM_B";
 		
 		$res['from_a'] = $this->oBudget->id;
-		$res['from_b'] = $this->oBudget->reference_scenario->id;
+		$res['from_b'] = $this->oReference->id;
 		
 		// echo '<pre>',$res,'</pre>'; 
 		

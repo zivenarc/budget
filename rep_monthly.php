@@ -4,7 +4,9 @@ require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
-$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator));
+
+
+$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$reference));
 
 if(!isset($_GET['pccGUID'])){
 	$oBudget = new Budget($budget_scenario);
@@ -15,6 +17,7 @@ if(!isset($_GET['pccGUID'])){
 	$arrActions[] = Array ('title'=>'By activity','action'=>"?budget_scenario={$budget_scenario}&type=activity");
 	$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?budget_scenario={$budget_scenario}&type=ghq");
 	$arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");	
+	$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");	
 	
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
@@ -44,18 +47,21 @@ if(!isset($_GET['pccGUID'])){
 	
 	switch ($type){
 		case 'activity':		
-			$oReport->monthlyReport($sqlWhere,$currency, 'activity');	
+			$oReport->monthlyReport($sqlWhere, 'activity');	
+			break;
+		case 'pc':		
+			$oReport->monthlyReport($sqlWhere, 'pc');	
 			break;
 		case 'ghq':
 			echo "<input type='hidden' id='group' value='activity'/>";
-			$oReport->monthlyReport($sqlWhere,$currency,'ghq');	
+			$oReport->monthlyReport($sqlWhere,'ghq');	
 		break;
 		// case 'f865e855-d328-102e-9d25-5de97ba9df63':
 			// $sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") OR (customer=9907 AND Group_code=94))";
 		case 'customer':
 		default:
 			echo "<input type='hidden' id='group' value='customer'/>";
-			$oReport->monthlyReport($sqlWhere,$currency,'customer');
+			$oReport->monthlyReport($sqlWhere,'customer');
 			break;
 	}
 
