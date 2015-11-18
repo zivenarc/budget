@@ -1,6 +1,7 @@
 <?php
 require ('common/auth.php');
 require ('classes/budget.class.php');
+require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
@@ -16,8 +17,7 @@ if(!isset($_GET['pccGUID'])){
 	<?php
 	Budget::getProfitTabs('reg_sales');	
 	include ('includes/inc-frame_bottom.php');
-} else {
-	require ('classes/reports.class.php');
+} else {	
 	include ('includes/inc_report_buttons.php');
 	if ($_GET['pccGUID']=='all'){
 		$sqlWhere = " WHERE scenario='$budget_scenario'";
