@@ -103,7 +103,7 @@ class Reports{
 	public function salesByCustomer($sqlWhere=''){
 		
 		ob_start();
-			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().") as Total, usrTitle as responsible
+			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().") as Total, usrTitle as responsible, sales
 					FROM `reg_sales`
 					LEFT JOIN vw_customer ON customer=cntID					
 					LEFT JOIN vw_profit ON pc=pccID	
@@ -136,7 +136,7 @@ class Reports{
 				if ($rw['responsible']!=$responsible){
 					?>
 					<tr>
-						<th colspan="20">By <?php echo $rw['responsible'];?></th>
+						<th colspan="20">By <a target="sales_report" href="rep_my.php?usrID=<?php echo $rw['sales'];?>"><?php echo $rw['responsible'];?></a></th>
 					</tr>
 					<?php 
 				}				
