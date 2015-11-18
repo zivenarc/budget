@@ -101,20 +101,18 @@ class Reports{
 	}
 	
 	public function salesByCustomer($sqlWhere=''){
-		GLOBAL $oSQL;
-		GLOBAL $budget_scenario;
 		
 		ob_start();
 			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().") as Total 
 					FROM `reg_sales`
 					LEFT JOIN vw_customer ON customer=cntID					
 					LEFT JOIN vw_profit ON pc=pccID					
-					WHERE posted=1 AND scenario='{$budget_scenario}' and kpi=1 $sqlWhere
+					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 $sqlWhere
 					GROUP BY `reg_sales`.`customer`, unit
 					ORDER BY Total DESC"; 
 			//echo $sql;
-			$rs = $oSQL->q($sql);
-			if (!$oSQL->num_rows($rs)){
+			$rs = $this->oSQL->q($sql);
+			if (!$this->oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
 				echo '<pre>',$sql,'</pre>';
 				return (false);
@@ -132,7 +130,7 @@ class Reports{
 			</thead>			
 			<tbody>
 			<?php
-			while ($rw=$oSQL->f($rs)){
+			while ($rw=$this->oSQL->f($rs)){
 				?>
 				<tr>
 					<td><?php echo $rw['Customer'];?></td>
