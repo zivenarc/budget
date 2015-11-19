@@ -145,38 +145,54 @@ while ($rw=$oSQL->f($rs)){
 	$arrHeadcountBudget['FTE'][$keyProfit] += $rw['Estimate'];	
 }
 
-$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
-		FROM reg_master
-		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='{$oBudget->id}' and active=1
-			AND account='J00400'
-		GROUP BY Profit
+$sql = "SELECT account,Customer_group_code, Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
+		FROM vw_master		
+		WHERE scenario='{$oBudget->id}'
+			AND account IN('J00400','J00802')
+		GROUP BY account, Customer_group_code, Profit
 		UNION ALL
-		SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
-		FROM reg_master
-		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='{$oBudget->reference_scenario->id}' and active=1
-			AND account='J00400'
-		GROUP BY Profit
+		SELECT account,Customer_group_code, Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
+		FROM vw_master		
+		WHERE scenario='{$oBudget->reference_scenario->id}'
+			AND account IN('J00400','J00802')
+		GROUP BY account,Customer_group_code, Profit
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 	$keyProfit = $oBudget->getProfitAlias($rw);
-	$arrGrossRevenue[$keyProfit] += $rw['Total'];	
-	$arrGrossRevenueEstimate += $rw['Estimate'];	
+	
+	if ($rw['account']=='J00400'){
+		$arrGrossRevenue[$keyProfit] += $rw['Total'];	
+		$arrGrossRevenueEstimate += $rw['Estimate'];
+	}
+	
+	switch ($rw['Customer_group_code']){
+		case 33239:
+			$cusGroup = 'New customers';
+			break;
+		case 31153:
+			$cusGroup = 'Brought in 2015';
+			break;
+		default:
+			$cusGroup = 'Old customers';
+			break;
+	}
+	
+	$arrGP[$cusGroup]['this'][$keyProfit] += $rw['Total'];
+	$arrGP[$cusGroup]['last'][$keyProfit] += $rw['Estimate'];
 }
 
 $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='{$oBudget->id}' and active=1
+		WHERE scenario='{$oBudget->id}'
 			AND (account NOT LIKE '6%' AND account NOT LIKE '7%')
 		GROUP BY Profit
 		UNION ALL
 		SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='{$oBudget->reference_scenario->id}' and active=1
+		WHERE scenario='{$oBudget->reference_scenario->id}'
 			AND (account NOT LIKE '6%' AND account NOT LIKE '7%')
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
@@ -495,6 +511,11 @@ foreach($arrProfit as $pc=>$flag){
 ?>
 <td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome['last']) - array_sum($arrTotal['last'][GROSS_PROFIT]));?></td>	
 </tr>
+<?php
+foreach ($arrGP as $customer=>$data){
+	renderDataByPC($data, $arrProfit, $customer, $strClass="");
+}
+?>
 </tfoot>
 </table>
 	<ul class='link-footer'>
