@@ -458,7 +458,7 @@ class Budget{
 			
 			$rs = $this->oSQL->q($sql);
 			while ($rw = $this->oSQL->f($rs)){
-				$res[$rw['month']] = $rw['Rate'];
+				$res[strtolower($rw['month'])] = $rw['Rate'];
 			}
 			
 			$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency 
@@ -467,8 +467,8 @@ class Budget{
 			$rs = $this->oSQL->q($sql);
 			$rw = $this->oSQL->f($rs);
 			
-			for($m=$start_month;$m<=12;$m++){
-				$month = date('M',mktime(0,0,0,$m,15));
+			for($m=$start_month;$m<=15;$m++){
+				$month = $this->arrPeriod[$m];
 				$res[$month] = $rw['Rate'];
 			}
 			
