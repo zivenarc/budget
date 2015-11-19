@@ -1399,7 +1399,7 @@ ul.menu-h {	padding: 0;}
 
 .content form { padding: .5em 0; }
 .content .f-row { overflow: hidden; margin-bottom: .5em; }
-.content label { float: left; text-align: right; width: 25.99%; padding: 0 2%; }
+.content .f-row label { float: left; text-align: right; width: 25.99%; padding: 0 2%; }
 .content .f-inputs { padding-left: 30%; }
 
 .f-actions { padding-top: 1em; border-top: 1px solid #ccc; }
