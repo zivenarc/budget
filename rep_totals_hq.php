@@ -55,7 +55,7 @@ $sql = "SELECT account,Customer_group_code, vw_profit.pccTitle as Profit, SUM(".
 		LEFT JOIN vw_profit ON usrProfitID=pccID
 		WHERE scenario='{$oBudget->id}'
 			AND account IN('J00400','J00802')
-		GROUP BY account, Customer_group_code, Profit
+		GROUP BY sales, account, Customer_group_code, Profit
 		UNION ALL
 		SELECT account,Customer_group_code, vw_profit.pccTitle as Profit,  0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
 		FROM vw_master
@@ -63,7 +63,7 @@ $sql = "SELECT account,Customer_group_code, vw_profit.pccTitle as Profit, SUM(".
 		LEFT JOIN vw_profit ON usrProfitID=pccID		
 		WHERE scenario='{$oBudget->reference_scenario->id}'
 			AND account IN('J00400','J00802')
-		GROUP BY account,Customer_group_code, Profit
+		GROUP BY sales, account,Customer_group_code, Profit
 		ORDER BY Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){	
