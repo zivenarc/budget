@@ -179,7 +179,9 @@ while ($rw=$oSQL->f($rs)){
 	}
 	
 	$arrGP[$cusGroup]['this'][$keyProfit] += $rw['Total'];
+	$arrGPTotal['this'][$keyProfit] += $rw['Total'];
 	$arrGP[$cusGroup]['last'][$keyProfit] += $rw['Estimate'];
+	$arrGPTotal['last'][$keyProfit] += $rw['Estimate'];
 }
 
 $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
@@ -513,8 +515,9 @@ foreach($arrProfit as $pc=>$flag){
 </tr>
 <?php
 foreach ($arrGP as $customer=>$data){
-	renderDataByPC($data, $arrProfit, $customer, $strClass="");
+	renderDataByPC($data, $arrProfit, $customer);	
 }
+renderDataByPC($arrGPTotal, $arrProfit, "Total GP", "budget-subtotal");	
 ?>
 </tfoot>
 </table>
