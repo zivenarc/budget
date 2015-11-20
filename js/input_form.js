@@ -1,3 +1,5 @@
+var DATE_FORMAT = 'dd.mm.yy';
+var MYSQL_DATE_FORMAT = 'yy-mm-dd';
 var months = Array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec','jan_1','feb_1','mar_1');
 var cache = {},	lastXhr;
 
@@ -32,7 +34,20 @@ function spinner_div(){
 }
 
 $(document).ready(function(){
-	$('#tabs').tabs(tabs_options);
+		
+		$.datepicker.setDefaults({
+			constrainInput:true
+			,dateFormat:DATE_FORMAT
+			,altFormat: MYSQL_DATE_FORMAT
+			,firstDay:1
+			,showOtherMonths: true
+			,selectOtherMonths: true
+			,showWeek: true
+		});
+
+
+		$('#tabs').tabs(tabs_options);
+		$('.date').datepicker();
 		
 		initCheckboxes();
 		initGroups($('#entity'));

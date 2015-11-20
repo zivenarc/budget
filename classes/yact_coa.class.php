@@ -10,6 +10,9 @@ class YACT_COA extends Reference{
 	// private $pointer;
 	// public $current;
 	
+	const GAIN_ON_SALE = '606000';
+	const LOSS_ON_SALE = '660000';
+	
 	const TABLE = 'vw_yact';
 	
 	function __construct(){

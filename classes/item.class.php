@@ -55,6 +55,8 @@ class Items extends Reference{
 	
 	const PROFIT_SHARE = 'fd09fb23-efd0-11e3-926a-00155d010e0b';
 	
+	const GAIN_ON_SALE = 'ac7d2f1e-63f0-11df-9a0b-005056930d2f';	
+	
 	function __construct(){
 		parent::__construct();
 		$this->child_class = 'Item';

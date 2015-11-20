@@ -56,7 +56,7 @@ class Depreciation extends Document{
 		
 		parent::refresh($sql);
 		
-		$this->disposal_date = $this->data[$this->prefix."DisposalDate"];
+		$this->disposal_date = strtotime($this->data[$this->prefix."DisposalDate"]);
 		$this->disposal_value = $this->data[$this->prefix."DisposalValue"];
 		
 		if($this->GUID){
@@ -76,21 +76,23 @@ class Depreciation extends Document{
 		
 		parent::defineEF();
 		
-		$this->Columns[] = Array(
-					'title'=>'Disposal date'
-					,'field'=>$this->prefix.'DisposalDate'
-					,'type'=>'date'					
-					, 'mandatory' => false
-					, 'disabled'=>!$this->flagUpdate
-				);
-		
-		$this->Columns[] =Array(
-					'title'=>'Disposal value'
-					,'field'=>$this->prefix."DisposalValue"
-					,'type'=>'decimal'
-					,'mandatory'=> false
-					, 'disabled'=>!$this->flagUpdate
-				);
+		if ($this->type=='current'){
+			$this->Columns[] = Array(
+						'title'=>'Disposal date'
+						,'field'=>$this->prefix.'DisposalDate'
+						,'type'=>'date'					
+						, 'mandatory' => false
+						, 'disabled'=>!$this->flagUpdate
+					);
+			
+			$this->Columns[] =Array(
+						'title'=>'Disposal value'
+						,'field'=>$this->prefix."DisposalValue"
+						,'type'=>'money'
+						,'mandatory'=> false
+						, 'disabled'=>!$this->flagUpdate
+					);
+		}
 			
 	}
 
@@ -452,8 +454,13 @@ class Depreciation extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $record->item;
 						
+						if ($this->disposal_date){
+							$disposal_month = date('Ym', $this->disposal_date) - date('Ym',$this->budget->date_start)+1;
+						} else {
+							$disposal_month = 15;
+						}
 						
-						for($m=1;$m<=15;$m++){
+						for($m=1;$m <= $disposal_month;$m++){
 							$month = $this->budget->arrPeriod[$m];
 							$master_row->{$month} = -$record->{$month}*$monthly_depr;
 							
@@ -473,7 +480,7 @@ class Depreciation extends Document{
 						//echo '<pre>';print_r($master_row);echo '</pre>';
 	
 				}
-				
+												
 				$master_row = $oMaster->add_master();//------------------------ Property tax
 				$master_row->profit = $this->profit;
 				$master_row->activity = $record->activity;
@@ -483,9 +490,28 @@ class Depreciation extends Document{
 				$master_row->account = $item->getYACT($master_row->profit);
 				$master_row->item = Items::PROPERTY_TAX;
 				
-				for($m=1;$m<=15;$m++){
+				for($m=1;$m <= $disposal_month;$m++){
 					$month = $this->budget->arrPeriod[$m];
 					$master_row->{$month} = -self::PROPERTY_TAX*$record->{$month}*$residual_value[$m]/12;
+				}
+				
+				if ($this->disposal_date){
+					$master_row = $oMaster->add_master();//------------------------ Property tax
+					$master_row->profit = $this->profit;
+					$master_row->activity = $record->activity;
+					$master_row->customer = $record->customer;										
+					
+					$month = $this->budget->arrPeriod[$disposal_month];
+					
+					if ($this->disposal_value > $residual_value[$disposal_month]) {
+						$master_row->account = YACT_COA::GAIN_ON_SALE;
+					} else {
+						$master_row->account = YACT_COA::LOSS_ON_SALE;
+					}
+					$master_row->item = Items::GAIN_ON_SALE;
+							
+					$master_row->{$month} = $this->disposal_value - $residual_value[$disposal_month];
+					
 				}
 				
 				$oMaster->save();

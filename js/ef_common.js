@@ -9,7 +9,7 @@ $(document).ready(function(){
 		$.datepicker.setDefaults({
 			constrainInput:true
 			,dateFormat:DATE_FORMAT
-			,altFormat:'yy-dd-mm'
+			,altFormat: MYSQL_DATE_FORMAT
 			,firstDay:1
 			,showOtherMonths: true
 			,selectOtherMonths: true
