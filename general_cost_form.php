@@ -54,10 +54,7 @@ if ($_GET['tab']){
 			die();
 			break;
 		case 'financials':
-			require_once ('classes/reports.class.php');
-			$sqlWhere= "WHERE source='".$oDocument->GUID."'";			
-			Reports::masterByProfit($sqlWhere);			
-			Reports::masterByYACT($sqlWhere);
+			include ('includes/inc_financials.php');
 			die();
 			break;
 		default:
