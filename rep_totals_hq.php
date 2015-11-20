@@ -8,6 +8,8 @@ require ('classes/item.class.php');
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 
 $oBudget = new Budget($budget_scenario);
+$mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1;
+$mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12;
 $denominator = isset($_GET['denominator'])?(double)$_GET['denominator']:1;
 
 $arrJS[] = 'js/rep_totals.js';
@@ -43,6 +45,45 @@ while ($rw=$oSQL->f($rs)){
 	$arrGrandTotalEstimate[$keyProfit] += $rw['Estimate'];
 	$arrEstimate[$rw['Group']][$rw['Budget item']] += $rw['Estimate'];
 	$arrProfit[$keyProfit] = $rw['pccFlagProd'];
+}
+
+
+//------------------------------ GROSS PROFIT ---------------------------
+$sql = "SELECT account,Customer_group_code, vw_profit.pccTitle as Profit, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
+		FROM vw_master
+		LEFT JOIN stbl_user ON sales=usrID
+		LEFT JOIN vw_profit ON usrProfitID=pccID
+		WHERE scenario='{$oBudget->id}'
+			AND account IN('J00400','J00802')
+		GROUP BY account, Customer_group_code, Profit
+		UNION ALL
+		SELECT account,Customer_group_code, vw_profit.pccTitle as Profit,  0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
+		FROM vw_master
+		LEFT JOIN stbl_user ON sales=usrID
+		LEFT JOIN vw_profit ON usrProfitID=pccID		
+		WHERE scenario='{$oBudget->reference_scenario->id}'
+			AND account IN('J00400','J00802')
+		GROUP BY account,Customer_group_code, Profit
+		ORDER BY Profit";
+$rs = $oSQL->q($sql);
+while ($rw=$oSQL->f($rs)){	
+	
+	switch ($rw['Customer_group_code']){
+		case 33239:
+			$cusGroup = 'New customers';
+			break;
+		case 31153:
+			$cusGroup = 'Brought in 2015';
+			break;
+		default:
+			$cusGroup = 'Old customers';
+			break;
+	}
+	
+	$arrGP[$cusGroup]['this'][$rw['Profit']] += $rw['Total'];
+	$arrGPTotal['this'][$rw['Profit']] += $rw['Total'];
+	$arrGP[$cusGroup]['last'][$rw['Profit']] += $rw['Estimate'];
+	$arrGPTotal['last'][$rw['Profit']] += $rw['Estimate'];
 }
 // echo '<pre>';print_r($arrReport);echo '</pre>';
 ?>
@@ -161,6 +202,12 @@ foreach($arrProfit as $pc=>$flag){
 ?>
 	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrandTotal)-array_sum($arrGrandTotalEstimate));?></td>
 </tr>
+<?php
+foreach ($arrGP as $customer=>$data){
+	renderDataByPC($data, $arrProfit, $customer);	
+}
+renderDataByPC($arrGPTotal, $arrProfit, "Total GP", "budget-subtotal");	
+?>
 </tfoot>
 </table>
 	<ul class='link-footer'>
@@ -168,4 +215,23 @@ foreach($arrProfit as $pc=>$flag){
 	</ul>
 <?php
 include ('includes/inc-frame_bottom.php');
+
+function renderDataByPC($data, $arrProfit, $strTitle, $strClass=""){
+	?>
+	<tr class="<?echo $strClass;?>">
+		<td><?php echo $strTitle;?></td>
+		<?php
+		foreach($arrProfit as $pc=>$flag){
+			?>
+			<td class='budget-decimal'><?php Reports::render($data['this'][$pc]);?></td>
+			<?php
+		}
+		?>
+		<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($data['this']));?></td>
+		<td class='budget-decimal '><?php Reports::render(array_sum($data['last']));?></td>
+		<td class='budget-decimal '><?php Reports::render(array_sum($data['this']) - array_sum($data['last']));?></td>
+	</tr>
+	<?php
+}
+
 ?>
