@@ -56,6 +56,9 @@ class Depreciation extends Document{
 		
 		parent::refresh($sql);
 		
+		$this->disposal_date = $this->data[$this->prefix."DisposalDate"];
+		$this->disposal_value = $this->data[$this->prefix."DisposalValue"];
+		
 		if($this->GUID){
 			$sql = "SELECT * FROM `".$this->register."` WHERE `source`='".$this->GUID."';";
 			$rs = $this->oSQL->q($sql);			
@@ -65,6 +68,31 @@ class Depreciation extends Document{
 		}
 	}
 	
+	public function defineEF(){
+	
+		global $arrUsrData;
+		global $budget_scenario;
+		global $Items;
+		
+		parent::defineEF();
+		
+		$this->Columns[] = Array(
+					'title'=>'Disposal date'
+					,'field'=>$this->prefix.'DisposalDate'
+					,'type'=>'date'					
+					, 'mandatory' => false
+					, 'disabled'=>!$this->flagUpdate
+				);
+		
+		$this->Columns[] =Array(
+					'title'=>'Disposal value'
+					,'field'=>$this->prefix."DisposalValue"
+					,'type'=>'decimal'
+					,'mandatory'=> false
+					, 'disabled'=>!$this->flagUpdate
+				);
+			
+	}
 
 	public function defineGrid(){
 		
