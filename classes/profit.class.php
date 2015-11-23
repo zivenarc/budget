@@ -14,6 +14,7 @@ class ProfitCenters extends Reference{
 	function __construct(){
 		parent::__construct();		
 		$this->child_class = 'ProfitCenter';
+		$this->prefix='pcc';
 		
 		$sql = "SELECT * FROM `".self::TABLE."` WHERE pccFlagDeleted=0";
 		$rs = $this->oSQL->q($sql);
@@ -24,6 +25,22 @@ class ProfitCenters extends Reference{
 			$this->pointer = 0;
 		}
 	}
+	
+	public function getStructuredRef(){		
+		$group = '';		
+		foreach ($this->data as $key=>$value){
+			if ($group!=$value[$this->prefix.'ParentID']){
+				$arrRes['##optgroupopen##'.$value[$this->prefix.'ParentID']] = $value[$this->prefix.'ParentTitle'];
+			}
+			if ($value[$this->prefix.'ParentID']){
+				$arrRes[$key] = $value[$this->prefix.'Title'];
+				$group = $value[$this->prefix.'ParentID'];
+			}
+			
+		}
+		return ($arrRes);
+	}
+	
 }
 
 class ProfitCenter {
