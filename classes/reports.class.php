@@ -116,6 +116,7 @@ class Reports{
 		$rs = $this->oSQL->q($sql); 
 		$tableID = "kpi_".md5($sql);
 			?>
+			<h2>Freehand OFF by route:</h2>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr>
@@ -144,7 +145,10 @@ class Reports{
 					// $month = date('M',mktime(0,0,0,$m,15));
 					$month = $this->oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
+					$arrTotal[$month]+=$rw[$month];
 				}
+				$arrTotal['Total']+=$rw['Total'];
+				
 				$arrQuarter = Array('Q1'=>$rw['jan']+$rw['feb']+$rw['mar'],
 									'Q2'=>$rw['apr']+$rw['may']+$rw['jun'],
 									'Q3'=>$rw['jul']+$rw['Aug']+$rw['sep'],
@@ -154,6 +158,7 @@ class Reports{
 				for ($q=1;$q<5;$q++){		
 					$quarter = 'Q'.$q;
 					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
+					$arrTotal[$quarter]+=$arrQuarter[$quarter];
 				}				
 									
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';
@@ -162,6 +167,26 @@ class Reports{
 			}
 			?>
 			</tbody>
+			<tfoot>
+				<tr class='budget-subtotal'>
+					<td>Total freehand volume</td>
+					<?php
+					for ($m=1;$m<=12;$m++){
+					// $month = date('M',mktime(0,0,0,$m,15));
+					$month = $this->oBudget->arrPeriod[$m];
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($arrTotal[$month]),'</td>';
+	
+					}
+					for ($q=1;$q<5;$q++){		
+					$quarter = 'Q'.$q;
+					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($arrTotal[$quarter]),'</td>';
+
+					}	
+					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']),'</td>';
+					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render($arrTotal['Q5']),'</td>';
+					?>
+				</tr>
+			</tfoot>
 			</table>
 			<ul class='link-footer'>
 				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
