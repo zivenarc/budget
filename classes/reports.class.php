@@ -59,6 +59,9 @@ class Reports{
 			<?php
 			$prtGHQ = '';
 			while ($rw=$oSQL->f($rs)){
+				if ($rw['Unit']=='TEU') {
+					$flagShowOFFReport = true;
+				}
 				?>
 				<tr class='graph'>
 				<?php
@@ -97,7 +100,73 @@ class Reports{
 				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
 			</ul>
 			<?php
+			
+			if ($flagShowOFFReport) {
+				$this->offByRoute($sqlWhere);
+			}
+			
 			ob_flush();
+	}
+	
+	function offByRoute($sqlWhere){
+		
+		$sql = "SELECT * FROM vw_sales {$sqlWhere} AND posted=1 AND kpi=1 AND OFF_Route IS NOT NULL 
+				GROUP BY OFF_Route";
+		$rs = $this->oSQL->q($sql);
+		$tableID = "kpi_".md5($sql);
+			?>
+			<table id='<?php echo $tableID;?>' class='budget'>
+			<thead>
+				<tr>
+					<th>Route</th>
+					<?php 
+					echo $this->oBudget->getTableHeader(); 
+					echo $this->oBudget->getTableHeader('quarterly'); 
+					?>
+					<th class='budget-ytd'>Total</th>
+					<th>Q5</th>
+				</tr>
+			</thead>			
+			<tbody>
+			<?php			
+			while ($rw=$this->oSQL->f($rs)){				
+				?>
+				<tr class='graph'>
+				<?php
+				if ($rw['prtGHQ']!=$prtGHQ){
+					?>
+					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
+					<?php
+				};
+				echo "<td>",$rw['OFF_Route'],'</td>';				
+				for ($m=1;$m<=12;$m++){
+					// $month = date('M',mktime(0,0,0,$m,15));
+					$month = $this->oBudget->arrPeriod[$m];
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
+				}
+				$arrQuarter = Array('Q1'=>$rw['jan']+$rw['feb']+$rw['mar'],
+									'Q2'=>$rw['apr']+$rw['may']+$rw['jun'],
+									'Q3'=>$rw['jul']+$rw['Aug']+$rw['sep'],
+									'Q4'=>$rw['oct']+$rw['nov']+$rw['dec'],
+									'Q5'=>$rw['jan_1']+$rw['feb_1']+$rw['mar_1']);
+				
+				for ($q=1;$q<5;$q++){		
+					$quarter = 'Q'.$q;
+					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
+				}				
+									
+				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';
+				echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
+				echo "</tr>\r\n";				
+			}
+			?>
+			</tbody>
+			</table>
+			<ul class='link-footer'>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
+		<?php
+		
 	}
 	
 	public function salesByCustomer($sqlWhere=''){
