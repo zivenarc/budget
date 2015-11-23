@@ -282,6 +282,7 @@ class Sales extends Document{
 						$row->formula = $_POST['formula'][$id];				
 						$row->kpi = $_POST['kpi'][$id];				
 						$row->sales = $this->sales;				
+						$row->route = $this->route;				
 						for ($m=1;$m<=$this->budget->length;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
