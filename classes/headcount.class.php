@@ -109,20 +109,7 @@ class Headcount extends Document{
 	}
 	
 	public function defineGrid(){
-		$grid = new eiseGrid($this->oSQL
-                    ,$this->gridName
-                    , Array(
-                            'flagKeepLastRow' => false
-                            , 'arrPermissions' => Array("FlagWrite" => !$this->flagPosted)
-                            , 'flagStandAlone' => true
-							, 'controlBarButtons' => "add|delete"
-                            )
-                    );
-		$grid->Columns[]=Array(
-			'field'=>"id"
-			,'type'=>'row_id'
-		);
-		
+				
 		// $grid->Columns[] = Array(
 			// 'title'=>'Employee'
 			// ,'field'=>'particulars'
@@ -134,7 +121,7 @@ class Headcount extends Document{
 		// );
 		
 		if ($this->type=='current'){
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'Employee'
 				,'field'=>'particulars'
 				,'type'=>'combobox'
@@ -147,7 +134,7 @@ class Headcount extends Document{
 		}
 		
 		if ($this->type=='new'){
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'Start date'
 				,'field'=>'start_date'
 				,'type'=>'date'	
@@ -157,7 +144,7 @@ class Headcount extends Document{
 		}
 		
 		if ($this->type=='current'){
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'End date'
 				,'field'=>'end_date'
 				,'type'=>'date'				
@@ -166,7 +153,7 @@ class Headcount extends Document{
 			);
 		}
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Function'
 			,'field'=>'function'
 			,'type'=>'combobox'
@@ -175,7 +162,7 @@ class Headcount extends Document{
 			, 'disabled'=>false
 		);
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'W/collar'
 			,'field'=>'wc'
 			,'type'=>'boolean'		
@@ -183,7 +170,7 @@ class Headcount extends Document{
 			, 'disabled'=>false//($this->type=='current')
 		);
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'VKS'
 			,'field'=>'vks'
 			,'type'=>'boolean'			
@@ -191,7 +178,7 @@ class Headcount extends Document{
 			, 'disabled'=>false
 		);
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Location'
 			,'field'=>'location'
 			,'type'=>'combobox'
@@ -201,10 +188,10 @@ class Headcount extends Document{
 			, 'disabled'=>false
 		);
 		
-		$grid->Columns[] = parent::getActivityEG();
+		$this->grid->Columns[] = parent::getActivityEG();
 		
 		if ($this->type=='new'){
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'PC'
 				,'field'=>'pc_profile'
 				,'type'=>'combobox'				
@@ -215,7 +202,7 @@ class Headcount extends Document{
 			);
 		}
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Salary'
 			,'field'=>'salary'
 			,'type'=>'money'
@@ -224,7 +211,7 @@ class Headcount extends Document{
 			,'totals'=>true
 		);
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Mobile'
 			,'field'=>'mobile_limit'
 			,'type'=>'money'
@@ -234,7 +221,7 @@ class Headcount extends Document{
 			,'totals'=>true
 		);
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Fuel'
 			,'field'=>'fuel'
 			,'type'=>'money'
@@ -244,7 +231,7 @@ class Headcount extends Document{
 			,'totals'=>true
 		);
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'DMS'
 			,'field'=>'insurance'
 			,'type'=>'money'
@@ -255,7 +242,7 @@ class Headcount extends Document{
 		);
 		
 		if($this->type=='new'){
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'FTE'
 				,'field'=>'new_fte'
 				,'type'=>'int'
@@ -270,7 +257,7 @@ class Headcount extends Document{
 		for ($m=1;$m<=15;$m++){
 			$month = $this->budget->arrPeriod[$m];
 					
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 			'title'=>''//ucfirst($month)------------------------ Title hidden
 			,'field'=>strtolower($month)
 			,'class'=>'budget-month'
@@ -282,7 +269,7 @@ class Headcount extends Document{
 			);		
 		}
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Average FTE'
 			,'field'=>'AVG'
 			,'type'=>'decimal'
@@ -290,8 +277,8 @@ class Headcount extends Document{
 			,'totals'=>true
 			,'disabled'=>true
 		);
-		$this->grid = $grid;
-		return ($grid);
+		
+		return ($this->grid);
 	}
 	
 

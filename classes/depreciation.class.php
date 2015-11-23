@@ -100,30 +100,17 @@ class Depreciation extends Document{
 		
 		GLOBAL $Items;
 		GLOBAL $FixedAssets;
-		
-		$grid = new eiseGrid($this->oSQL
-                    ,$this->gridName
-                    , Array(
-                            'flagKeepLastRow' => false
-                            , 'arrPermissions' => Array("FlagWrite" => !$this->flagPosted)
-                            , 'flagStandAlone' => true
-							, 'controlBarButtons' => "add"
-                            )
-                    );
-		$grid->Columns[]=Array(
-			'field'=>"id"
-			,'type'=>'row_id'
-		);
+				
 		
 		if ($this->type=='current'){
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'Code'
 				,'field'=>'fixID'
 				,'type'=>'text'
 				, 'disabled'=>true
 			);	
 			
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 				'title'=>'Asset'
 				,'field'=>'particulars'
 				,'type'=>'combobox'
@@ -133,7 +120,7 @@ class Depreciation extends Document{
 			);		
 		};
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Description'
 			,'field'=>'comment'
 			,'type'=>'text'
@@ -141,7 +128,7 @@ class Depreciation extends Document{
 			, 'disabled'=>false
 		);
 		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 			'title'=>'Item'
 			,'field'=>'item'
 			,'type'=>'combobox'
@@ -155,9 +142,9 @@ class Depreciation extends Document{
 			, 'default'=>Items::DEPRECIATION
 		);
 		
-		$grid->Columns[] = parent::getActivityEG();
+		$this->grid->Columns[] = parent::getActivityEG();
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Initial value'
 			,'field'=>'value_start'
 			,'type'=>'money'
@@ -166,7 +153,7 @@ class Depreciation extends Document{
 		);
 		
 		if ($this->type=='new'){
-			$grid->Columns[] =Array(
+			$this->grid->Columns[] =Array(
 				'title'=>'Count'
 				,'field'=>'count'
 				,'type'=>'integer'
@@ -176,7 +163,7 @@ class Depreciation extends Document{
 		}
 		
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Value Jan'
 			,'field'=>'value_primo'
 			,'type'=>'money'
@@ -184,7 +171,7 @@ class Depreciation extends Document{
 			,'totals'=>true
 		);
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Value Dec'
 			,'field'=>'value_ultimo'
 			,'type'=>'money'
@@ -194,7 +181,7 @@ class Depreciation extends Document{
 		
 		
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Start date'
 			,'field'=>'date_start'
 			,'type'=>'date'
@@ -202,7 +189,7 @@ class Depreciation extends Document{
 			,'disabled'=>$this->type=='current'
 		);
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'End date'
 			,'field'=>'date_end'
 			,'type'=>'date'
@@ -210,7 +197,7 @@ class Depreciation extends Document{
 			,'disabled'=>$this->type=='current'
 		);
 		
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Duration'
 			,'field'=>'duration'
 			,'type'=>'int'
@@ -224,7 +211,7 @@ class Depreciation extends Document{
 		for ($m=1;$m<13;$m++){
 			$month = $this->budget->arrPeriod[$m];
 					
-			$grid->Columns[] = Array(
+			$this->grid->Columns[] = Array(
 			'title'=>''//hidden
 			,'field'=>strtolower($month)
 			,'class'=>'budget-month'
@@ -234,16 +221,15 @@ class Depreciation extends Document{
 			,'totals'=>true
 		);
 		}
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Total'
 			,'field'=>'YTD'
 			,'type'=>'decimal'
 			,'totals'=>true
 			,'disabled'=>true
 		);
-		
-		$this->grid = $grid;
-		return ($grid);
+				
+		return ($this->grid);
 	}
 	
 	public function fillGrid(){

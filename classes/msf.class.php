@@ -84,21 +84,7 @@ class MSF extends Document{
 		
 		GLOBAL $Items;
 	
-		$grid = new eiseGrid($this->oSQL
-                    ,$this->gridName
-                    , Array(
-                            'flagKeepLastRow' => false
-                            , 'arrPermissions' => Array("FlagWrite" => !$this->flagPosted)
-                            , 'flagStandAlone' => true
-							, 'controlBarButtons' => "add|delete"
-                            )
-                    );
-		$grid->Columns[]=Array(
-			'field'=>"id"
-			,'type'=>'row_id'
-		);
-		
-		$grid->Columns[] = Array(
+		$this->grid->Columns[] = Array(
 				'title'=>'PC'
 				,'field'=>'pc'
 				,'type'=>'combobox'
@@ -112,7 +98,7 @@ class MSF extends Document{
 				// , 'class'=>'costs_supplier'
 			);		
 
-		$grid->Columns[] =Array(
+		$this->grid->Columns[] =Array(
 			'title'=>'Unit'
 			,'field'=>'unit'
 			,'type'=>'text'
@@ -120,29 +106,17 @@ class MSF extends Document{
 		);
 		
 	
-		for ($m=1;$m<=$this->budget->length;$m++){
-			// $month = date('M',mktime(0,0,0,$m,15));
-			$month = $this->budget->arrPeriod[$m];			
-			$grid->Columns[] = Array(
-			'title'=>ucfirst($month)
-			,'field'=>strtolower($month)
-			,'class'=>'budget-month'
-			,'type'=>'money'
-			, 'mandatory' => true
-			, 'disabled'=>!$this->flagUpdate
-			,'totals'=>true
-		);
-		}
-		$grid->Columns[] =Array(
-			'title'=>'Total'
-			,'field'=>'YTD'
+		$this->setMonthlyEG('decimal');
+		
+		$this->grid->Columns[] =Array(
+			'title'=>'Average'
+			,'field'=>'AVG'
 			,'type'=>'money'
 			,'totals'=>true
 			,'disabled'=>true
 		);
 		
-		$this->grid = $grid;
-		return ($grid);
+		return ($this->grid);
 	}
 		
 	public function save($mode='update'){

@@ -121,23 +121,6 @@ class Sales extends Document{
 		
 		GLOBAL $Products;
 	
-		$grid = new eiseGrid($this->oSQL
-                    ,$this->gridName
-                    , Array(
-                            'flagKeepLastRow' => false
-                            , 'arrPermissions' => Array("FlagWrite" => $this->flagUpdate)
-                            , 'flagStandAlone' => true
-							, 'controlBarButtons' => "add|delete"
-                            )
-                    );
-		
-		$this->grid = $grid;
-		
-		$this->grid->Columns[]=Array(
-			'field'=>"id"
-			,'type'=>'row_id'
-		);
-		
 		if (!$this->data[self::Prefix.'CustomerID']){
 			$this->grid->Columns[] = parent::getCustomerEG();
 		}

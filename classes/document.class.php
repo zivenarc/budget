@@ -32,6 +32,21 @@ class Document extends easyForm{
 					$this->flagUpdate = false;
 				}
 				
+				$this->grid = new eiseGrid($this->oSQL
+				,$this->gridName
+				, Array(
+						'flagKeepLastRow' => false
+						, 'arrPermissions' => Array("FlagWrite" => $this->flagUpdate)
+						, 'flagStandAlone' => true
+						, 'controlBarButtons' => "add|delete"
+						)
+				);
+				
+				$this->grid->Columns[]=Array(
+					'field'=>"id"
+					,'type'=>'row_id'
+				);
+				
 			} else {
 				//$this->budget = $oBudget;
 				//do nothing

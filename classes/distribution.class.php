@@ -81,23 +81,6 @@ class Distribution extends Document{
 		
 		GLOBAL $Items;
 	
-		$grid = new eiseGrid($this->oSQL
-                    ,$this->gridName
-                    , Array(
-                            'flagKeepLastRow' => false
-                            , 'arrPermissions' => Array("FlagWrite" => !$this->flagPosted)
-                            , 'flagStandAlone' => true
-							, 'controlBarButtons' => "add|delete"
-                            )
-                    );
-					
-		$this->grid = $grid;
-		
-		$this->grid->Columns[]=Array(
-			'field'=>"id"
-			,'type'=>'row_id'
-		);
-		
 		$this->grid->Columns[] = Array(
 				'title'=>'Customer'
 				,'field'=>'customer'

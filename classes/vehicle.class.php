@@ -144,22 +144,6 @@ class Vehicle extends Document{
 		GLOBAL $Items;
 		GLOBAL $FixedAssets;
 		
-		$grid = new eiseGrid($this->oSQL
-                    ,$this->gridName
-                    , Array(
-                            'flagKeepLastRow' => false
-                            , 'arrPermissions' => Array("FlagWrite" => !$this->flagPosted)
-                            , 'flagStandAlone' => true
-							, 'controlBarButtons' => "add"
-                            )
-                    );
-		$this->grid = $grid;
-		
-		$this->grid->Columns[]=Array(
-			'field'=>"id"
-			,'type'=>'row_id'
-		);
-		
 		if ($this->type=='current'){
 			$this->grid->Columns[] = Array(
 				'title'=>'Code'
