@@ -133,7 +133,7 @@ class MSF extends Document{
 			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
 			$this->item = isset($_POST[$this->prefix.'ItemGUID'])?$_POST[$this->prefix.'ItemGUID']:$this->item;
 			
-			$sql = "SELECT SUM(".$this->budget->getYTDSQL().") as Total, ".$this->budget->getMonthlySumSQL()." 
+			$sql = "SELECT SUM(".$this->budget->getYTDSQL(1,15).") as Total, ".$this->budget->getMonthlySumSQL(1,15)." 
 						FROM reg_master 
 						WHERE active=1 AND scenario='{$this->scenario}' AND pc={$this->profit} AND source NOT IN ('Estimate')";
 			$rs = $this->oSQL->q($sql);	
@@ -222,7 +222,7 @@ class MSF extends Document{
 						}						
 					}
 					
-					$sql = "SELECT account, item, SUM(".$this->budget->getYTDSQL().") as Total, ".$this->budget->getMonthlySumSQL()." 
+					$sql = "SELECT account, item, SUM(".$this->budget->getYTDSQL(1,15).") as Total, ".$this->budget->getMonthlySumSQL(1,15)." 
 						FROM reg_master 
 						WHERE active=1 AND scenario='{$this->scenario}' AND pc={$this->profit} AND source NOT IN ('Estimate')
 						GROUP BY account, item"; 
