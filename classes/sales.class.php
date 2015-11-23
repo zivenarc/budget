@@ -35,6 +35,7 @@ class Sales extends Document{
 		$this->sales = $this->data['salUserID'];
 		$this->ps_profit = $this->data['salPSProfitID'];
 		$this->ps_rate = $this->data['salPSRate'];
+		$this->route = $this->data['salRoute'];
 		
 	}
 	public function refresh($id){
@@ -114,6 +115,19 @@ class Sales extends Document{
 			,'default'=>0			
 			,'disabled'=>!$this->flagUpdate
 		);
+		
+		$this->Columns[] = Array(
+			'title'=>'Ocean route'
+			,'field'=>self::Prefix.'Route'
+			,'type'=>'combobox'			
+			,'prefix'=>'rte'
+			,'sql'=>'tbl_route'
+			,'mandatory'=>false
+			,'default'=>null
+			,'defaultText'=>'---Non-FHD---'
+			,'disabled'=>!$this->flagUpdate
+		);
+
 	}
 	
 	//==========================================Definition of document GRID ===================================================
