@@ -45,8 +45,9 @@ if ($_GET['tab']){
 		case 'financials':
 			require_once ('classes/reports.class.php');
 			$sqlWhere= "WHERE source='".$oDocument->GUID."'";			
-			Reports::masterByCustomer($sqlWhere);
-			Reports::masterByYACT($sqlWhere);
+			$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id));
+			$oReport->masterByActivity($sqlWhere);
+			$oReport->masterByYACT($sqlWhere);
 			die();
 			break;
 		case 'access':
