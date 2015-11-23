@@ -207,7 +207,7 @@ class MSF extends Document{
 			// print_r($this->subtotal);
 			if(is_array($this->records[$this->gridName])){
 					// echo '<pre>';print_r($this->records[$this->gridName]);echo '</pre>';die();					
-					$sql = "SELECT pc, activity, ".$this->budget->getMonthlySumSQL()."
+					$sql = "SELECT pc, activity, ".$this->budget->getMonthlySumSQL(1,15)."
 							FROM reg_master							
 							WHERE account='J00400'
 							AND scenario =  '{$this->scenario}' AND source NOT IN ('Estimate')
@@ -262,7 +262,7 @@ class MSF extends Document{
 								// $master_row->item = $this->item;
 								$master_row->item = $item_code;
 								for($m=1;$m<=15;$m++){
-									$month = date('M',mktime(0,0,0,$m,15));
+									// $month = date('M',mktime(0,0,0,$m,15));
 									$month = $this->budget->arrPeriod[$m];
 									// $master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]
 															// *$total[$month]															
