@@ -145,6 +145,7 @@ while ($rw=$oSQL->f($rs)){
 	$arrHeadcountBudget['FTE'][$keyProfit] += $rw['Estimate'];	
 }
 
+//------------------------------ GROSS PROFIT ---------------------------
 $sql = "SELECT account,Customer_group_code, Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
 		FROM vw_master		
 		WHERE scenario='{$oBudget->id}'

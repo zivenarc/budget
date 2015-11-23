@@ -9,6 +9,7 @@ $oBudget = new Budget($budget_scenario);
 
 // $startMonth = date('n',$oBudget->date_start);
 $startMonth = 1;
+$endMonth = 15;
 
 if($_GET['DataAction']=='update'){
 	$sql = Array();
@@ -58,7 +59,7 @@ if (!isset($_GET['tab'])){
 	<?php
 	switch($_GET['tab']){
 		case 'activity':
-			$sql = "SELECT *, ".$oBudget->getYTDSQL()." FROM reg_profit_ghq 
+			$sql = "SELECT *, ".$oBudget->getYTDSQL(1,15)." FROM reg_profit_ghq 
 					LEFT JOIN vw_profit ON pccID=pc
 					WHERE scenario='$budget_scenario' 
 					order by prtGHQ, `dec` DESC";
@@ -71,7 +72,7 @@ if (!isset($_GET['tab'])){
 					<th>Activity</th>
 					<th>PC</th>
 					<?php
-					echo $oBudget->getTableHeader('monthly',$startMonth);
+					echo $oBudget->getTableHeader('monthly',$startMonth, $endMonth);
 					?>
 					<th>Total</th>
 				</tr>
@@ -79,8 +80,8 @@ if (!isset($_GET['tab'])){
 			<tbody>
 			<?php
 			while ($rw=$oSQL->f($rs)){	
-				for ($m=$startMonth;$m<13;$m++) {
-					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+				for ($m=$startMonth;$m<=15;$m++) {
+					$month = $oBudget->arrPeriod[$m];
 					$arrGHQ[$rw['prtGHQ']][$rw['pccTitle']][$month] = $rw[$month];
 					$arrSubtotal[$rw['prtGHQ']][$month] += $rw[$month];
 					$arrGrandTotal[$month] += $rw[$month];
@@ -92,8 +93,8 @@ if (!isset($_GET['tab'])){
 
 			foreach ($arrGHQ as $ghq=>$arrPC){
 				
-				for ($m=$startMonth;$m<13;$m++) {
-					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+				for ($m=$startMonth;$m<=15;$m++) {
+					$month = $oBudget->arrPeriod[$m];
 					if ($arrGrandTotal[$month]) {
 							$arrRatio[$ghq][$month] = $arrSubtotal[$ghq][$month]/$arrGrandTotal[$month]*100;
 					}
@@ -158,8 +159,8 @@ if (!isset($_GET['tab'])){
 			<tbody>
 			<?php
 			while ($rw=$oSQL->f($rs)){	
-				for ($m=$startMonth;$m<13;$m++) {
-					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+				for ($m=$startMonth;$m<=15;$m++) {
+					$month = $oBudget->arrPeriod[$m];
 					$arrPC[$rw['pccTitle']][$rw['prtGHQ']][$month] = $rw[$month];
 					$arrSubtotal[$rw['pccTitle']][$month] += $rw[$month];
 					$arrGrandTotal[$month] += $rw[$month];
@@ -171,8 +172,8 @@ if (!isset($_GET['tab'])){
 
 			foreach ($arrPC as $pc=>$arrGHQ){
 				
-				for ($m=$startMonth;$m<13;$m++) {
-					$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+				for ($m=$startMonth;$m<=15;$m++) {
+					$month = $oBudget->arrPeriod[$m];
 					if ($arrGrandTotal[$month]) {
 							$arrRatio[$pc][$month] = $arrSubtotal[$pc][$month]/$arrGrandTotal[$month]*100;
 					}
@@ -221,9 +222,10 @@ if (!isset($_GET['tab'])){
 function echoMonthlyTR($data,$class='', $decimal_places=0){
 
 	GLOBAL $startMonth;
-
-	for ($m=$startMonth;$m<13;$m++) {
-			$month = strtolower(date('M',mktime(0,0,0,$m,15)));
+	GLOBAL $oBudget;
+	
+	for ($m=$startMonth;$m<=15;$m++) {
+					$month = $oBudget->arrPeriod[$m];
 			echo '<td class="budget-decimal">',number_format($data[$month],$decimal_places,'.',','),'</td>';
 	}
 	echo '<td class="budget-decimal budget-ytd">',number_format(isset($data['YTD'])?$data['YTD']:array_sum($data),$decimal_places,'.',','),'</td>';	
