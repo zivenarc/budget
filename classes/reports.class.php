@@ -111,7 +111,7 @@ class Reports{
 	function offByRoute($sqlWhere){
 		
 		$sql = "SELECT OFF_Route, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
-				FROM vw_sales {$sqlWhere} AND posted=1 AND kpi=1 AND OFF_Route IS NOT NULL 
+				FROM vw_sales {$sqlWhere} AND posted=1 AND kpi=1 AND unit='TEU' AND OFF_Route IS NOT NULL 
 				GROUP BY OFF_Route";
 		$rs = $this->oSQL->q($sql); 
 		$tableID = "kpi_".md5($sql);
