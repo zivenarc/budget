@@ -4,6 +4,8 @@ require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 
+include ('includes/inc_report_settings.php');
+
 session_start();
 
 $cntID = isset($_GET['cntID'])?(integer)$_GET['cntID']:(isset($_SESSION['cntID'])?$_SESSION['cntID']:31153);//new if not defined
