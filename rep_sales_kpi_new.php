@@ -2,6 +2,7 @@
 // $flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
+require ('classes/reports.class.php');
 
 session_start();
 
@@ -10,6 +11,7 @@ $_SESSION['cntID'] = $cntID;
 
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 $oBudget = new Budget($budget_scenario);
+$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator));
 
 $sql = "SELECT cntID, cntTitle$strLocal FROM common_db.tbl_counterparty WHERE cntID={$cntID} OR cntParentCode1C=(SELECT cntCode1C FROM common_db.tbl_counterparty WHERE cntID={$cntID})";
 $rs = $oSQL->q($sql);
@@ -32,7 +34,7 @@ if(!isset($_GET['pccGUID'])){
 	Budget::getProfitTabs('reg_sales', false, Array('customer'=>$arrCnt));	
 	include ('includes/inc-frame_bottom.php');
 } else {
-	require ('classes/reports.class.php');
+	
 	include ('includes/inc_report_buttons.php');
 	if ($_GET['pccGUID']=='all'){
 		$sqlWhere = " WHERE scenario='$budget_scenario' AND customer IN (".implode(',',$arrCnt).")"; 
@@ -40,11 +42,11 @@ if(!isset($_GET['pccGUID'])){
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND scenario='$budget_scenario' AND customer IN (".implode(',',$arrCnt).")";
 	}
 
-	Reports::salesByActivity($sqlWhere);
+	$oReport->salesByActivity($sqlWhere);
 	?>
 		<div id='graph'/>
 	<?php	
-	Reports::masterbyGHQEst($sqlWhere);
+	$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
 }
 
 
