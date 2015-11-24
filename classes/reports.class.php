@@ -345,7 +345,7 @@ class Reports{
 		$denominator = 1000;
 		ob_start();
 			
-			$sqlSelect = "SELECT prtRHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pc, pccTitle,pccTitleLocal , 
+			$sqlSelect = "SELECT prtRHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pc, pccTitle,pccTitleLocal , wc,
 						".$this->oBudget->getMonthlySumSQL().", 
 						SUM(".$this->oBudget->getYTDSQL().")/12 as Total 
 					FROM `reg_headcount`
@@ -355,8 +355,8 @@ class Reports{
 					LEFT JOIN vw_profit ON pccID=pc
 					$sqlWhere AND posted=1 AND active=1 AND salary>0";
 			
-			$sql = $sqlSelect." GROUP BY `activity`
-					ORDER BY prtRHQ";
+			$sql = $sqlSelect." GROUP BY `prtGHQ`,wc
+					ORDER BY prtRHQ,wc";
 			$rs = $oSQL->q($sql);			
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
@@ -376,7 +376,7 @@ class Reports{
 			while ($rw=$oSQL->f($rs)){
 				?>
 				<tr>
-					<td><?php echo $rw['Activity'];?></td>					
+					<td><?php echo $rw['Activity'], ": ",($rw['wc']?'White':'Blue');?></td>					
 				<?php
 				self::_renderHeadcountArray($rw);
 				for ($m=1;$m<13;$m++){
