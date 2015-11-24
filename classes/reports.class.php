@@ -376,7 +376,7 @@ class Reports{
 			while ($rw=$oSQL->f($rs)){
 				?>
 				<tr>
-					<td><?php echo $rw['Activity'], ": ",($rw['wc']?'White':'Blue');?></td>					
+					<td><?php echo $rw['prtGHQ'], ": ",($rw['wc']?'White':'Blue');?></td>					
 				<?php
 				self::_renderHeadcountArray($rw);
 				for ($m=1;$m<13;$m++){
