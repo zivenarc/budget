@@ -2,10 +2,12 @@
 //$flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
-require ('classes/reports.class.php');
 require ('classes/reference.class.php');
 require ('classes/item.class.php');
+require ('classes/reports.class.php');
+include ('includes/inc_report_settings.php');
 
+$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$reference));
 $oBudget = new Budget($budget_scenario);
 $arrJS[]='js/rep_pnl.js';
 
@@ -47,7 +49,7 @@ $sqlWhere = "WHERE `item` IN ($strItems)  AND scenario='$budget_scenario'";
 </div>
 <div id='report_content'>
 <?php
-Reports::masterbyProfitEst($sqlWhere);
+$oReport->periodicPnL($sqlWhere,Array('field_data'=>'pc','field_title'=>'Profit','title'=>'PC'));	
 ?>
 </div>
 <?php
