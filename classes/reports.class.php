@@ -345,7 +345,7 @@ class Reports{
 		$denominator = 1000;
 		ob_start();
 			
-			$sqlSelect = "SELECT prtRHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pc, pccTitle,pccTitleLocal , wc,
+			$sqlSelect = "SELECT prtGHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pc, pccTitle,pccTitleLocal , wc,
 						".$this->oBudget->getMonthlySumSQL().", 
 						SUM(".$this->oBudget->getYTDSQL().")/12 as Total 
 					FROM `reg_headcount`
