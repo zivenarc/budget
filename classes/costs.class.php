@@ -419,7 +419,7 @@ class Indirect_costs extends Document{
 					$currency_rate = $this->settings[strtolower($record->buying_curr)];
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
-						$denominator = $record->period=='annual'?$record->{$month}/$record->total():1;						
+						$denominator = $record->period=='annual'?$record->{$month}/min($record->total(),12):1;						
 						$master_row->{$month} = -$record->{$month}*$record->buying_rate*$currency_rate*$denominator;
 					}				
 											
