@@ -97,7 +97,10 @@ class Waterfall {
 		}
 		?>
 		</table>
-		<a id="chart_png_href">Get chart as image</a>
+		<nav>
+		<li><a href="javascript:SelectContent('table_<?php echo $this->chartID;?>');">Select table</a></li>
+		<li><a id="chart_png_href">Get chart as image</a></li>
+		</nav>
 		<?php
 	}
 	
