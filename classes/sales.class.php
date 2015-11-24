@@ -251,6 +251,10 @@ class Sales extends Document{
 						$row->flagUpdated = true;				
 						$row->customer = $this->customer;
 					}
+					if ($row->sales!=$this->sales){
+						$row->flagUpdated = true;				
+						$row->sales = $this->sales;
+					}
 				}
 			}
 						
