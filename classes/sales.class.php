@@ -255,6 +255,10 @@ class Sales extends Document{
 						$row->flagUpdated = true;				
 						$row->sales = $this->sales;
 					}
+					if ($row->route!=$this->route){
+						$row->flagUpdated = true;				
+						$row->route = $this->route;
+					}
 				}
 			}
 						
