@@ -1,6 +1,6 @@
 <input type='hidden' id='request_uri' value='<?php echo $_SERVER['REQUEST_URI'];?>'/>
 <input type='hidden' id='pccGUID' value='<?php echo $_GET['pccGUID'];?>'/>
-<div class="report-radio f-row">
+<div class="report-radio">
 <div id='period_switch'>
 	<input type='radio' id='period_monthly_<?php echo $_GET['pccGUID'];?>' name='period' value='monthly'/>
 	<label for='period_monthly_<?php echo $_GET['pccGUID'];?>'>Monthly</label>

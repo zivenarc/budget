@@ -259,27 +259,9 @@ while ($rw = $oSQL->f($rs)){
 
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
+include ('includes/inc_report_selectors.php');
 echo '<p>',$oBudget->timestamp,'</p>';
-
-if($currency!=643){
-		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
-		$rs = $oSQL->q($sql);
-		$rw = $oSQL->f($rs);
-		$curTitle = $rw["curTitle$strLocal"];		
-} else {
-	$curTitle = "RUB";
-}
-
-if ($denominator!=1) {
-	echo "<h2>{$curTitle} x{$denominator}</h2>";
-} else {
-	echo "<h2>{$curTitle}</h2>";
-}
-
-
-
 ?>
-<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
 <table id='report' class='budget'>
 <thead>
 	<th>Item</th>
@@ -470,7 +452,7 @@ function error_distribution($params){
 
 function distribute($reportKey, $sql){
 	GLOBAL $oSQL, $oBudget;	
-	GLOBAl $startMonth;
+	GLOBAl $startMonth, $endMonth;
 	GLOBAl $arrReport;
 	GLOBAL $arrGrandTotal;
 	GLOBAL $arrRatio,$arrGHQSubtotal,$arrRevenue;
