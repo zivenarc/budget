@@ -233,7 +233,8 @@ class Sales extends Document{
 			$this->product_folder = isset($_POST[$this->prefix.'ProductFolderID'])?$_POST[$this->prefix.'ProductFolderID']:$this->product_folder;			
 			$this->customer = isset($_POST[$this->prefix.'CustomerID'])?$_POST[$this->prefix.'CustomerID']:$this->customer;
 			$this->sales = isset($_POST[$this->prefix.'UserID'])?$_POST[$this->prefix.'UserID']:$this->sales;
-
+			$this->route = isset($_POST[$this->prefix.'Route'])?$_POST[$this->prefix.'Route']:$this->route;
+			
 			if (isset($_POST[$this->prefix.'ProfitID']) && count($this->records[$this->gridName])){
 				foreach ($this->records[$this->gridName] as $id=>$row){
 					$row = $this->get_record($id); 
