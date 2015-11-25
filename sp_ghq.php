@@ -20,13 +20,19 @@ while ($rw = $oSQL->f($rs)){
 }
 
 // $startMonth = date('n',$oBudget->date_start);
-$startMonth = 1;
+$arrActions[] = Array('title'=>'Jan-Dec', 'action'=>'?mthStart=1&mthEnd=12');
+$arrActions[] = Array('title'=>'Apr-Mar', 'action'=>'?mthStart=4&mthEnd=15');
+$arrActions[] = Array('title'=>'Jan-Mar', 'action'=>'?mthStart=1&mthEnd=15');
+$startMonth = isset($_GET['mthStart'])?$_GET['mthStart']:1;
+$endMonth = isset($_GET['mthEnd'])?$_GET['mthEnd']:15;
+$colspan = $endMonth - $startMonth + 3;
 
-$sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,12, $arrRates)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
+
+$sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
 		GROUP BY prtGHQ, pc";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
+	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		$arrPC[$rw['pc']][$rw['prtGHQ']][$month] += $rw[$month];
 		$arrSubtotal[$rw['pc']][$month] += $rw[$month];
@@ -37,7 +43,7 @@ while ($rw = $oSQL->f($rs)){
 
 foreach($arrPC as $pc=>$arrGhq){
 	foreach ($arrGhq as $ghq=>$values){
-		for($m=$startMonth;$m<13;$m++){
+		for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 			$arrRatio[$pc][$ghq][$month] = $arrSubtotal[$pc][$month]?$values[$month]/$arrSubtotal[$pc][$month]:0;
 		}
@@ -47,8 +53,11 @@ foreach($arrPC as $pc=>$arrGhq){
 // echo '<pre>';print_r($arrRatio);echo '</pre>';
 
 $sqlFields = "CONCAT(account,': ',title) as account, prtGHQ, pc, pccFlagProd, 
-				SUM(".$oBudget->getYTDSQL($startMonth,12, $arrRates).") as Total, ".$oBudget->getMonthlySumSQL($startMonth,12, $arrRates);
+				SUM(".$oBudget->getYTDSQL($startMonth,$endMonth, $arrRates).") as Total, 				
+				".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates);
 $sqlGroupBy = "account, pc, prtGHQ";
+
+// echo '<pre>',$sqlFields,'</pre>';
 
 $arrFilter = Array(
 	Items::REVENUE,
@@ -61,7 +70,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
+	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
@@ -80,7 +89,7 @@ $sql = "SELECT {$sqlFields} FROM vw_master
 		GROUP BY {$sqlGroupBy}";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
+	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
@@ -126,7 +135,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
+	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
@@ -145,7 +154,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
+	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
@@ -165,7 +174,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
+	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
@@ -184,7 +193,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
+	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
@@ -204,7 +213,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
+	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
@@ -223,7 +232,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
+	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		if ($rw['prtGHQ']){
 			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
@@ -242,7 +251,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 		WHERE scenario='$budget_scenario' AND source<>'Estimate'";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<13;$m++){
+	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		$arrControl[$month] += $rw[$month];
 	}
@@ -274,36 +283,37 @@ if ($denominator!=1) {
 <table id='report' class='budget'>
 <thead>
 	<th>Item</th>
-	<?php echo $oBudget->getTableHeader('monthly', $startMonth,12); ?>
-	<th>Total</th>
+	<?php echo $oBudget->getTableHeader('monthly', $startMonth,$endMonth); ?>
+	<th>Total</th>	
 </thead>
 <tbody>
 <?php
 foreach ($arrReport as $ghq=>$arrItems){
-	echo '<tr>';
-	echo '<th colspan="14">',($ghq?$ghq:'[None]'),'</th>';
-	echo "</tr>\r\n";
-	
+	?>
+	<tr>
+	<th colspan="<?php echo $colspan;?>"><?php echo $ghq?$ghq:'[None]';?></th>
+	</tr>
+	<?php
 	foreach ($arrItems as $item=>$values){
 		?>
 		<tr>
 			<td><?php echo $item;?></td>
 			<?php
-			for ($m=$startMonth;$m<13;$m++){
+			for ($m=$startMonth;$m<=$endMonth;$m++){
 				$month = $oBudget->arrPeriod[$m];
 				?>
 				<td class="budget-decimal"><?php Reports::render($values[$month],0);?></td>
 				<?php
 			}
 		?>
-			<td class="budget-ytd budget-decimal"><?php Reports::render(array_sum($values),0);?></td>
+			<td class="budget-ytd budget-decimal"><?php Reports::render(array_sum($values),0);?></td>			
 		</tr>
 		<?php
 	}
 }
 ?>
 <tr>
-	<th colspan="14">Grand total</th>
+	<th colspan="<?php echo $colspan;?>">Grand total</th>
 </tr>
 <?php
 foreach ($arrGrandTotal as $item=>$values){
@@ -311,7 +321,7 @@ foreach ($arrGrandTotal as $item=>$values){
 		<tr>
 			<td><?php echo $item;?></td>
 			<?php
-			for ($m=$startMonth;$m<13;$m++){
+			for ($m=$startMonth;$m<=$endMonth;$m++){
 				$month = $oBudget->arrPeriod[$m];
 				?>
 				<td class="budget-decimal"><?php Reports::render($values[$month],0);?></td>
@@ -327,7 +337,7 @@ foreach ($arrGrandTotal as $item=>$values){
 <tr class="budget-total">
 <td>Total NRBT</td>
 <?php
-for ($m=$startMonth;$m<13;$m++){
+for ($m=$startMonth;$m<=$endMonth;$m++){
 				$month = $oBudget->arrPeriod[$m];
 				?>
 				<td class="budget-decimal"><?php Reports::render($arrNRBT[$month],0);?></td>
@@ -339,7 +349,7 @@ for ($m=$startMonth;$m<13;$m++){
 <tr class="budget-total">
 <td>Control</td>
 <?php
-for ($m=$startMonth;$m<13;$m++){
+for ($m=$startMonth;$m<=$endMonth;$m++){
 				$month = $oBudget->arrPeriod[$m];
 				?>
 				<td class="budget-decimal" style="background-color:<?php echo (round($arrControl[$month],0)==round($arrNRBT[$month],0)?'lightgreen':'pink');?>;"><?php Reports::render($arrControl[$month],0);?></td>
@@ -475,7 +485,7 @@ function distribute($reportKey, $sql){
 			$key = $reportKey;
 		}
 	
-		for($m=$startMonth;$m<13;$m++){
+		for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 			if ($rw[$month]!=0){
 				if ($rw['prtGHQ']){
