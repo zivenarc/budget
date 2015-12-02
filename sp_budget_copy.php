@@ -7,6 +7,7 @@ $old_budget = $_GET['old_budget'];
 $new_budget = $_GET['new_budget'];
 
 $oBudget = new Budget($old_budget);
+$oNewBudget = new Budget($new_budget);
 
 if (!isset($_GET['old_budget'])){
 	die ('ERROR: Old budget scenario is not set');
@@ -31,19 +32,28 @@ while ($rw=$oSQL->f($rs)){
 
 }
 
-$sql = Array('SET AUTOCOMMIT=0;','START TRANSACTION;');
+$sql = Array('SET AUTOCOMMIT=0;','START TRANSACTION;','SET FOREIGN_KEY_CHECKS=0;');
 
-$sql[] = "DELETE FROM `reg_sales` WHERE `scenario`='{$new_budget}';";
-$sql[] = "DELETE FROM `reg_costs` WHERE `scenario`='{$new_budget}';";
-$sql[] = "DELETE FROM `reg_depreciation` WHERE `scenario`='{$new_budget}';";
-$sql[] = "DELETE FROM `reg_vehicles` WHERE `scenario`='{$new_budget}';";
-$sql[] = "DELETE FROM `reg_headcount` WHERE `scenario`='{$new_budget}';";
-$sql[] = "DELETE FROM `reg_rent` WHERE `scenario`='{$new_budget}';";
+//------------get master fields-----------------
+$arrRegFields = Array();
+$sqlFields = "SHOW COLUMNS FROM `reg_master`";
+$rs = $oSQL->q($sqlFields);
+while ($rwMaster=$oSQL->f($rs)){
+	//echo '<pre>';print_r($rw);echo '</pre>';
+	$arrMasterFields[] = $rwMaster['Field'];
+	
+}
 
-$sql [] = "DELETE FROM reg_master WHERE scenario='{$new_budget}';";
+$sqlRegs = "SHOW TABLES LIKE 'reg%'";
+$rs = $oSQL->q($sqlRegs);
+while ($rw = $oSQL->f($rs)){
+	$table = array_values($rw)[0];
+	$sql[] = "DELETE FROM `{$table}` WHERE `scenario`='{$new_budget}';";
+}
 
 $sql [] = "SELECT @refID:=scnLastID FROM tbl_scenario WHERE scnID='{$new_budget}'";
 
+if ($oNewBudget->type=='FYE'){
 $sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item, source, estimate, ytd, roy, scenario, active)
 			SELECT company, pc, activity, customer, account, item, 'Estimate', 
 					SUM(".$oBudget->getYTDSQL().") as FYE,
@@ -53,18 +63,30 @@ $sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item
 				FROM reg_master WHERE scenario=@refID AND active=1 AND estimate=0
 				GROUP BY company, pc, activity, customer, account, item
 				HAVING FYE<>0;";
+} else {
+	$sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item, source, estimate, scenario, active)
+				SELECT company, pc, activity, customer, account, item, 'Estimate', 
+						SUM(".$oBudget->getYTDSQL(1,12).") as FYE,						
+						'{$new_budget}', active
+					FROM reg_master WHERE scenario=@refID AND active=1 AND estimate=0
+					GROUP BY company, pc, activity, customer, account, item
+					HAVING FYE<>0;";	
+}
 				
 $sql [] = "DELETE FROM tbl_scenario_variable WHERE scvScenarioID='{$new_budget}';";
 $sql [] = "INSERT INTO tbl_scenario_variable (scvVariableID, scvScenarioID, scvValue, scvEditBy, scvEditDate, scvInsertBy, scvInsertDate, scvFlagDeleted, scvGUID)
 			SELECT scvVariableID, '{$new_budget}', scvValue, scvEditBy, scvEditDate, scvInsertBy, scvInsertDate, scvFlagDeleted, UUID()
 				FROM tbl_scenario_variable WHERE scvScenarioID='{$old_budget}';";
 
-$sql[] = "update tbl_scenario_variable, vw_currency set scvValue=ROUND(IFNULL(curRate,1),2) where
-			scvVariableID=curTitle and scvScenarioID='{$new_budget}';";
+if ($oNewBudget->type=='FYE'){
+	$sql[] = "update tbl_scenario_variable, vw_currency set scvValue=ROUND(IFNULL(curRate,1),2) where
+				scvVariableID=curTitle and scvScenarioID='{$new_budget}';";
+}
 				
 foreach ($arrEntity as $entity=>$entity_data){
 	
-	echo '<h1>',$entity_data['entTitle'],'</h1>';
+	// echo '<h3>',$entity_data['entTitle'],'</h3>';
+	$sql[] = "##-------{$entity_data['entTitle']}";
 	
 	$prefix = $entity_data['entPrefix'];
 
@@ -110,7 +132,7 @@ foreach ($arrEntity as $entity=>$entity_data){
 					$arrSet[] = "`{$field}`='{$new_budget}'";
 					break;
 				case $prefix."FlagPosted":
-					$arrSet[] = "`{$field}`=0";
+					$arrSet[] = "`{$field}`=".(($oNewBudget->type=='Budget' && $oBudget->type=='Budget')?1:0);
 					break;					
 				case $prefix."InsertDate":
 				case $prefix."EditDate":
@@ -132,17 +154,29 @@ foreach ($arrEntity as $entity=>$entity_data){
 		
 		$sql[] = $strSQL;
 		
+		
 		//-------------Copy register lines--------------------------------//		
 		$strFields = "`".implode("`, `",$arrRegFields)."`";
 		
-		$strSQL = "INSERT INTO `{$entity_data['entRegister']}` ({$strFields}) SELECT ";
+		$strSQL = "INSERT INTO `{$entity_data['entRegister']}` ({$strFields}) \r\n\tSELECT ";
 		$array_search = Array ('`id`','`source`','`scenario`','`posted`');
-		$array_replace = Array ("NULL","'{$new_guid}'","'{$new_budget}'",0);
+		$array_replace = Array ("NULL","'{$new_guid}'","'{$new_budget}'",(($oNewBudget->type=='Budget' && $oBudget->type=='Budget')?1:0));
 		$strSQL .= str_replace($array_search,$array_replace,$strFields);
-		$strSQL .= " FROM `{$entity_data['entRegister']}` WHERE `source`='{$rw[$prefix."GUID"]}';";
-				
+		$strSQL .= " \r\n\tFROM `{$entity_data['entRegister']}` WHERE `source`='{$rw[$prefix."GUID"]}';";
 		$sql[] = $strSQL;
 		
+		if ($oNewBudget->type=='Budget' && $oBudget->type=='Budget'){
+		
+			//-------------Copy master lines--------------------------------//		
+			$strFields = "`".implode("`, `",$arrMasterFields)."`";
+		
+			$strSQL = "INSERT INTO `reg_master` ({$strFields}) \r\n\tSELECT ";
+			$array_search = Array ('`id`','`source`','`scenario`','`posted`');
+			$array_replace = Array ("NULL","'{$new_guid}'","'{$new_budget}'",1);
+			$strSQL .= str_replace($array_search,$array_replace,$strFields);
+			$strSQL .= " \r\n\tFROM `reg_master` WHERE `source`='{$rw[$prefix."GUID"]}';";
+			$sql[] = $strSQL;
+		}
 		
 		
 	}
@@ -154,6 +188,7 @@ foreach ($arrEntity as $entity=>$entity_data){
 
 $sql[] = "COMMIT;";
 $sql[] = "SET AUTOCOMMIT=1;";
+$sql[] = "SET FOREIGN_KEY_CHECKS=1;";
 for ($i=0;$i<count($sql);$i++){
 	echo '<pre>',$sql[$i],'</pre>';
 	$oSQL->q($sql[$i]);
