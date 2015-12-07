@@ -79,7 +79,7 @@ class Reports{
 				}
 				$arrQuarter = Array('Q1'=>$rw['jan']+$rw['feb']+$rw['mar'],
 									'Q2'=>$rw['apr']+$rw['may']+$rw['jun'],
-									'Q3'=>$rw['jul']+$rw['Aug']+$rw['sep'],
+									'Q3'=>$rw['jul']+$rw['aug']+$rw['sep'],
 									'Q4'=>$rw['oct']+$rw['nov']+$rw['dec'],
 									'Q5'=>$rw['jan_1']+$rw['feb_1']+$rw['mar_1']);
 				
@@ -89,7 +89,7 @@ class Reports{
 				}				
 									
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';
-				echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
+				echo '<td class=\'budget-decimal budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
 				echo "</tr>\r\n";
 				$prtGHQ = $rw['prtGHQ'];
 			}
@@ -151,7 +151,7 @@ class Reports{
 				
 				$arrQuarter = Array('Q1'=>$rw['jan']+$rw['feb']+$rw['mar'],
 									'Q2'=>$rw['apr']+$rw['may']+$rw['jun'],
-									'Q3'=>$rw['jul']+$rw['Aug']+$rw['sep'],
+									'Q3'=>$rw['jul']+$rw['aug']+$rw['sep'],
 									'Q4'=>$rw['oct']+$rw['nov']+$rw['dec'],
 									'Q5'=>$rw['jan_1']+$rw['feb_1']+$rw['mar_1']);
 				
@@ -231,7 +231,7 @@ class Reports{
 				if ($rw['responsible']!=$responsible){
 					?>
 					<tr>
-						<th colspan="20">By <a target="sales_report" href="rep_my.php?usrID=<?php echo $rw['sales'];?>"><?php echo $rw['responsible'];?></a></th>
+						<th colspan="21">By <a target="sales_report" href="rep_my.php?usrID=<?php echo $rw['sales'];?>"><?php echo $rw['responsible'];?></a></th>
 					</tr>
 					<?php 
 				}				
@@ -247,7 +247,7 @@ class Reports{
 				}
 				$arrQuarter = Array('Q1'=>$rw['jan']+$rw['feb']+$rw['mar'],
 									'Q2'=>$rw['apr']+$rw['may']+$rw['jun'],
-									'Q3'=>$rw['jul']+$rw['Aug']+$rw['sep'],
+									'Q3'=>$rw['jul']+$rw['aug']+$rw['sep'],
 									'Q4'=>$rw['oct']+$rw['nov']+$rw['dec'],
 									'Q5'=>$rw['jan_1']+$rw['feb_1']+$rw['mar_1']);
 				
@@ -261,6 +261,7 @@ class Reports{
 				
 				?>
 				<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']);?></td>				
+				<td class='budget-decimal'><?php self::render($arrQuarter['Q5']);?></td>				
 				</tr>
 				<?php
 				$responsible = $rw['responsible'];
@@ -288,6 +289,7 @@ class Reports{
 					}
 					?>
 					<td class='budget-decimal budget-ytd'><?php self::render(array_sum($data));?></td>
+					<td class='budget-decimal budget-<?php echo $quarter;?>'><?php self::render($arrQTotal[$unit]['Q5'])?></td>
 				</tr>
 				<?php 
 				}
