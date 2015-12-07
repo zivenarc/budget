@@ -473,7 +473,7 @@ class Budget{
 			}
 			
 			if ($start_month>1) {
-				$res['ROY'] = $res['Dec'];
+				$res['ROY'] = $res[$this->arrPeriod[$start_month]];
 			}
 			
 			$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency, tbl_scenario
