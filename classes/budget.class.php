@@ -6,7 +6,8 @@ class Budget{
 	protected $oSQL;	
 	public static $arrPeriod;
 	
-	function __construct($scenario){
+	function __construct($scenario, $from = null){
+	
 		global $strLocal;
 		global $oSQL;
 		$this->oSQL = $oSQL;
@@ -35,7 +36,9 @@ class Budget{
 		$this->rates = "<a href='?currency=840'>USD</a> = {$this->settings['usd']}, <a href='?currency=978'>EUR</a> = {$this->settings['eur']}";
 		
 		if ($rw['scnLastID']) {
-			$this->reference_scenario = new Budget($rw['scnLastID']);
+			if (!$from) {
+				$this->reference_scenario = new Budget($rw['scnLastID'], $this->id);
+			}
 		};				
 	}
 	
@@ -430,14 +433,18 @@ class Budget{
 	
 	public function getMonthlyRates($currency=643){		
 		
-		$res = Array('YTD'=>1,'ROY'=>1);
 		
+		$res = Array('YTD'=>1,'ROY'=>1, 'Total'=>1, 'Estimate'=>1);
 		for($m=1;$m<=15;$m++){
 				// $month = date('M',mktime(0,0,0,$m,15));
 				$month = $this->arrPeriod[$m];
 				$res[$month] = 1;
 		}
-		
+		for($m=1;$m<=5;$m++){
+				// $month = date('M',mktime(0,0,0,$m,15));
+				$quarter = 'Q'.$m;
+				$res[$quarter] = 1;
+		}
 		
 		if ($currency==643 || !$currency){
 			return ($res);
@@ -448,44 +455,68 @@ class Budget{
 		$sql = "SELECT * FROM common_db.tbl_currency WHERE curID={$currency}";
 		$rs = $this->oSQL->q($sql);
 		
-		if ($this->oSQL->num_rows($rs)){
-			$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate) as Rate
-						FROM common_db.tbl_rate_history
-						WHERE erhCurrencyID={$currency} 
-							AND YEAR(erhDate)={$this->year} 
-							AND MONTH(erhDate)<{$start_month}
-						GROUP BY DATE_FORMAT(erhDate,'%b')";
-			
-			$rs = $this->oSQL->q($sql);
-			while ($rw = $this->oSQL->f($rs)){
-				$res[strtolower($rw['month'])] = $rw['Rate'];
+		if ($this->oSQL->n($rs)){
+			switch($this->type){
+				case 'FYE':
+					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate) as Rate
+								FROM common_db.tbl_rate_history
+								WHERE erhCurrencyID={$currency} 
+									AND YEAR(erhDate)={$this->year} 
+									AND MONTH(erhDate)<{$start_month}
+								GROUP BY DATE_FORMAT(erhDate,'%b')";
+					
+					$rs = $this->oSQL->q($sql);
+					$i=0;
+					while ($rw = $this->oSQL->f($rs)){
+						$res[strtolower($rw['month'])] = $rw['Rate'];
+						$ytd_rate+=$rw['Rate'];
+						$i++;
+					}
+					$res['YTD'] = $ytd_rate/$i;
+					
+					$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency 
+								WHERE curTitle=scvVariableID AND scvScenarioID='{$this->id}'
+									AND curID={$currency}";
+					$rs = $this->oSQL->q($sql);
+					$rw = $this->oSQL->f($rs);
+					
+					for($m=$start_month;$m<=15;$m++){
+						$month = $this->arrPeriod[$m];
+						$res[$month] = $rw['Rate'];
+					}
+					
+					if ($start_month>1) {
+						$res['ROY'] = $res[$this->arrPeriod[$start_month]];
+					}
+					
+					$res['Q1'] = ($res['jan']*31+$res['feb']*28+$res['mar']*31)/90;
+					$res['Q2'] = ($res['apr']*30+$res['may']*31+$res['jun']*30)/91;
+					$res['Q3'] = ($res['jul']*31+$res['aug']*31+$res['sep']*30)/93;
+					$res['Q4'] = ($res['oct']*31+$res['nov']*30+$res['dec']*31)/92;
+					$res['Q5'] = ($res['jan_1']*31+$res['feb_1']*28+$res['mar_1']*31)/90;
+					
+					$res['Total'] = ($res['Q1']+$res['Q2']+$res['Q3']+$res['Q4'])/4;
+					
+					break;
+				case 'Budget':
+					$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency, tbl_scenario
+								WHERE curTitle=scvVariableID AND scvScenarioID=scnLastID
+									AND scnID='{$this->id}'
+									AND curID={$currency}";
+					$rs = $this->oSQL->q($sql);
+					$rw = $this->oSQL->f($rs);
+					for($m=1;$m<=15;$m++){
+						$month = $this->arrPeriod[$m];
+						$res[$month] = $rw['Rate'];
+					}
+					for($m=1;$m<=5;$m++){
+							$quarter = 'Q'.$m;
+							$res[$quarter] =  $res['dec'];
+					}
+					$res['Total'] = $res['dec'];
+					break;
 			}
 			
-			$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency 
-						WHERE curTitle=scvVariableID AND scvScenarioID='{$this->id}'
-							AND curID={$currency}";
-			$rs = $this->oSQL->q($sql);
-			$rw = $this->oSQL->f($rs);
-			
-			for($m=$start_month;$m<=15;$m++){
-				$month = $this->arrPeriod[$m];
-				$res[$month] = $rw['Rate'];
-			}
-			
-			if ($start_month>1) {
-				$res['ROY'] = $res[$this->arrPeriod[$start_month]];
-			}
-			
-			$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency, tbl_scenario
-						WHERE curTitle=scvVariableID AND scvScenarioID=scnLastID
-							AND scnID='{$this->id}'
-							AND curID={$currency}";
-
-			$rs = $this->oSQL->q($sql);
-			$rw = $this->oSQL->f($rs);
-			if ($start_month>1) {
-				$res['YTD'] = $rw['Rate'];
-			}
 			
 			return ($res);
 			

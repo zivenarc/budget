@@ -36,7 +36,12 @@ if(!isset($_GET['pccGUID'])){
 	
 	if ($_GET['pccGUID']=='all'){
 		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-		$sqlWhere = "WHERE pc in (SELECT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1)";
+		$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){
+			$arrPC[] = $rw['pcrProfitID'];
+		}
+		$sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
 	} else {
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 	}
@@ -46,7 +51,7 @@ if(!isset($_GET['pccGUID'])){
 	}
 	
 	
-	$sqlWhere .= " AND scenario='$budget_scenario'";
+	// $sqlWhere .= " AND scenario='$budget_scenario'";
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator));
 	
 	switch ($type){

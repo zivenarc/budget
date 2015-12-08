@@ -687,17 +687,29 @@ class Reports{
 	
 	public function periodicPnL($sqlWhere, $params = Array('field_data','field_title','title')){
 		
-		$strFields = $this->_getMonthlyFields();
+		$strFields_this = $this->_getMonthlyFields();
+		$strFields_last = $this->_getMonthlyFields('last');
 		
 		ob_start();
-		$sql = "SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `Budget item`, `Group`, `item`,
-					{$strFields}
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15).",\r\n".
+				$this->oBudget->getQuarterlySumSQL().
+				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,Level1_title,level1_code,`Budget item`,`Group`, `item`
+			FROM 
+			(SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `Budget item`, `Group`, `item`,
+					{$strFields_this}
 			FROM `vw_master` 			
-			{$sqlWhere} AND Group_code=".self::GP_CODE." ## Gross margin only
-			GROUP BY ({$params['field_data']}), `vw_master`.item
-			ORDER BY ({$params['field_data']}), `Group`, `vw_master`.itmOrder ASC			
+			{$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=".self::GP_CODE." ## Gross margin only
+			GROUP BY Level1_code, Level1_title, `vw_master`.item, `Budget item`
+			UNION ALL
+			SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `Budget item`, `Group`, `item`,
+					{$strFields_last}
+			FROM `vw_master` 			
+			{$sqlWhere} AND scenario='{$this->oBudget->reference_scenario->id}' AND Group_code=".self::GP_CODE."
+			GROUP BY Level1_code, Level1_title, `vw_master`.item, `Budget item`) Q
+			GROUP BY Level1_code, Level1_title, item, `Budget item`
+			ORDER BY Level1_title, `Group` ASC			
 			";
-		
+		// echo '<pre>',$sql,'</pre>';
 		$this->_firstLevelPeriodic($sql, $params['title'], $this->oBudget);
 				
 		//==========================================================================================================================Non-customer-related data
@@ -832,6 +844,7 @@ class Reports{
 					if ($this->oBudget->length>12){
 					?>
 						<th>Q5(Jan-Mar)</th>
+						<th class='budget-ytd'><?php echo $this->oBudget->type=='Budget'?'Budget':'FYE';?> Apr-Mar</th>
 					<?php
 					}					
 					if ($this->oBudget->type=='FYE'){
@@ -880,6 +893,7 @@ class Reports{
 					$arrSubreport[$l1Code][$rw['item']]['ROY_A']+=$rw['ROY_A'];
 					$arrSubreport[$l1Code][$rw['item']]['ROY']+=$rw['ROY'];
 					$arrSubreport[$l1Code][$rw['item']]['Total']+=$rw['Total'];
+					$arrSubreport[$l1Code][$rw['item']]['Total_AM']+=$rw['Total_AM'];
 					$arrSubreport[$l1Code][$rw['item']]['estimate']+=$rw['estimate'];
 					$arrSubreport[$l1Code][$rw['item']]['Total_AprMar']+=$rw['Total_AprMar'];
 					$arrSubreport[$l1Code][$rw['item']]['Total_15']+=$rw['Total_15'];
@@ -897,7 +911,7 @@ class Reports{
 				
 				// echo '<pre>';print_r($arrReport);echo '</pre>';die();
 				foreach ($arrReport as $key=>$data){
-					$this->echoBudgetItemString($data);
+					$this->echoBudgetItemString($data, 'budget-item');
 				}
 				
 					$arrGrandTotal['Budget item'] = 'Grand total';
@@ -1046,17 +1060,28 @@ class Reports{
 	
 	private function no_firstLevelPeriodic($sqlWhere){
 				
-		$strFields = $this->_getMonthlyFields();
+		$strFields_this = $this->_getMonthlyFields();
+		$strFields_last = $this->_getMonthlyFields('last');
+		$sqlGroup = "GROUP BY item, `Budget item`";
 		
-		$sqlGroup = "GROUP BY `Group`, `Budget item`";
-		
-		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`, 
-					{$strFields}
-			FROM `vw_master`
-			##LEFT JOIN tbl_scenario ON scnID=scenario
-			{$sqlWhere} 
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15).",\r\n".
+				$this->oBudget->getQuarterlySumSQL().
+				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,`Budget item`,`Group`, `item`, Group_code
+			FROM 
+			(SELECT `Budget item`, `Group`, `item`,Group_code,
+					{$strFields_this}
+			FROM `vw_master` 			
+			{$sqlWhere} AND scenario='{$this->oBudget->id}' 
 			{$sqlGroup}
-			ORDER BY `Group`, `itmOrder` ASC";
+			UNION ALL
+			SELECT `Budget item`, `Group`, `item`,Group_code,
+					{$strFields_last}
+			FROM `vw_master` 			
+			{$sqlWhere} AND scenario='{$this->oBudget->reference_scenario->id}' 
+			{$sqlGroup}) Q
+			{$sqlGroup}
+			ORDER BY `Group` ASC			
+			";
 			
 			// echo '<pre>',$sql,'</pre>';
 			
@@ -1066,7 +1091,7 @@ class Reports{
 			$rs = $this->oSQL->q($sql);
 			while ($rw=$this->oSQL->f($rs)){
 				
-				if ($rw['Group_code']==94){
+				if ($rw['Group_code']==self::GP_CODE){
 					$tr_class = "budget-total";
 				} else {
 					$tr_class = 'budget-item';
@@ -1089,14 +1114,16 @@ class Reports{
 					$grandTotal[$month] += $rw[$month];
 					$grandTotal['Q'.$m] += $rw['Q'.$m];
 				}
-				$subtotal[$rw['Group']]['Total'] += $local_subtotal;
+				$subtotal[$rw['Group']]['Total'] += $rw['Total'];
+				$subtotal[$rw['Group']]['Total_AM'] += $rw['Total_AM'];
 				$subtotal[$rw['Group']]['estimate'] += $rw['estimate'];
 				$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
 				$subtotal[$rw['Group']]['YTD'] += $rw['YTD'];
 				$subtotal[$rw['Group']]['ROY_A'] += $rw['ROY_A'];
 				$subtotal[$rw['Group']]['ROY'] += $rw['ROY'];
 				
-				$grandTotal['Total'] += $local_subtotal;
+				$grandTotal['Total'] += $rw['Total'];
+				$grandTotal['Total_AM'] += $rw['Total_AM'];
 				$grandTotal['estimate'] += $rw['estimate'];
 				$grandTotal['YTD_A'] += $rw['YTD_A'];
 				$grandTotal['YTD'] += $rw['YTD'];
@@ -1209,21 +1236,37 @@ class Reports{
 			
 	}
 	
-	private function _getMonthlyFields(){
+	private function _getMonthlyFields($type='this'){
 		// GLOBAL $budget_scenario;
 		// $oBudget = new Budget($budget_scenario);
-		
-		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
+		switch ($type){
+		case 'this':
+			$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
+			// echo '<pre>';print_r($arrRates);echo '</pre>';
+			$res=	$this->oBudget->getMonthlySumSQL(1,15,$arrRates).", \r\n".
+					$this->oBudget->getQuarterlySumSQL($arrRates).", \r\n 
+					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total ,\r\n
+					SUM(".$this->oBudget->getYTDSQL(3,15,$arrRates).") as Total_AM ,\r\n
+					0 as estimate, 
+					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD_A, 
+					SUM(YTD/{$arrRates['YTD']}) as YTD, 
+					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates).") as ROY_A, 
+					SUM(ROY/{$arrRates['YTD']}) as ROY";
+			break;
+		case 'last':
+			$arrRates = $this->oBudget->reference_scenario->getMonthlyRates($this->Currency);
+			$res=	str_repeat('0,',15)." \r\n".
+					str_repeat('0,',5)." \r\n".
+					"0 as Total, \r\n".
+					"0 as Total_AM, \r\n".
+					"SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as estimate ,
+					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD_A, 
+					SUM(YTD/{$arrRates['YTD']}) as YTD, 
+					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates).") as ROY_A, 
+					SUM(ROY/{$arrRates['YTD']}) as ROY";
+			break;
+		}
 		// echo '<pre>';print_r($arrRates);echo '</pre>';
-		$res=	$this->oBudget->getMonthlySumSQL(1,12,$arrRates).", ".
-				$this->oBudget->getQuarterlySumSQL($arrRates).", 
-				SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total ,
-				SUM(estimate/{$arrRates['YTD']}) as estimate, 
-				SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD_A, 
-				SUM(YTD/{$arrRates['YTD']}) as YTD, 
-				SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates).") as ROY_A, 
-				SUM(ROY/{$arrRates['YTD']}) as ROY";
-		
 		return ($res);
 		
 	}
@@ -1290,6 +1333,7 @@ class Reports{
 				<?php 
 				if ($this->oBudget->length>12){ ?>
 					<td class='budget-decimal'><?php self::render($data['Q5'],0);?></td>				
+					<td class='budget-decimal budget-ytd'><?php self::render($data['Total_AM'],0);?></td>				
 				<?php };
 				if ($this->oBudget->type == 'FYE'){ ?>
 					<!--Data for YTD actual-->
@@ -1329,7 +1373,7 @@ class Reports{
 				foreach ($data as $item=>$values){
 					if ($row>1){ ?>
 						</tr>
-						<tr class="">					
+						<tr class="budget-item">					
 					<?php };
 					?>
 					<td><?php echo $values['Budget item'];?></td>
@@ -1341,7 +1385,7 @@ class Reports{
 					};	
 				}
 				$arrSubtotal['Budget item'] = "Subtotal";
-				$this->echoBudgetItemString($arrSubtotal,'budget-subtotal');
+				$this->echoBudgetItemString($arrSubtotal,'budget-subtotal budget-item');
 			} else {	
 			?>
 			<td colspan="2">
