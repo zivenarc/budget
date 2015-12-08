@@ -62,7 +62,7 @@ class Reports{
 				if ($rw['Unit']=='TEU') {
 					$flagShowOFFReport = true;
 				}
-				if ($rw['prtID']==12){
+				if ($rw['prtID']==12 || $rw['prtID']==9){
 					$flagShowWHReport = true;
 				}
 				?>
@@ -206,7 +206,7 @@ class Reports{
 		
 		$empty = 1894;
 		
-		$sql = "SELECT cntTitle, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
+		$sql = "SELECT cntTitle,customer, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
 				FROM reg_rent 
 				LEFT JOIN vw_customer ON cntID=customer
 				{$sqlWhere} AND posted=1 
@@ -260,12 +260,22 @@ class Reports{
 									'Q4'=>($rw['oct']+$rw['nov']+$rw['dec'])/3,
 									'Q5'=>($rw['jan_1']+$rw['feb_1']+$rw['mar_1'])/3);
 				
+				if ($rw['customer']!=$empty){
+						$arrUtil['Q1']+=$arrQuarter['Q1'];
+						$arrUtil['Q2']+=$arrQuarter['Q2'];
+						$arrUtil['Q3']+=$arrQuarter['Q3'];
+						$arrUtil['Q4']+=$arrQuarter['Q4'];
+						$arrUtil['Q5']+=$arrQuarter['Q5'];
+				}
+				
 				for ($q=1;$q<5;$q++){		
 					$quarter = 'Q'.$q;
 					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
 					$arrTotal[$quarter]+=$arrQuarter[$quarter];
 				}				
-									
+							
+				$arrTotal['Q5']+=$arrQuarter['Q5'];
+				
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total']/12,0,'.',','),'</td>';
 				echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
 				echo "</tr>\r\n";				
@@ -289,6 +299,24 @@ class Reports{
 					}	
 					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']/12),'</td>';
 					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render($arrTotal['Q5']),'</td>';
+					?>
+				</tr>
+				<tr class='budget-subtotal budget-ratio'>
+					<td>Utilization, %</td>
+					<?php
+					for ($m=1;$m<=12;$m++){
+					// $month = $this->oBudget->arrPeriod[$m];
+					$month = $this->oBudget->arrPeriod[$m];
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render_ratio($arrUtil[$month],$arrTotal[$month]),'</td>';
+	
+					}
+					for ($q=1;$q<5;$q++){		
+					$quarter = 'Q'.$q;
+					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render_ratio($arrUtil[$quarter],$arrTotal[$quarter]),'</td>';
+
+					}	
+					echo '<td class=\'budget-decimal budget-ytd\'>',self::render_ratio($arrUtil['Total']/12,$arrTotal['Total']/12),'</td>';
+					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render_ratio($arrUtil['Q5'],$arrTotal['Q5']),'</td>';
 					?>
 				</tr>
 			</tfoot>
