@@ -62,6 +62,9 @@ class Reports{
 				if ($rw['Unit']=='TEU') {
 					$flagShowOFFReport = true;
 				}
+				if ($rw['prtID']==12){
+					$flagShowWHReport = true;
+				}
 				?>
 				<tr class='graph'>
 				<?php
@@ -103,6 +106,10 @@ class Reports{
 			
 			if ($flagShowOFFReport) {
 				$this->offByRoute($sqlWhere);
+			}
+			
+			if ($flagShowWHReport) {
+				$this->whByCustomer($sqlWhere);
 			}
 			
 			ob_flush();
@@ -183,6 +190,104 @@ class Reports{
 
 					}	
 					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']),'</td>';
+					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render($arrTotal['Q5']),'</td>';
+					?>
+				</tr>
+			</tfoot>
+			</table>
+			<ul class='link-footer'>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
+		<?php
+		
+	}
+	
+	function whByCustomer($sqlWhere){
+		
+		$empty = 1894;
+		
+		$sql = "SELECT cntTitle, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
+				FROM reg_rent 
+				LEFT JOIN vw_customer ON cntID=customer
+				{$sqlWhere} AND posted=1 
+				GROUP BY customer";
+		$rs = $this->oSQL->q($sql); 
+		$tableID = "kpi_".md5($sql);
+			?>
+			<h2>WH utilization, m<sup>2</sup></h2>
+			<table id='<?php echo $tableID;?>' class='budget'>
+			<thead>
+				<tr>
+					<th>Customer</th>
+					<?php 
+					echo $this->oBudget->getTableHeader(); 
+					echo $this->oBudget->getTableHeader('quarterly'); 
+					?>
+					<th class='budget-ytd'>Total</th>
+					<th>Q5</th>
+				</tr>
+			</thead>			
+			<tbody>
+			<?php			
+			while ($rw=$this->oSQL->f($rs)){				
+				?>
+				<tr class='graph'>
+				<?php
+				if ($rw['prtGHQ']!=$prtGHQ){
+					?>
+					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
+					<?php
+				};
+				echo "<td>",$rw['cntTitle'],'</td>';				
+				for ($m=1;$m<=12;$m++){
+					// $month = $this->oBudget->arrPeriod[$m];
+					$month = $this->oBudget->arrPeriod[$m];
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
+					$arrTotal[$month]+=$rw[$month];
+					if ($rw['customer']!=$empty){
+						$arrUtil[$month]+=$rw[$month];
+					}	
+					
+				}
+				$arrTotal['Total']+=$rw['Total'];
+				if ($rw['customer']!=$empty){
+						$arrUtil['Total']+=$rw['Total'];
+				}
+				
+				$arrQuarter = Array('Q1'=>($rw['jan']+$rw['feb']+$rw['mar'])/3,
+									'Q2'=>($rw['apr']+$rw['may']+$rw['jun'])/3,
+									'Q3'=>($rw['jul']+$rw['aug']+$rw['sep'])/3,
+									'Q4'=>($rw['oct']+$rw['nov']+$rw['dec'])/3,
+									'Q5'=>($rw['jan_1']+$rw['feb_1']+$rw['mar_1'])/3);
+				
+				for ($q=1;$q<5;$q++){		
+					$quarter = 'Q'.$q;
+					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
+					$arrTotal[$quarter]+=$arrQuarter[$quarter];
+				}				
+									
+				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total']/12,0,'.',','),'</td>';
+				echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
+				echo "</tr>\r\n";				
+			}
+			?>
+			</tbody>
+			<tfoot>
+				<tr class='budget-subtotal'>
+					<td>Total space</td>
+					<?php
+					for ($m=1;$m<=12;$m++){
+					// $month = $this->oBudget->arrPeriod[$m];
+					$month = $this->oBudget->arrPeriod[$m];
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($arrTotal[$month]),'</td>';
+	
+					}
+					for ($q=1;$q<5;$q++){		
+					$quarter = 'Q'.$q;
+					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($arrTotal[$quarter]),'</td>';
+
+					}	
+					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']/12),'</td>';
 					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render($arrTotal['Q5']),'</td>';
 					?>
 				</tr>
