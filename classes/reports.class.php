@@ -277,7 +277,7 @@ class Reports{
 				$arrTotal['Q5']+=$arrQuarter['Q5'];
 				
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total']/12,0,'.',','),'</td>';
-				echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
+				echo '<td class=\'budget-decimal budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
 				echo "</tr>\r\n";				
 			}
 			?>
