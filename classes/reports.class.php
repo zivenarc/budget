@@ -238,7 +238,7 @@ class Reports{
 					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
 					<?php
 				};
-				echo "<td>",$rw['cntTitle'],'</td>';				
+				echo "<td class='code-".$rw['customer']."'>",$rw['cntTitle'],'</td>';				
 				for ($m=1;$m<=12;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
