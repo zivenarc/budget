@@ -224,7 +224,7 @@ class MSF extends Document{
 					
 					$sql = "SELECT account, item, SUM(".$this->budget->getYTDSQL(1,15).") as Total, ".$this->budget->getMonthlySumSQL(1,15)." 
 						FROM reg_master 
-						WHERE posted=1 AND scenario='{$this->scenario}' AND pc={$this->profit} AND source NOT IN ('Estimate')
+						WHERE AND scenario='{$this->scenario}' AND pc={$this->profit} AND source NOT IN ('Estimate')
 						GROUP BY account, item"; 
 					 
 					$rs = $this->oSQL->q($sql);
