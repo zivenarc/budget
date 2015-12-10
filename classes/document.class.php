@@ -10,6 +10,8 @@ class Document extends easyForm{
 	public  $flagPosted;
 	public  $flagDeleted;
 	public  $data;
+	
+	private $log;
 	// public static $GUID;
 	// public static $prefix;
 	
@@ -535,6 +537,10 @@ class Document extends easyForm{
 				,'witdh'=>'10%'
 			);
 		}
+	}
+	
+	function log($data){
+		$this->log[] = var_export($data, true);
 	}
 	
 }
