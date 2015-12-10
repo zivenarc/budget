@@ -8,8 +8,7 @@ class sales_record extends table_record{
 		parent::__construct($session, $scenario, $id, $data);
 		
 		if (count($data)){			
-			$this->product = $data['product'];			
-			$this->profit = $data['profit'];
+			$this->product = $data['product'];						
 			$this->activity = $data['activity'];
 			$this->customer = $data['customer'];
 			$this->comment = $data['comment'];
