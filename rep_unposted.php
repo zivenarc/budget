@@ -9,7 +9,7 @@ if ($_GET['tab']){
 		LEFT JOIN stbl_user ON usrID=edit_by
 		LEFT JOIN vw_profit ON pccID=pc
 		LEFT JOIN vw_location ON locID=pc
-		WHERE posted=1 AND scenario='{$_GET['tab']}' 
+		WHERE posted=0 AND scenario='{$_GET['tab']}' 
 		GROUP BY guid
 		ORDER BY timestamp DESC";	
 
