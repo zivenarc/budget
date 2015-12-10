@@ -8,8 +8,14 @@ include ('includes/inc_report_settings.php');
 
 $oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$reference));
 
+$oBudget = new Budget($budget_scenario);
+if ($reference!=$oBudget->reference_scenario->id){
+	$oReference = new Budget($reference);
+	$strVsTitle = ' vs '.$oReference->title;
+}
+
 if(!isset($_GET['pccGUID'])){
-	$oBudget = new Budget($budget_scenario);
+	
 	$arrJS[]='js/rep_pnl.js';
 	// $arrJS[]='js/input_form.js';	
 	
@@ -20,7 +26,7 @@ if(!isset($_GET['pccGUID'])){
 	$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");	
 	
 	include ('includes/inc-frame_top.php');
-	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
+	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	?>
 	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect(Array('type'=>'FYE'));?></div>
