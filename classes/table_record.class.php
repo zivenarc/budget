@@ -4,18 +4,7 @@ $arrJS[] ='/common/eiseGrid2/eiseGrid.jQuery.js';
 $arrCSS[] = '/common/eiseGrid2/themes/default/screen.css';
 
 class table_record {
-	public $Jan;
-	public $Feb;
-	public $Mar;
-	public $Apr;
-	public $May;
-	public $Jun;
-	public $Jul;
-	public $Aug;
-	public $Sep;
-	public $Oct;
-	public $Nov;
-	public $Dec;
+	public $jan,  $feb,  $mar,  $apr,  $may,  $jun,  $jul,  $aug,  $sep,  $oct,  $nov,  $dec, $jan_1, $feb_1, $mar_1;
 	
 	public $flagUpdated;
 	public $flagDeleted;
@@ -24,6 +13,7 @@ class table_record {
 	public $source;
 	public $scenario;
 	public $company;
+	public $profit;
 	
 	protected $oSQL;
 	
@@ -43,6 +33,7 @@ class table_record {
 				$this->{$month} = $data[strtolower($month)];			
 			}
 			$this->company = $data['company'];
+			$this->profit = $data['pc'];
 		}
 	}
 	
