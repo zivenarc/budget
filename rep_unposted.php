@@ -17,8 +17,14 @@ if ($_GET['tab']){
 		while ($rw=$oSQL->f($rs)){
 			$data[] = $rw;
 		}
+		?>
+		<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
+		<div id='div_<?php echo $_GET['tab'];?>'>
+		<?php
 		Reports::getJournalEntries($data);
-		
+		?>
+		</div>
+		<?php
 	
 } else {
 	require ('classes/budget.class.php');
