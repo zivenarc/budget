@@ -240,7 +240,7 @@ class Sales extends Document{
 					$row = $this->get_record($id); 
 					if ($row->profit!=$this->profit){		
 						$row->flagUpdated = true; 
-						$this->log('row #'.$id." updated	with profit value (".$this->profit.")");
+						die('row #'.$id." updated	with profit value (".$this->profit.")");
 						$row->profit = $this->profit;
 					}
 				}	 			
@@ -251,17 +251,17 @@ class Sales extends Document{
 					$row = $this->get_record($id);
 					if ($row->customer!=$this->customer){
 						$row->flagUpdated = true;				
-						$this->log('row #'.$id." updated with customer value (".$this->customer.")");
+						die('row #'.$id." updated with customer value (".$this->customer.")");
 						$row->customer = $this->customer;
 					}
 					if ($row->sales!=$this->sales){
 						$row->flagUpdated = true;
-						$this->log('row #'.$id." updated with sales value (".$this->sales.")");						
+						die('row #'.$id." updated with sales value (".$this->sales.")");						
 						$row->sales = $this->sales;
 					}
 					if ($row->route!=$this->route){
 						$row->flagUpdated = true;	
-						$this->log('row #'.$id." updated with route value (".$this->route.")");							
+						die('row #'.$id." updated with route value (".$this->route.")");							
 						$row->route = $this->route;
 					}
 				}
