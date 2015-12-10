@@ -1611,7 +1611,7 @@ class Reports{
 		
 				$total += $data[$i]['amount'];	
 				?>
-				<tr id="tr_<?php echo $data[$i]['guid'];?>">
+				<tr id="tr_<?php echo $data[$i]['guid'];?>" class="<?php echo ($data[$i]['posted']?'journal-posted':'')?> <?php echo ($data[$i]['deleted']?'journal-deleted':'')?>">
 					<td><?php echo $data[$i]['title'];?></td>
 					<td><?php echo $data[$i]['id'];?></td>
 					<td><a class="budget-document-link" target="_blank" href="<?php echo $data[$i]['script'].'?'.$data[$i]['prefix'].'ID='.$data[$i]['id'];?>"><?php echo $data[$i]['guid'];?></a></td>

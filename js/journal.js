@@ -39,28 +39,52 @@ function repost(tab, event){
 			// console.log(td_posted);
 			var guid = tr.attr('id').replace('tr_','');
 			td_posted.addClass('spinner');
-			$.post(href,{DataAction:'unpost'},function(data){
-				// console.log(data);
-				if (data.flagPosted==0){
-					td_posted.removeClass('budget-icon-posted');
-					tr.find('#amount_'+guid).next().text('0.00');
-					$.post(href,{DataAction:'post'},function(data){
-						// console.log(data);
-						if (data.flagPosted==1){
-							td_posted.addClass('budget-icon-posted');
-							tr.find('#amount_'+guid).next().html($('<span>',{text:number_format(data.amount,0,'.',','), class:(data.amount<0?'budget-negative':'')}));
-							tr.find('#usrTitle_'+guid).text(data.editor);
-							tr.find('#timestamp_'+guid).text(data.timestamp_short);
-							total+=parseFloat(data.amount);console.log(data.amount);console.log(total);
-							$('#journal_total',$('#div_'+tab)).next().text(number_format(total,0,'.',','));							
-						} else {
-							td_posted.removeClass('spinner').text('Error');
-						}
-					});
-				} else {
-					td_posted.removeClass('spinner').text('Error');
-				}
-			});
+			
+			if (tr.hasClass('journal-deleted')){
+				//skip
+			} else if (tr.hasClass('journal-posted')){
+				//--unpost, then post
+				$.post(href,{DataAction:'unpost'},function(data){
+					// console.log(data);
+					if (data.flagPosted==0){
+						tr.removeClass('journal-posted');
+						td_posted.removeClass('budget-icon-posted');
+						tr.find('#amount_'+guid).next().text('0.00');
+						$.post(href,{DataAction:'post'},function(data){
+							// console.log(data);
+							if (data.flagPosted==1){
+								tr.addClass('journal-posted');
+								td_posted.addClass('budget-icon-posted');
+								tr.find('#amount_'+guid).next().html($('<span>',{text:number_format(data.amount,0,'.',','), class:(data.amount<0?'budget-negative':'')}));
+								tr.find('#usrTitle_'+guid).text(data.editor);
+								tr.find('#timestamp_'+guid).text(data.timestamp_short);
+								total+=parseFloat(data.amount);console.log(data.amount);console.log(total);
+								$('#journal_total',$('#div_'+tab)).next().text(number_format(total,0,'.',','));							
+							} else {
+								td_posted.removeClass('spinner').text('Error');
+							}
+						});
+					} else {
+						td_posted.removeClass('spinner').text('Error');
+					}
+				});
+			} else {
+				//post only
+				$.post(href,{DataAction:'post'},function(data){
+					// console.log(data);
+					if (data.flagPosted==1){
+						tr.addClass('journal-posted');
+						td_posted.addClass('budget-icon-posted');
+						tr.find('#amount_'+guid).next().html($('<span>',{text:number_format(data.amount,0,'.',','), class:(data.amount<0?'budget-negative':'')}));
+						tr.find('#usrTitle_'+guid).text(data.editor);
+						tr.find('#timestamp_'+guid).text(data.timestamp_short);
+						total+=parseFloat(data.amount);console.log(data.amount);console.log(total);
+						$('#journal_total',$('#div_'+tab)).next().text(number_format(total,0,'.',','));							
+					} else {
+						td_posted.removeClass('spinner').text('Error');
+					}
+				});
+			}
 		});
 		
 		$(event.srcElement).removeClass('spinner');
