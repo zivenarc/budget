@@ -4,22 +4,6 @@ require ('classes/budget.class.php');
 
 include ('includes/inc_report_settings.php');
 
-if($currency!=643){
-		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
-		$rs = $oSQL->q($sql);
-		$rw = $oSQL->f($rs);
-		$curTitle = $rw["curTitle$strLocal"];		
-} else {
-	$curTitle = "RUB";
-}
-
-$arrUsrData["pagTitle$strLocal"] .= ': '.$curTitle;
-
-if ($denominator!=1) {
-	$arrUsrData["pagTitle$strLocal"] .= ' x'.$denominator;
-}
-
-
 if(!isset($_GET['pccGUID'])){
 	$oBudget = new Budget($budget_scenario);
 	$arrJS[]='js/rep_pnl.js';
