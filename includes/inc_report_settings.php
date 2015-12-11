@@ -67,4 +67,21 @@ if (isset($_GET['denominator'])) {
 }
 SetCookie('report_denominator',$denominator,0,'/budget/');
 
+
+//------------------------------------ Title for report ------------------------------------------//
+if($currency!=643){
+		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
+		$rs = $oSQL->q($sql);
+		$rw = $oSQL->f($rs);
+		$curTitle = $rw["curTitle$strLocal"];		
+} else {
+	$curTitle = "RUB";
+}
+
+$arrUsrData["pagTitle$strLocal"] .= ': '.$curTitle;
+
+if ($denominator!=1) {
+	$arrUsrData["pagTitle$strLocal"] .= ' x'.$denominator;
+}
+
 ?>

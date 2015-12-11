@@ -14,39 +14,21 @@ $arrJS[]='js/rep_pnl.js';
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 
+include ('includes/inc_report_selectors.php');
+// include ('includes/inc_report_buttons.php');
+
 $arrItems[] = Items::IT_EQUIPMENT;
 $arrItems[] = Items::INTERNET;
 $arrItems[] = Items::IT_COSTS;
 $arrItems[] = Items::IT_SUPPORT;
 $arrItems[] = Items::SATELLITE;
 $arrItems[] = Items::ONEASS;
+$arrItems[] = Items::RHQ_IT_COST;
 
 $strItems = "'".implode("','",$arrItems)."'";
 
-$sqlWhere = "WHERE `item` IN ($strItems)  AND scenario='$budget_scenario'";
+$sqlWhere = "WHERE `item` IN ($strItems)";
 ?>
-<script>
-	$(document).ready(function(){
-		$('#period_switch').buttonset().children('input').change(function(){
-				if($(this).val()=='monthly'){
-					$('.budget-monthly').show();
-					$('.budget-quarterly').hide();
-				} else {
-					$('.budget-monthly').hide();
-					$('.budget-quarterly').show();
-				}
-		});
-		init_panel($('#report_content'));
-	});
-</script>
-<div class="report-radio f-row">
-<div id='period_switch'>
-		<input type='radio' id='period_monthly_<?php echo $_GET['tab'];?>' name='period' value='monthly'/>
-		<label for='period_monthly_<?php echo $_GET['tab'];?>'>Monthly</label>
-		<input type='radio' checked id='period_quarterly_<?php echo $_GET['tab'];?>' name='period' value='quarterly'/>
-		<label for='period_quarterly_<?php echo $_GET['tab'];?>'>Quarterly</label>
-	</div>
-</div>
 <div id='report_content'>
 <?php
 $oReport->periodicPnL($sqlWhere,Array('field_data'=>'pc','field_title'=>'Profit','title'=>'PC'));	

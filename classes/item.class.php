@@ -29,6 +29,7 @@ class Items extends Reference{
 	const IT_SUPPORT = '602b626c-f52f-11de-95b2-00188bc729d2';
 	const SATELLITE = '17ae1750-48e3-11e1-b30e-005056930d2f';
 	const ONEASS = 'f0b14b2e-f52b-11de-95b2-00188bc729d2';
+	const RHQ_IT_COST = '1ab25fd9-7c3f-11e3-b664-00155d010e0b';
 	
 	const OFFICE_RENT = '602b627d-f52f-11de-95b2-00188bc729d2';
 	const OTHER_OFFICE = '602b6287-f52f-11de-95b2-00188bc729d2';

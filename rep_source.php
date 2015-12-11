@@ -15,7 +15,7 @@ if (isset($_POST['activity'])){
 	$sqlWhere = " AND activity=".$oSQL->e($_POST['activity']);
 }
 
-if ($_POST['pccGUID']=='all'){
+if ($_POST['pccGUID']=='all' || $_POST['pccGUID']=='undefined' || !isset($_POST['pccGUID'])){
 	$strPCFilter = '';
 } else {
 	$strPCFilter = " AND pccGUID=".$oSQL->e($_POST['pccGUID']);
