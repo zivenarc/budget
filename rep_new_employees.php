@@ -7,6 +7,7 @@ include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
 
+$arrJS[]='js/rep_pnl.js';
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 if ($denominator!=1) {
