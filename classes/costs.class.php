@@ -409,6 +409,8 @@ class Indirect_costs extends Document{
 						$record->customer = self::EMPTY_CUSTOMER;
 					}
 					
+					$nCount = $record->count();
+					
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $record->profit;
 					$master_row->activity = $record->activity;
@@ -419,7 +421,7 @@ class Indirect_costs extends Document{
 					$currency_rate = $this->settings[strtolower($record->buying_curr)];
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
-						$denominator = $record->period=='annual'?$record->{$month}/min($record->total(),12):1;						
+						$denominator = $record->period=='annual'?1/min($nCount,12):1;						
 						$master_row->{$month} = -$record->{$month}*$record->buying_rate*$currency_rate*$denominator;
 					}				
 											

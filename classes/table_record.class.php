@@ -68,6 +68,15 @@ class table_record {
 		return ($res);
 	}	
 	
+	public function count(){
+		for($m=1;$m<=15;$m++){
+			// $month = date('M',mktime(0,0,0,$m,15));
+			$month = $this->arrPeriod[$m];
+			if ($this->{$month}) $res++;
+		}
+		return ($res);
+	}	
+	
 	public function getMonthlySQL(){
 	
 		for($m=1;$m<=15;$m++){
