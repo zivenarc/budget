@@ -106,6 +106,8 @@ class Headcount extends Document{
 			);
 		}
 		
+		$this->Columns[] = $this->getResponsibleEF();
+		
 	}
 	
 	public function defineGrid(){
