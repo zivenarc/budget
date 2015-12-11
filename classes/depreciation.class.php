@@ -76,6 +76,8 @@ class Depreciation extends Document{
 		
 		parent::defineEF();
 		
+		$this->Columns[] = $this->getResponsibleEF();
+		
 		if ($this->type=='current'){
 			$this->Columns[] = Array(
 						'title'=>'Disposal date'
