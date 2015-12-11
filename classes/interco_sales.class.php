@@ -106,7 +106,9 @@ class Interco_sales extends Document{
 			,'default'=>22
 			, 'disabled'=>!$this->flagUpdate
 		);
-
+		
+		$this->Columns[] = $this->getResponsibleEF();
+		
 	}
 	
 	public function defineGrid(){
