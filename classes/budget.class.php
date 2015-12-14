@@ -433,6 +433,7 @@ class Budget{
 	
 	public function getMonthlyRates($currency=643){		
 		
+		// $this->oSQL->startProfiling();
 		
 		$res = Array('YTD'=>1,'ROY'=>1, 'Total'=>1, 'Estimate'=>1);
 		for($m=1;$m<=15;$m++){
@@ -499,9 +500,9 @@ class Budget{
 					
 					break;
 				case 'Budget':
-					$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency, tbl_scenario
-								WHERE curTitle=scvVariableID AND scvScenarioID=scnLastID
-									AND scnID='{$this->id}'
+					$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency
+								WHERE curTitle=scvVariableID 
+									AND scvScenarioID='{$this->id}'
 									AND curID={$currency}";
 					$rs = $this->oSQL->q($sql);
 					$rw = $this->oSQL->f($rs);
@@ -517,7 +518,7 @@ class Budget{
 					break;
 			}
 			
-			
+			// $this->oSQL->showProfileInfo();
 			return ($res);
 			
 		} else {
