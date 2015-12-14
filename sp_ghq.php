@@ -11,6 +11,9 @@ $oBudget = new Budget($budget_scenario);
 
 $arrRates = $oBudget->getMonthlyRates($currency);
 
+$arrKeys = Array();
+$arrReport = Array('Air export'=>$arrKeys,'Air import'=>$arrKeys,'Ocean export'=>$arrKeys,'Ocean import'=>$arrKeys,'OCM'=>$arrKeys,'Warehouse'=>$arrKeys,'Land transport'=>$arrKeys);
+
 $arrJS[] = 'js/rep_totals.js';
 
 $sql = "SELECT * FROM vw_profit";
@@ -32,6 +35,7 @@ $colspan = $endMonth - $startMonth + 3;
 $sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
 		GROUP BY prtGHQ, pc";
 $rs = $oSQL->q($sql);
+
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
