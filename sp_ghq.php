@@ -28,7 +28,7 @@ $arrActions[] = Array('title'=>'Jan-Dec', 'action'=>'?mthStart=1&mthEnd=12');
 $arrActions[] = Array('title'=>'Apr-Mar', 'action'=>'?mthStart=4&mthEnd=15');
 $arrActions[] = Array('title'=>'Jan-Mar', 'action'=>'?mthStart=1&mthEnd=15');
 $startMonth = isset($_GET['mthStart'])?$_GET['mthStart']:1;
-$endMonth = isset($_GET['mthEnd'])?$_GET['mthEnd']:15;
+$endMonth = isset($_GET['mthEnd'])?$_GET['mthEnd']:$oBudget->length;
 $colspan = $endMonth - $startMonth + 3;
 
 
