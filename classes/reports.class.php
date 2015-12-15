@@ -18,6 +18,7 @@ class Reports{
 		
 		$this->oBudget = new Budget($params['budget_scenario']);
 		$this->oReference = $params['reference']?new Budget($params['reference']):$this->oBudget->reference_scenario;
+		
 		$this->Currency = $params['currency']?$params['currency']:643;
 		$this->Denominator = $params['denominator']?$params['denominator']:1;
 		$this->ID = md5(time());
@@ -837,7 +838,7 @@ class Reports{
 			SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `Budget item`, `Group`, `item`,
 					{$strFields_last}
 			FROM `vw_master` 			
-			{$sqlWhere} AND scenario='{$this->oBudget->reference_scenario->id}' AND Group_code=".self::GP_CODE."
+			{$sqlWhere} AND scenario='{$this->oReference->id}' AND Group_code=".self::GP_CODE."
 			GROUP BY Level1_code, Level1_title, `vw_master`.item, `Budget item`) Q
 			GROUP BY Level1_code, Level1_title, item, `Budget item`
 			ORDER BY Level1_title, `Group` ASC			
@@ -1210,7 +1211,7 @@ class Reports{
 			SELECT `Budget item`, `Group`, `item`,Group_code,
 					{$strFields_last}
 			FROM `vw_master` 			
-			{$sqlWhere} AND scenario='{$this->oBudget->reference_scenario->id}' 
+			{$sqlWhere} AND scenario='{$this->oReference->id}' 
 			{$sqlGroup}) Q
 			{$sqlGroup}
 			ORDER BY `Group` ASC			
@@ -1387,7 +1388,7 @@ class Reports{
 					SUM(ROY/{$arrRates['YTD']}) as ROY";
 			break;
 		case 'last':
-			$arrRates = $this->oBudget->reference_scenario->getMonthlyRates($this->Currency);
+			$arrRates = $this->oReference->getMonthlyRates($this->Currency);
 			$res=	str_repeat('0,',15)." \r\n".
 					str_repeat('0,',5)." \r\n".
 					"0 as Total, \r\n".
