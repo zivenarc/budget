@@ -6,6 +6,10 @@ include ('includes/inc_report_settings.php');
 
 if(!isset($_GET['pccGUID'])){
 	$oBudget = new Budget($budget_scenario);
+	if ($reference!=$oBudget->reference_scenario->id){
+		$oReference = new Budget($reference);
+		$strVsTitle = ' vs '.$oReference->title;
+	}
 	$arrJS[]='js/rep_pnl.js';
 	// $arrJS[]='js/input_form.js';	
 	
@@ -17,7 +21,7 @@ if(!isset($_GET['pccGUID'])){
 	$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");
 		
 	include ('includes/inc-frame_top.php');
-	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
+	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
 	include ('includes/inc_report_selectors.php');
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	
@@ -45,7 +49,7 @@ if(!isset($_GET['pccGUID'])){
 	
 	
 	// $sqlWhere .= " AND scenario='$budget_scenario'";
-	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator));
+	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator,'reference'=>$reference));
 	
 	switch ($type){
 		case 'activity':		
