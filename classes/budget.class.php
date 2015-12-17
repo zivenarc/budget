@@ -253,7 +253,7 @@ class Budget{
 				
 			}
 			
-			echo '<pre>',$sql,'</pre>';
+			// echo '<pre>',$sql,'</pre>';
 			$rs = $oSQL->q($sql);
 			
 			$arrGET = $_GET;
