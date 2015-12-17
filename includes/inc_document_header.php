@@ -2,7 +2,7 @@
 echo '<h1>';
 if ($oDocument->ID){
 	echo $oDocument->budget->title,' :: ';
-	echo $arrUsrData["pagTitle"];
+	echo $arrUsrData["pagTitle"], "# ",$oDocument->ID;
 } else {
  echo 'New ',$arrUsrData["pagTitle"];
 }
