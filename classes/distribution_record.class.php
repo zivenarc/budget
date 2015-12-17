@@ -11,6 +11,7 @@ class distribution_record extends table_record{
 		
 		if (count($data)){		
 			$this->customer = $data['customer'];
+			$this->profit = $data['pc'];
 			$this->comment = $data['comment'];
 			$this->unit = $data['unit'];			
 		}		
@@ -31,7 +32,7 @@ class distribution_record extends table_record{
 			//$oProduct = $Products->getByCode($this->product);
 			
 			$arrRes[] = "`company`='OOO'";
-			// $arrRes[] = "`pc`=".(integer)$this->profit;
+			$arrRes[] = "`pc`=".(integer)$this->profit;
 			$arrRes[] = "`source`='".$this->source."'";
 			$arrRes[] = "`scenario`='".$this->scenario."'";
 			$arrRes[] = "`customer`='".$this->customer."'";
@@ -41,7 +42,7 @@ class distribution_record extends table_record{
 			// $arrRes[] = "`agreement`=".(integer)$this->agreement;			
 			// $arrRes[] = "`buying_rate`=".(double)$this->buying_rate;
 			// $arrRes[] = "`buying_curr`='".$this->buying_curr."'";
-			// $arrRes[] = "`activity`=".(integer)$this->activity;
+			$arrRes[] = "`activity`=".(integer)$this->activity;
 			$arrRes[] = "`comment`=".$this->oSQL->e($this->comment);
 			$arrRes[] = "`unit`='".$this->unit."'";
 			// $arrRes[] = "`period`='".$this->period."'";

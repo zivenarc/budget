@@ -3,8 +3,10 @@ include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
 include_once ('classes/distribution_record.class.php');
 include_once ('classes/item.class.php');
+include_once ('classes/product.class.php');
 
 $Items = new Items();
+$Activities = new Activities();
 
 class Distribution extends Document{
 	
@@ -35,6 +37,7 @@ class Distribution extends Document{
 				
 		$this->total = $this->data[$this->prefix."Total"];
 		$this->item = $this->data[$this->prefix."ItemGUID"];
+		$this->activity = $this->data[$this->prefix."ActivityID"];
 				
 		if($this->GUID){
 			$this->subtotal = Array();
@@ -55,7 +58,7 @@ class Distribution extends Document{
 	
 		global $arrUsrData;
 		global $budget_scenario;
-		global $Items;
+		global $Items,$Activities;
 		
 		parent::defineEF();
 		
@@ -63,9 +66,21 @@ class Distribution extends Document{
 					'title'=>'Item'
 					,'field'=>$this->prefix.'ItemGUID'
 					,'type'=>'combobox'
-					,'sql'=>$Items->getStructuredRef()
+					// ,'sql'=>$Items->getStructuredRef()
+					,'sql'=>"SELECT itmGUID as optValue, itmTitle as optText FROM vw_item"
 					, 'mandatory' => true
 					, 'disabled'=>!$this->flagUpdate
+				);
+				
+		$this->Columns[] = Array(
+					'title'=>'Activity'
+					,'field'=>$this->prefix.'ActivityID'
+					,'type'=>'combobox'
+					,'sql'=>"SELECT prtID as optValue, prtTitle as optText FROM vw_product_type"
+					// ,'sql'=>$Activities->getStructuredRef()
+					, 'mandatory' => true
+					, 'disabled'=>!$this->flagUpdate
+					, 'defaultText'=>"[All]"
 				);
 		$this->Columns[] =Array(
 					'title'=>'Total'
@@ -126,6 +141,7 @@ class Distribution extends Document{
 		if($mode=='update' || $mode=='post'){						
 			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
 			$this->item = isset($_POST[$this->prefix.'ItemGUID'])?$_POST[$this->prefix.'ItemGUID']:$this->item;
+			$this->activity = isset($_POST[$this->prefix.'ActivityID'])?$_POST[$this->prefix.'ActivityID']:$this->activity;
 			$this->total = isset($_POST[$this->prefix.'Total'])?$_POST[$this->prefix.'Total']:$this->rate;
 		}
 		//-------------------Updating grid records---------------------------------
@@ -138,7 +154,9 @@ class Distribution extends Document{
 
 				if ($row){
 					if ($arrUpdated[$id]){				
-						$row->flagUpdated = true;				
+						$row->flagUpdated = true;	
+						$row->profit = $this->profit;						
+						$row->activity = $this->activity;						
 						$row->customer = isset($_POST['customer'][$id]) ? $_POST['customer'][$id] : $this->customer;						
 						$row->unit = $_POST['unit'][$id];					
 						for ($m=1;$m<=$this->budget->length;$m++){
@@ -254,7 +272,7 @@ class Distribution extends Document{
 					while ($rw = $this->oSQL->f($rs)){
 						$arrItemFilter[] = $rw['itmGUID'];
 					}
-					$strItemFilter = implode("','",$rw['itmGUID']);
+					$strItemFilter = implode("','",$arrItemFilter);
 				} else {
 					$strItemFilter = $this->item;
 				}
@@ -264,7 +282,9 @@ class Distribution extends Document{
 							AND pc='{$this->profit}'
 							AND item IN ('{$strItemFilter}')
 							AND IFNULL(customer,".self::EMPTY_CUSTOMER.")=".self::EMPTY_CUSTOMER."
+							".($this->activity?" AND activity={$this->activity}":"")."
 						GROUP BY item, activity;";
+				$this->log($sql);
 				$rs = $this->oSQL->q($sql);
 				while ($total = $this->oSQL->f($rs)){				
 					foreach($this->records[$this->gridName] as $id=>$record){
