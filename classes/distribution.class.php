@@ -245,12 +245,26 @@ class Distribution extends Document{
 			// print_r($this->subtotal);
 			if(is_array($this->records[$this->gridName])){
 				
-				$sql = "SELECT activity, ".$this->budget->getMonthlySumSQL()." FROM reg_master
+				$sql = "SELECT * FROM vw_item WHERE itmGUID='{$this->item}'";
+				$rs = $this->oSQL->q($sql);
+				$rw = $this->oSQL->f($rs);
+				if ($rw['itmFlagFolder']){
+					$sql = "SELECT * FROM vw_item WHERE itmParentID={$rw['itmID']}";
+					$rs = $this->oSQL->q($sql);
+					while ($rw = $this->oSQL->f($rs)){
+						$arrItemFilter[] = $rw['itmGUID'];
+					}
+					$strItemFilter = implode("','",$rw['itmGUID']);
+				} else {
+					$strItemFilter = $this->item;
+				}
+				
+				$sql = "SELECT activity, item, ".$this->budget->getMonthlySumSQL(1,$this->budget->length)." FROM reg_master
 						WHERE scenario='{$this->scenario}'
 							AND pc='{$this->profit}'
-							AND item='{$this->item}'
+							AND item IN ('{$strItemFilter}')
 							AND IFNULL(customer,".self::EMPTY_CUSTOMER.")=".self::EMPTY_CUSTOMER."
-						GROUP BY activity;";
+						GROUP BY item, activity;";
 				$rs = $this->oSQL->q($sql);
 				while ($total = $this->oSQL->f($rs)){				
 					foreach($this->records[$this->gridName] as $id=>$record){
@@ -259,9 +273,9 @@ class Distribution extends Document{
 							$master_row->profit = $this->profit;
 							$master_row->activity = $total['activity'];
 							$master_row->customer = $record->customer;					
-							$item = $Items->getById($this->item);
+							$item = $Items->getById($total['item']);
 							$master_row->account = $item->getYACT($this->profit);
-							$master_row->item = $this->item;
+							$master_row->item = $total['item'];
 							for($m=1;$m<=$this->budget->length;$m++){
 								$month = $this->budget->arrPeriod[$m];
 								$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]*$total[$month];
@@ -276,9 +290,9 @@ class Distribution extends Document{
 					$master_row->profit = $this->profit;
 					$master_row->activity = $total['activity'];
 					$master_row->customer = self::EMPTY_CUSTOMER;					
-					$item = $Items->getById($this->item);
+					$item = $Items->getById($total['item']);
 					$master_row->account = $item->getYACT($this->profit);
-					$master_row->item = $this->item;
+					$master_row->item = $total['item'];
 					for($m=1;$m<=$this->budget->length;$m++){
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -$total[$month];
