@@ -228,8 +228,14 @@ class Budget{
 		}
 		
 		foreach ($params as $key=>$value){
-			$sqlWhere .= " AND `{$key}`='{$value}'\r\n";
+			if (is_array($value)){
+				$sqlWhere .= " AND `{$key}` IN ('".implode("','",$value)."')\r\n";
+			} else {
+				$sqlWhere .= " AND `{$key}`='{$value}'\r\n";
+			}
 		}
+		
+		$sqlWhere .= " AND scenario='$budget_scenario'";
 		
 		ob_start();
 		?>
@@ -246,6 +252,8 @@ class Budget{
 						";
 				
 			}
+			
+			echo '<pre>',$sql,'</pre>';
 			$rs = $oSQL->q($sql);
 			
 			$arrGET = $_GET;
