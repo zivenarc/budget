@@ -253,7 +253,7 @@ class Reports{
 					<?php
 				};
 				echo "<td class='code-".$rw['customer']."'>",$rw['cntTitle'],'</td>';				
-				echo "<td class='budget-decimal'>",$this->render_ratio($arrRevenue[$rw['customer']]['Total'],$rw['Total'],0),'</td>';				
+				echo "<td class='budget-decimal'>",$this->render_ratio($arrRevenue[$rw['customer']]['Total']/10,$rw['Total'],0),'</td>';				
 				for ($m=1;$m<=12;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
