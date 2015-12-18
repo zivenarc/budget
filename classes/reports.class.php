@@ -214,7 +214,7 @@ class Reports{
 		GROUP BY customer";
 		$rs = $this->oSQL->q($sql); 
 		while ($rw = $this->oSQL->f($rs)){
-			$arrRevenue['customer'] = $rw;
+			$arrRevenue[$rw['customer']] = $rw;
 		}
 		
 		$sql = "SELECT cntTitle,customer, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
