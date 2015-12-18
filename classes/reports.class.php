@@ -205,12 +205,22 @@ class Reports{
 	
 	function whByCustomer($sqlWhere){
 		
+		require_once('item.class.php');
 		$empty = 1894;
+		
+		$sql = "SELECT customer, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
+		FROM reg_master 
+		{$sqlWhere} AND item='".Items::REVENUE."'
+		GROUP BY customer";
+		$rs = $this->oSQL->q($sql); 
+		while ($rw = $this->oSQL->f($rs)){
+			$arrRevenue['customer'] = $rw;
+		}
 		
 		$sql = "SELECT cntTitle,customer, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
 				FROM reg_rent 
 				LEFT JOIN vw_customer ON cntID=customer
-				{$sqlWhere} AND posted=1 
+				{$sqlWhere} AND posted=1 AND item='".Items::WH_RENT."'
 				GROUP BY customer";
 		$rs = $this->oSQL->q($sql); 
 		$tableID = "kpi_".md5($sql);
@@ -220,6 +230,7 @@ class Reports{
 			<thead>
 				<tr>
 					<th>Customer</th>
+					<th>Revenue per sqm</th>
 					<?php 
 					echo $this->oBudget->getTableHeader(); 
 					echo $this->oBudget->getTableHeader('quarterly'); 
@@ -240,6 +251,7 @@ class Reports{
 					<?php
 				};
 				echo "<td class='code-".$rw['customer']."'>",$rw['cntTitle'],'</td>';				
+				echo "<td class='budget-decimal'>",$this->render_ratio($arrRevenue[$rw['customer']],$rw['Total']),'</td>';				
 				for ($m=1;$m<=12;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
@@ -285,7 +297,7 @@ class Reports{
 			</tbody>
 			<tfoot>
 				<tr class='budget-subtotal'>
-					<td>Total space</td>
+					<td colspan='2'>Total space</td>
 					<?php
 					for ($m=1;$m<=12;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
@@ -303,7 +315,7 @@ class Reports{
 					?>
 				</tr>
 				<tr class='budget-subtotal budget-ratio'>
-					<td>Utilization, %</td>
+					<td colspan="2">Utilization, %</td>
 					<?php
 					for ($m=1;$m<=12;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];

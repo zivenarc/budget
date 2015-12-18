@@ -14,6 +14,7 @@ class distribution_record extends table_record{
 			$this->profit = $data['pc'];
 			$this->comment = $data['comment'];
 			$this->unit = $data['unit'];			
+			$this->item = $data['item'];			
 		}		
 		return (true);
 	}	
@@ -37,7 +38,7 @@ class distribution_record extends table_record{
 			$arrRes[] = "`scenario`='".$this->scenario."'";
 			$arrRes[] = "`customer`='".$this->customer."'";
 			// $arrRes[] = "`supplier`=".(integer)$this->supplier;
-			// $arrRes[] = "`item`='".$this->item."'";
+			$arrRes[] = "`item`='".$this->item."'";
 			//$arrRes[] = "`product`='".$this->product."'";
 			// $arrRes[] = "`agreement`=".(integer)$this->agreement;			
 			// $arrRes[] = "`buying_rate`=".(double)$this->buying_rate;

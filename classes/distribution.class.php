@@ -157,6 +157,7 @@ class Distribution extends Document{
 						$row->flagUpdated = true;	
 						$row->profit = $this->profit;						
 						$row->activity = $this->activity;						
+						$row->item = $this->item;						
 						$row->customer = isset($_POST['customer'][$id]) ? $_POST['customer'][$id] : $this->customer;						
 						$row->unit = $_POST['unit'][$id];					
 						for ($m=1;$m<=$this->budget->length;$m++){
