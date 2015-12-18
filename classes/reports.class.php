@@ -208,7 +208,8 @@ class Reports{
 		require_once('item.class.php');
 		$empty = 1894;
 		
-		$sql = "SELECT customer, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
+		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
+		$sql = "SELECT customer, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length, $arrRates).", SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total 
 		FROM reg_master 
 		{$sqlWhere} AND item='".Items::REVENUE."'
 		GROUP BY customer";
@@ -251,7 +252,7 @@ class Reports{
 					<?php
 				};
 				echo "<td class='code-".$rw['customer']."'>",$rw['cntTitle'],'</td>';				
-				echo "<td class='budget-decimal'>",$this->render_ratio($arrRevenue[$rw['customer']]['Total'],$rw['Total']),'</td>';				
+				echo "<td class='budget-decimal'>",$this->render_ratio($arrRevenue[$rw['customer']]['Total']/100,$rw['Total'],0),'</td>';				
 				for ($m=1;$m<=12;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
