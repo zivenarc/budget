@@ -264,7 +264,7 @@ class Location_costs extends Document{
 					$sqlWhere .= " AND wc=1";						
 					break;
 				case 'bc':
-					$sqlWhere = " AND wc=0";
+					$sqlWhere .= " AND wc=0";
 					break;
 				case 'users':
 						$sqlFrom .= " LEFT JOIN vw_employee ON empGUID1C=particulars
