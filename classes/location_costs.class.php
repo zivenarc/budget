@@ -274,7 +274,7 @@ class Location_costs extends Document{
 			}
 			
 			$sql = $sqlSelect.$sqlFrom.$sqlWhere.$sqlGroup;
-			// echo '<pre>';print($sql);echo '</pre>';						
+			$this->log($sql);
 			
 			$rs = $this->oSQL->q($sql);	
 			
@@ -316,7 +316,11 @@ class Location_costs extends Document{
 						$master_row->item = $record->item;
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
-							$master_row->{$month} = -$hc_data[$month]*($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)]/$headcount[$month]/$denominator;
+							if ($headcount[$month]) {
+								$master_row->{$month} = -$hc_data[$month]*($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)]/$headcount[$month]/$denominator;
+							} else {
+								$master_row->{$month} = 0;
+							}
 						}				
 												
 						
