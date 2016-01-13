@@ -8,6 +8,9 @@ require ('classes/budget.class.php');
 include ('includes/inc_report_settings.php');
 $oBudget = new Budget($budget_scenario);
 
+$arrKeys = Array();
+$arrReport = Array('Air export'=>$arrKeys,'Air import'=>$arrKeys,'Ocean export'=>$arrKeys,'Ocean import'=>$arrKeys,'OCM'=>$arrKeys,'Warehouse'=>$arrKeys,'Land transport'=>$arrKeys);
+
 $arrRates = $oBudget->getMonthlyRates($currency);
 
 $sql = "SELECT * FROM vw_profit";
