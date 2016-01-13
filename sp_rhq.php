@@ -482,12 +482,14 @@ while ($rw = $oSQL->f($rs)){
 
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
+include ('includes/inc_report_selectors.php');
 echo '<p>',$oBudget->timestamp,'</p>';
+
 ?>
 <table id='report' class='budget'>
 <thead>
 	<th>Item</th>
-	<?php echo $oBudget->getTableHeader('monthly'); ?>
+	<?php echo $oBudget->getTableHeader('monthly', $startMonth, $endMonth);?>
 	<th>Total</th>
 </thead>
 <tbody>
