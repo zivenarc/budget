@@ -487,7 +487,7 @@ echo '<p>',$oBudget->timestamp,'</p>';
 <table id='report' class='budget'>
 <thead>
 	<th>Item</th>
-	<?php echo Budget::getTableHeader('monthly'); ?>
+	<?php echo $oBudget->getTableHeader('monthly'); ?>
 	<th>Total</th>
 </thead>
 <tbody>
