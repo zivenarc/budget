@@ -28,8 +28,8 @@ $sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $
 		GROUP BY prtGHQ, pc";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=1;$m<13;$m++){
-		$month = (date('M',mktime(0,0,0,$m,15)));
+	for($m=$startMonth;$m<=$endMonth;$m++){
+			$month = $oBudget->arrPeriod[$m];
 		$arrPC[$rw['pc']][$rw['prtGHQ']][$month] += $rw[$month];
 		$arrSubtotal[$rw['pc']][$month] += $rw[$month];
 		$arrGHQSubtotal[$rw['prtGHQ']][$month] += $rw[$month];
@@ -494,7 +494,7 @@ echo '<p>',$oBudget->timestamp,'</p>';
 <?php
 foreach ($arrReport as $ghq=>$arrItems){
 	echo '<tr>';
-	echo '<th colspan="14">',$ghq,'</th>';
+	echo "<th colspan='{$colspan}'>",$ghq,'</th>';
 	echo "</tr>\r\n";
 	
 	foreach ($arrItems as $item=>$values){
@@ -510,7 +510,7 @@ foreach ($arrReport as $ghq=>$arrItems){
 }
 
 echo '<tr>';
-echo '<th colspan="14">Grand total</th>';
+echo "<th colspan='{$colspan}'>Grand total</th>";
 echo "</tr>\r\n";
 foreach ($arrGrandTotal as $item=>$values){
 		echo '<tr>';
