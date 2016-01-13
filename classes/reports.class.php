@@ -1394,7 +1394,7 @@ class Reports{
 			$res=	$this->oBudget->getMonthlySumSQL(1,15,$arrRates).", \r\n".
 					$this->oBudget->getQuarterlySumSQL($arrRates).", \r\n 
 					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total ,\r\n
-					SUM(".$this->oBudget->getYTDSQL(3,15,$arrRates).") as Total_AM ,\r\n
+					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as Total_AM ,\r\n
 					0 as estimate, 
 					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD_A, 
 					SUM(YTD/{$arrRates['YTD']}) as YTD, 
