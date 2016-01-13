@@ -53,6 +53,9 @@ class Reports{
 					echo $this->oBudget->getTableHeader('quarterly'); 
 					?>
 					<th class='budget-ytd'>Total</th>
+					<th class='budget-monthly'>Jan+</th>
+					<th class='budget-monthly'>Feb+</th>
+					<th class='budget-monthly'>Mar+</th>
 					<th>Q5</th>
 				</tr>
 			</thead>			
@@ -93,6 +96,11 @@ class Reports{
 				}				
 									
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';
+				for ($m=13;$m<=15;$m++){
+					// $month = $this->oBudget->arrPeriod[$m];
+					$month = $this->oBudget->arrPeriod[$m];
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
+				}
 				echo '<td class=\'budget-decimal budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
 				echo "</tr>\r\n";
 				$prtGHQ = $rw['prtGHQ'];
@@ -134,6 +142,9 @@ class Reports{
 					echo $this->oBudget->getTableHeader('quarterly'); 
 					?>
 					<th class='budget-ytd'>Total</th>
+					<th class='budget-monthly'>Jan+</th>
+					<th class='budget-monthly'>Feb+</th>
+					<th class='budget-monthly'>Mar+</th>
 					<th>Q5</th>
 				</tr>
 			</thead>			
@@ -170,6 +181,11 @@ class Reports{
 				}				
 									
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';
+				for ($m=13;$m<=15;$m++){
+					// $month = $this->oBudget->arrPeriod[$m];
+					$month = $this->oBudget->arrPeriod[$m];
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
+				}
 				echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
 				echo "</tr>\r\n";				
 			}
