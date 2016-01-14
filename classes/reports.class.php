@@ -1007,7 +1007,10 @@ class Reports{
 					<?php 
 					if ($this->oBudget->length>12){
 					?>
-						<th>Q5(Jan-Mar)</th>
+						<th class='budget-monthly'>Jan+</th>
+						<th class='budget-monthly'>Feb+</th>
+						<th class='budget-monthly'>Mar+</th>
+						<th class='budget-quarterly'>Q5(Jan-Mar)</th>
 						<th class='budget-ytd'><?php echo $this->oBudget->type=='Budget'?'Budget':'FYE';?> Apr-Mar</th>
 					<?php
 					}					
@@ -1470,7 +1473,7 @@ class Reports{
 		$local_subtotal = 0;
 		$ytd = 0;
 		$roy = 0;
-				for ($m=1;$m<13;$m++){
+				for ($m=1;$m<=12;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
 					?>
@@ -1495,8 +1498,17 @@ class Reports{
 				<td class='budget-decimal'><?php self::render($data['Total']-$data['estimate'],0);?></td>
 				<td class='budget-decimal'><em><?php self::render_ratio($data['Total'],$data['estimate']);?></em></td>
 				<?php 
-				if ($this->oBudget->length>12){ ?>
-					<td class='budget-decimal'><?php self::render($data['Q5'],0);?></td>				
+				if ($this->oBudget->length>12){ 
+					
+					for ($m=13;$m<=15;$m++){
+						// $month = $this->oBudget->arrPeriod[$m];
+						$month = $this->oBudget->arrPeriod[$m];
+						?>
+						<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
+						<?php
+						}
+					?>
+					<td class='budget-decimal budget-quarterly '><?php self::render($data['Q5'],0);?></td>				
 					<td class='budget-decimal budget-ytd'><?php self::render($data['Total_AM'],0);?></td>				
 				<?php };
 				if ($this->oBudget->type == 'FYE'){ ?>
