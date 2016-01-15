@@ -91,7 +91,7 @@ switch ($oNewBudget->type){
 		break;
 	case 'Actual':
 		$sql[] = "update tbl_scenario_variable, vw_currency 
-				SET scvValue=ROUND(IFNULL((SELECT AVG(curRate) FROM common_db.tbl_rate_history WHERE erhCurrencyID=curID AND YEAR(erhDate)='{$oNewBudget->year}'),1),2) 
+				SET scvValue=ROUND(IFNULL((SELECT AVG(erhRate) FROM common_db.tbl_rate_history WHERE erhCurrencyID=curID AND YEAR(erhDate)='{$oNewBudget->year}'),1),2) 
 				where scvVariableID=curTitle 
 					and scvScenarioID='{$new_budget}';";
 		break;
