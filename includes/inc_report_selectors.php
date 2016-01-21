@@ -27,7 +27,7 @@
 <div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
 </td>
 <td>
-<div class='f-row'><label for='reference'>Compare to</label><?php echo $oBudget->getScenarioSelect(Array('active'=>false,'name'=>'reference','budget_scenario'=>$reference); ?></div>
+<div class='f-row'><label for='reference'>Compare to</label><?php echo $oBudget->getScenarioSelect(Array('active'=>false,'name'=>'reference','budget_scenario'=>$reference)); ?></div>
 </td>
 </tr>
 </table>
