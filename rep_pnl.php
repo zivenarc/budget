@@ -4,6 +4,14 @@ require ('classes/budget.class.php');
 
 include ('includes/inc_report_settings.php');
 
+if ($bu_group){
+	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrBus[] = $rw['pccID']; 
+	}
+}
+
 if(!isset($_GET['pccGUID'])){
 	$oBudget = new Budget($budget_scenario);
 	if ($reference!=$oBudget->reference_scenario->id){
@@ -25,7 +33,8 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc_report_selectors.php');
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	
-	Budget::getProfitTabs('reg_master', true);
+	Budget::getProfitTabs('reg_master', true, Array('pccID'=>$arrBus));
+	
 	include ('includes/inc-frame_bottom.php');
 } else {
 	require ('classes/reports.class.php');
@@ -33,7 +42,13 @@ if(!isset($_GET['pccGUID'])){
 	
 	if ($_GET['pccGUID']=='all'){
 		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-		$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
+		
+		if ($bu_group){
+			$strBUs = implode(',',$arrBus);
+			$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1 AND pcrProfitID IN ({$strBUs})";
+		} else {		
+			$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
+		}
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){
 			$arrPC[] = $rw['pcrProfitID'];

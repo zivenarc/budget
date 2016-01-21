@@ -414,7 +414,7 @@ class Budget{
 		
 		switch ($params['type']){
 			case 'FYE':
-				$sqlWhere .= "scnType='FYE' ";
+				$sqlWhere .= "scnType IN('FYE','Actual') ";
 				break;
 			case 'Budget':
 				$sqlWhere .= "scnType='Budget' ";
@@ -571,6 +571,26 @@ class Budget{
 	
 	}
 	
+	function getBUGroupSelect(){
+		GLOBAL $bu_group;
+		
+		$sql = "SELECT * FROM common_db.tbl_profit WHERE pccFlagFolder=1";
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			$arrSelect[$rw['pccCode1C']] = $rw['pccTitle'];
+		}
+		$arrSelect[] = "---None---";
+		?>
+		<select name='bu_group' id='bu_group'>
+			<?php 
+				foreach($arrSelect as $key=>$value){
+					echo "<option value='{$key}' ".($key==$bu_group?'selected':'').">{$value}</option>";
+				}
+			?>
+		</select>
+		<?php
+			
+	}
 }
 
 ?>

@@ -21,6 +21,17 @@ if (isset($_GET['reference'])) {
 
 SetCookie('reference',$reference,0,'/budget/');
 
+//------------------------------------------- Business group ------------------------------------//
+if (isset($_GET['bu_group'])) {
+	$bu_group = $_GET['bu_group'];
+} elseif (isset($_COOKIE['bu_group'])) {
+	$bu_group = $_COOKIE['bu_group'];
+} else {
+	$bu_group = ""; 
+}
+
+SetCookie('bu_group',$bu_group,0,'/budget/');
+
 //------------------------------------------- Determine report currency ----------------------------------//
 if (isset($_GET['currency'])) {
 	$currency = $_GET['currency'];

@@ -55,7 +55,9 @@ $(document).ready(function(){
 	$('#reference').change(function(){		
 		location.search = 'reference='+$(this).val();
 	});	
-	
+	$('#bu_group').change(function(){		
+		location.search = 'bu_group='+$(this).val();
+	});	
 });
 
 function init_panel(o){
