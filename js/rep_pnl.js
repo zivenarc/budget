@@ -50,11 +50,11 @@ var header = document.title;
 $(document).ready(function(){
 	$('#tabs').tabs(tabs_options);
 	$('#budget_scenario').change(function(){		
-		$(this).wrap($('<form>',{method:'GET',id:'scenario'}));		
-		console.log($(this));
-		$('#scenario').submit();
+		location.search = 'budget_scenario='+$(this).val();
 	});
-		
+	$('#reference').change(function(){		
+		location.search = 'reference='+$(this).val();
+	});	
 	
 });
 

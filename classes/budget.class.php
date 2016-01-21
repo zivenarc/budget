@@ -423,11 +423,17 @@ class Budget{
 				break;
 		}
 		
-		$sql = "SELECT * FROM `vw_active_scenario` {$sqlWhere}";
+		if ($params['active']===false){
+			$sql = "SELECT * FROM `tbl_scenario` {$sqlWhere}";
+		} else {
+			$sql = "SELECT * FROM `vw_active_scenario` {$sqlWhere}";
+		}
 		$rs = $oSQL->q($sql);
 		ob_start();
+		
+		$id = $params['name']?$params['name']:'budget_scenario';
 		?>
-		<select name='budget_scenario' id='budget_scenario'>
+		<select name='<?php echo $id;?>' id='<?php echo $id;?>'>
 		<?php
 		while ($rw=$oSQL->f($rs)){
 			echo "<option ".($scnID==$rw['scnID']?'SELECTED':'')." value='{$rw['scnID']}'>{$rw["scnTitle$strLocal"]}</option>";
