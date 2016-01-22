@@ -22,6 +22,8 @@ class Reports{
 		$this->Currency = $params['currency']?$params['currency']:643;
 		$this->Denominator = $params['denominator']?$params['denominator']:1;
 		$this->ID = md5(time());
+		
+		$this->YACT = $params['yact']?true:false;
 		// echo '<pre>';print_r($this);echo '</pre>';
 	
 	}
@@ -849,28 +851,40 @@ class Reports{
 		
 	}
 	
-	public function periodicPnL($sqlWhere, $params = Array('field_data','field_title','title')){
+	public function periodicPnL($sqlWhere, $params = Array('field_data','field_title','title','yact'=>false)){
 		
 		$strFields_this = $this->_getMonthlyFields();
 		$strFields_last = $this->_getMonthlyFields('last');
 		
+		if ($this->YACT){
+			$strAccountTitle = "title";
+			$strAccountGroup = "yact_group";
+			$strAccountCode = "account";
+			$strGPFilter = "yact_group_code IN ('400000','450000')"; 
+		} else {
+			$strAccountTitle = "Budget item";
+			$strAccountGroup = "Group";
+			$strAccountCode = "item";
+			$strGPFilter = "Group_code=".self::GP_CODE; 
+		}
+		
 		ob_start();
 		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15).",\r\n".
 				$this->oBudget->getQuarterlySumSQL().
-				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,Level1_title,level1_code,`Budget item`,`Group`, `item`
+				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,Level1_title,level1_code,`{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item'
 			FROM 
-			(SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `Budget item`, `Group`, `item`,
+			(SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
 					{$strFields_this}
 			FROM `vw_master` 			
-			{$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=".self::GP_CODE." ## Gross margin only
-			GROUP BY Level1_code, Level1_title, `vw_master`.item, `Budget item`
+			{$sqlWhere} AND scenario='{$this->oBudget->id}' AND {$strGPFilter} ## Gross margin only
+			GROUP BY Level1_code, Level1_title, `{$strAccountCode}` , `{$strAccountTitle}`
 			UNION ALL
-			SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `Budget item`, `Group`, `item`,
+			SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
 					{$strFields_last}
 			FROM `vw_master` 			
-			{$sqlWhere} AND scenario='{$this->oReference->id}' AND Group_code=".self::GP_CODE."
-			GROUP BY Level1_code, Level1_title, `vw_master`.item, `Budget item`) Q
-			GROUP BY Level1_code, Level1_title, item, `Budget item`
+			{$sqlWhere} AND scenario='{$this->oReference->id}' AND {$strGPFilter}
+			GROUP BY Level1_code, Level1_title,  `{$strAccountCode}` , `{$strAccountTitle}`) Q
+			GROUP BY Level1_code, Level1_title, `item` , `Budget item`
 			ORDER BY Level1_title, `Group` ASC			
 			";
 		// echo '<pre>',$sql,'</pre>';

@@ -1,67 +1,93 @@
 <?php
-//$flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
 
-$budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
+include ('includes/inc_report_settings.php');
 
+if ($bu_group){
+	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrBus[] = $rw['pccID']; 
+	}
+}
 
 if(!isset($_GET['pccGUID'])){
 	$oBudget = new Budget($budget_scenario);
+	if ($reference!=$oBudget->reference_scenario->id){
+		$oReference = new Budget($reference);
+		$strVsTitle = ' vs '.$oReference->title;
+	}
 	$arrJS[]='js/rep_pnl.js';
 	// $arrJS[]='js/input_form.js';	
+	
+	$arrActions[] = Array ('title'=>'By customer group','action'=>"?type=customer_group");
+	$arrActions[] = Array ('title'=>'By customer','action'=>"?type=customer");
+	$arrActions[] = Array ('title'=>'By activity','action'=>"?type=activity");
+	$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
+	$arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");
+	$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");
+		
 	include ('includes/inc-frame_top.php');
-	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
-	?>
-	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
-	<?php
-	Budget::getProfitTabs('reg_master', true);
+	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
+	include ('includes/inc_report_selectors.php');
+	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
+	
+	Budget::getProfitTabs('reg_master', true, Array('pccID'=>$arrBus));
+	
 	include ('includes/inc-frame_bottom.php');
 } else {
 	require ('classes/reports.class.php');
-	?>
-	<input type='hidden' id='request_uri' value='<?php echo $_SERVER['REQUEST_URI'];?>'/>
-	<input type='hidden' id='pccGUID' value='<?php echo $_GET['pccGUID'];?>'/>
-	<div class="report-radio f-row">
-	<div id='period_switch'>
-		<input type='radio' id='period_monthly_<?php echo $_GET['pccGUID'];?>' name='period' value='monthly'/>
-		<label for='period_monthly_<?php echo $_GET['pccGUID'];?>'>Monthly</label>
-		<input type='radio' checked id='period_quarterly_<?php echo $_GET['pccGUID'];?>' name='period' value='quarterly'/>
-		<label for='period_quarterly_<?php echo $_GET['pccGUID'];?>'>Quarterly</label>
-	</div>
-	<div id='detail_switch'>
-		<input type='radio' id='detail_all_<?php echo $_GET['pccGUID'];?>' checked name='detail' value='all'/>
-		<label for='detail_all_<?php echo $_GET['pccGUID'];?>'>Details</label>
-		<input type='radio' id='detail_totals_<?php echo $_GET['pccGUID'];?>' name='detail' value='totals'/>
-		<label for='detail_totals_<?php echo $_GET['pccGUID'];?>'>Totals</label>
-	</div>
-	</div>
-	<?php
+	include ('includes/inc_report_buttons.php');
+	
 	if ($_GET['pccGUID']=='all'){
 		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-		$sqlWhere = "WHERE pc in (SELECT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles))";
+		
+		if ($bu_group){
+			$strBUs = implode(',',$arrBus);
+			$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1 AND pcrProfitID IN ({$strBUs})";
+		} else {		
+			$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
+		}
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){
+			$arrPC[] = $rw['pcrProfitID'];
+		}
+		$sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
 	} else {
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 	}
-	// switch ($_GET['pccGUID']){
-		// case 'f865db6b-d328-102e-9d25-5de97ba9df63':
-		// case 'f865e1de-d328-102e-9d25-5de97ba9df63':
-		// case 'all':
-			echo "<input type='hidden' id='group' value='activity'/>";
-			Reports::masterYactByActivityEst($sqlWhere." AND scenario='$budget_scenario'");	
-		// break;
-		// case 'f865e855-d328-102e-9d25-5de97ba9df63':
-			// $sqlWhere = "WHERE (pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") OR (customer=9907 AND Group_code=94))";
-		// default:
-			// echo "<input type='hidden' id='group' value='customer'/>";
-			// Reports::masterYactByCustomerEst($sqlWhere." AND scenario='$budget_scenario'");
-			// break;
-	// }
-	?>
-		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("report_<?php echo $_GET['pccGUID'];?>");'>Select table</a></li>
-		</ul>
-	<?php
+	
+	if ($_GET['nowh']){
+		$sqlWhere .= " AND pc NOT in (5,15)";
+	}
+	
+	
+	// $sqlWhere .= " AND scenario='$budget_scenario'";
+	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator,'reference'=>$reference, 'yact'=>true));
+	
+	switch ($type){
+		case 'activity':		
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity'));	
+			break;
+		case 'ghq':
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
+			break;
+		case 'sales':			
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'sales','field_title'=>'usrTitle','title'=>'Responsible'));	
+			break;
+		case 'pc':			
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'pc','field_title'=>'Profit','title'=>'PC'));	
+			break;
+		case 'customer':
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'customer','field_title'=>'Customer_name','title'=>'Customer'));
+			break;
+		case 'customer_group':
+		default:			
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'CASE WHEN Customer_group_code=723 THEN customer ELSE Customer_group_code END','field_title'=>'CASE WHEN Customer_group_code=723 THEN Customer_name ELSE Customer_group_title END','title'=>'Customer group'));
+			break;
+	}
+
 }
 
 
