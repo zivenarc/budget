@@ -860,7 +860,7 @@ class Reports{
 			$strAccountTitle = "title";
 			$strAccountGroup = "yact_group";
 			$strAccountCode = "account";
-			$strGPFilter = "yact_group_code IN ('500000')"; 
+			$strGPFilter = "yact_group_code IN ('449000','499000')"; 
 		} else {
 			$strAccountTitle = "Budget item";
 			$strAccountGroup = "Group";
