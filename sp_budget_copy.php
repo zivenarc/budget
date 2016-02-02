@@ -59,8 +59,8 @@ switch ($oNewBudget->type){
 		$sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item, source, estimate, ytd, roy, scenario, active)
 				SELECT company, pc, activity, customer, account, item, 'Estimate', 
 						SUM(".$oBudget->getYTDSQL().") as FYE,
-						SUM(".$oBudget->getYTDSQL(1,date('m',$oNewBudget->date_start)-1).") as YTD, 
-						SUM(".$oBudget->getYTDSQL(date('m',$oNewBudget->date_start),12).") as ROY, 
+						SUM(".$oBudget->getYTDSQL(1,date('n',$oNewBudget->date_start)-1).") as YTD, 
+						SUM(".$oBudget->getYTDSQL(date('n',$oNewBudget->date_start),12).") as ROY, 
 						'{$new_budget}', active
 					FROM reg_master WHERE scenario=@refID AND active=1 AND estimate=0
 					GROUP BY company, pc, activity, customer, account, item
