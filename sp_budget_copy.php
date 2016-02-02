@@ -86,8 +86,12 @@ $sql [] = "INSERT INTO tbl_scenario_variable (scvVariableID, scvScenarioID, scvV
 				FROM tbl_scenario_variable WHERE scvScenarioID='{$old_budget}';";
 switch ($oNewBudget->type){
 	case 'FYE':
-		$sql[] = "update tbl_scenario_variable, vw_currency set scvValue=ROUND(IFNULL(curRate,1),2) where
-				scvVariableID=curTitle and scvScenarioID='{$new_budget}';";
+		// $sql[] = "update tbl_scenario_variable, vw_currency set scvValue=ROUND(IFNULL(curRate,1),2) where
+				// scvVariableID=curTitle and scvScenarioID='{$new_budget}';";
+	$sql[] = "update tbl_scenario_variable, vw_currency 
+					SET scvValue=ROUND(IFNULL((SELECT AVG(erhRate) FROM common_db.tbl_rate_history WHERE erhCurrencyID=curID AND YEAR(erhDate)='{$oNewBudget->year}'),1),2) 
+					where scvVariableID=curTitle 
+						and scvScenarioID='{$new_budget}';";				
 		break;
 	case 'Actual':
 		$sql[] = "update tbl_scenario_variable, vw_currency 
