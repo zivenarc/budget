@@ -22,6 +22,7 @@ $arrKPI[] = Array('prtID'=>3,'ghq'=>'Transportation','kpi'=>'COUNT(DISTINCT jobI
 $arrKPI[] = Array('prtID'=>4,'ghq'=>'Customs','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>13,'ghq'=>'Int.trucking','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>50,'ghq'=>'AFF c/c','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>69,'ghq'=>'Rail','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 
 $sql = Array();
 
