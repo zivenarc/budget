@@ -24,8 +24,8 @@ $sql[] = "SET @scenario='{$oBudget->id}'";
 $sql[] = "DELETE FROM `reg_sales` WHERE scenario=@scenario AND source='Actual';";
 
 for ($i=0; $i<count($arrKPI);$i++){
-	$sql[] = "SELECT  @prtID:=prtID, @jobGHQ:=prtGHQ, @unit=prtUnit 
-				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']}, ;";
+	$sql[] = "SELECT  @prtID:=prtID, @jobGHQ:=prtGHQ, @unit:=prtUnit 
+				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']};";
 	for($m=1;$m<=$ytd;$m++){
 	
 	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
