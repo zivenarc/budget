@@ -1262,6 +1262,7 @@ class Reports{
 		$rw['Budget item'] = "Operating income";
 		$this->echoBudgetItemString($rw,'budget-subtotal');
 		
+		
 	}
 	
 	private function no_firstLevelPeriodic($sqlWhere){
@@ -1432,14 +1433,56 @@ class Reports{
 			
 		//------ Operating income -------
 		
-		// $sqlOps = str_replace($sqlWhere, $sqlWhere." AND account NOT LIKE '6%'", $sql);
-		// $sqlOps = str_replace($sqlGroup, '', $sqlOps);
-		// $rs = $oSQL->q($sqlOps);
-		// while ($rw = $oSQL->f($rs)){
-			// $rw['Budget item'] = "Operating income";
-			// self::echoMRItemString($rw,'budget-subtotal');
-		// }
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND account NOT LIKE '6%'", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $oSQL->q($sqlOps);
+		while ($rw = $oSQL->f($rs)){
+			$rw['Budget item'] = "Operating income";
+			self::echoMRItemString($rw,'budget-subtotal');
+		}
+		
+		//------- KPIs -----------------
+		
+		echo '<tr><th colspan="13">Operational KPIs</th></tr>';
+		
+		$sql = "SELECT activity, unit, 
+					{$strFields['actual']}
+			FROM `reg_sales`			
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND source='Actual'
+			GROUP BY activity, unit
+			UNION ALL
+			SELECT activity, unit, 
+					{$strFields['next']}
+			FROM `reg_sales`			
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1
+			GROUP BY activity, unit
+			UNION ALL
+				SELECT activity, unit, 
+				{$strFields['budget']}
+			FROM `reg_sales`				
+			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND kpi=1 AND posted=1 
+			GROUP BY activity, unit
+			ORDER BY activity, unit";
 			
+		$sql = "SELECT prtTitle, activity, unit, 
+					SUM(CM_A) as CM_A,
+					SUM(CM_B) as CM_B,
+					SUM(YTD_A) as YTD_A,
+					SUM(YTD_B) as YTD_B,
+					SUM(NM_A) as NM_A,
+					SUM(NM_B) as NM_B					
+				FROM ($sql) U
+				LEFT JOIN vw_product_type ON activity=prtID
+				WHERE unit<>''
+				GROUP BY activity, unit
+				ORDER BY prtGHQ";
+		// echo '<pre>',$sql,'</pre>';
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){			
+			$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
+			self::echoMRItemString($rw);
+		}	
+	
 	}
 	
 	private function _getMonthlyFields($type='this'){
@@ -1489,6 +1532,12 @@ class Reports{
 		$res['actual']=	"SUM(`{$cm}`)/{$arrRates[$cm]} as CM_A, 
 						0 as CM_B,								
 						SUM(".$this->oBudget->getYTDSQL(1,$nCurrent,$arrRates).") as YTD_A ,
+						0 as YTD_B, 
+						SUM(`$nm`)/{$arrRates[$nm]} as NM_A , 
+						0 as NM_B";
+		$res['next']=	"0 as CM_A, 
+						0 as CM_B,								
+						0 as YTD_A ,
 						0 as YTD_B, 
 						SUM(`$nm`)/{$arrRates[$nm]} as NM_A , 
 						0 as NM_B";
