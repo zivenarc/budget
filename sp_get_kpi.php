@@ -35,13 +35,13 @@ for ($i=0; $i<count($arrKPI);$i++){
 	$sql[] = "SET @dateStart:='{$repDateStart}', @dateEnd:='{$repDateEnd}'";
 	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
 				SELECT jobProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1,cntUserID
-				FROM tbl_job
-				JOIN vw_counterparty ON cntID=jobCustomerID
+				FROM nlogjc.tbl_job
+				JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
 				WHERE {$arrKPI[$i]['date']} BETWEEN @dateStart AND @dateEnd
 					AND jobStatusID BETWEEN 15 AND 40
 					AND (SELECT COUNT(jitGUID) 
-								FROM tbl_job_item 
-								LEFT JOIN vw_product ON prdID=jitProductID 
+								FROM nlogjc.tbl_job_item 
+								LEFT JOIN common_db.tbl_product ON prdID=jitProductID 
 								WHERE jitJobID=jobID AND prdCategoryID=@prtID
 								)>0				
 				GROUP BY jobCustomerID, jobProfitID
