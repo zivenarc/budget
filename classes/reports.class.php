@@ -31,10 +31,9 @@ class Reports{
 	public function salesByActivity($sqlWhere=''){
 		GLOBAL $oSQL;
 		ob_start();
-			$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', vw_product_type.prtUnit as 'Unit', ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
-					FROM `reg_sales`
-					LEFT JOIN vw_product ON prdID=product
-					LEFT JOIN vw_product_type ON prtID=prdCategoryID
+			$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', prtUnit as 'Unit', ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
+					FROM `reg_sales`					
+					LEFT JOIN vw_product_type ON prtID=activity
 					$sqlWhere AND posted=1 AND kpi=1
 					GROUP BY `reg_sales`.`activity`, `reg_sales`.`unit`
 					ORDER BY prtGHQ, prtRHQ";
