@@ -13,8 +13,10 @@ if ($oBudget->type=='Budget') die('Wrong budget type, cannot fill in the actuals
 $ytd = date('n',$oBudget->date_start-1);echo $ytd;
 $year = date('Y',$oBudget->date_start-1);
 
-$arrKPI[] = Array('prtID'=>48,'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)');
-$arrKPI[] = Array('prtID'=>63,'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)');
+$arrKPI[] = Array('prtID'=>48,'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'jobETAPort');
+$arrKPI[] = Array('prtID'=>63,'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>46,'ghq'=>'Air import','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobETAPort');
+$arrKPI[] = Array('prtID'=>47,'ghq'=>'Air export','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobShipmentDate');
 
 $sql = Array();
 
@@ -22,7 +24,8 @@ $sql[] = "SET @scenario='{$oBudget->id}'";
 $sql[] = "DELETE FROM `reg_sales` WHERE scenario=@scenario AND source='Actual';";
 
 for ($i=0; $i<count($arrKPI);$i++){
-	$sql[] = "SET @prtID:={$arrKPI[$i]['prtID']}, @jobGHQ:='{$arrKPI[$i]['ghq']}';";
+	$sql[] = "SELECT  @prtID:=prtID, @jobGHQ:=prtGHQ, @unit=prtUnit 
+				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']}, ;";
 	for($m=1;$m<=$ytd;$m++){
 	
 	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
@@ -30,11 +33,11 @@ for ($i=0; $i<count($arrKPI);$i++){
 	$month = $oBudget->arrPeriod[$m];
 
 	$sql[] = "SET @dateStart:='{$repDateStart}', @dateEnd:='{$repDateEnd}'";
-	$sql[] = "INSERT INTO reg_sales (pc,activity,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
-				SELECT jobProfitID, @prtID, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1,cntUserID
+	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
+				SELECT jobProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1,cntUserID
 				FROM nlogjc.tbl_job 
 				JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
-				WHERE jobETAPort BETWEEN @dateStart AND @dateEnd AND jobGHQ=@jobGHQ
+				WHERE jobETAPort BETWEEN @dateStart AND @dateEnd AND jobGHQ=@jobGHQ AND jobStatusID BETWEEN 15 AND 40
 				GROUP BY jobCustomerID, jobProfitID
 				HAVING  {$arrKPI[$i]['kpi']} IS NOT NULL";
 	};
