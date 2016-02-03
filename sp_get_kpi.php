@@ -41,7 +41,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 };
 
 for ($i=0;$i<count($sql);$i++){
-	$oSQL->q($sql);
+	$oSQL->q($sql[$i]);
 }
 
 
