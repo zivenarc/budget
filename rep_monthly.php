@@ -4,7 +4,13 @@ require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
-
+if ($bu_group){
+	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrBus[] = $rw['pccID']; 
+	}
+}
 
 $oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$reference));
 
@@ -12,8 +18,9 @@ $oBudget = new Budget($budget_scenario);
 if ($reference!=$oBudget->reference_scenario->id){
 	$oReference = new Budget($reference);
 	$strVsTitle = ' vs '.$oReference->title;
+} else {
+	$reference = $oBudget->reference_scenario->id;
 }
-
 if(!isset($_GET['pccGUID'])){
 	
 	$arrJS[]='js/rep_pnl.js';
@@ -27,11 +34,10 @@ if(!isset($_GET['pccGUID'])){
 	
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
-	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
-	?>
-	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect(Array('type'=>'FYE'));?></div>
-	<?php
-	$oBudget->getProfitTabs('reg_master', true);
+	include ('includes/inc_report_selectors.php');
+	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';	
+	
+	$oBudget::getProfitTabs('reg_master', true, Array('pccID'=>$arrBus));
 	include ('includes/inc-frame_bottom.php');
 } else {
 	
@@ -46,7 +52,18 @@ if(!isset($_GET['pccGUID'])){
 	
 	if ($_GET['pccGUID']=='all'){
 		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-		$sqlWhere = "WHERE pc in (SELECT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1)";
+		
+		if ($bu_group){
+			$strBUs = implode(',',$arrBus);
+			$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1 AND pcrProfitID IN ({$strBUs})";
+		} else {		
+			$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
+		}
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){
+			$arrPC[] = $rw['pcrProfitID'];
+		}
+		$sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
 	} else {
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 	}

@@ -9,6 +9,10 @@ include ('includes/inc_report_settings.php');
 $oBudget = new Budget($budget_scenario);
 $ytd = date('n',$oBudget->date_start-1);echo $ytd;
 
+echo $oBudget->type;
+if ($oBudget->type=='Budget') die('Wrong budget type, cannot fill in the actuals');
+
+
 //------------------------------------Fill in the actual data-------------------
 $sql = Array();
 $sql[] = "START TRANSACTION;";
