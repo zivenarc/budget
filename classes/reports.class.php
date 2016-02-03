@@ -31,16 +31,42 @@ class Reports{
 	public function salesByActivity($sqlWhere=''){
 		GLOBAL $oSQL;
 		ob_start();
-			$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', prtUnit as 'Unit', ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
-					FROM `reg_sales`					
-					LEFT JOIN vw_product_type ON prtID=activity
-					$sqlWhere AND posted=1 AND kpi=1
-					GROUP BY `reg_sales`.`activity`, `reg_sales`.`unit`
-					ORDER BY prtGHQ, prtRHQ";
+			
+			switch ($this->oBudget->type){
+				case 'Budget':
+					$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', prtUnit as 'Unit', ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
+							FROM `reg_sales`					
+							LEFT JOIN vw_product_type ON prtID=activity
+							{$sqlWhere} AND posted=1 AND kpi=1
+							GROUP BY `reg_sales`.`activity`, `reg_sales`.`unit`
+							ORDER BY prtGHQ, prtRHQ";
+					break;
+				default:	
+					$mthStart = (integer)date('n',$this->oBudget->date_start);					
 					
+					$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', prtUnit as 'Unit',
+							".$this->oBudget->getMonthlySumSQL(1,15).",
+							SUM(".$this->oBudget->getYTDSQL().") as Total, SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
+						FROM 
+							(SELECT pc, activity, unit,
+									".$this->oBudget->getMonthlySumSQL(1,15)."
+							FROM `reg_sales` 			
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual'
+							GROUP BY activity, unit
+							UNION ALL
+							SELECT pc, activity, unit,
+									".str_repeat("0, ",$mthStart-1).$this->oBudget->getMonthlySumSQL($mthStart,15)."
+							FROM `reg_sales` 			
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual'
+							GROUP BY activity, unit) U
+					LEFT JOIN vw_product_type ON prtID=activity
+					GROUP BY U.activity, unit
+					ORDER BY prtGHQ, activity ASC";		
+					break;
+			}		
 			$rs = $oSQL->q($sql);
 			if (!$oSQL->num_rows($rs)){
-				echo "<div class='warning'>No data found</div>";
+				echo "<div class='warning'>No sales KPI found</div>";
 				return (false);
 			}
 			$tableID = "kpi_".md5($sql);
