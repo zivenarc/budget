@@ -935,16 +935,24 @@ class Reports{
 		switch($type){
 			case 'activity':
 				$sqlMeasure = "Activity_title as 'Level1_title', activity as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'Activity';
 				break;
 			case 'customer':
 				$sqlMeasure = "Customer_name as 'Level1_title', customer as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'Customer';
+				break;
+			case 'sales':
+				$sqlMeasure = "usrTitle as 'Level1_title', sales as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'BDV employee';
 				break;
 			case 'pc':
 				$sqlMeasure = "Profit as 'Level1_title', pc as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'Businessunit';
 				break;
 			case 'ghq':
 			default:
 				$sqlMeasure = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'GHQ segment';
 				break;
 		}
 		
@@ -980,7 +988,7 @@ class Reports{
 				ORDER BY `level1_code`, `Group`, `itmOrder` ASC";
 			
 			
-			self::firstLevelReportMR($sql, 'Activity', $oBudget);
+			self::firstLevelReportMR($sql, $strGroupTitle, $oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
 			self::noFirstLevelReportMR($sqlWhere, $this->currency);
