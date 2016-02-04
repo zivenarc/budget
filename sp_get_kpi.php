@@ -55,6 +55,34 @@ for ($i=0; $i<count($arrKPI);$i++){
 	};
 };
 
+//-------------- Intercompany -----------------
+$arrKPI[] = Array('prtID'=>3,'ghq'=>'Transport','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>6,'ghq'=>'Delivery to plant','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>11,'ghq'=>'Shunting','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+for ($i=0; $i<count($arrKPI);$i++){
+	$sql[] = "SELECT  @prtID:=prtID, @jobGHQ:=prtGHQ, @unit:=prtUnit 
+				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']};";
+	for($m=1;$m<=$ytd;$m++){
+	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
+	$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
+	$month = $oBudget->arrPeriod[$m];
+	$sql[] = "SET @dateStart:='{$repDateStart}', @dateEnd:='{$repDateEnd}'";
+	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
+				SELECT jobOwnerProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1,cntUserID
+				FROM intercompany.tbl_job
+				JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
+				WHERE {$arrKPI[$i]['date']} BETWEEN @dateStart AND @dateEnd
+					AND jobStatusID BETWEEN 15 AND 40
+					AND (SELECT COUNT(jitGUID) 
+								FROM intercompany.tbl_job_item 
+								LEFT JOIN common_db.tbl_product ON prdID=jitProductID 
+								WHERE jitJobID=jobID AND prdCategoryID=@prtID
+								)>0				
+				GROUP BY jobCustomerID, jobProfitID
+				HAVING  {$arrKPI[$i]['kpi']} IS NOT NULL";
+	};
+};
+
 for ($i=0;$i<count($sql);$i++){
 	echo '<pre>',$sql[$i],'</pre>';
 	$oSQL->q($sql[$i]);
