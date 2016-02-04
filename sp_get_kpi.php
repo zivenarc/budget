@@ -56,9 +56,11 @@ for ($i=0; $i<count($arrKPI);$i++){
 };
 
 //-------------- Intercompany -----------------
+$arrKPI = Array();
 $arrKPI[] = Array('prtID'=>3,'ghq'=>'Transport','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>6,'ghq'=>'Delivery to plant','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>11,'ghq'=>'Shunting','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+
 for ($i=0; $i<count($arrKPI);$i++){
 	$sql[] = "SELECT  @prtID:=prtID, @jobGHQ:=prtGHQ, @unit:=prtUnit 
 				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']};";
