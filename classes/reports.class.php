@@ -941,13 +941,18 @@ class Reports{
 				$sqlMeasure = "Customer_name as 'Level1_title', customer as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
 				$strGroupTitle = 'Customer';
 				break;
+			case 'customer_group':
+				$sqlMeasure = "CASE WHEN Customer_group_code=723 THEN Customer_name ELSE Customer_group_title END as 'Level1_title'
+						, CASE WHEN Customer_group_code=723 THEN customer ELSE Customer_group_code END as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'Customer group';
+				break;
 			case 'sales':
 				$sqlMeasure = "usrTitle as 'Level1_title', sales as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
 				$strGroupTitle = 'BDV employee';
 				break;
 			case 'pc':
 				$sqlMeasure = "Profit as 'Level1_title', pc as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
-				$strGroupTitle = 'Businessunit';
+				$strGroupTitle = 'Business unit';
 				break;
 			case 'ghq':
 			default:
