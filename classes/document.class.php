@@ -508,7 +508,7 @@ class Document extends easyForm{
 		echo json_encode($jsonData);
 	}
 	
-	public function setMonthlyEG($type='decimal'){
+	public function setMonthlyEG($type='decimal', $flagDisableActual=true){
 		
 		if(!$this->grid) return (false);
 		$start = (integer)date('n',$this->budget->date_start);
@@ -519,7 +519,7 @@ class Document extends easyForm{
 			$strClassDisabled = '';
 			
 			if ($this->budget->type=='FYE'){				
-				if ($m < $start) {
+				if ($m < $start && $flagDisableActual) {
 					$flagDisabled = true;
 					$strClassDisabled = ' budget-inactive';
 				}

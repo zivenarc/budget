@@ -106,7 +106,7 @@ class MSF extends Document{
 		);
 		
 	
-		$this->setMonthlyEG('decimal');
+		$this->setMonthlyEG('decimal', false);
 		
 		$this->grid->Columns[] =Array(
 			'title'=>'Average'
