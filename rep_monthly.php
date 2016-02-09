@@ -79,6 +79,9 @@ if(!isset($_GET['pccGUID'])){
 		case 'sales':		
 			$oReport->monthlyReport($sqlWhere, 'sales');	
 			break;
+		case 'customer_group':		
+			$oReport->monthlyReport($sqlWhere, 'customer_group');	
+			break;
 		case 'ghq':
 			echo "<input type='hidden' id='group' value='activity'/>";
 			$oReport->monthlyReport($sqlWhere,'ghq');	
