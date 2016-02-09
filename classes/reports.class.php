@@ -1494,7 +1494,47 @@ class Reports{
 		while ($rw = $oSQL->f($rs)){			
 			$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
 			self::echoMRItemString($rw);
-		}	
+		}
+
+		//------- Headcount -----------------
+		
+		echo '<tr><th colspan="13">Headcount</th></tr>';
+		
+		$sql = "SELECT  wc, 
+					{$strFields['actual']}
+			FROM `reg_headcount`			
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND posted=1 AND source='Actual' AND salary>50
+			GROUP BY  wc
+			UNION ALL
+			SELECT  wc, 
+					{$strFields['next']}
+			FROM `reg_headcount`			
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND posted=1 AND salary>50
+			GROUP BY  wc
+			UNION ALL
+				SELECT  wc, 
+				{$strFields['budget']}
+			FROM `reg_headcount`				
+			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND posted=1  AND salary>50
+			GROUP BY  wc
+			ORDER BY  wc";
+			
+		$sql = "SELECT   wc, 
+					SUM(CM_A) as CM_A,
+					SUM(CM_B) as CM_B,
+					SUM(YTD_A) as YTD_A,
+					SUM(YTD_B) as YTD_B,
+					SUM(NM_A) as NM_A,
+					SUM(NM_B) as NM_B					
+				FROM ($sql) U	
+				GROUP BY wc
+				ORDER BY wc";
+		// echo '<pre>',$sql,'</pre>';
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){			
+			$rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
+			self::echoMRItemString($rw);
+		}
 	
 	}
 	
