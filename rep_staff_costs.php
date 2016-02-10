@@ -45,7 +45,8 @@ for($m=1;$m<=$ytd;$m++){
 						, IFNULL((SELECT funFlagWC FROM common_db.tbl_function WHERE funGUID=empFunctionGUID),0), 1, 1
 				FROM common_db.tbl_employee
 				WHERE empStartDate <= @repDateEnd 
-				AND (empEndDate IS NULL OR empEndDate >=@repDateStart)
+				AND (empEndDate IS NULL OR empEndDate >=@repDateStart) 
+				AND empFlagDeleted=0
 				AND empSalary>0;";
 	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_vacation SET salary=0 
 				WHERE vacVactypeID IN (4,5) 
