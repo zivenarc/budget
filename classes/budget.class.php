@@ -185,9 +185,9 @@ class Budget{
 			case 'mr':
 				ob_start();
 				?>
-					<th colspan="4">Current month</th>
+					<th colspan="4">Current month (<?php echo date('M',$this->date_start-1);?>)</th>
 					<th colspan="4">YTD</th>				
-					<th colspan="3">Next month</th>
+					<th colspan="4">Next month (<?php echo date('M',$this->date_start);?>)</th>
 				</tr>
 				<tr>
 					<th class='budget-ytd'>Actual</th>
@@ -201,6 +201,7 @@ class Budget{
 					<th class='budget-ytd'>Forecast</th>
 					<th>Budget</th>
 					<th>Diff</th>
+					<th>%</th>
 				</tr>
 				<?php
 				$res = ob_get_contents();

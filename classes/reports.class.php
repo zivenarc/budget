@@ -1154,44 +1154,49 @@ class Reports{
 				<tr>
 					<th rowspan="2"><?php echo $firstLevelTitle; ?></th>
 					<th rowspan="2">Account</th>
-					<?php echo Budget::getTableHeader('mr'); 							
+					<?php echo $this->oBudget->getTableHeader('mr'); 							
 					?>					
 			</thead>			
 			<tbody>
 			<?php
-			if ($oSQL->num_rows($rs)){
+			if ($this->oSQL->num_rows($rs)){
 				$Level1_title = '';		
-				while ($rw=$oSQL->f($rs)){
-					if($Level1_title && $Level1_title!=$rw['Level1_title']){
-						$data = $subtotal[$Level1_title];
-						$data['Budget item']=$group;
-						self::echoMRItemString($data,'budget-subtotal', $oBudget);
+				
+				while ($rw=$this->oSQL->f($rs)){
+					
+					foreach ($rw as $key=>$value){
+						$arrGrandTotal[$key] += $value;
 					}
-						
-					$subtotal[$rw['Level1_title']]['CM_A'] += $rw['CM_A'];
-					$subtotal[$rw['Level1_title']]['CM_B'] += $rw['CM_B'];
-					$subtotal[$rw['Level1_title']]['YTD_A'] += $rw['YTD_A'];
-					$subtotal[$rw['Level1_title']]['YTD_B'] += $rw['YTD_B'];
-					$subtotal[$rw['Level1_title']]['NM_A'] += $rw['NM_A'];
-					$subtotal[$rw['Level1_title']]['NM_B'] += $rw['NM_B'];
 					
-														
+					$l1Code = (string)$rw['level1_code'];
+					$arrSubreport[$l1Code][$rw['item']] = Array('Level1_title'=>$rw['Level1_title'],'Budget item'=>$rw['Budget item'],'level1_code'=>$l1Code);
+											
+					$arrSubreport[$l1Code][$rw['item']]['CM_A'] += $rw['CM_A'];
+					$arrSubreport[$l1Code][$rw['item']]['CM_B'] += $rw['CM_B'];
+					$arrSubreport[$l1Code][$rw['item']]['YTD_A'] += $rw['YTD_A'];
+					$arrSubreport[$l1Code][$rw['item']]['YTD_B'] += $rw['YTD_B'];
+					$arrSubreport[$l1Code][$rw['item']]['NM_A'] += $rw['NM_A'];
+					$arrSubreport[$l1Code][$rw['item']]['NM_B'] += $rw['NM_B'];
+
 					
-					$data = $rw;
-					if ($data['Level1_title']==$Level1_title && $Level1_title) $data['Level1_title']="&nbsp;";
+					$arrSort[$l1Code]['value'] += $rw['YTD_A'];
 					
-					// echo '<pre>';print_r($data);echo '</pre>';
+					if (!$template) $template = $rw;
 					
-					self::echoMRItemString($data,$tr_class, $oBudget);
-					
-					$Level1_title = $rw['Level1_title'];
-					$group = $rw['Group'];
 				}
-				$data = $subtotal[$Level1_title];
-				$data['Budget item']=$group;
-				self::echoMRItemString($data,'budget-subtotal', $oBudget);
+							
+				arsort($arrSort);
+				foreach ($arrSort as $key=>$value){
+					$arrReport[$key] = $arrSubreport[$key];
+				}
 				
+				// echo '<pre>';print_r($arrReport);echo '</pre>';die();
+				foreach ($arrReport as $key=>$data){
+					$this->echoBudgetItemString($data, 'budget-item', $oBudget);
+				}
 				
+					$arrGrandTotal['Budget item'] = 'Grand total';
+					return ($arrGrandTotal);
 			}
 	}
 	
@@ -1614,22 +1619,39 @@ class Reports{
 		$local_subtotal = 0;
 		$ytd = 0;
 		$roy = 0;
-				for ($m=1;$m<=12;$m++){
-					// $month = $this->oBudget->arrPeriod[$m];
-					$month = $this->oBudget->arrPeriod[$m];
+		if (isset($data['CM_A'])){ ?>
+			<td class='budget-decimal budget-ytd'><?php self::render($data['CM_A'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['CM_B'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['CM_A']-$data['CM_B'],0);?></td>
+			<td class='budget-decimal'><em><?php self::render_ratio($data['CM_A'],$data['CM_B']);?></em></td>
+			
+			<td class='budget-decimal budget-quarterly'><?php self::render($data['YTD_A'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
+			<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B']);?></em></td>
+			
+			<td class='budget-decimal budget-ytd'><?php self::render($data['NM_A'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['NM_B'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['NM_A']-$data['NM_B'],0);?></td>
+			<td class='budget-decimal'><em><?php self::render_ratio($data['NM_A'],$data['NM_B']);?></em></td>
+		<?php
+		} else {
+			for ($m=1;$m<=12;$m++){
+				// $month = $this->oBudget->arrPeriod[$m];
+				$month = $this->oBudget->arrPeriod[$m];
+				?>
+				<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
+				<?php
+			}
+			
+			//--------------------- quarterly data -----------------------
+			if(isset($data['Q1'])){
+				for ($q=1;$q<5;$q++){
 					?>
-					<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
+					<td class='budget-decimal budget-quarterly budget-<?php echo 'q'.$m;?>'><?php self::render($data['Q'.$q],0);?></td>
 					<?php
 				}
-				
-				//--------------------- quarterly data -----------------------
-				if(isset($data['Q1'])){
-					for ($q=1;$q<5;$q++){
-						?>
-						<td class='budget-decimal budget-quarterly budget-<?php echo 'q'.$m;?>'><?php self::render($data['Q'.$q],0);?></td>
-						<?php
-					}
-				}
+			}
 			?>
 			<td class='budget-decimal budget-ytd'><?php self::render($data['Total'],0);?></td>			
 			<?php 
@@ -1652,7 +1674,8 @@ class Reports{
 					<td class='budget-decimal budget-quarterly '><?php self::render($data['Q5'],0);?></td>				
 					<td class='budget-decimal budget-ytd'><?php self::render($data['Total_AM'],0);?></td>				
 				<?php };
-				if ($this->oBudget->type == 'FYE'){ ?>
+				if ($this->oBudget->type == 'FYE' || $this->oBudget->type == 'Actual'){ 
+				?>					
 					<!--Data for YTD actual-->
 					<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
 					<td class='budget-decimal'><?php self::render($data['YTD'],0);?></td>
@@ -1665,7 +1688,8 @@ class Reports{
 					<td class='budget-decimal'><em><?php self::render_ratio($data['ROY_A'],$data['ROY']);?></em></td>
 				<?php
 				}
-			}			
+			}
+		}			
 	}
 	
 	private function echoBudgetItemString($data, $strClass=''){							
