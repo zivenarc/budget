@@ -2,7 +2,9 @@
 // $flagNoAuth =true;
 require ('common/auth.php');
 
-$usrID = isset($_GET['usrID'])?$_GET['usrID']:$arrUsrData['usrID'];
+$ownerID = isset($_GET['ownerID'])?$_GET['ownerID']:($_COOKIE['ownerID']?$_COOKIE['ownerID']:$arrUsrData['usrID']);
+SetCookie('ownerID',$ownerID,0);
+
 
 if ($_GET['tab']){
 	
@@ -17,7 +19,7 @@ if ($_GET['tab']){
 		LEFT JOIN vw_profit ON pccID=vw_journal.pc
 		LEFT JOIN vw_location ON locID=vw_journal.pc
 		WHERE vw_journal.scenario='{$_GET['tab']}' 
-		AND responsible=".$oSQL->e($usrID)."
+		AND responsible=".$oSQL->e($ownerID)."
 		GROUP BY vw_journal.guid
 		ORDER BY vw_journal.edit_date ASC";	
 
