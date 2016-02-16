@@ -2,13 +2,17 @@ $(document).ready(function(){
 
 	var report_id='report';
 	
-		$('#budget_scenario').change(function(){		
-		$(this).wrap($('<form>',{method:'GET',id:'scenario'}));		
-		// console.log($(this));
-		$('#frameContent').addClass('ui-widget-overlay');
-		$('#scenario').submit();
+	$('#budget_scenario').change(function(){		
+		location.search = 'budget_scenario='+$(this).val();
 	});
+	$('#reference').change(function(){		
+		location.search = 'reference='+$(this).val();
+	});	
+	$('#bu_group').change(function(){		
+		location.search = 'bu_group='+$(this).val();
+	});	
 	
+		
 		$('#'+report_id).find('td').each(function(){		
 					$(this).click(function(){					
 						$('#'+report_id).find('tr').removeClass('report-selected');

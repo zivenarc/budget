@@ -1418,7 +1418,7 @@ class Reports{
 				if($group && $group!=$rw['Group']){
 					$data = $subtotal[$group];
 					$data['Budget item']=$group;
-					self::echoMRItemString($data,'budget-subtotal');
+					$this->echoBudgetItemString($data,'budget-subtotal');
 				}
 				
 
@@ -1437,17 +1437,17 @@ class Reports{
 				$grandTotal['NM_B'] += $rw['NM_B'];
 				
 				
-				self::echoMRItemString($rw,$tr_class);				
+				$this->echoBudgetItemString($rw,$tr_class);				
 				$group = $rw['Group'];
 			}
 			//last group subtotal
 			$data = $subtotal[$group];
 			$data['Budget item']=$group;
-			self::echoMRItemString($data,'budget-subtotal');
+			$this->echoBudgetItemString($data,'budget-subtotal');
 			//Grand total
 			$data = $grandTotal;
 			$data['Budget item']='Profit before tax';
-			self::echoMRItemString($data,'budget-total');
+			$this->echoBudgetItemString($data,'budget-total');
 			
 		//------ Operating income -------
 		
@@ -1456,12 +1456,12 @@ class Reports{
 		$rs = $oSQL->q($sqlOps);
 		while ($rw = $oSQL->f($rs)){
 			$rw['Budget item'] = "Operating income";
-			self::echoMRItemString($rw,'budget-subtotal');
+			$this->echoBudgetItemString($rw,'budget-subtotal');
 		}
 		
 		//------- KPIs -----------------
 		
-		echo '<tr><th colspan="13">Operational KPIs</th></tr>';
+		echo '<tr><th colspan="14">Operational KPIs</th></tr>';
 		
 		$sql = "SELECT activity, unit, 
 					{$strFields['actual']}
@@ -1498,12 +1498,12 @@ class Reports{
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){			
 			$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
-			self::echoMRItemString($rw);
+			$this->echoBudgetItemString($rw);
 		}
 
 		//------- Headcount -----------------
 		
-		echo '<tr><th colspan="13">Headcount</th></tr>';
+		echo '<tr><th colspan="14">Headcount</th></tr>';
 		
 		$sql = "SELECT  wc, 
 					{$strFields['actual']}
@@ -1524,7 +1524,7 @@ class Reports{
 			GROUP BY  wc
 			ORDER BY  wc";
 			
-		$sql = "SELECT   wc, 
+		$sql = "SELECT  wc, 
 					SUM(CM_A) as CM_A,
 					SUM(CM_B) as CM_B,
 					SUM(YTD_A) as YTD_A,
@@ -1538,7 +1538,7 @@ class Reports{
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){			
 			$rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
-			self::echoMRItemString($rw);
+			$this->echoBudgetItemString($rw);
 		}
 	
 	}
@@ -1746,60 +1746,6 @@ class Reports{
 				$this->_echoNumericTDs($data);
 			}
 			?>
-		</tr>
-		<?php
-		ob_flush();
-	}
-	
-	private function echoMRItemString($data, $strClass=''){					
-		
-		ob_start();
-		static $Level1_title;
-		?>
-		<tr class='<?php echo $strClass;?>'>
-			<?php 			
-			if (strlen($data['Level1_title'])){				
-			?>
-			<td class='budget-tdh code-<?php echo urlencode($data['level1_code']);?>' data-code='<?php echo $data['level1_code'];?>'><span><?php echo $data['Level1_title'];?></span></td>
-			<td><?php echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\',\'level1\':\''.$data['level1_code'].'\'})">'.$data['Budget item'].'</a>';?></td>
-			<?php 
-			} 
-			else 			
-			{	
-			?>
-			<td colspan="2">
-			<?php
-				if ($data['Group_code']==self::GP_CODE) {
-					echo 'Total '.strtolower($data['Budget item']); 
-				} else {
-					if (strpos($strClass,'total') || !isset($data['item'])){
-						echo $data['Budget item'];
-					} else {
-						echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\'})">'.$data['Budget item'].'</a>';
-					}
-				}
-			?>
-			</td>
-			<?php
-			}
-				// echo '<pre>';print_r($data);echo '</pre>';		
-					?>
-					<td class='budget-decimal budget-ytd'><?php self::render($data['CM_A'],0);?></td>
-					<td class='budget-decimal'><?php self::render($data['CM_B'],0);?></td>
-					<td class='budget-decimal'><?php self::render($data['CM_A']-$data['CM_B'],0);?></td>
-					<td class='budget-decimal'><em><?php self::render_ratio($data['CM_A'],$data['CM_B']);?></em></td>
-					
-					<td class='budget-decimal budget-quarterly'><?php self::render($data['YTD_A'],0);?></td>
-					<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
-					<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
-					<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B']);?></em></td>
-					
-					<td class='budget-decimal budget-ytd'><?php self::render($data['NM_A'],0);?></td>
-					<td class='budget-decimal'><?php self::render($data['NM_B'],0);?></td>
-					<td class='budget-decimal'><?php self::render($data['NM_A']-$data['NM_B'],0);?></td>
-					<?php				
-				
-			?>						
 		</tr>
 		<?php
 		ob_flush();
