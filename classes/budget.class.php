@@ -102,6 +102,9 @@ class Budget{
 			case 'ytd':
 				return($this->getYTDSQL(1,$nCurrent,$arrRates));
 				break;
+			case 'am':
+				return($this->getYTDSQL(4,15,$arrRates));
+				break;
 			case 'cm':
 				return($this->getYTDSQL($nCurrent,$nCurrent,$arrRates));
 				break;

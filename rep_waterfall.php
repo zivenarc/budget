@@ -36,6 +36,7 @@ $arrPeriodType['q3'] = '3<sup>rd</sup> quarter';
 $arrPeriodType['q4'] = '4<sup>th</sup> quarter';
 $arrPeriodType['roy'] = 'Rest-of-year';
 $arrPeriodType['fye'] = 'FYE';
+$arrPeriodType['am'] = 'Apr-Mar';
 	
 foreach($arrPeriodType as $id=>$title){
 	$temp = $_GET;

@@ -1289,21 +1289,35 @@ class Reports{
 		$strFields_last = $this->_getMonthlyFields('last');
 		$sqlGroup = "GROUP BY item, `Budget item`";
 		
+		if ($this->YACT){
+			$strAccountTitle = "title";
+			$strAccountGroup = "yact_group";
+			$strAccountCode = "account";
+			$strGroupCode = 'yact_group_code';
+			$strGPFilter = "yact_group_code IN ('449000','499000')"; 
+		} else {
+			$strAccountTitle = "Budget item";
+			$strAccountGroup = "Group";
+			$strAccountCode = "item";
+			$strGroupCode = 'Group_code';
+			$strGPFilter = "Group_code=".self::GP_CODE; 
+		}
+		
 		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15).",\r\n".
 				$this->oBudget->getQuarterlySumSQL().
-				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,`Budget item`,`Group`, `item`, Group_code
+				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,`Budget item`,`Group`, `item`, `Group_code`
 			FROM 
-			(SELECT `Budget item`, `Group`, `item`,Group_code,
-					{$strFields_this}
-			FROM `vw_master` 			
-			{$sqlWhere} AND scenario='{$this->oBudget->id}' 
-			{$sqlGroup}
-			UNION ALL
-			SELECT `Budget item`, `Group`, `item`,Group_code,
-					{$strFields_last}
-			FROM `vw_master` 			
-			{$sqlWhere} AND scenario='{$this->oReference->id}' 
-			{$sqlGroup}) Q
+				(SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
+						{$strFields_this}
+				FROM `vw_master` 			
+				{$sqlWhere} AND scenario='{$this->oBudget->id}' 
+				{$sqlGroup}
+				UNION ALL
+				SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
+						{$strFields_last}
+				FROM `vw_master` 			
+				{$sqlWhere} AND scenario='{$this->oReference->id}' 
+				{$sqlGroup}) Q
 			{$sqlGroup}
 			ORDER BY `Group` ASC			
 			";
