@@ -910,7 +910,8 @@ class Reports{
 		ob_start();
 		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15).",\r\n".
 				$this->oBudget->getQuarterlySumSQL().
-				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,Level1_title,level1_code,`{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item'
+				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,SUM(estimate_AM) as estimate_AM,
+				Level1_title,level1_code,`{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item'
 			FROM 
 			(SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
 					{$strFields_this}
@@ -1078,6 +1079,8 @@ class Reports{
 						<th class='budget-monthly'>Mar+</th>
 						<th class='budget-quarterly'>Q5(Jan-Mar)</th>
 						<th class='budget-ytd'><?php echo $this->oBudget->type=='Budget'?'Budget':'FYE';?> Apr-Mar</th>
+						<th><?php echo $this->oBudget->type=='Budget'?$this->oReference->id:'Budget';?> Apr-Mar</th>
+						<th>Diff</th>
 					<?php
 					}					
 					if ($this->oBudget->type=='FYE'){
@@ -1128,6 +1131,7 @@ class Reports{
 					$arrSubreport[$l1Code][$rw['item']]['Total']+=$rw['Total'];
 					$arrSubreport[$l1Code][$rw['item']]['Total_AM']+=$rw['Total_AM'];
 					$arrSubreport[$l1Code][$rw['item']]['estimate']+=$rw['estimate'];
+					$arrSubreport[$l1Code][$rw['item']]['estimate_AM']+=$rw['estimate_AM'];
 					$arrSubreport[$l1Code][$rw['item']]['Total_AprMar']+=$rw['Total_AprMar'];
 					$arrSubreport[$l1Code][$rw['item']]['Total_15']+=$rw['Total_15'];
 										
@@ -1319,7 +1323,8 @@ class Reports{
 		
 		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15).",\r\n".
 				$this->oBudget->getQuarterlySumSQL().
-				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,`Budget item`,`Group`, `item`, `Group_code`
+				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,SUM(estimate_AM) as estimate_AM,
+				`Budget item`,`Group`, `item`, `Group_code`
 			FROM 
 				(SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
 						{$strFields_this}
@@ -1370,6 +1375,7 @@ class Reports{
 				$subtotal[$rw['Group']]['Total'] += $rw['Total'];
 				$subtotal[$rw['Group']]['Total_AM'] += $rw['Total_AM'];
 				$subtotal[$rw['Group']]['estimate'] += $rw['estimate'];
+				$subtotal[$rw['Group']]['estimate_AM'] += $rw['estimate_AM'];
 				$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
 				$subtotal[$rw['Group']]['YTD'] += $rw['YTD'];
 				$subtotal[$rw['Group']]['ROY_A'] += $rw['ROY_A'];
@@ -1378,6 +1384,7 @@ class Reports{
 				$grandTotal['Total'] += $rw['Total'];
 				$grandTotal['Total_AM'] += $rw['Total_AM'];
 				$grandTotal['estimate'] += $rw['estimate'];
+				$grandTotal['estimate_AM'] += $rw['estimate_AM'];
 				$grandTotal['YTD_A'] += $rw['YTD_A'];
 				$grandTotal['YTD'] += $rw['YTD'];
 				$grandTotal['ROY_A'] += $rw['ROY_A'];
@@ -1583,6 +1590,7 @@ class Reports{
 					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total ,\r\n
 					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as Total_AM ,\r\n
 					0 as estimate, 
+					0 as estimate_AM, 
 					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD_A, 
 					SUM(YTD/{$arrRates['YTD']}) as YTD, 
 					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates).") as ROY_A, 
@@ -1595,6 +1603,7 @@ class Reports{
 					"0 as Total, \r\n".
 					"0 as Total_AM, \r\n".
 					"SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as estimate ,
+					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as estimate_AM ,
 					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD_A, 
 					SUM(YTD/{$arrRates['YTD']}) as YTD, 
 					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates).") as ROY_A, 
@@ -1701,6 +1710,8 @@ class Reports{
 					?>
 					<td class='budget-decimal budget-quarterly '><?php self::render($data['Q5'],0);?></td>				
 					<td class='budget-decimal budget-ytd'><?php self::render($data['Total_AM'],0);?></td>				
+					<td class='budget-decimal'><?php self::render($data['estimate_AM'],0);?></td>				
+					<td class='budget-decimal'><?php self::render($data['Total_AM'] - $data['estimate_AM'],0);?></td>				
 				<?php };
 				if ($this->oBudget->type == 'FYE' || $this->oBudget->type == 'Actual'){ 
 				?>					
