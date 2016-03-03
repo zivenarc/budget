@@ -253,7 +253,8 @@ class Reports{
 		
 		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
 		$sql = "SELECT customer, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length, $arrRates).", 
-						SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total 
+						SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total,
+						SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as Total_AM 
 		FROM reg_master 
 		{$sqlWhere} AND item='".Items::REVENUE."'
 		GROUP BY customer";
@@ -262,7 +263,9 @@ class Reports{
 			$arrRevenue[$rw['customer']] = $rw;
 		}
 		
-		$sql = "SELECT cntTitle,customer, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
+		$sql = "SELECT cntTitle,customer, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", 
+					SUM(".$this->oBudget->getYTDSQL().") as Total,
+					SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
 				FROM reg_rent 
 				LEFT JOIN vw_customer ON cntID=customer
 				{$sqlWhere} AND posted=1 AND item='".Items::WH_RENT."'
@@ -282,6 +285,7 @@ class Reports{
 					?>
 					<th class='budget-ytd'>Total</th>
 					<th>Q5</th>
+					<th class='budget-ytd'>Apr-Mar</th>
 				</tr>
 			</thead>			
 			<tbody>
@@ -308,8 +312,10 @@ class Reports{
 					
 				}
 				$arrTotal['Total']+=$rw['Total'];
+				$arrTotal['Total_AM']+=$rw['Total_AM'];
 				if ($rw['customer']!=$empty){
 						$arrUtil['Total']+=$rw['Total'];
+						$arrUtil['Total_AM']+=$rw['Total_AM'];
 				}
 				
 				$arrQuarter = Array('Q1'=>($rw['jan']+$rw['feb']+$rw['mar'])/3,
@@ -336,6 +342,7 @@ class Reports{
 				
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total']/12,0,'.',','),'</td>';
 				echo '<td class=\'budget-decimal budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
+				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total_AM']/12,0,'.',','),'</td>';
 				echo "</tr>\r\n";				
 			}
 			?>
@@ -357,6 +364,7 @@ class Reports{
 					}	
 					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']/12),'</td>';
 					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render($arrTotal['Q5']),'</td>';
+					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render($arrTotal['Total_AM']/12),'</td>';
 					?>
 				</tr>
 				<tr class='budget-subtotal budget-ratio'>
@@ -375,6 +383,7 @@ class Reports{
 					}	
 					echo '<td class=\'budget-decimal budget-ytd\'>',self::render_ratio($arrUtil['Total']/12,$arrTotal['Total']/12),'</td>';
 					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render_ratio($arrUtil['Q5'],$arrTotal['Q5']),'</td>';
+					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render_ratio($arrUtil['Total_AM']/12,$arrTotal['Total_AM']/12),'</td>';
 					?>
 				</tr>
 			</tfoot>
