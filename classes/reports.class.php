@@ -34,7 +34,9 @@ class Reports{
 			
 			switch ($this->oBudget->type){
 				case 'Budget':
-					$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', prtUnit as 'Unit', ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
+					$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', prtUnit as 'Unit', ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", 
+								SUM(".$this->oBudget->getYTDSQL().") as Total, 
+								SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM 
 							FROM `reg_sales`					
 							LEFT JOIN vw_product_type ON prtID=activity
 							{$sqlWhere} AND posted=1 AND kpi=1
@@ -46,7 +48,8 @@ class Reports{
 					
 					$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', prtUnit as 'Unit',
 							".$this->oBudget->getMonthlySumSQL(1,15).",
-							SUM(".$this->oBudget->getYTDSQL().") as Total, SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
+							SUM(".$this->oBudget->getYTDSQL().") as Total, 
+							SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
 						FROM 
 							(SELECT pc, activity, unit,
 									".$this->oBudget->getMonthlySumSQL(1,15)."
@@ -84,6 +87,7 @@ class Reports{
 					<th class='budget-monthly'>Feb+</th>
 					<th class='budget-monthly'>Mar+</th>
 					<th>Q5</th>
+					<th class='budget-ytd'>Apr-Mar</th>
 				</tr>
 			</thead>			
 			<tbody>
@@ -129,6 +133,7 @@ class Reports{
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
 				}
 				echo '<td class=\'budget-decimal budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
+				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total_AM'],0,'.',','),'</td>';
 				echo "</tr>\r\n";
 				$prtGHQ = $rw['prtGHQ'];
 			}
