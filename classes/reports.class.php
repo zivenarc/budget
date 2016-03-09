@@ -910,20 +910,21 @@ class Reports{
 		ob_start();
 		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15).",\r\n".
 				$this->oBudget->getQuarterlySumSQL().
-				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,SUM(estimate_AM) as estimate_AM,
+				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,SUM(estimate_AM) as estimate_AM, 
+				SUM(YTD_A) as YTD_A, SUM(YTD) as YTD, SUM(ROY_A) as ROY_A, SUM(ROY) as ROY,
 				Level1_title,level1_code,`{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item'
 			FROM 
-			(SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
-					{$strFields_this}
-			FROM `vw_master` 			
-			{$sqlWhere} AND scenario='{$this->oBudget->id}' AND {$strGPFilter} ## Gross margin only
-			GROUP BY Level1_code, Level1_title, `{$strAccountCode}` , `{$strAccountTitle}`
-			UNION ALL
-			SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
-					{$strFields_last}
-			FROM `vw_master` 			
-			{$sqlWhere} AND scenario='{$this->oReference->id}' AND {$strGPFilter}
-			GROUP BY Level1_code, Level1_title,  `{$strAccountCode}` , `{$strAccountTitle}`) Q
+				(SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
+						{$strFields_this}
+				FROM `vw_master` 			
+				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND {$strGPFilter} ## Gross margin only
+				GROUP BY Level1_code, Level1_title, `{$strAccountCode}` , `{$strAccountTitle}`
+				UNION ALL
+				SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
+						{$strFields_last}
+				FROM `vw_master` 			
+				{$sqlWhere} AND scenario='{$this->oReference->id}' AND {$strGPFilter}
+				GROUP BY Level1_code, Level1_title,  `{$strAccountCode}` , `{$strAccountTitle}`) Q
 			GROUP BY Level1_code, Level1_title, `item` , `Budget item`
 			ORDER BY Level1_title, `Group` ASC			
 			";
@@ -1324,6 +1325,7 @@ class Reports{
 		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15).",\r\n".
 				$this->oBudget->getQuarterlySumSQL().
 				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,SUM(estimate_AM) as estimate_AM,
+				SUM(YTD_A) as YTD_A, SUM(YTD) as YTD, SUM(ROY_A) as ROY_A, SUM(ROY) as ROY,
 				`Budget item`,`Group`, `item`, `Group_code`
 			FROM 
 				(SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
@@ -1592,9 +1594,9 @@ class Reports{
 					0 as estimate, 
 					0 as estimate_AM, 
 					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD_A, 
-					SUM(YTD/{$arrRates['YTD']}) as YTD, 
+					0 as YTD, 
 					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates).") as ROY_A, 
-					SUM(ROY/{$arrRates['YTD']}) as ROY";
+					0 as ROY";
 			break;
 		case 'last':
 			$arrRates = $this->oReference->getMonthlyRates($this->Currency);
@@ -1604,10 +1606,11 @@ class Reports{
 					"0 as Total_AM, \r\n".
 					"SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as estimate ,
 					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as estimate_AM ,
-					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD_A, 
-					SUM(YTD/{$arrRates['YTD']}) as YTD, 
-					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates).") as ROY_A, 
-					SUM(ROY/{$arrRates['YTD']}) as ROY";
+					0 as YTD_A,
+					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD, 
+					0 as ROY_A,
+					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates).") as ROY";
+					
 			break;
 		}
 		// echo '<pre>';print_r($arrRates);echo '</pre>';
