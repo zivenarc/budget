@@ -39,9 +39,9 @@ if(!isset($_GET['pccGUID'])){
 	
 	include ('includes/inc_report_buttons.php');
 	if ($_GET['pccGUID']=='all'){
-		$sqlWhere = " WHERE scenario='$budget_scenario' AND customer IN (".implode(',',$arrCnt).")"; 
+		$sqlWhere = " WHERE customer IN (".implode(',',$arrCnt).")"; 
 	} else {
-		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND scenario='$budget_scenario' AND customer IN (".implode(',',$arrCnt).")";
+		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND customer IN (".implode(',',$arrCnt).")";
 	}
 
 	$oReport->salesByActivity($sqlWhere);
