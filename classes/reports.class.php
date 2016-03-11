@@ -158,8 +158,10 @@ class Reports{
 	
 	function offByRoute($sqlWhere){
 		
-		$sql = "SELECT OFF_Route, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
-				FROM vw_sales {$sqlWhere} AND posted=1 AND kpi=1 AND unit='TEU' AND OFF_Route IS NOT NULL 
+		$sql = "SELECT OFF_Route, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", 
+				SUM(".$this->oBudget->getYTDSQL().") as Total, 
+				SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
+				FROM vw_sales {$sqlWhere} AND posted=1 AND kpi=1 AND unit='TEU' AND OFF_Route IS NOT NULL AND scenario='{$this->oBudget->id}'
 				GROUP BY OFF_Route";
 		$rs = $this->oSQL->q($sql); 
 		$tableID = "kpi_".md5($sql);
@@ -178,6 +180,7 @@ class Reports{
 					<th class='budget-monthly'>Feb+</th>
 					<th class='budget-monthly'>Mar+</th>
 					<th>Q5</th>
+					<th class='budget-ytd'>Apr-Mar</th>
 				</tr>
 			</thead>			
 			<tbody>
@@ -199,6 +202,7 @@ class Reports{
 					$arrTotal[$month]+=$rw[$month];
 				}
 				$arrTotal['Total']+=$rw['Total'];
+				$arrTotal['Total_AM']+=$rw['Total_AM'];
 				
 				$arrQuarter = Array('Q1'=>$rw['jan']+$rw['feb']+$rw['mar'],
 									'Q2'=>$rw['apr']+$rw['may']+$rw['jun'],
@@ -219,6 +223,8 @@ class Reports{
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
 				}
 				echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
+				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total_AM'],0,'.',','),'</td>';
+				for ($m=13;$m<=15;$m++){
 				echo "</tr>\r\n";				
 			}
 			?>
@@ -240,6 +246,7 @@ class Reports{
 					}	
 					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']),'</td>';
 					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render($arrTotal['Q5']),'</td>';
+					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total_AM']),'</td>';
 					?>
 				</tr>
 			</tfoot>
@@ -261,7 +268,7 @@ class Reports{
 						SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total,
 						SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as Total_AM 
 		FROM reg_master 
-		{$sqlWhere} AND item='".Items::REVENUE."'
+		{$sqlWhere} AND item='".Items::REVENUE."'  AND scenario='{$this->oBudget->id}'
 		GROUP BY customer";
 		$rs = $this->oSQL->q($sql); 
 		while ($rw = $this->oSQL->f($rs)){
@@ -273,7 +280,7 @@ class Reports{
 					SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
 				FROM reg_rent 
 				LEFT JOIN vw_customer ON cntID=customer
-				{$sqlWhere} AND posted=1 AND item='".Items::WH_RENT."'
+				{$sqlWhere} AND posted=1 AND item='".Items::WH_RENT."'  AND scenario='{$this->oBudget->id}'
 				GROUP BY customer";
 		$rs = $this->oSQL->q($sql); 
 		$tableID = "kpi_".md5($sql);
@@ -408,7 +415,7 @@ class Reports{
 					LEFT JOIN vw_customer ON customer=cntID					
 					LEFT JOIN vw_profit ON pc=pccID	
 					LEFT JOIN stbl_user ON sales=usrID
-					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 $sqlWhere
+					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 $sqlWhere 
 					GROUP BY sales, `reg_sales`.`customer`, unit
 					ORDER BY sales, Total DESC"; 
 			//echo $sql;
