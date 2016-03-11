@@ -39,7 +39,7 @@ class Reports{
 								SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM 
 							FROM `reg_sales`					
 							LEFT JOIN vw_product_type ON prtID=activity
-							{$sqlWhere} AND posted=1 AND kpi=1
+							{$sqlWhere} AND posted=1 AND kpi=1 AND scenario='{$this->oBudget->id}'
 							GROUP BY `reg_sales`.`activity`, `reg_sales`.`unit`
 							ORDER BY prtGHQ, prtRHQ";
 					break;
@@ -1587,15 +1587,15 @@ class Reports{
 		case 'this':
 			$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
 			// echo '<pre>';print_r($arrRates);echo '</pre>';
-			$res=	$this->oBudget->getMonthlySumSQL(1,15,$arrRates).", \r\n".
-					$this->oBudget->getQuarterlySumSQL($arrRates).", \r\n 
-					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total ,\r\n
-					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as Total_AM ,\r\n
+			$res=	$this->oBudget->getMonthlySumSQL(1,15,$arrRates, $this->Denominator).", \r\n".
+					$this->oBudget->getQuarterlySumSQL($arrRates, $this->Denominator).", \r\n 
+					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $this->Denominator).") as Total ,\r\n
+					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $this->Denominator).") as Total_AM ,\r\n
 					0 as estimate, 
 					0 as estimate_AM, 
-					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD_A, 
+					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates, $this->Denominator).") as YTD_A, 
 					0 as YTD, 
-					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates).") as ROY_A, 
+					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates, $this->Denominator).") as ROY_A, 
 					0 as ROY";
 			break;
 		case 'last':
@@ -1604,12 +1604,12 @@ class Reports{
 					str_repeat('0,',5)." \r\n".
 					"0 as Total, \r\n".
 					"0 as Total_AM, \r\n".
-					"SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as estimate ,
-					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as estimate_AM ,
+					"SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $this->Denominator).") as estimate ,
+					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $this->Denominator).") as estimate_AM ,
 					0 as YTD_A,
-					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates).") as YTD, 
+					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates, $this->Denominator).") as YTD, 
 					0 as ROY_A,
-					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates).") as ROY";
+					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates, $this->Denominator).") as ROY";
 					
 			break;
 		}
