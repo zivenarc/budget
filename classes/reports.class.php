@@ -200,7 +200,7 @@ class Reports{
 					$month = $this->oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
 					$arrTotal[$month]+=$rw[$month];
-				}
+				};
 				$arrTotal['Total']+=$rw['Total'];
 				$arrTotal['Total_AM']+=$rw['Total_AM'];
 				
@@ -225,6 +225,9 @@ class Reports{
 				echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total_AM'],0,'.',','),'</td>';
 				for ($m=13;$m<=15;$m++){
+					$month = $this->oBudget->arrPeriod[$m];
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
+				}
 				echo "</tr>\r\n";				
 			}
 			?>
@@ -268,7 +271,7 @@ class Reports{
 						SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total,
 						SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as Total_AM 
 		FROM reg_master 
-		{$sqlWhere} AND item='".Items::REVENUE."'  AND scenario='{$this->oBudget->id}'
+		{$sqlWhere} AND item='".Items::REVENUE."' AND scenario='{$this->oBudget->id}'
 		GROUP BY customer";
 		$rs = $this->oSQL->q($sql); 
 		while ($rw = $this->oSQL->f($rs)){
@@ -280,7 +283,7 @@ class Reports{
 					SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
 				FROM reg_rent 
 				LEFT JOIN vw_customer ON cntID=customer
-				{$sqlWhere} AND posted=1 AND item='".Items::WH_RENT."'  AND scenario='{$this->oBudget->id}'
+				{$sqlWhere} AND posted=1 AND item='".Items::WH_RENT."' AND scenario='{$this->oBudget->id}'
 				GROUP BY customer";
 		$rs = $this->oSQL->q($sql); 
 		$tableID = "kpi_".md5($sql);
@@ -415,7 +418,7 @@ class Reports{
 					LEFT JOIN vw_customer ON customer=cntID					
 					LEFT JOIN vw_profit ON pc=pccID	
 					LEFT JOIN stbl_user ON sales=usrID
-					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 $sqlWhere 
+					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 {$sqlWhere} 
 					GROUP BY sales, `reg_sales`.`customer`, unit
 					ORDER BY sales, Total DESC"; 
 			//echo $sql;
