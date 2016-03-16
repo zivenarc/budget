@@ -20,6 +20,20 @@ function drawChart(arrData, target, options){
 	chart.draw(data, options);
 }
 
+function drawGraph(arrData, target, options){
+	var data = google.visualization.arrayToDataTable(arrData);
+	
+	var options = options || {
+		title: arrData[0][1],
+		hAxis: {title: 'Month', textStyle: {fontSize:10}},
+		height: 400,
+		legend: { position: "none" }
+	};
+	
+	var chart = new google.visualization.LineChart(target);
+	chart.draw(data, options);
+}
+
 var tabs_options = {beforeLoad: function( event, ui ) {
 				$(ui.panel).html(spinner_div());
 				ui.jqXHR.error(function() {

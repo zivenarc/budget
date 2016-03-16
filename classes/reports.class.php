@@ -953,6 +953,109 @@ class Reports{
 		ob_flush();
 	}
 	
+	public function periodicGraph($sqlWhere){
+		
+		$strFields_this = $this->_getMonthlyFields();
+		$strFields_last = $this->_getMonthlyFields('last');
+		
+		if ($this->YACT){
+			$strAccountTitle = "title";
+			$strAccountGroup = "yact_group";
+			$strAccountCode = "account";
+			$strGPFilter = "yact_group_code IN ('449000','499000')"; 
+		} else {
+			$strAccountTitle = "Budget item";
+			$strAccountGroup = "Group";
+			$strAccountCode = "item";
+			$strGPFilter = "Group_code=".self::GP_CODE; 
+		}
+		
+		ob_start();
+		
+		$arrGraph[] = Array('Period','Gross revenue','GP','Budget GP','Staff costs','OP','Budget OP');
+		
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+				FROM `vw_master` 			
+				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND account='J00400'";
+		$rs = $this->oSQL->q($sql);
+		$rwGR = $this->oSQL->f($rs);
+		
+		
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+				FROM `vw_master` 			
+				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=".self::GP_CODE;
+		$rs = $this->oSQL->q($sql);
+		$rwGP = $this->oSQL->f($rs);
+		
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+				FROM `vw_master` 			
+				{$sqlWhere} AND scenario='{$this->oReference->id}' AND Group_code=".self::GP_CODE;
+		$rs = $this->oSQL->q($sql);
+		$rwBGP = $this->oSQL->f($rs);
+		
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+				FROM `vw_master` 			
+				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=95";
+		$rs = $this->oSQL->q($sql);
+		$rwSC = $this->oSQL->f($rs);
+		
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+				FROM `vw_master` 			
+				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND account NOT LIKE '6%'";
+		$rs = $this->oSQL->q($sql);
+		$rwOP = $this->oSQL->f($rs);
+		
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+				FROM `vw_master` 			
+				{$sqlWhere} AND scenario='{$this->oReference->id}' AND account NOT LIKE '6%'";
+		$rs = $this->oSQL->q($sql);
+		$rwBOP = $this->oSQL->f($rs);
+		
+		foreach ($this->oBudget->arrPeriod as $period){
+			$arrGraph[] = Array($period,(double)$rwGR[$period],(double)$rwGP[$period], (double)$rwBGP[$period], -(double)$rwSC[$period], (double)$rwOP[$period], (double)$rwBOP[$period]);
+		}
+		// echo '<pre>';print_r($arrGraph);echo '</pre>';
+		?>
+		<table class='budget' id='<?php $this->ID;?>'>
+		<tr>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<th>',$period,'</th>';
+			}
+		?>
+		</tr>
+		</table>
+		<ul class='link-footer'>
+			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
+		</ul>
+		<div id='graph_<?php echo $this->ID;?>'>Line chart loading...</div>
+		<script type='text/javascript'>
+			console.log('Here should be a chart!');
+			var target = 'graph_<?php echo $this->ID;?>'
+			$('#'+target).ready(function(){
+				var arrData = <?php echo json_encode($arrGraph);?>;
+				var options = {
+					title: 'Monthly performance',
+					legend: { position: 'bottom' },
+					height:600,
+					series: {0:{targetAxisIndex:0},
+								1: {targetAxisIndex:1, color: 'red', lineWidth:4},
+								2: {targetAxisIndex:1, color: 'red', lineDashStyle:[3,3]},
+								3: {targetAxisIndex:1},
+								4: {targetAxisIndex:1, color:'purple', lineWidth:4},
+								5: {targetAxisIndex:1, color:'purple', lineDashStyle:[3,3]}
+					}
+				};
+				
+				console.log(arrData);
+				target = document.getElementById(target);
+				drawGraph(arrData, target, options);
+			});
+		</script>
+		<?php			
+		ob_flush();
+	}
+	
 	public function monthlyReport($sqlWhere, $type='ghq'){
 		
 		GLOBAL $budget_scenario;
