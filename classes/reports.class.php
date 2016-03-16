@@ -970,42 +970,45 @@ class Reports{
 			$strGPFilter = "Group_code=".self::GP_CODE; 
 		}
 		
+		$arrRates_this = $this->oBudget->getMonthlyRates($this->Currency);
+		$arrRates_that = $this->oReference->getMonthlyRates($this->Currency);
+		
 		ob_start();
 		
 		$arrGraph[] = Array('Period','Gross revenue','GP','Budget GP','Staff costs','OP','Budget OP');
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_this, $this->Denominator)."
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND account='J00400'";
 		$rs = $this->oSQL->q($sql);
 		$rwGR = $this->oSQL->f($rs);
 		
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_this, $this->Denominator)."
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=".self::GP_CODE;
 		$rs = $this->oSQL->q($sql);
 		$rwGP = $this->oSQL->f($rs);
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_that, $this->Denominator)."
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oReference->id}' AND Group_code=".self::GP_CODE;
 		$rs = $this->oSQL->q($sql);
 		$rwBGP = $this->oSQL->f($rs);
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_this, $this->Denominator)."
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=95";
 		$rs = $this->oSQL->q($sql);
 		$rwSC = $this->oSQL->f($rs);
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_this, $this->Denominator)."
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND account NOT LIKE '6%'";
 		$rs = $this->oSQL->q($sql);
 		$rwOP = $this->oSQL->f($rs);
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15)."
+		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_that, $this->Denominator)."
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oReference->id}' AND account NOT LIKE '6%'";
 		$rs = $this->oSQL->q($sql);
