@@ -1018,9 +1018,80 @@ class Reports{
 		?>
 		<table class='budget' id='<?php $this->ID;?>'>
 		<tr>
+			<th>Period</th>
 		<?php
 			foreach ($this->oBudget->arrPeriod as $period){
 				echo '<th>',$period,'</th>';
+			}
+		?>
+		</tr>
+		<tr><td>Gross revenue</td>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<td class="budget-decimal">',self::render($rwGR[$period]),'</td>';
+			}
+		?>
+		</tr>
+		<tr><td>Gross profit</td>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<td class="budget-decimal">',self::render($rwGP[$period]),'</td>';
+			}
+		?>
+		</tr>
+		<tr class="budget-ratio"><td>Profitability</td>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<td class="budget-decimal">',self::render_ratio($rwGP[$period],$rwGR[$period]),'</td>';
+			}
+		?>
+		</tr>
+		<tr><td>Gross profit, reference</td>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<td class="budget-decimal">',self::render($rwBGP[$period]),'</td>';
+			}
+		?>
+		</tr>
+		<tr><td>Diff</td>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<td class="budget-decimal">',self::render($rwGP[$period]-$rwBGP[$period]),'</td>';
+			}
+		?>
+		</tr>
+		<tr><td>Staff costs</td>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<td class="budget-decimal">',self::render(-$rwSC[$period]),'</td>';
+			}
+		?>
+		</tr>
+		<tr class="budget-ratio"><td>Staff efficiency</td>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<td class="budget-decimal">',self::render_ratio($rwGP[$period],-$rwSC[$period]*100),'</td>';
+			}
+		?>
+		</tr>
+		<tr><td>Operating income</td>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<td class="budget-decimal">',self::render($rwOP[$period]),'</td>';
+			}
+		?>
+		</tr>
+		<tr><td>Op.income, reference</td>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<td class="budget-decimal">',self::render($rwBOP[$period]),'</td>';
+			}
+		?>
+		</tr>
+		<tr><td>Diff</td>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<td class="budget-decimal">',self::render($rwOP[$period]-$rwBOP[$period]),'</td>';
 			}
 		?>
 		</tr>
