@@ -1146,6 +1146,7 @@ class Reports{
 					title: 'Monthly performance',
 					legend: { position: 'bottom' },
 					height:600,
+					hAxis: {gridlines: {count: 4}},
 					series: {0:{targetAxisIndex:0},
 								1: {targetAxisIndex:1, color: 'red', lineWidth:4},
 								2: {targetAxisIndex:1, color: 'red', lineDashStyle:[3,3]},
