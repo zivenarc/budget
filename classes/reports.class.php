@@ -1110,8 +1110,8 @@ class Reports{
 			foreach ($this->oBudget->arrPeriod as $period){
 				echo '<td class="budget-decimal">',self::render_ratio($rwOP[$period],$rwGR[$period]),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwOP['Q1'], $rwGR['Q1']*100),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwOP['Total_AM'],$rwGR['Total_AM']*100),'</td>';
+		echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwOP['Q1'], $rwGR['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwOP['Total_AM'],$rwGR['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr><td>Op.income, <?php echo $this->oReference->id;?></td>
