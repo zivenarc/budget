@@ -977,38 +977,42 @@ class Reports{
 		
 		$arrGraph[] = Array('Period','Gross revenue','GP','Budget GP','Staff costs','OP','Budget OP');
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_this, $this->Denominator)."
+		$sqlSelect = $this->oBudget->getMonthlySumSQL(1,15,$arrRates_this, $this->Denominator).", ".
+				"SUM(".$this->oBudget->getYTDSQL(1,3,$arrRates_this, $this->Denominator).") as Q1, ".
+				"SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates_this, $this->Denominator).") as Total_AM";
+		
+		$sql = "SELECT {$sqlSelect}
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND account='J00400'";
 		$rs = $this->oSQL->q($sql);
 		$rwGR = $this->oSQL->f($rs);
 		
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_this, $this->Denominator)."
+		$sql = "SELECT {$sqlSelect}
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=".self::GP_CODE;
 		$rs = $this->oSQL->q($sql);
 		$rwGP = $this->oSQL->f($rs);
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_that, $this->Denominator)."
+		$sql = "SELECT {$sqlSelect}
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oReference->id}' AND Group_code=".self::GP_CODE;
 		$rs = $this->oSQL->q($sql);
 		$rwBGP = $this->oSQL->f($rs);
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_this, $this->Denominator)."
+		$sql = "SELECT {$sqlSelect}
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=95";
 		$rs = $this->oSQL->q($sql);
 		$rwSC = $this->oSQL->f($rs);
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_this, $this->Denominator)."
+		$sql = "SELECT {$sqlSelect}
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND account NOT LIKE '6%'";
 		$rs = $this->oSQL->q($sql);
 		$rwOP = $this->oSQL->f($rs);
 		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15,$arrRates_that, $this->Denominator)."
+		$sql = "SELECT {$sqlSelect}
 				FROM `vw_master` 			
 				{$sqlWhere} AND scenario='{$this->oReference->id}' AND account NOT LIKE '6%'";
 		$rs = $this->oSQL->q($sql);
@@ -1027,12 +1031,15 @@ class Reports{
 				echo '<th>',$period,'</th>';
 			}
 		?>
+		<th>Q1</th><th>FY Apr-Mar</th>
 		</tr>
 		<tr><td>Gross revenue</td>
 		<?php
 			foreach ($this->oBudget->arrPeriod as $period){
 				echo '<td class="budget-decimal">',self::render($rwGR[$period]),'</td>';
 			}
+		echo '<td class="budget-decimal budget-quarterly">',self::render($rwGR['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($rwGR['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr><td>Gross profit</td>
@@ -1040,20 +1047,26 @@ class Reports{
 			foreach ($this->oBudget->arrPeriod as $period){
 				echo '<td class="budget-decimal">',self::render($rwGP[$period]),'</td>';
 			}
+		echo '<td class="budget-decimal budget-quarterly">',self::render($rwGP['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($rwGP['Total_AM']),'</td>';
 		?>
 		</tr>
-		<tr class="budget-ratio"><td>Profitability</td>
+		<tr class="budget-ratio"><td>Profitability, %</td>
 		<?php
 			foreach ($this->oBudget->arrPeriod as $period){
 				echo '<td class="budget-decimal">',self::render_ratio($rwGP[$period],$rwGR[$period]),'</td>';
 			}
+		echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwGP['Q1'], $rwGR['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwGP['Total_AM'], $rwGR['Total_AM']),'</td>';
 		?>
 		</tr>
-		<tr><td>Gross profit, reference</td>
+		<tr><td>Gross profit, <?php echo $this->oReference->id;?></td>
 		<?php
 			foreach ($this->oBudget->arrPeriod as $period){
 				echo '<td class="budget-decimal">',self::render($rwBGP[$period]),'</td>';
 			}
+		echo '<td class="budget-decimal budget-quarterly">',self::render($rwBGP['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($rwBGP['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr><td>Diff</td>
@@ -1061,6 +1074,8 @@ class Reports{
 			foreach ($this->oBudget->arrPeriod as $period){
 				echo '<td class="budget-decimal">',self::render($rwGP[$period]-$rwBGP[$period]),'</td>';
 			}
+		echo '<td class="budget-decimal budget-quarterly">',self::render($rwGP['Q1']-$rwBGP['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($rwGP['Total_AM']-$rwBGP['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr><td>Staff costs</td>
@@ -1068,6 +1083,8 @@ class Reports{
 			foreach ($this->oBudget->arrPeriod as $period){
 				echo '<td class="budget-decimal">',self::render(-$rwSC[$period]),'</td>';
 			}
+		echo '<td class="budget-decimal budget-quarterly">',self::render(-$rwSC['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render(-$rwSC['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr class="budget-ratio"><td>Staff efficiency</td>
@@ -1075,6 +1092,8 @@ class Reports{
 			foreach ($this->oBudget->arrPeriod as $period){
 				echo '<td class="budget-decimal">',self::render_ratio($rwGP[$period],-$rwSC[$period]*100),'</td>';
 			}
+		echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwGP['Q1'], -$rwSC['Q1']*100),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwGP['Total_AM'],-$rwSC['Total_AM']*100),'</td>';
 		?>
 		</tr>
 		<tr><td>Operating income</td>
@@ -1084,7 +1103,14 @@ class Reports{
 			}
 		?>
 		</tr>
-		<tr><td>Op.income, reference</td>
+		<tr class="budget-ratio"><td>Profitability%</td>
+		<?php
+			foreach ($this->oBudget->arrPeriod as $period){
+				echo '<td class="budget-decimal">',self::render_ratio($rwOP[$period],$rwGR[$period]),'</td>';
+			}
+		?>
+		</tr>
+		<tr><td>Op.income, <?php echo $this->oReference->id;?></td>
 		<?php
 			foreach ($this->oBudget->arrPeriod as $period){
 				echo '<td class="budget-decimal">',self::render($rwBOP[$period]),'</td>';
