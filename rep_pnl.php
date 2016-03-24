@@ -30,6 +30,7 @@ if(!isset($_GET['pccGUID'])){
 	$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
 	$arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");
 	$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");
+	$arrActions[] = Array ('title'=>'By BDV dept','action'=>"?type=bdv");
 		
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
@@ -78,6 +79,9 @@ if(!isset($_GET['pccGUID'])){
 			break;
 		case 'sales':			
 			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'sales','field_title'=>'usrTitle','title'=>'Responsible'));	
+			break;
+		case 'bdv':			
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'bdv','field_title'=>'bdvTitle','title'=>'Selling unit'));	
 			break;
 		case 'pc':			
 			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'pc','field_title'=>'Profit','title'=>'PC'));	
