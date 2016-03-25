@@ -413,7 +413,7 @@ class Sales extends Document{
 						
 						//------Update for Project bridge since 1st April 2016-----------
 						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-						if ($current_month_start>=strtotime('2016-04-01')){
+						if ($current_month_start>=strtotime('1 April 2016')){
 							if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
 								$master_row->item = null;
 								$master_row->account = 'SZ0001';
@@ -445,7 +445,7 @@ class Sales extends Document{
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							echo 'This: '.$current_month_start.'\r\n';
 							echo 'PB: '.strtotime('2016-04-01').'\r\n';
-							if ($current_month_start>=strtotime('2016-04-01')){
+							if ($current_month_start>=strtotime('1 April 2016')){
 								if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
 									$master_row->item = null;
 									$master_row->account = 'SZ0011';
@@ -478,7 +478,7 @@ class Sales extends Document{
 							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])/2;
 							//------Update for Project bridge since 1st April 2016-----------
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-							if ($current_month_start>=strtotime('2016-04-01')){
+							if ($current_month_start>=strtotime('1 April 2016')){
 								$master_row->{$month} = 0;								
 							}
 						}
