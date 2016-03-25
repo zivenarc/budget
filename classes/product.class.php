@@ -81,9 +81,13 @@ class Product{
 	public $id;
 	
 	const PRS_Import = 2888;
-	const OFT_Import = 2852;
+	const OFT_Import = 2852;	
 	const OFT_Export = 2941;
 	const PRS_Export = 5712;
+	const OFT_DHC_Import = 7036;
+	const OFT_SSC_Import = 7037;
+	const OFT_DHC_Export = 7038;
+	const OFT_SSC_Export = 7039;
 	
 	function __construct($id,$params){
 		$this->code = $params['prdID'];
