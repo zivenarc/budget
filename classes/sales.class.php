@@ -443,8 +443,8 @@ class Sales extends Document{
 							
 							//------Update for Project bridge since 1st April 2016-----------
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-							echo $current_month_start.'/r/n/';
-							echo strtotime('2016-04-01');
+							echo 'This: '.$current_month_start.'\r\n';
+							echo 'PB: '.strtotime('2016-04-01').'\r\n';
 							if ($current_month_start>=strtotime('2016-04-01')){
 								if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
 									$master_row->item = null;
