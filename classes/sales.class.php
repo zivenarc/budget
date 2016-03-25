@@ -520,6 +520,11 @@ class Sales extends Document{
 					}
 					
 					if ($flagProjectBridge){
+						
+						$sql = "SELECT * FROM tbl_route WHERE rteID=".(integer)$this->route;
+						$rs = $this->oSQL->q($sql);
+						$arrRoute = $this->oSQL->f($rs);
+						
 						//------- Sales commission ----------
 						if ($this->job_owner!=PB_Ourselves && $this->business_owner==PB_Ourselves){
 							$master_row = $oMaster->add_master();
@@ -542,17 +547,96 @@ class Sales extends Document{
 								//------Update for Project bridge since 1st April 2016-----------
 								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 								if ($current_month_start>=$dateProjectBridge){										
-									$master_row->{$month} = -($record->{$month})*30*$this->settings['usd'];
+									$master_row->{$month} = ($record->{$month})*$arrRoute['rteSC_OFF']*$this->settings['usd'];
 								} else {
 									$master_row->{$month} = 0;	// do not calculate Profit share						
 								}
 							}
 						} elseif ($this->job_owner==PB_Ourselves && $this->business_owner!=PB_Ourselves) {
-						
+							$master_row = $oMaster->add_master();
+							$master_row->profit = $this->profit;
+							$master_row->activity = $record->activity;
+							$master_row->customer = $record->customer;				
+							$master_row->sales = $record->sales;
+							
+							$activity = $Activities->getByCode($record->activity);
+							$account = $activity->YACT;
+							
+							//$master_row->item = Items::PROFIT_SHARE;
+							$item = $Items->getById(Items::DIRECT_COSTS);
+							$master_row->account = $item->getYACT($master_row->profit);
+							$master_row->item = $item->id;
+							
+							for($m=1;$m<=$this->budget->length;$m++){
+								// $month = date('M',mktime(0,0,0,$m,15));
+								$month = $this->budget->arrPeriod[$m];									
+								//------Update for Project bridge since 1st April 2016-----------
+								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
+								if ($current_month_start>=$dateProjectBridge){										
+									$master_row->{$month} = -($record->{$month})*$arrRoute['rteSC_OFF']*$this->settings['usd'];
+								} else {
+									$master_row->{$month} = 0;	// do not calculate Profit share						
+								}
+							}
 						} else {
 							// no SSC in our books
 						}
 						//------- Destination handling charge
+						if ($this->job_owner!=PB_Ourselves && $this->destination_agent==PB_Ourselves){
+							$master_row = $oMaster->add_master();
+							$master_row->profit = $this->profit;
+							$master_row->activity = $record->activity;
+							$master_row->customer = $record->customer;				
+							$master_row->sales = $record->sales;
+							
+							$activity = $Activities->getByCode($record->activity);
+							$account = $activity->YACT;
+							
+							//$master_row->item = Items::PROFIT_SHARE;
+							$item = $Items->getById(Items::REVENUE);
+							$master_row->account = $item->getYACT($master_row->profit);
+							$master_row->item = $item->id;
+							
+							for($m=1;$m<=$this->budget->length;$m++){
+								// $month = date('M',mktime(0,0,0,$m,15));
+								$month = $this->budget->arrPeriod[$m];									
+								//------Update for Project bridge since 1st April 2016-----------
+								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
+								if ($current_month_start>=$dateProjectBridge){										
+									$master_row->{$month} = ($record->{$month})*6*$this->settings['usd'];
+								} else {
+									$master_row->{$month} = 0;	// do not calculate Profit share						
+								}
+							}
+						} elseif ($this->job_owner==PB_Ourselves && $this->destination_agent!=PB_Ourselves) {
+							$master_row = $oMaster->add_master();
+							$master_row->profit = $this->profit;
+							$master_row->activity = $record->activity;
+							$master_row->customer = $record->customer;				
+							$master_row->sales = $record->sales;
+							
+							$activity = $Activities->getByCode($record->activity);
+							$account = $activity->YACT;
+							
+							//$master_row->item = Items::PROFIT_SHARE;
+							$item = $Items->getById(Items::DIRECT_COSTS);
+							$master_row->account = $item->getYACT($master_row->profit);
+							$master_row->item = $item->id;
+							
+							for($m=1;$m<=$this->budget->length;$m++){
+								// $month = date('M',mktime(0,0,0,$m,15));
+								$month = $this->budget->arrPeriod[$m];									
+								//------Update for Project bridge since 1st April 2016-----------
+								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
+								if ($current_month_start>=$dateProjectBridge){										
+									$master_row->{$month} = -($record->{$month})*6*$this->settings['usd'];
+								} else {
+									$master_row->{$month} = 0;	// do not calculate Profit share						
+								}
+							}
+						} else {
+							// no DHC in our books
+						}
 					}
 					
 					if ($this->ps_profit && $this->ps_rate){
