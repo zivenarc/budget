@@ -460,9 +460,19 @@ class Sales extends Document{
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							if ($current_month_start>=$dateProjectBridge){
 								if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
-									$master_row->item = null;
-									$master_row->account = 'SZ0011';
-								} else{
+									if (!isset($freight_c_row)){
+										$freight_c_row = $oMaster->add_master();
+									}
+																
+									$freight_c_row->item = null;
+									$freight_c_row->account = 'SZ0011';
+									$freight_c_row->profit = $this->profit;
+									$freight_c_row->activity = $record->activity;
+									$freight_c_row->customer = $record->customer;				
+									$freight_c_row->sales = $record->sales;	
+									$freight_c_row->{$month} = ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
+									$master_row->{$month} = 0;
+									} else {
 									// leave it alone
 								}
 							}
@@ -492,7 +502,7 @@ class Sales extends Document{
 							//------Update for Project bridge since 1st April 2016-----------
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							if ($current_month_start>=$dateProjectBridge){
-								$master_row->{$month} = 0;								
+								$master_row->{$month} = 0;	// do not calculate Profit share							
 							}
 						}
 					}
