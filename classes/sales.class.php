@@ -123,10 +123,41 @@ class Sales extends Document{
 			,'prefix'=>'rte'
 			,'sql'=>'tbl_route'
 			,'mandatory'=>false
-			,'default'=>null
-			,'defaultText'=>'---Non-FHD---'
+			,'default'=>2
+			// ,'defaultText'=>'---Non-FHD---'
 			,'disabled'=>!$this->flagUpdate
 		);
+		
+		$this->Columns[] = Array(
+			'title'=>'Job owner'
+			,'field'=>self::Prefix.'JO'
+			,'type'=>'ajax'
+			,'table'=>'vw_pb_intercompany'
+			,'prefix'=>'cnt'
+			,'sql'=>'vw_pb_intercompany'			
+			,'disabled'=>!$this->flagUpdate			
+		);
+		
+		$this->Columns[] = Array(
+			'title'=>'Business owner'
+			,'field'=>self::Prefix.'BO'
+			,'type'=>'ajax'
+			,'table'=>'vw_pb_intercompany'
+			,'prefix'=>'cnt'
+			,'sql'=>'vw_pb_intercompany'			
+			,'disabled'=>!$this->flagUpdate			
+		);
+		
+		$this->Columns[] = Array(
+			'title'=>'Destination agent'
+			,'field'=>self::Prefix.'DA'
+			,'type'=>'ajax'
+			,'table'=>'vw_pb_intercompany'
+			,'prefix'=>'cnt'
+			,'sql'=>'vw_pb_intercompany'			
+			,'disabled'=>!$this->flagUpdate			
+		);
+		
 
 	}
 	

@@ -1023,7 +1023,7 @@ class Reports{
 		}
 		// echo '<pre>';print_r($arrGraph);echo '</pre>';
 		?>
-		<table class='budget' id='<?php $this->ID;?>'>
+		<table class='budget' id='<?php echo $this->ID;?>'>
 		<tr>
 			<th>Period</th>
 		<?php
