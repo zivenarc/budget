@@ -430,7 +430,7 @@ class Sales extends Document{
 								$freight_r_row->customer = $record->customer;				
 								$freight_r_row->sales = $record->sales;	
 								$freight_r_row->{$month} = ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
-								$master_row->{$month} = null;
+								$master_row->{$month} = 0;
 								
 							} else{
 								// leave it alone
@@ -458,8 +458,6 @@ class Sales extends Document{
 							
 							//------Update for Project bridge since 1st April 2016-----------
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-							echo 'This: '.date('Y-m-d',$current_month_start).'\r\n';
-							echo 'PB: '.date('Y-m-d',strtotime('2016-04-01')).'\r\n';
 							if ($current_month_start>=$dateProjectBridge){
 								if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
 									$master_row->item = null;
