@@ -36,6 +36,9 @@ class Sales extends Document{
 		$this->ps_profit = $this->data['salPSProfitID'];
 		$this->ps_rate = $this->data['salPSRate'];
 		$this->route = $this->data['salRoute'];
+		$this->job_owner = $this->data['salJO'];
+		$this->destination_agent = $this->data['salDA'];
+		$this->business_owner = $this->data['salBO'];
 		
 	}
 	public function refresh($id){
@@ -266,6 +269,10 @@ class Sales extends Document{
 			$this->sales = isset($_POST[$this->prefix.'UserID'])?$_POST[$this->prefix.'UserID']:$this->sales;
 			$this->route = isset($_POST[$this->prefix.'Route'])?$_POST[$this->prefix.'Route']:$this->route;
 			
+			$this->job_owner = isset($_POST[$this->prefix.'JO'])?$_POST[$this->prefix.'JO']:$this->job_owner;
+			$this->destination_agent = isset($_POST[$this->prefix.'DA'])?$_POST[$this->prefix.'DA']:$this->destination_agent;
+			$this->business_owner = isset($_POST[$this->prefix.'BO'])?$_POST[$this->prefix.'BO']:$this->business_owner;
+			
 			if (isset($_POST[$this->prefix.'ProfitID']) && count($this->records[$this->gridName])){
 				foreach ($this->records[$this->gridName] as $id=>$row){
 					$row = $this->get_record($id); 
@@ -390,6 +397,8 @@ class Sales extends Document{
 		GLOBAL $oBudget;
 		
 		$dateProjectBridge = strtotime('1 April 2016');
+		define ('PB_Ourselves',714);
+				
 		
 		$this->refresh($this->ID);		
 		$oMaster = new Master($this->scenario, $this->GUID);
@@ -470,7 +479,7 @@ class Sales extends Document{
 									$freight_c_row->activity = $record->activity;
 									$freight_c_row->customer = $record->customer;				
 									$freight_c_row->sales = $record->sales;	
-									$freight_c_row->{$month} = ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
+									$freight_c_row->{$month} = -($record->{$month})*$record->buying_rate*$this->settings[strtolower($record->buying_curr)];
 									$master_row->{$month} = 0;
 									} else {
 									// leave it alone
@@ -481,6 +490,9 @@ class Sales extends Document{
 					}
 					
 					if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
+					
+						$flagProjectBridge = true;
+					
 						$master_row = $oMaster->add_master();	
 						$master_row->profit = $this->profit;
 						$master_row->activity = $record->activity;
@@ -505,6 +517,42 @@ class Sales extends Document{
 								$master_row->{$month} = 0;	// do not calculate Profit share							
 							}
 						}
+					}
+					
+					if ($flagProjectBridge){
+						//------- Sales commission ----------
+						if ($this->job_owner!=PB_Ourselves && $this->business_owner==PB_Ourselves){
+							$master_row = $oMaster->add_master();
+							$master_row->profit = $this->profit;
+							$master_row->activity = $record->activity;
+							$master_row->customer = $record->customer;				
+							$master_row->sales = $record->sales;
+							
+							$activity = $Activities->getByCode($record->activity);
+							$account = $activity->YACT;
+							
+							//$master_row->item = Items::PROFIT_SHARE;
+							$item = $Items->getById(Items::REVENUE);
+							$master_row->account = $item->getYACT($master_row->profit);
+							$master_row->item = $item->id;
+							
+							for($m=1;$m<=$this->budget->length;$m++){
+								// $month = date('M',mktime(0,0,0,$m,15));
+								$month = $this->budget->arrPeriod[$m];									
+								//------Update for Project bridge since 1st April 2016-----------
+								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
+								if ($current_month_start>=$dateProjectBridge){										
+									$master_row->{$month} = -($record->{$month})*30*$this->settings['usd'];
+								} else {
+									$master_row->{$month} = 0;	// do not calculate Profit share						
+								}
+							}
+						} elseif ($this->job_owner==PB_Ourselves && $this->business_owner!=PB_Ourselves) {
+						
+						} else {
+							// no SSC in our books
+						}
+						//------- Destination handling charge
 					}
 					
 					if ($this->ps_profit && $this->ps_rate){
