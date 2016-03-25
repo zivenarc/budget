@@ -387,6 +387,7 @@ class Sales extends Document{
 		GLOBAL $Activities;
 		GLOBAL $YACT;
 		GLOBAL $Items;
+		GLOBAL $oBudget;
 		
 		$this->refresh($this->ID);		
 		$oMaster = new Master($this->scenario, $this->GUID);
