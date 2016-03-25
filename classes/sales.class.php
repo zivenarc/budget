@@ -389,6 +389,8 @@ class Sales extends Document{
 		GLOBAL $Items;
 		GLOBAL $oBudget;
 		
+		$dateProjectBridge = strtotime('1 April 2016');
+		
 		$this->refresh($this->ID);		
 		$oMaster = new Master($this->scenario, $this->GUID);
 			
@@ -414,10 +416,22 @@ class Sales extends Document{
 						
 						//------Update for Project bridge since 1st April 2016-----------
 						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-						if ($current_month_start>=strtotime('1 April 2016')){
+						if ($current_month_start>=$dateProjectBridge){
 							if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
-								$master_row->item = null;
-								$master_row->account = 'SZ0001';
+								
+								if (!isset($freight_r_row)){
+									$freight_r_row = $oMaster->add_master();
+								}
+															
+								$freight_r_row->item = null;
+								$freight_r_row->account = 'SZ0001';
+								$freight_r_row->profit = $this->profit;
+								$freight_r_row->activity = $record->activity;
+								$freight_r_row->customer = $record->customer;				
+								$freight_r_row->sales = $record->sales;	
+								$freight_r_row->{$month} = ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
+								$master_row->{$month} = null;
+								
 							} else{
 								// leave it alone
 							}
@@ -446,7 +460,7 @@ class Sales extends Document{
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							echo 'This: '.date('Y-m-d',$current_month_start).'\r\n';
 							echo 'PB: '.date('Y-m-d',strtotime('2016-04-01')).'\r\n';
-							if ($current_month_start>=strtotime('1 April 2016')){
+							if ($current_month_start>=$dateProjectBridge){
 								if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
 									$master_row->item = null;
 									$master_row->account = 'SZ0011';
@@ -479,7 +493,7 @@ class Sales extends Document{
 							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])/2;
 							//------Update for Project bridge since 1st April 2016-----------
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-							if ($current_month_start>=strtotime('1 April 2016')){
+							if ($current_month_start>=$dateProjectBridge){
 								$master_row->{$month} = 0;								
 							}
 						}
