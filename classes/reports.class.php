@@ -1799,7 +1799,7 @@ class Reports{
 				ORDER BY wc";
 		// echo '<pre>',$sql,'</pre>';
 		
-		$cm = $this->oBudget->arrPeriod[date('n',$this->oBudget->date_start - 1)];
+		$cm = date('n',$this->oBudget->date_start - 1);
 		
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){			
