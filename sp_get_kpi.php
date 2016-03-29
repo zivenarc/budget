@@ -40,7 +40,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 	$month = $oBudget->arrPeriod[$m];
 
 	$sql[] = "SET @dateStart:='{$repDateStart}', @dateEnd:='{$repDateEnd}'";
-	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
+	$sql[] = "INSERT INTO budget.reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
 				SELECT jobProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1,cntUserID
 				FROM nlogjc.tbl_job
 				JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
@@ -52,7 +52,8 @@ for ($i=0; $i<count($arrKPI);$i++){
 								WHERE jitJobID=jobID AND prdCategoryID=@prtID
 								)>0				
 				GROUP BY jobCustomerID, jobProfitID
-				HAVING  {$arrKPI[$i]['kpi']} IS NOT NULL";
+				HAVING `{$month}` IS NOT NULL";
+				// HAVING  {$arrKPI[$i]['kpi']} IS NOT NULL";
 	};
 };
 
