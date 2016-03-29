@@ -18,6 +18,7 @@ $arrKPI[] = Array('prtID'=>63,'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)', 'date'
 $arrKPI[] = Array('prtID'=>46,'ghq'=>'Air import','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobETAPort');
 $arrKPI[] = Array('prtID'=>47,'ghq'=>'Air export','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>7,'ghq'=>'Distribution','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>6,'ghq'=>'Delivery to plant','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>3,'ghq'=>'Transportation','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>4,'ghq'=>'Customs','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>13,'ghq'=>'Int.trucking','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
