@@ -80,6 +80,9 @@ if(!isset($_GET['pccGUID'])){
 		case 'sales':		
 			$oReport->monthlyReport($sqlWhere, 'sales');	
 			break;
+		case 'bdv':		
+			$oReport->monthlyReport($sqlWhere, 'bdv');	
+			break;
 		case 'customer_group':		
 			$oReport->monthlyReport($sqlWhere, 'customer_group');	
 			break;
