@@ -120,7 +120,7 @@ class Sales extends Document{
 		);
 		
 		$this->Columns[] = Array(
-			'title'=>'Ocean route'
+			'title'=>'Ocean/Air route'
 			,'field'=>self::Prefix.'Route'
 			,'type'=>'combobox'			
 			,'prefix'=>'rte'
