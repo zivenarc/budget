@@ -1188,6 +1188,10 @@ class Reports{
 				$sqlMeasure = "usrTitle as 'Level1_title', sales as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
 				$strGroupTitle = 'BDV employee';
 				break;
+			case 'bdv':
+				$sqlMeasure = "bdvTitle as 'Level1_title', bdv as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'Selling unit';
+				break;
 			case 'pc':
 				$sqlMeasure = "Profit as 'Level1_title', pc as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
 				$strGroupTitle = 'Business unit';
@@ -1559,7 +1563,7 @@ class Reports{
 				SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
 						{$strFields_last}
 				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oReference->id}' 
+				{$sqlWhere} AND scenario='{$this->oReference->id} AND `{$strAccountCode}` IS NOT NULL' 
 				{$sqlGroup}) Q
 			{$sqlGroup}
 			ORDER BY `Group` ASC			
@@ -1655,7 +1659,7 @@ class Reports{
 				SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
 				{$strFields['budget']}
 			FROM `vw_master`				
-			{$sqlWhere} AND scenario='{$strFields['from_b']}'
+			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND `item` IS NOT NULL
 			{$sqlGroup}			
 			ORDER BY `Group`, `itmOrder` ASC";
 			

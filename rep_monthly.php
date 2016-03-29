@@ -32,6 +32,7 @@ if(!isset($_GET['pccGUID'])){
 	$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
 	$arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");	
 	$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");	
+	$arrActions[] = Array ('title'=>'By BDV dept','action'=>"?type=bdv");	
 	
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
