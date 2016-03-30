@@ -25,7 +25,17 @@ class Reports{
 		
 		$this->YACT = $params['yact']?true:false;
 		// echo '<pre>';print_r($this);echo '</pre>';
-	
+		$this->filter = $params['filter'];
+		if(is_array($this->filter)){
+			foreach($this->filter as $key=>$value){
+				if (is_array($value)){
+					$arrWhere[] = $key." IN ('".implode("','",$value)."')";
+				} else {
+					$arrWhere[] = $key." = '{$value}'";
+				}
+			}
+			$this->sqlWhere = "WHERE ".implode (" AND ",$arrWhere);		
+		}		
 	}
 	
 	public function salesByActivity($sqlWhere=''){
@@ -1165,10 +1175,12 @@ class Reports{
 		ob_flush();
 	}
 	
-	public function monthlyReport($sqlWhere, $type='ghq'){
+	public function monthlyReport($type='ghq'){
 		
 		GLOBAL $budget_scenario;
 		$oBudget = new Budget($budget_scenario);
+		
+		$sqlWhere = $this->sqlWhere;
 		
 		switch($type){
 			case 'activity':
@@ -1238,7 +1250,7 @@ class Reports{
 			self::firstLevelReportMR($sql, $strGroupTitle, $oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
-			self::noFirstLevelReportMR($sqlWhere, $this->currency);
+			self::noFirstLevelReportMR($this->currency);
 			?>
 			</tbody>
 			</table>
@@ -1642,9 +1654,10 @@ class Reports{
 			
 	}
 	
-	private function noFirstLevelReportMR($sqlWhere, $currency=643){
+	private function noFirstLevelReportMR($currency=643){
 				
 		global $oSQL;		
+		$sqlWhere = $this->sqlWhere;
 		
 		$strFields = self::_getMRFields($currency);
 		
@@ -1724,8 +1737,6 @@ class Reports{
 		
 		//------- KPIs -----------------
 		
-		echo '<tr><th colspan="14">Operational KPIs</th></tr>';
-		
 		$sql = "SELECT activity, unit, 
 					{$strFields['actual']}
 			FROM `reg_sales`			
@@ -1759,11 +1770,20 @@ class Reports{
 				ORDER BY prtGHQ";
 		// echo '<pre>',$sql,'</pre>';
 		$rs = $oSQL->q($sql);
-		while ($rw = $oSQL->f($rs)){			
-			$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
-			$this->echoBudgetItemString($rw);
+		if ($oSQL->n($rs)){
+			?>
+			<tr><th colspan="14">Operational KPIs</th></tr>
+			<?php		
+			while ($rw = $oSQL->f($rs)){			
+				$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
+				$filter = $this->filter;
+				$filter['activity'] = $rw['activity'];
+				$arrMetadata = Array('filter' => $filter, 'DataAction' => 'kpiByCustomer', 'title'=>$rw['prtTitle']);
+				$rw['metadata'] = json_encode($arrMetadata);
+				$rw['href'] = "javascript:getDetails(".json_encode($arrMetadata).");";
+				$this->echoBudgetItemString($rw);
+			}
 		}
-
 		//------- Headcount -----------------
 		
 		echo '<tr><th colspan="14">Headcount</th></tr>';
@@ -1811,6 +1831,73 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 	
+	}
+	
+	public function kpiByCustomerMR(){
+		
+		GLOBAL $oSQL;
+		
+		$sqlWhere = $this->sqlWhere;
+		$strFields = self::_getMRFields(643);
+		
+		
+		$sql = "SELECT customer,
+					{$strFields['actual']}
+			FROM `reg_sales`			
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND source='Actual'
+			GROUP BY customer
+			UNION ALL
+			SELECT customer, 
+					{$strFields['next']}
+			FROM `reg_sales`			
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1
+			GROUP BY customer
+			UNION ALL
+				SELECT customer, 
+				{$strFields['budget']}
+			FROM `reg_sales`				
+			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND kpi=1 AND posted=1 
+			GROUP BY customer
+			ORDER BY customer";
+			
+		$sql = "SELECT cntTitle, 
+					SUM(CM_A) as CM_A,
+					SUM(CM_B) as CM_B,
+					SUM(YTD_A) as YTD_A,
+					SUM(YTD_B) as YTD_B,
+					SUM(NM_A) as NM_A,
+					SUM(NM_B) as NM_B					
+				FROM ($sql) U
+				LEFT JOIN common_db.tbl_counterparty ON customer=cntID
+				WHERE customer IS NOT NULL
+				GROUP BY customer
+				ORDER BY CM_A DESC";
+		// echo '<pre>',$sql,'</pre>';		
+		$rs = $oSQL->q($sql);
+		if ($oSQL->n($rs)){		
+			$tableID = "KPI_".md5($sql);
+			?>
+			<table id='<?php echo $tableID;?>' class='budget'>
+			<thead>
+				<tr>
+					<th colspan="2" rowspan="2">Customer</th>					
+					<?php echo $this->oBudget->getTableHeader('mr'); 							
+					?>					
+			</thead>			
+			<tbody>
+			<?php
+			while ($rw = $oSQL->f($rs)){			
+				$rw['Budget item'] = $rw['cntTitle'];
+				$this->echoBudgetItemString($rw);
+			}
+			?>
+			</tbody>
+			</table>
+			<?php
+		} else {
+			echo '<pre>',$sql,'</pre>';
+		}
+			
 	}
 	
 	private function _getMonthlyFields($type='this'){
@@ -1971,13 +2058,16 @@ class Reports{
 		GLOBAL $arrUsrData;
 		ob_start();
 		static $Level1_title;
+		
+		// echo '<pre>';print_r($data);echo '</pre>';
+		
 		?>
 		<tr class='<?php echo $strClass;?>'>
 			<?php 			
 			$first = reset($data);
 			if (is_array($first)){				
 				?>
-				<td class="budget-tdh code-<?php echo urlencode($first['level1_code']);?>" data-code="<?php echo $first['metadata'];?>" rowspan="<?php echo count($data);?>">
+				<td class="budget-tdh code-<?php echo urlencode($first['level1_code']);?>" data-code='<?php echo $first['metadata'];?>' rowspan='<?php echo count($data);?>'>
 					<?php 
 					if ($first['level1_code']==$arrUsrData['usrID']) echo '<strong>';
 					echo $first['Level1_title'];
@@ -2004,15 +2094,16 @@ class Reports{
 				$this->echoBudgetItemString($arrSubtotal,'budget-subtotal budget-item');
 			} else {	
 			?>
-			<td colspan="2">
+			<td colspan="2" data-code='<?php echo $data['metadata'];?>'>
 			<?php
 				if ($data['Group_code']==self::GP_CODE) {
 					echo 'Total '.strtolower($data['Budget item']); 
 				} else {
-					if (strpos($strClass,'total') || !isset($data['item'])){
+					if (!isset($data['href'])){
 						echo $data['Budget item'];
 					} else {
-						echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\'})">'.$data['Budget item'].'</a>';
+						// echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\'})">'.$data['Budget item'].'</a>';
+						echo "<a target='_blank' href='{$data['href']}'>{$data['Budget item']}</a>";
 					}
 				}
 			?>
