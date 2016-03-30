@@ -1871,7 +1871,7 @@ class Reports{
 				LEFT JOIN common_db.tbl_counterparty ON customer=cntID
 				WHERE customer IS NOT NULL
 				GROUP BY customer
-				ORDER BY CM_A DESC";
+				ORDER BY CM_A DESC, CM_B DESC";
 		// echo '<pre>',$sql,'</pre>';		
 		$rs = $oSQL->q($sql);
 		if ($oSQL->n($rs)){		
