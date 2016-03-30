@@ -22,6 +22,8 @@ class Budget{
 		$this->arrPeriod = Array(1=>'jan',2=>'feb',3=>'mar',4=>'apr',5=>'may',6=>'jun',7=>'jul',8=>'aug',9=>'sep',10=>'oct',11=>'nov',12=>'dec',13=>'jan_1',14=>'feb_1',15=>'mar_1');
 		$this->year = $rw['scnYear'];
 		$this->date_start = strtotime($rw['scnDateStart']);
+		$this->cm = date('n',$this->date_start-1); 
+		$this->nm = $this->cm+1;
 		$this->title = $rw["scnTitle$strLocal"];
 		$this->total = $rw['scnTotal'];
 		$this->id = $scenario;
@@ -376,27 +378,43 @@ class Budget{
 		ob_flush();
 	}
 	
-	public function getProfitAlias($rw){
-		if ($rw['pccFlagProd']){
-			switch ($rw['Profit']){
-				case 'TMMR':
-				case 'ICD':
-					$keyProfit = 'Toyota';
-					break;
-				case 'Forwarding':				
-				//case 'NOVO':
-				case 'Krekshino':
-					$keyProfit = 'FWD';
-					break;
-				// case 'STP':
-				// case 'CHB':
-					// $keyProfit = 'STP+CHB';
-					// break;
-				default:
-					$keyProfit = $rw['Profit'];
+	public function getProfitAlias($arrData, $structure = true){
+			
+		GLOBAL $oSQL;
+		
+		if ($structure){ // Подбор структуры в соответствии с 1С
+			if (!isset($this->arrPccID)){
+				$sql = "SELECT * FROM common_db.tbl_profit";
+				$rs = $oSQL->q($sql);
+				while ($rw = $oSQL->f($rs)){
+					$this->arrPccID[$rw['pccCode1C']] = $rw;
+					$this->arrProfit[$rw['pccTitle']] = $rw;
+				}
 			}
+			$keyProfit = $this->arrPccID[$this->arrProfit[$arrData['Profit']]['pccParentCode1C']]['pccTitle'];
 		} else {
-			$keyProfit = 'Corporate';
+			// По понятиям, быдлокод
+			if ($arrData['pccFlagProd']){
+				switch ($arrData['Profit']){
+					case 'TMMR':
+					case 'ICD':
+						$keyProfit = 'Toyota';
+						break;
+					case 'Forwarding':				
+					//case 'NOVO':
+					case 'Krekshino':
+						$keyProfit = 'FWD';
+						break;
+					// case 'STP':
+					// case 'CHB':
+						// $keyProfit = 'STP+CHB';
+						// break;
+					default:
+						$keyProfit = $arrData['Profit'];
+				}
+			} else {
+				$keyProfit = 'Corporate';
+			}
 		}
 		return ($keyProfit);
 	}

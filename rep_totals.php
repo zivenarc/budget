@@ -22,6 +22,8 @@ if ($bu_group){
 }
 
 
+
+
 $oBudget = new Budget($budget_scenario);
 $oReference = new Budget($reference);
 $mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1;
@@ -33,6 +35,12 @@ $arrRates_last = $oReference->getMonthlyRates($currency);
 // echo '<pre>'; print_r($arrRates);echo '</pre>';
 
 $arrJS[] = 'js/rep_totals.js';
+$arrActions[] = Array('title'=>'Apr-Mar','action'=>'?mthStart=4&mthEnd=15');
+$arrActions[] = Array('title'=>'Jan-Dec','action'=>'?mthStart=1&mthEnd=12');
+$arrActions[] = Array('title'=>'YTD','action'=>'?mthStart=1&mthEnd='.$oBudget->cm);
+$arrActions[] = Array('title'=>'This month','action'=>'?mthStart='.$oBudget->cm.'&mthEnd='.$oBudget->cm);
+$arrActions[] = Array('title'=>'Next month','action'=>'?mthStart='.$oBudget->nm.'&mthEnd='.$oBudget->nm);
+
 
 $arrUsrData["pagTitle$strLocal"] .= ': '.$oBudget->title;
 
@@ -59,10 +67,11 @@ include ('includes/inc_report_selectors.php');
 
 if ($mthStart!=1 || $mthEnd!=12){
 	if ($mthStart==$mthEnd){
-		echo '<h2>',date('F',mktime(0,0,0,$mthStart)),' only</h2>';
+		$periodTitle = date('F',mktime(0,0,0,$mthStart)).' only';
 	} else {
-		echo '<h2>Period: ',date('M',mktime(0,0,0,$mthStart))," &ndash; ", date('M',mktime(0,0,0,$mthEnd)),'</h2>';
+		$periodTitle = 'Period: '.date('M',mktime(0,0,0,$mthStart))." &ndash; ". date('M',mktime(0,0,0,$mthEnd));
 	}
+	echo '<h2>',$periodTitle,'</h2>';
 }
 
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
@@ -83,7 +92,11 @@ $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `G
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 
-	$keyProfit = $oBudget->getProfitAlias($rw);
+	if (!$bu_group) {
+		$keyProfit = $oBudget->getProfitAlias($rw);		
+	} else {
+		$keyProfit = $rw['Profit'];
+	}
 	
 	if ($rw['item']==Items::REVENUE || $rw['item']==Items::INTERCOMPANY_REVENUE){
 		$arrRevenue[$keyProfit] += $rw['Total'];
@@ -185,15 +198,7 @@ while ($rw=$oSQL->f($rs)){
 <table class='budget' id='report'>
 <caption><?php echo $arrUsrData["pagTitle$strLocal"], ' printed on ', date('d.m.Y h:i');?></caption>
 <thead>
-	<tr>
-		<th>Account</th>
-		<?php foreach($arrProfit as $pc=>$flag){
-					echo '<th>',$pc,'</th>';
-		};?>
-		<th class='budget-ytd'><?php echo $oBudget->type=='FYE'?'FYE':'Total';?></th>
-		<th><?php echo $strLastTitle;?></th>
-		<th>Diff</th>
-	</tr>
+	<?php echo getTableHeader();?>
 </thead>
 <tbody>
 <?php
@@ -284,15 +289,7 @@ foreach($arrReport as $group=>$arrItem){
 ?>
 </tbody>
 <tfoot>
-	<tr>
-		<th>Business unit</th>
-		<?php foreach($arrProfit as $pc=>$flag){
-					echo '<th>',$pc,'</th>';
-		};?>
-		<th class='budget-ytd'><?php echo $oBudget->type=='FYE'?'FYE':'Total';?></th>
-		<th><?php echo $strLastTitle;?></th>
-		<th>Diff</th>
-	</tr>
+	<?php echo getTableHeader();?>
 	<tr class="budget-total">
 		<td>Profit before tax</td>
 <?php
@@ -517,6 +514,24 @@ function renderDataByPC($data, $arrProfit, $strTitle, $strClass=""){
 		<td class='budget-decimal '><?php Reports::render(array_sum($data['this']) - array_sum($data['last']));?></td>
 	</tr>
 	<?php
+}
+
+function getTableHeader(){
+	GLOBAL $oBudget, $oReference, $arrProfit, $periodTitle;
+	ob_start();
+	?>
+		<tr>
+		<th>Account</th>
+		<?php foreach($arrProfit as $pc=>$flag){
+					echo '<th>',$pc,'</th>';
+		};?>
+		<th class='budget-ytd'><?php echo $oBudget->type=='FYE'?'FYE':'Total';?><br/><small><?php echo $periodTitle;?></small></th>
+		<th title="<?php echo $oReference->title;?>"><?php echo $oReference->id;?></th>
+		<th>Diff</th>
+	</tr>
+	<?php
+	$res = ob_get_clean();
+	return($res);
 }
 
 ?>
