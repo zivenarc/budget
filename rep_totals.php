@@ -126,7 +126,11 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthSt
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	$keyProfit = $oBudget->getProfitAlias($rw);
+	if (!$bu_group) {
+		$keyProfit = $oBudget->getProfitAlias($rw);		
+	} else {
+		$keyProfit = $rw['Profit'];
+	}
 	$arrHeadcount['FTE'][$keyProfit] += $rw['Total'];	
 	$arrHeadcountBudget['FTE'][$keyProfit] += $rw['Estimate'];	
 }
