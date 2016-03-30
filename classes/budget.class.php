@@ -416,6 +416,9 @@ class Budget{
 				$keyProfit = 'Corporate';
 			}
 		}
+		
+		if(!$keyProfit) $keyProfit = $arrData['Profit'];
+		
 		return ($keyProfit);
 	}
 	
