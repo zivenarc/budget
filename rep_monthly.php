@@ -85,7 +85,7 @@ switch ($_POST['DataAction']){
 							$(this).dialog({
 								'title':'Details for '+params.title,
 								'modal':true,
-								'width':'auto'
+								'width':'80%'
 							});
 						});
 				}
