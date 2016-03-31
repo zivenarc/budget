@@ -2088,11 +2088,14 @@ class Reports{
 					<?php
 					$this->_echoNumericTDs($values);
 					$row++;
-					foreach ($values as $column=>$value){						
-						$arrSubtotal[$column] += $value;
-					};	
+					
+					if ($data['item']){
+						foreach ($values as $column=>$value){						
+							$arrSubtotal[$column] += $value;
+						};	
+					}
 				}
-				$arrSubtotal['Budget item'] = "Subtotal";
+				$arrSubtotal['Budget item'] = "Subtotal";						
 				$this->echoBudgetItemString($arrSubtotal,'budget-subtotal budget-item');
 			} else {	
 			?>
@@ -2102,7 +2105,7 @@ class Reports{
 					echo 'Total '.strtolower($data['Budget item']); 
 				} else {
 					if (!isset($data['href'])){
-						echo $data['item']?$data['Budget item']:'<None>';
+						echo $data['Budget item']?$data['Budget item']:'<None>';
 					} else {
 						// echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\'})">'.$data['Budget item'].'</a>';
 						echo "<a target='_blank' href='{$data['href']}'>{$data['Budget item']}</a>";
