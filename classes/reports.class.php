@@ -888,7 +888,7 @@ class Reports{
 		$sql = "SELECT {$params['field_title']} as 'Level1_title', {$params['field_data']} as 'level1_code', `Budget item`, `Group`, `item`,
 					{$strFields}
 			FROM `vw_master` 			
-			{$sqlWhere} AND item IS NOT NULL
+			{$sqlWhere}
 			GROUP BY `vw_master`.`{$params['field_data']}`, `vw_master`.item
 			ORDER BY `{$params['field_data']}`, `Group`, `vw_master`.itmOrder ASC			
 			";
@@ -1344,8 +1344,8 @@ class Reports{
 				
 				while ($rw=$this->oSQL->f($rs)){
 					
-					foreach ($rw as $key=>$value){
-						$arrGrandTotal[$key] += $value;
+					foreach ($rw as $key=>$value){						
+						if ($rw['item']) $arrGrandTotal[$key] += $value;
 					}
 					
 					$l1Code = (string)$rw['level1_code'];
@@ -2100,7 +2100,7 @@ class Reports{
 					echo 'Total '.strtolower($data['Budget item']); 
 				} else {
 					if (!isset($data['href'])){
-						echo $data['Budget item'];
+						echo $data['item']?'<None>':$data['Budget item'];
 					} else {
 						// echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\'})">'.$data['Budget item'].'</a>';
 						echo "<a target='_blank' href='{$data['href']}'>{$data['Budget item']}</a>";
