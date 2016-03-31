@@ -57,6 +57,12 @@ class Sales extends Document{
 			$rs = $this->oSQL->q($sql);			
 			while($rw = $this->oSQL->f($rs)){
 				$this->records[$this->gridName][$rw['id']] = new sales_record($this->GUID, $this->scenario, $rw['id'], $rw);
+				if ($rw['unit']=='TEU'&& $rw['kpi']){
+					$this->arrTEU = $rw;
+				}
+				if ($rw['unit']=='Kgs'&& $rw['kpi']){
+					$this->arrKgs = $rw;
+				}
 			}		
 		}		
 		
@@ -564,7 +570,7 @@ class Sales extends Document{
 								//------Update for Project bridge since 1st April 2016-----------
 								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 								if ($current_month_start>=$dateProjectBridge){										
-									$master_row->{$month} = ($record->{$month})*$arrRoute['rteSC_OFF']*$this->settings['usd'];
+									$master_row->{$month} = ($this->arrTEU[$month])*$arrRoute['rteSC_OFF']*$this->settings['usd'];
 								} else {
 									$master_row->{$month} = 0;	// do not calculate Profit share						
 								}
@@ -590,7 +596,7 @@ class Sales extends Document{
 								//------Update for Project bridge since 1st April 2016-----------
 								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 								if ($current_month_start>=$dateProjectBridge){										
-									$master_row->{$month} = -($record->{$month})*$arrRoute['rteSC_OFF']*$this->settings['usd'];
+									$master_row->{$month} = -($this->arrTEU[$month])*$arrRoute['rteSC_OFF']*$this->settings['usd'];
 								} else {
 									$master_row->{$month} = 0;	// do not calculate Profit share						
 								}
@@ -620,7 +626,7 @@ class Sales extends Document{
 								//------Update for Project bridge since 1st April 2016-----------
 								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 								if ($current_month_start>=$dateProjectBridge){										
-									$master_row->{$month} = ($record->{$month})*6*$this->settings['usd'];
+									$master_row->{$month} = ($this->arrTEU[$month])*6*$this->settings['usd'];
 								} else {
 									$master_row->{$month} = 0;	// do not calculate Profit share						
 								}
@@ -646,7 +652,7 @@ class Sales extends Document{
 								//------Update for Project bridge since 1st April 2016-----------
 								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 								if ($current_month_start>=$dateProjectBridge){										
-									$master_row->{$month} = -($record->{$month})*6*$this->settings['usd'];
+									$master_row->{$month} = -($this->arrTEU[$month])*6*$this->settings['usd'];
 								} else {
 									$master_row->{$month} = 0;	// do not calculate Profit share						
 								}
