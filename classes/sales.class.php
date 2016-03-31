@@ -422,7 +422,9 @@ class Sales extends Document{
 			
 			if(is_array($this->records[$this->gridName])){
 				foreach($this->records[$this->gridName] as $id=>$record){
-							
+					
+					// echo '<pre>';print_r($record);echo '</pre>';
+					
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
 					$master_row->activity = $record->activity;
@@ -457,7 +459,7 @@ class Sales extends Document{
 								$freight_r_row->activity = $record->activity;
 								$freight_r_row->customer = $record->customer;				
 								$freight_r_row->sales = $record->sales;	
-								$freight_r_row->{$month} = ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
+								$freight_r_row->{$month} += ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
 								$master_row->{$month} = 0;
 								
 							} else{
@@ -500,7 +502,7 @@ class Sales extends Document{
 									$freight_c_row->activity = $record->activity;
 									$freight_c_row->customer = $record->customer;				
 									$freight_c_row->sales = $record->sales;	
-									$freight_c_row->{$month} = -($record->{$month})*$record->buying_rate*$this->settings[strtolower($record->buying_curr)];
+									$freight_c_row->{$month} += -($record->{$month})*$record->buying_rate*$this->settings[strtolower($record->buying_curr)];
 									$master_row->{$month} = 0;
 									} else {
 									// leave it alone
@@ -540,6 +542,8 @@ class Sales extends Document{
 								$master_row->{$month} = 0;	// do not calculate Profit share							
 							}
 						}
+					} else {
+						$flagProjectBridge = false;
 					}
 					
 					if ($flagProjectBridge){
