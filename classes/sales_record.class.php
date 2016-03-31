@@ -21,6 +21,7 @@ class sales_record extends table_record{
 			$this->kpi= $data['kpi'];	
 			$this->sales= $data['sales'];	
 			$this->route= $data['route'];	
+			$this->hbl= $data['hbl'];	
 		}		
 		return (true);
 	}	
@@ -57,6 +58,7 @@ class sales_record extends table_record{
 			$arrRes[] = "`sales`=".$oSQL->e($this->sales);
 			$arrRes[] = "`route`=".($this->route?(integer)$this->route:'NULL');
 			$arrRes[] = "`kpi`=".(integer)$this->kpi;
+			$arrRes[] = "`hbl`=".(integer)$this->hbl;
 			if ($this->id){
 				$res = "UPDATE `reg_sales` SET ". implode(',',$arrRes)." WHERE id=".$this->id;
 			} else {

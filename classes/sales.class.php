@@ -228,6 +228,16 @@ class Sales extends Document{
 				, 'disabled'=>$this->flagPosted
 		);	
 		
+		$this->grid->Columns[] =Array(
+				'title'=>"HBL/HAWB"
+				,'field'=>'hbl'
+				,'type'=>'boolean'
+				,'width'=>'35px'
+				,'mandatory'=>false
+				, 'disabled'=>$this->flagPosted
+		);	
+		
+		
 		if (!$this->flagPosted){		
 			
 			$this->setMonthlyEG('int');
@@ -333,6 +343,7 @@ class Sales extends Document{
 						$row->buying_curr = $_POST['buying_curr'][$id];				
 						$row->formula = $_POST['formula'][$id];				
 						$row->kpi = $_POST['kpi'][$id];				
+						$row->hbl = $_POST['hbl'][$id];				
 						$row->sales = $this->sales;				
 						$row->route = $this->route;				
 						for ($m=1;$m<=$this->budget->length;$m++){
@@ -425,8 +436,9 @@ class Sales extends Document{
 						
 						//------Update for Project bridge since 1st April 2016-----------
 						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-						if ($current_month_start>=$dateProjectBridge){
-							if ($record->activity==48 || $record->activity==63){
+						if ($current_month_start>=$dateProjectBridge){							
+							if ($record->hbl){
+							// if ($record->activity==48 || $record->activity==63){
 							// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
 								
 								if (!isset($freight_r_row)){
@@ -469,7 +481,8 @@ class Sales extends Document{
 							//------Update for Project bridge since 1st April 2016-----------
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							if ($current_month_start>=$dateProjectBridge){
-								if ($record->activity==48 || $record->activity==63){
+								if ($record->hbl){
+								// if ($record->activity==48 || $record->activity==63){
 								// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
 									if (!isset($freight_c_row)){
 										$freight_c_row = $oMaster->add_master();
@@ -491,8 +504,9 @@ class Sales extends Document{
 						}
 					}
 					
+					if ($record->hbl){
 					// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
-					if ($record->activity==48 || $record->activity==63){
+					// if ($record->activity==48 || $record->activity==63){
 					
 						$flagProjectBridge = true;
 					
