@@ -888,7 +888,7 @@ class Reports{
 		$sql = "SELECT {$params['field_title']} as 'Level1_title', {$params['field_data']} as 'level1_code', `Budget item`, `Group`, `item`,
 					{$strFields}
 			FROM `vw_master` 			
-			{$sqlWhere} 
+			{$sqlWhere} AND item IS NOT NULL
 			GROUP BY `vw_master`.`{$params['field_data']}`, `vw_master`.item
 			ORDER BY `{$params['field_data']}`, `Group`, `vw_master`.itmOrder ASC			
 			";
