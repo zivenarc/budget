@@ -2089,7 +2089,7 @@ class Reports{
 					$this->_echoNumericTDs($values);
 					$row++;
 					
-					if ($values['item']){
+					if ($item){
 						foreach ($values as $column=>$value){						
 							$arrSubtotal[$column] += $value;
 						};	
