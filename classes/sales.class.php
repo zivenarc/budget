@@ -426,7 +426,8 @@ class Sales extends Document{
 						//------Update for Project bridge since 1st April 2016-----------
 						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 						if ($current_month_start>=$dateProjectBridge){
-							if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
+							if ($record->activity==48 || $record->activity==63){
+							// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
 								
 								if (!isset($freight_r_row)){
 									$freight_r_row = $oMaster->add_master();
@@ -468,7 +469,8 @@ class Sales extends Document{
 							//------Update for Project bridge since 1st April 2016-----------
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							if ($current_month_start>=$dateProjectBridge){
-								if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
+								if ($record->activity==48 || $record->activity==63){
+								// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
 									if (!isset($freight_c_row)){
 										$freight_c_row = $oMaster->add_master();
 									}
@@ -489,7 +491,8 @@ class Sales extends Document{
 						}
 					}
 					
-					if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
+					// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
+					if ($record->activity==48 || $record->activity==63){
 					
 						$flagProjectBridge = true;
 					
