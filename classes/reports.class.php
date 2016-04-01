@@ -2063,6 +2063,10 @@ class Reports{
 		
 		// echo '<pre>';print_r($data);echo '</pre>';
 		
+		if (!is_array($data)){
+			return (false);
+		}
+		
 		?>
 		<tr class='<?php echo $strClass;?>'>
 			<?php 			
