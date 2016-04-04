@@ -1571,13 +1571,13 @@ class Reports{
 				(SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
 						{$strFields_this}
 				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oBudget->id}' 
+				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND `{$strAccountCode}` IS NOT NULL
 				{$sqlGroup}
 				UNION ALL
 				SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
 						{$strFields_last}
 				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oReference->id} AND `{$strAccountCode}` IS NOT NULL' 
+				{$sqlWhere} AND scenario='{$this->oReference->id} AND `{$strAccountCode}` IS NOT NULL 
 				{$sqlGroup}) Q
 			{$sqlGroup}
 			ORDER BY `Group` ASC			
