@@ -32,6 +32,9 @@ $sql[] = "SET @scenario='{$oBudget->id}'";
 $sql[] = "DELETE FROM `reg_sales` WHERE scenario=@scenario AND source='Actual';";
 
 for ($i=0; $i<count($arrKPI);$i++){
+
+	echo '<pre>',$arrKPI[$i]['ghq'],'</pre>';
+	
 	$sql[] = "SELECT  @prtID:=prtID, @jobGHQ:=prtGHQ, @unit:=prtUnit 
 				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']};";
 	for($m=1;$m<=$ytd;$m++){
@@ -65,6 +68,9 @@ $arrKPI[] = Array('prtID'=>6,'ghq'=>'Delivery to plant','kpi'=>'COUNT(DISTINCT j
 $arrKPI[] = Array('prtID'=>11,'ghq'=>'Shunting','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 
 for ($i=0; $i<count($arrKPI);$i++){
+
+	echo '<pre>',$arrKPI[$i]['ghq'],'</pre>';
+	
 	$sql[] = "SELECT  @prtID:=prtID, @jobGHQ:=prtGHQ, @unit:=prtUnit 
 				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']};";
 	for($m=1;$m<=$ytd;$m++){
@@ -88,9 +94,11 @@ for ($i=0; $i<count($arrKPI);$i++){
 	};
 };
 
-for ($i=0;$i<count($sql);$i++){
-	echo '<pre>',$sql[$i],'</pre>';
-	$oSQL->q($sql[$i]);
+for ($i=0;$i<count($sql);$i++){	
+	if (!$oSQL->q($sql[$i])){
+		echo '<h2>Error:</h2>';
+		echo '<pre>',$sql[$i],'</pre>';
+	}
 }
 
 
