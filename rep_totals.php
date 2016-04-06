@@ -78,12 +78,12 @@ echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
 $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM vw_master
-		WHERE scenario='{$oBudget->id}' AND item IS NOT NULL {$sqlWherePC}
+		WHERE scenario='{$oBudget->id}' AND account NOT LIKE 'SZ%' {$sqlWherePC}
 		GROUP BY Profit, `Budget item`,`item`
 		UNION ALL
 		SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM vw_master
-		WHERE scenario='{$reference}' AND item IS NOT NULL {$sqlWherePC}
+		WHERE scenario='{$reference}' AND account NOT LIKE 'SZ%' {$sqlWherePC}
 		GROUP BY Profit, `Budget item`,`item`
 		ORDER BY `Group`,pccFlagProd,Profit,itmOrder";
 
@@ -183,14 +183,14 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthSt
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$oBudget->id}' {$sqlWherePC}
-			AND (account NOT LIKE '6%' AND account NOT LIKE '7%')
+			AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')
 		GROUP BY Profit
 		UNION ALL
 		SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$reference}' {$sqlWherePC}
-			AND (account NOT LIKE '6%' AND account NOT LIKE '7%')
+			AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
