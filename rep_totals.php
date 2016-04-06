@@ -78,12 +78,12 @@ echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
 $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM vw_master
-		WHERE scenario='{$oBudget->id}' {$sqlWherePC}
+		WHERE scenario='{$oBudget->id}' AND item IS NOT NULL {$sqlWherePC}
 		GROUP BY Profit, `Budget item`,`item`
 		UNION ALL
 		SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM vw_master
-		WHERE scenario='{$reference}' {$sqlWherePC}
+		WHERE scenario='{$reference}' AND item IS NOT NULL {$sqlWherePC}
 		GROUP BY Profit, `Budget item`,`item`
 		ORDER BY `Group`,pccFlagProd,Profit,itmOrder";
 
