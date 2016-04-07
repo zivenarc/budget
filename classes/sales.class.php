@@ -444,7 +444,7 @@ class Sales extends Document{
 						
 						//------Update for Project bridge since 1st April 2016-----------
 						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-						if ($current_month_start>=$dateProjectBridge){							
+						if ($current_month_start>=$dateProjectBridge && $this->job_owner!=PB_Ourselves){							
 							if ($record->hbl){
 							// if ($record->activity==48 || $record->activity==63){
 							// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
@@ -488,7 +488,7 @@ class Sales extends Document{
 							
 							//------Update for Project bridge since 1st April 2016-----------
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-							if ($current_month_start>=$dateProjectBridge){
+							if ($current_month_start>=$dateProjectBridge && $this->job_owner!=PB_Ourselves){
 								if ($record->hbl){
 								// if ($record->activity==48 || $record->activity==63){
 								// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
