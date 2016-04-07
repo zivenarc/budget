@@ -1018,13 +1018,13 @@ class Reports{
 		
 		$sql = "SELECT {$sqlSelect}
 				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND account NOT LIKE '6%'";
+				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')";
 		$rs = $this->oSQL->q($sql);
 		$rwOP = $this->oSQL->f($rs);
 		
 		$sql = "SELECT {$sqlSelect}
 				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oReference->id}' AND account NOT LIKE '6%'";
+				{$sqlWhere} AND scenario='{$this->oReference->id}' AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')";
 		$rs = $this->oSQL->q($sql);
 		$rwBOP = $this->oSQL->f($rs);
 		
@@ -1532,7 +1532,7 @@ class Reports{
 			
 		//------ Operating income -------
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND account NOT LIKE '6%'", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
 		$sqlOps = str_replace('GROUP BY `yact_group`, `account`', '', $sqlOps);
 		$rs = $oSQL->q($sqlOps);
 		$rw = $oSQL->f($rs);
@@ -1646,7 +1646,7 @@ class Reports{
 			
 		//------ Operating income -------
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND account NOT LIKE '6%'", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
@@ -1729,7 +1729,7 @@ class Reports{
 			
 		//------ Operating income -------
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND account NOT LIKE '6%'", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $oSQL->q($sqlOps);
 		while ($rw = $oSQL->f($rs)){
