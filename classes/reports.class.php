@@ -1846,14 +1846,15 @@ class Reports{
 		
 		$cm = date('n',$this->oBudget->date_start - 1);
 		
-		$rs = $oSQL->q($sql);
-		while ($rw = $oSQL->f($rs)){			
-			$rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
-			
-			$rw['YTD_A'] = $rw['YTD_A']/$cm;
-			$rw['YTD_B'] = $rw['YTD_B']/$cm;
-			
-			$this->echoBudgetItemString($rw);
+		if (@$rs = $oSQL->q($sql)){
+			while ($rw = $oSQL->f($rs)){			
+				$rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
+				
+				$rw['YTD_A'] = $rw['YTD_A']/$cm;
+				$rw['YTD_B'] = $rw['YTD_B']/$cm;
+				
+				$this->echoBudgetItemString($rw);
+			}
 		}
 	
 	}
