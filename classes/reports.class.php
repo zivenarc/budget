@@ -1752,13 +1752,13 @@ class Reports{
 		
 		//------ JO freight -------
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('SZ0001','SZ0011'))", $sql);
-		$sqlOps = str_replace($sqlGroup, 'GROUP BY account', $sqlOps);
-		$rs = $oSQL->q($sqlOps);
-		while ($rw = $oSQL->f($rs)){
+		// $sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('SZ0001','SZ0011'))", $sql);
+		// $sqlOps = str_replace($sqlGroup, 'GROUP BY account', $sqlOps);
+		// $rs = $oSQL->q($sqlOps);
+		// while ($rw = $oSQL->f($rs)){
 			// $rw['Budget item'] = "Job owner's freight revenue";
-			$this->echoBudgetItemString($rw);
-		}
+			// $this->echoBudgetItemString($rw);
+		// }
 		
 		//------- KPIs -----------------
 		
