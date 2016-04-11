@@ -22,6 +22,7 @@ $arrJS[]='js/rep_pnl.js';
 $arrActions[] = Array ('title'=>'By customer','action'=>"?type=customer");
 $arrActions[] = Array ('title'=>'By activity','action'=>"?type=activity");
 $arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
+$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");
 
 if(isset($currency)){
 		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
@@ -52,6 +53,9 @@ switch ($type){
 	case 'ghq':
 		$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
 		break;		
+	case 'pc':
+		$oReport->periodicPnL($sqlWhere,Array('field_data'=>'pc','field_title'=>'Profit','title'=>'PC'));	
+		break;	
 	case 'customer':
 	default:			
 		$oReport->periodicPnL($sqlWhere,Array('field_data'=>'customer','field_title'=>'Customer_name','title'=>'Customer'));
