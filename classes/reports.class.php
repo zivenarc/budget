@@ -1737,6 +1737,16 @@ class Reports{
 			$this->echoBudgetItemString($rw,'budget-subtotal');
 		}
 		
+		//------ Gross revenue -------
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = 'J00400')", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $oSQL->q($sqlOps);
+		while ($rw = $oSQL->f($rs)){
+			$rw['Budget item'] = "Gross revenue";
+			$this->echoBudgetItemString($rw);
+		}
+		
 		//------- KPIs -----------------
 		
 		$sql = "SELECT activity, unit, 
