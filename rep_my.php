@@ -44,27 +44,33 @@ echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 <div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 <?php
 $sqlWhere .= "WHERE scenario='$budget_scenario' AND sales = ".$oSQL->e($ownerID);
-$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator));
-	
-switch ($type){
-	case 'activity':		
-		$oReport->periodicPnL($sqlWhere,Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity'));	
-		break;
-	case 'ghq':
-		$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
-		break;		
-	case 'pc':
-		$oReport->periodicPnL($sqlWhere,Array('field_data'=>'pc','field_title'=>'Profit','title'=>'PC'));	
-		break;	
-	case 'customer':
-	default:			
-		$oReport->periodicPnL($sqlWhere,Array('field_data'=>'customer','field_title'=>'Customer_name','title'=>'Customer'));
-		break;
-}
-?>
-<h2>KPI</h2>
-<?php
-$oReport->salesByCustomer(' and sales='.$oSQL->e($ownerID));
 
+
+$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>Array('sales'=>$ownerID)));
+
+if ($oBudget->type=='FYE'){
+	$oReport->monthlyReport($type);
+} else {
+	switch ($type){
+		case 'activity':		
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity'));	
+			break;
+		case 'ghq':
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
+			break;		
+		case 'pc':
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'pc','field_title'=>'Profit','title'=>'PC'));	
+			break;	
+		case 'customer':
+		default:			
+			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'customer','field_title'=>'Customer_name','title'=>'Customer'));
+			break;
+	}
+
+	?>
+	<h2>KPI</h2>
+	<?php
+	$oReport->salesByCustomer(' and sales='.$oSQL->e($ownerID));
+}
 include ('includes/inc-frame_bottom.php');
 ?>
