@@ -1846,7 +1846,7 @@ class Reports{
 		
 		$cm = date('n',$this->oBudget->date_start - 1);
 		
-		if (@$rs = $oSQL->q($sql)){
+		if ($rs = @$oSQL->q($sql)){
 			while ($rw = $oSQL->f($rs)){			
 				$rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
 				
