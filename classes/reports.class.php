@@ -1726,7 +1726,10 @@ class Reports{
 			$data = $grandTotal;
 			$data['Budget item']='Profit before tax';
 			$this->echoBudgetItemString($data,'budget-total');
-			
+		
+		?>
+			<tr><th colspan="14">Other financials</th></tr>
+		<?php			
 		//------ Operating income -------
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
@@ -1744,6 +1747,16 @@ class Reports{
 		$rs = $oSQL->q($sqlOps);
 		while ($rw = $oSQL->f($rs)){
 			$rw['Budget item'] = "Gross revenue";
+			$this->echoBudgetItemString($rw);
+		}
+		
+		//------ JO freight -------
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('SZ0001','SZ0011'))", $sql);
+		$sqlOps = str_replace($sqlGroup, 'GROUP BY account', $sqlOps);
+		$rs = $oSQL->q($sqlOps);
+		while ($rw = $oSQL->f($rs)){
+			// $rw['Budget item'] = "Job owner's freight revenue";
 			$this->echoBudgetItemString($rw);
 		}
 		
