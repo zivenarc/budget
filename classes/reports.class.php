@@ -1699,21 +1699,21 @@ class Reports{
 					$this->echoBudgetItemString($data,'budget-subtotal');
 				}
 				
-
-				$subtotal[$rw['Group']]['CM_A'] += $rw['CM_A'];
-				$subtotal[$rw['Group']]['CM_B'] += $rw['CM_B'];
-				$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
-				$subtotal[$rw['Group']]['YTD_B'] += $rw['YTD_B'];
-				$subtotal[$rw['Group']]['NM_A'] += $rw['NM_A'];
-				$subtotal[$rw['Group']]['NM_B'] += $rw['NM_B'];
-				
-				$grandTotal['CM_A'] += $rw['CM_A'];
-				$grandTotal['CM_B'] += $rw['CM_B'];
-				$grandTotal['YTD_A'] += $rw['YTD_A'];
-				$grandTotal['YTD_B'] += $rw['YTD_B'];
-				$grandTotal['NM_A'] += $rw['NM_A'];
-				$grandTotal['NM_B'] += $rw['NM_B'];
-				
+				if ($rw['Budget item']){
+					$subtotal[$rw['Group']]['CM_A'] += $rw['CM_A'];
+					$subtotal[$rw['Group']]['CM_B'] += $rw['CM_B'];
+					$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
+					$subtotal[$rw['Group']]['YTD_B'] += $rw['YTD_B'];
+					$subtotal[$rw['Group']]['NM_A'] += $rw['NM_A'];
+					$subtotal[$rw['Group']]['NM_B'] += $rw['NM_B'];
+					
+					$grandTotal['CM_A'] += $rw['CM_A'];
+					$grandTotal['CM_B'] += $rw['CM_B'];
+					$grandTotal['YTD_A'] += $rw['YTD_A'];
+					$grandTotal['YTD_B'] += $rw['YTD_B'];
+					$grandTotal['NM_A'] += $rw['NM_A'];
+					$grandTotal['NM_B'] += $rw['NM_B'];				
+				}
 				
 				$this->echoBudgetItemString($rw,$tr_class);				
 				$group = $rw['Group'];

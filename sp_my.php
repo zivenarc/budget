@@ -2,7 +2,11 @@
 // $flagNoAuth =true;
 require ('common/auth.php');
 
+
 $ownerID = isset($_GET['ownerID'])?$_GET['ownerID']:($_COOKIE['ownerID']?$_COOKIE['ownerID']:$arrUsrData['usrID']);
+if ($_GET['ownerID']=='MYSELF'){
+	$ownerID = $arrUsrData['usrID'];
+}
 SetCookie('ownerID',$ownerID,0);
 
 
@@ -35,7 +39,14 @@ if ($_GET['tab']){
 	
 } else {
 	require ('classes/budget.class.php');
-	$arrJS[] = 'js/journal.js';		
+	$arrJS[] = 'js/journal.js';
+
+	
+	$sql = "SELECT * FROM stbl_user WHERE usrID=".$oSQL->e($ownerID);
+	$rs = $oSQL->q($sql);
+	$rw = $oSQL->f($rs);
+	$arrUsrData["pagTitle$strLocal"] .= ' :: '.($rw['usrTitle']?$rw['usrTitle']:'<Unknown>');
+	
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
 	echo Budget::getScenarioTabs(true);
