@@ -1678,7 +1678,7 @@ class Reports{
 			{$sqlGroup}			
 			ORDER BY `Group`, `itmOrder` ASC";
 			
-			// echo '<pre>',$sql,'</pre>';
+		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
 		
 		$sql = self::_unionMRQueries($sql, $sqlGroup);
 			
@@ -1846,17 +1846,15 @@ class Reports{
 		
 		$cm = date('n',$this->oBudget->date_start - 1);
 		
-		if ($rs = @$oSQL->q($sql)){
-			while ($rw = $oSQL->f($rs)){			
-				$rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
-				
-				$rw['YTD_A'] = $rw['YTD_A']/$cm;
-				$rw['YTD_B'] = $rw['YTD_B']/$cm;
-				
-				$this->echoBudgetItemString($rw);
-			}
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){			
+			$rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
+			
+			$rw['YTD_A'] = $rw['YTD_A']/$cm;
+			$rw['YTD_B'] = $rw['YTD_B']/$cm;
+			
+			$this->echoBudgetItemString($rw);
 		}
-	
 	}
 	
 	public function kpiByCustomerMR(){
