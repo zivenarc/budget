@@ -56,7 +56,7 @@ if(!isset($_GET['pccGUID'])){
 	
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
 	
-	$oReport->salesByActivity($sqlWhere);
+	
 	?>
 		<div id='graph'/>
 	<?php
@@ -64,6 +64,7 @@ if(!isset($_GET['pccGUID'])){
 		$oReport->monthlyReport($type);	
 	} else {
 		$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
+		$oReport->salesByActivity($sqlWhere);
 	}
 	// $oReport->periodicPnL($sqlWhere,Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity'));	
 	
