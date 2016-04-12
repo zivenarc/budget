@@ -15,11 +15,16 @@ $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$bud
 $oBudget = new Budget($budget_scenario);
 
 
-$sql = "SELECT cntID, cntTitle$strLocal FROM common_db.tbl_counterparty WHERE cntID={$cntID} OR cntParentCode1C=(SELECT cntCode1C FROM common_db.tbl_counterparty WHERE cntID={$cntID})";
+$sql = "SELECT cntID, cntTitle$strLocal, cntUserID, usrTitle$strLocal as Sales
+		FROM common_db.tbl_counterparty 
+		LEFT JOIN stbl_user ON usrID=cntUserID
+		WHERE cntID={$cntID} 
+			OR cntParentCode1C=(SELECT cntCode1C FROM common_db.tbl_counterparty WHERE cntID={$cntID})
+		ORDER BY cntUserID, cntTitle$strLocal";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	$arrCnt[] = $rw['cntID'];
-	$arrCntTitle[] = $rw["cntTitle$strLocal"];
+	$arrCntTitle[$rw['Sales']][] = $rw["cntTitle$strLocal"];
 }
 
 if(!isset($_GET['pccGUID'])){
@@ -35,7 +40,12 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$oBudget->title,' :: ',$arrUsrData["pagTitle$strLocal"],'</h1>';
 	
-	echo '<h2>',implode(', ',$arrCntTitle),'</h2>';
+	if (count($arrCnt>1)){
+		foreach ($arrCntTitle as $sales=>$customers){
+			echo '<h2>',$sales,'</h2>';
+			'<p>',implode(', ',$customers),'</p>';
+		}
+	}
 	
 	?>
 	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
