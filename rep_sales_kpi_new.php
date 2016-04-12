@@ -13,7 +13,7 @@ $_SESSION['cntID'] = $cntID;
 
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 $oBudget = new Budget($budget_scenario);
-$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator));
+
 
 $sql = "SELECT cntID, cntTitle$strLocal FROM common_db.tbl_counterparty WHERE cntID={$cntID} OR cntParentCode1C=(SELECT cntCode1C FROM common_db.tbl_counterparty WHERE cntID={$cntID})";
 $rs = $oSQL->q($sql);
@@ -50,7 +50,12 @@ if(!isset($_GET['pccGUID'])){
 	} else {
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND customer IN (".implode(',',$arrCnt).")";
 	}
-
+	
+	$filter[] = Array('customer',$arrCnt);
+	
+	
+	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
+	
 	$oReport->salesByActivity($sqlWhere);
 	?>
 		<div id='graph'/>
