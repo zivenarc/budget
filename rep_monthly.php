@@ -6,10 +6,12 @@ include ('includes/inc_report_settings.php');
 
 if ($bu_group){
 	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		$arrBus[] = $rw['pccID']; 
-	}
+} else {
+	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccFlagFolder=0";
+}
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	$arrBus[] = $rw['pccID']; 
 }
 
 $oBudget = new Budget($budget_scenario);
