@@ -23,6 +23,13 @@ while ($rw = $oSQL->f($rs)){
 }
 
 if(!isset($_GET['pccGUID'])){
+
+	$arrActions[] = Array ('title'=>'By activity','action'=>"?type=activity");
+	$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
+	$arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");	
+	$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");	
+	$arrActions[] = Array ('title'=>'By BDV dept','action'=>"?type=bdv");	
+
 	$arrJS[] = 'https://www.google.com/jsapi';
 	$arrJS[]='js/rep_pnl.js';
 	include ('includes/inc-frame_top.php');
@@ -47,8 +54,12 @@ if(!isset($_GET['pccGUID'])){
 	$oReport->salesByActivity($sqlWhere);
 	?>
 		<div id='graph'/>
-	<?php	
-	$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
+	<?php
+	if ($oBudget->type=='FYE'){
+		$oReport->monthlyReport($type);	
+	} else {
+		$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
+	}
 	// $oReport->periodicPnL($sqlWhere,Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity'));	
 	
 }
