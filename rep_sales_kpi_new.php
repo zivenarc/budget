@@ -42,7 +42,7 @@ if(!isset($_GET['pccGUID'])){
 	
 	if (count($arrCnt>1)){
 		foreach ($arrCntTitle as $sales=>$customers){
-			echo '<h2>',$sales,'</h2>';
+			echo '<h2>',($sales?$sales:"Unassigned"),'</h2>';
 			echo '<p>',implode(', ',$customers),'</p>';
 		}
 	}
