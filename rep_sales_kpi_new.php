@@ -14,6 +14,7 @@ $_SESSION['cntID'] = $cntID;
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 $oBudget = new Budget($budget_scenario);
 
+include ('includes/inc_report_pcfilter.php');
 
 $sql = "SELECT cntID, cntTitle$strLocal, cntUserID, usrTitle$strLocal as Sales
 		FROM common_db.tbl_counterparty 
@@ -61,8 +62,7 @@ if(!isset($_GET['pccGUID'])){
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND customer IN (".implode(',',$arrCnt).")";
 	}
 	
-	$filter['customer'] = $arrCnt;
-	
+	$filter['customer'] = $arrCnt;	
 	
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
 	

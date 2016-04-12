@@ -4,16 +4,6 @@ require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
-if ($bu_group){
-	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
-} else {
-	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccFlagFolder=0";
-}
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	$arrBus[] = $rw['pccID']; 
-}
-
 $oBudget = new Budget($budget_scenario);
 if ($reference!=$oBudget->reference_scenario->id){
 	$oReference = new Budget($reference);
@@ -29,29 +19,7 @@ if(isset($_GET['currency'])){
 		echo '<h2>',$rw["curTitle$strLocal"],'</h2>';
 }
 
-if ($_GET['pccGUID']=='all'){
-	$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-	
-	if ($bu_group){
-		$strBUs = implode(',',$arrBus);
-		$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1 AND pcrProfitID IN ({$strBUs})";
-	} else {		
-		$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
-	}
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		$arrPC[] = $rw['pcrProfitID'];
-	}		
-} else {
-	$sql = "SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']);
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		$arrPC[] = $rw['pccID'];
-	}			
-}
-	// $sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
-
-$filter['pc'] = $arrPC;
+include ('includes/inc_report_pcfilter.php');
 
 if (isset($_REQUEST['filter'])){
 	$user_filter = $_REQUEST['filter'];	
