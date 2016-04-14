@@ -1,4 +1,6 @@
 <?php
+$flagNoAuth = true;
+
 require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
@@ -19,7 +21,18 @@ if(isset($_GET['currency'])){
 		echo '<h2>',$rw["curTitle$strLocal"],'</h2>';
 }
 
-include ('includes/inc_report_pcfilter.php'); /// filter and tabs for Business unit
+// include ('includes/inc_report_ghqfilter.php'); /// filter and tabs for GHQ product
+if (isset($_GET['prtGHQ'])){
+	$sql = "SELECT * FROM common_db.tbl_product_type WHERE prtGHQ=".$oSQL->e($_GET['prtGHQ']);
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrPRT[] = $rw['prtID'];
+	}
+	
+	$filter['activity'] = $arrPRT;	
+	
+}
+
 
 if (isset($_REQUEST['filter'])){
 	$user_filter = $_REQUEST['filter'];	
@@ -34,7 +47,7 @@ switch ($_POST['DataAction']){
 		die();
 		break;
 	default:
-		if(!isset($_GET['pccGUID'])){
+		if(!isset($_GET['prtGHQ'])){
 			
 			$arrJS[]='js/rep_pnl.js';
 			// $arrJS[]='js/input_form.js';	
@@ -42,7 +55,7 @@ switch ($_POST['DataAction']){
 			$arrActions[] = Array ('title'=>'By customer group','action'=>"?type=customer_group");
 			$arrActions[] = Array ('title'=>'By customer','action'=>"?type=customer");
 			$arrActions[] = Array ('title'=>'By activity','action'=>"?type=activity");
-			$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
+			// $arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
 			$arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");	
 			$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");	
 			$arrActions[] = Array ('title'=>'By BDV dept','action'=>"?type=bdv");	
@@ -67,11 +80,11 @@ switch ($_POST['DataAction']){
 			include ('includes/inc_report_selectors.php');
 			echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';	
 			
-			$oBudget::getProfitTabs('reg_master', true, Array('pccID'=>$arrBus));
+			$oBudget::getGHQTabs();
 			include ('includes/inc-frame_bottom.php');
 		} else {
 				
-			$oReport->monthlyReport($type);		
+			$oReport->monthlyReportGHQ($type);		
 
 		}
 }

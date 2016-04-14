@@ -1261,6 +1261,91 @@ class Reports{
 			ob_flush();
 	}
 	
+	public function monthlyReportGHQ($type='ghq'){
+		
+		GLOBAL $budget_scenario;
+		$oBudget = new Budget($budget_scenario);
+		
+		$sqlWhere = $this->sqlWhere;
+		
+		switch($type){
+			case 'activity':
+				$sqlMeasure = "Activity_title as 'Level1_title', activity as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'Activity';
+				break;
+			case 'customer':
+				$sqlMeasure = "Customer_name as 'Level1_title', customer as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'Customer';
+				break;
+			case 'customer_group':
+				$sqlMeasure = "CASE WHEN Customer_group_code=723 THEN Customer_name ELSE Customer_group_title END as 'Level1_title'
+						, CASE WHEN Customer_group_code=723 THEN customer ELSE Customer_group_code END as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'Customer group';
+				break;
+			case 'sales':
+				$sqlMeasure = "usrTitle as 'Level1_title', sales as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'BDV employee';
+				break;
+			case 'bdv':
+				$sqlMeasure = "bdvTitle as 'Level1_title', bdv as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'Selling unit';
+				break;
+			case 'pc':
+				$sqlMeasure = "Profit as 'Level1_title', pc as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'Business unit';
+				break;
+			case 'ghq':
+			default:
+				$sqlMeasure = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$strGroupTitle = 'GHQ segment';
+				break;
+		}
+		
+		$strFields = $this->_getMonthlyFields();
+		
+		$strFields = $this->_getMRFields();
+		
+		$sqlGroup = "GROUP BY Level1_title, level1_code, `Budget item`, `item`, `Group`";
+		
+		ob_start();
+		
+		$sql = "SELECT {$sqlMeasure}
+					{$strFields['actual']}
+			FROM `vw_master`			
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND Group_code=".self::GP_CODE." 
+			{$sqlGroup}	
+			UNION ALL
+				SELECT {$sqlMeasure}
+				{$strFields['budget']}
+			FROM `vw_master`				
+			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND Group_code=".self::GP_CODE."  
+			{$sqlGroup}			
+			ORDER BY `Group`, `itmOrder` ASC";
+		
+		$sql = "SELECT `Level1_title`, `level1_code`, `Budget item`, `Group`, `item`,`itmOrder`,
+					SUM(CM_A) as CM_A,
+					SUM(CM_B) as CM_B,
+					SUM(YTD_A) as YTD_A,
+					SUM(YTD_B) as YTD_B,
+					SUM(NM_A) as NM_A,
+					SUM(NM_B) as NM_B
+				FROM ({$sql}) U {$sqlGroup} 
+				ORDER BY `level1_code`, `Group`, `itmOrder` ASC";
+			
+			
+			self::firstLevelReportMR($sql, $strGroupTitle, $oBudget);
+			$tableID = "FLR_".md5($sql);
+			//==========================================================================================================================Non-customer-related data
+			// self::noFirstLevelReportMR($this->currency);
+			?>
+			</tbody>
+			</table>
+			<ul class='link-footer'>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
+			<?php			
+			ob_flush();
+	}
 	
 	public function masterYactbyActivityEst($sqlWhere){
 		global $oSQL;

@@ -304,9 +304,9 @@ class Budget{
 			}
 			$rs = $oSQL->q($sql);
 			while ($rw=$oSQL->f($rs)){
-				echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=",$rw['prtGHQ'],"'>",$rw['prtGHQ'],"</a></li>\r\n";
+				echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&prtGHQ=",urlencode($rw['prtGHQ']),"'>",($rw['prtGHQ']?$rw['prtGHQ']:'[None]'),"</a></li>\r\n";
 			}
-			echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&tab=all'>All</a></li>\r\n";
+			echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&prtGHQ=all'>All</a></li>\r\n";
 			?>
 			</ul>
 		</div>
