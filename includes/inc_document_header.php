@@ -2,7 +2,7 @@
 echo '<h1>';
 if ($oDocument->ID){
 	echo $oDocument->budget->title,' :: ';
-	echo $arrUsrData["pagTitle"], "# ",$oDocument->ID;
+	echo "<a href='{$_SERVER['REQUEST_URI']}'>",$arrUsrData["pagTitle"], "# ",$oDocument->ID,"</a>";
 } else {
  echo 'New ',$arrUsrData["pagTitle"];
 }
