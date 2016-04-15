@@ -1708,14 +1708,16 @@ class Reports{
 				$subtotal[$rw['Group']]['ROY_A'] += $rw['ROY_A'];
 				$subtotal[$rw['Group']]['ROY'] += $rw['ROY'];
 				
-				$grandTotal['Total'] += $rw['Total'];
-				$grandTotal['Total_AM'] += $rw['Total_AM'];
-				$grandTotal['estimate'] += $rw['estimate'];
-				$grandTotal['estimate_AM'] += $rw['estimate_AM'];
-				$grandTotal['YTD_A'] += $rw['YTD_A'];
-				$grandTotal['YTD'] += $rw['YTD'];
-				$grandTotal['ROY_A'] += $rw['ROY_A'];
-				$grandTotal['ROY'] += $rw['ROY'];
+				if($rw['item']){
+					$grandTotal['Total'] += $rw['Total'];
+					$grandTotal['Total_AM'] += $rw['Total_AM'];
+					$grandTotal['estimate'] += $rw['estimate'];
+					$grandTotal['estimate_AM'] += $rw['estimate_AM'];
+					$grandTotal['YTD_A'] += $rw['YTD_A'];
+					$grandTotal['YTD'] += $rw['YTD'];
+					$grandTotal['ROY_A'] += $rw['ROY_A'];
+					$grandTotal['ROY'] += $rw['ROY'];
+				}
 				
 				$this->echoBudgetItemString($rw,$tr_class);				
 				$group = $rw['Group'];
