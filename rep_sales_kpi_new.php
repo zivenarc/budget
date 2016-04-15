@@ -16,7 +16,7 @@ $oBudget = new Budget($budget_scenario);
 
 include ('includes/inc_report_pcfilter.php');
 
-$sql = "SELECT cntID, cntTitle$strLocal, cntUserID, usrTitle$strLocal as Sales
+$sql = "SELECT cntID, cntTitle$strLocal as cntTitle, cntUserID, usrTitle$strLocal as Sales, cntFlagFolder
 		FROM common_db.tbl_counterparty 
 		LEFT JOIN stbl_user ON usrID=cntUserID
 		WHERE cntID={$cntID} 
@@ -25,7 +25,7 @@ $sql = "SELECT cntID, cntTitle$strLocal, cntUserID, usrTitle$strLocal as Sales
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	$arrCnt[] = $rw['cntID'];
-	$arrCntTitle[$rw['Sales']][] = $rw["cntTitle$strLocal"];
+	$arrCntTitle[$rw['Sales']][$rw['cntID']] = $rw;
 }
 
 if(!isset($_GET['pccGUID'])){
@@ -43,8 +43,18 @@ if(!isset($_GET['pccGUID'])){
 	
 	if (count($arrCnt>1)){
 		foreach ($arrCntTitle as $sales=>$customers){
-			echo '<h3>',($sales?$sales:"Unassigned"),'</h3>';
-			echo '<div>',implode(', ',$customers),'</div>';
+			echo '<h4>',($sales?$sales:"Unassigned"),'</h4>';
+			echo '<div>';
+			foreach ($customers as $id=>$data){
+				echo "<span class='".($data['cntFlagFolder']?'folder-open':'')."'>";
+				if ($id==$cntID){
+					echo $data["cntTitle"];
+				} else {
+					echo "<a href='{$_SERVER['PHP_SELF']}?cntID={$id}'>",$data["cntTitle"],"</a>";
+				}
+				echo "</span> | ";
+			}
+			echo '</div>';
 		}
 	}
 	

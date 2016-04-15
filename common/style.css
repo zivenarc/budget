@@ -1910,3 +1910,9 @@ td.budget-inactive{
     margin-bottom: -25px;
     margin-left: 3px;
 }
+.folder-open {
+padding-left: 18px;
+background-image:url(/common/images/sprites/sprites.png);
+background-repeat:no-repeat;
+background-position:left -7597px;
+}
