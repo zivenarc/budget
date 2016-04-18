@@ -78,8 +78,8 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 					WHERE scenario='{$budget_scenario}'
 					AND posted=1 AND active=1 AND salary>0";
 			
-			$sql = $sqlSelect."\r\n GROUP BY pc, `particulars`
-					ORDER BY pc, empSalary DESC, funGUID, empTitleLocal";
+			$sql = $sqlSelect."\r\n GROUP BY pc,location, `particulars`
+					ORDER BY pc,location, empSalary DESC, funGUID, empTitleLocal";
 			$rs = $oSQL->q($sql);			
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
@@ -97,6 +97,7 @@ include ('includes/inc-frame_top.php');
 					<th>ID</th>		
 					<th>Code</th>		
 					<th>PC</th>		
+					<th>Location</th>		
 					<th>Name</th>		
 					<th>Title</th>		
 					<th>Salary</th>		
@@ -111,7 +112,7 @@ include ('includes/inc-frame_top.php');
 				if ($pcc && $pcc!=$rw['pccTitle']){
 					?>
 					<tr class="budget-subtotal">
-						<td colspan="8">Subtotal <?php echo $pcc;?></td>
+						<td colspan="9">Subtotal <?php echo $pcc;?></td>
 						<?php				
 						for ($m=1;$m<13;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
@@ -128,6 +129,7 @@ include ('includes/inc-frame_top.php');
 					<td><?php echo $rw['empID'];?></td>
 					<td><?php echo $rw['empCode1C'];?></td>
 					<td><?php echo $rw['pccTitle'];?></td>
+					<td><?php echo $rw['locTitle'];?></td>
 					<td><?php echo $rw['empTitleLocal'];?></td>
 					<td><?php echo $rw['empFunction'];?></td>
 					<td class='budget-decimal'><?php echo number_format($rw['empSalary'],2,'.',',');?></td>
@@ -151,7 +153,7 @@ include ('includes/inc-frame_top.php');
 			?>
 			<tfoot>
 			<tr class='budget-subtotal'>
-			<td colspan="8">Total</td>
+			<td colspan="9">Total</td>
 			<?php
 				for ($m=1;$m<13;$m++){
 					// $month = date('M',mktime(0,0,0,$m,15));
