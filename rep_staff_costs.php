@@ -68,7 +68,7 @@ for ($i=0;$i<count($sql);$i++){
 }
 
 $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empTitleLocal, empFunction, empSalary, empStartDate, empEndDate, end_date, 
-						locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pccTitle,pccTitleLocal , ".$oBudget->getMonthlySumSQL().", SUM(".$oBudget->getYTDSQL().")/12 as Total 
+						locTitle as 'Location', prtGHQ as 'Activity', funTitle, funTitleLocal, pccTitle,pccTitleLocal , ".$oBudget->getMonthlySumSQL().", SUM(".$oBudget->getYTDSQL().")/12 as Total 
 					FROM `reg_headcount`
 					LEFT JOIN vw_function ON funGUID=function
 					LEFT JOIN vw_product_type ON prtID=activity
@@ -98,6 +98,7 @@ include ('includes/inc-frame_top.php');
 					<th>Code</th>		
 					<th>PC</th>		
 					<th>Location</th>		
+					<th>Activity</th>		
 					<th>Name</th>		
 					<th>Title</th>		
 					<th>Salary</th>		
@@ -112,7 +113,7 @@ include ('includes/inc-frame_top.php');
 				if ($pcc && $pcc!=$rw['pccTitle']){
 					?>
 					<tr class="budget-subtotal">
-						<td colspan="9">Subtotal <?php echo $pcc;?></td>
+						<td colspan="10">Subtotal <?php echo $pcc;?></td>
 						<?php				
 						for ($m=1;$m<13;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
@@ -129,7 +130,8 @@ include ('includes/inc-frame_top.php');
 					<td><?php echo $rw['empID'];?></td>
 					<td><?php echo $rw['empCode1C'];?></td>
 					<td><?php echo $rw['pccTitle'];?></td>
-					<td><?php echo $rw['locTitle'];?></td>
+					<td><?php echo $rw['Location'];?></td>
+					<td><?php echo $rw['Activity'];?></td>
 					<td><?php echo $rw['empTitleLocal'];?></td>
 					<td><?php echo $rw['empFunction'];?></td>
 					<td class='budget-decimal'><?php echo number_format($rw['empSalary'],2,'.',',');?></td>
@@ -153,7 +155,7 @@ include ('includes/inc-frame_top.php');
 			?>
 			<tfoot>
 			<tr class='budget-subtotal'>
-			<td colspan="9">Total</td>
+			<td colspan="10">Total</td>
 			<?php
 				for ($m=1;$m<13;$m++){
 					// $month = date('M',mktime(0,0,0,$m,15));
