@@ -26,7 +26,11 @@ switch ($_POST['DataAction']){
 $oBudget->getSettings();
 $arrData = $oBudget->extendedSettings;
 
-$arrRates = $oBudget->getMonthlyRates('978');
+$sql = "SELECT * FROM vw_currency";
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	$arrRates[$rw['curTitle']] = $oBudget->getMonthlyRates($rw['curID']);
+}
 
 ?>
 <div>
@@ -38,7 +42,12 @@ Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> 
 		<label for='scnLastID'>Reference period</label>
 		<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->reference_scenario->id)); ?>
 	</div>
+<nav>
+	<a href='sp_get_kpi.php?budget_scenario=<?php echo $_GET['tab'];?>'>Get KPIs from Nlogjc</a>|
+	<a href='rep_staff_costs.php?budget_scenario=<?php echo $_GET['tab'];?>'>Refresh headcount</a>|	
+</nav>
 </div>
+<h2>Budget variables</h2>
 <table class='log'>
 <thead>
 	<tr><th>Title</th><th>Variable</th><th>Value</th></tr>
@@ -57,32 +66,36 @@ Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> 
 	}
 ?>
 </table>
-<h2>EUR rates</h2>
+<h2>Currency rates</h2>
 <table class='log'>
 	<thead>
 		<tr>
+		<th>Currency</th>
 		<?php
-		for($m=1;$m<13;$m++){
-			echo '<th>',date('M',mktime(0,0,0,$m,1,2015)),'</th>';
+		foreach($oBudget->arrPeriod as $month){
+			echo '<th>',ucfirst($month),'</th>';
 		}
 		?>
 		</tr>
 	</thead>
 	<tbody>
-		<tr>
 		<?php
-		for($m=1;$m<13;$m++){
-			$month = $oBudget->arrPeriod[$m];
-			echo '<td>',number_format($arrRates[$month],4,'.',','),'</td>';
+		foreach ($arrRates as $cur=>$data){
+		?>
+		<tr>
+		<td><?php echo $cur;?></td>
+		<?php
+		foreach($oBudget->arrPeriod as $month){
+			//$month = $oBudget->arrPeriod[$m];
+			echo '<td class="budget-decimal">',number_format($data[$month],4,'.',','),'</td>';
 		}
 		?>
 		</tr>
+		<?php
+		}
+		?>
 	</tbody>
 </table>
-<nav>
-	<a href='sp_get_kpi.php?budget_scenario=<?php echo $_GET['tab'];?>'>Get KPIs from Nlogjc</a>|
-	<a href='rep_staff_costs.php?budget_scenario=<?php echo $_GET['tab'];?>'>Refresh headcount</a>|	
-</nav>
 <?php
 } else {
 	$arrJS[] = 'js/journal.js';
