@@ -79,7 +79,10 @@ Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> 
 		</tr>
 	</tbody>
 </table>
-
+<nav>
+	<a href='sp_get_kpi.php?budget_scenario=<?php echo $_GET['tab'];?>'>Get KPIs from Nlogjc</a>|
+	<a href='rep_staff_costs.php?budget_scenario=<?php echo $_GET['tab'];?>'>Refresh headcount</a>|	
+</nav>
 <?php
 } else {
 	$arrJS[] = 'js/journal.js';
