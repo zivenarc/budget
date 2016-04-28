@@ -8,6 +8,10 @@ if ($oDocument->ID){
 }
 echo '</h1>';
 ?>
+<pre class='sql' style='display:none;'>
+SELECT * FROM `<?php echo $oDocument->register;?>` WHERE `source`='<?php echo $oDocument->GUID;?>';
+SELECT * FROM `reg_master` WHERE `source`='<?php echo $oDocument->GUID;?>';
+</pre>
 <p id="timestamp">
 <?php
 	echo $oDocument->timestamp;
