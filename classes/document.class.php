@@ -71,6 +71,7 @@ class Document extends easyForm{
 		$this->data = $this->oSQL->f($rs);
 						
 		$this->GUID = $this->data[$this->prefix.'GUID'];
+		$this->CopyOf = $this->data[$this->prefix.'CopyOf'];
 		$this->flagDeleted = $this->data[$this->prefix.'FlagDeleted'];
 		$this->flagPosted = $this->data[$this->prefix.'FlagPosted'];
 		$this->scenario = $this->data[$this->prefix.'Scenario'];

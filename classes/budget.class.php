@@ -186,7 +186,7 @@ class Budget{
 	public function getTableHeader($type='monthly', $start=1, $end=12){
 		switch($type){
 			case 'quarterly':
-				for($q=1;$q<5;$q++){
+				for($q=1+$this->offset/3;$q<=4+$this->offset/3;$q++){
 					$arrRes[] = 'Q'.$q;
 				}
 				$res = '<th class="budget-quarterly">'.implode('</th><th class="budget-quarterly">',$arrRes).'</th>';

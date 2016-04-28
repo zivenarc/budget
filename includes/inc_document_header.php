@@ -2,13 +2,22 @@
 echo '<h1>';
 if ($oDocument->ID){
 	echo $oDocument->budget->title,' :: ';
-	echo "<a href='{$_SERVER['REQUEST_URI']}'>",$arrUsrData["pagTitle"], "# ",$oDocument->ID,"</a>";
+	echo "<a href='{$_SERVER['REQUEST_URI']}'>",$arrUsrData["pagTitle"], " #",$oDocument->ID,"</a>";
 } else {
  echo 'New ',$arrUsrData["pagTitle"];
 }
 echo '</h1>';
-echo '<p id="timestamp">',$oDocument->timestamp,'</p>';
+?>
+<p id="timestamp">
+<?php
+	echo $oDocument->timestamp;
+	if($oDocument->CopyOf){
+		echo ". Copied from <a href='?{$oDocument->prefix}ID={$oDocument->CopyOf}'>".$arrUsrData["pagTitle"], " #",$oDocument->CopyOf."</a>";
+	};
+?>
+</p>
 
+<?php
 if($oDocument->flagPosted){
 	echo '<p id="doc_status" class="budget-doc-posted">',($strLocal?'Проведен':'Posted'),'</p>';
 }

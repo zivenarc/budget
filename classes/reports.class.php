@@ -44,8 +44,8 @@ class Reports{
 			
 			switch ($this->oBudget->type){
 				case 'Budget':
-					$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', prtUnit as 'Unit', ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", 
-								SUM(".$this->oBudget->getYTDSQL().") as Total, 
+					$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', prtUnit as 'Unit', ".$this->oBudget->getMonthlySumSQL(1,15).", 
+								SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total, 
 								SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM 
 							FROM `reg_sales`					
 							LEFT JOIN vw_product_type ON prtID=activity
@@ -58,7 +58,7 @@ class Reports{
 					
 					$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', prtUnit as 'Unit',
 							".$this->oBudget->getMonthlySumSQL(1,15).",
-							SUM(".$this->oBudget->getYTDSQL().") as Total, 
+							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total, 
 							SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
 						FROM 
 							(SELECT pc, activity, unit,
@@ -89,15 +89,15 @@ class Reports{
 				<tr>
 					<th>Activity</th><th>Unit</th>
 					<?php 
-					echo $this->oBudget->getTableHeader(); 
+					echo $this->oBudget->getTableHeader('monhtly',1+$this->oBudget->offset, 12+$this->oBudget->offset); 
 					echo $this->oBudget->getTableHeader('quarterly'); 
 					?>
 					<th class='budget-ytd'>Total</th>
-					<th class='budget-monthly'>Jan+</th>
+					<!--<th class='budget-monthly'>Jan+</th>
 					<th class='budget-monthly'>Feb+</th>
 					<th class='budget-monthly'>Mar+</th>
 					<th>Q5</th>
-					<th class='budget-ytd'>Apr-Mar</th>
+					<th class='budget-ytd'>Apr-Mar</th>-->
 				</tr>
 			</thead>			
 			<tbody>
@@ -125,25 +125,20 @@ class Reports{
 					$month = $this->oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
 				}
-				$arrQuarter = Array('Q1'=>$rw['jan']+$rw['feb']+$rw['mar'],
-									'Q2'=>$rw['apr']+$rw['may']+$rw['jun'],
-									'Q3'=>$rw['jul']+$rw['aug']+$rw['sep'],
-									'Q4'=>$rw['oct']+$rw['nov']+$rw['dec'],
-									'Q5'=>$rw['jan_1']+$rw['feb_1']+$rw['mar_1']);
+				$arrQuarter = _getQuarterTotals($rw);
 				
-				for ($q=1;$q<5;$q++){		
+				for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 					$quarter = 'Q'.$q;
 					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
 				}				
 									
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';
-				for ($m=13;$m<=15;$m++){
+				// for ($m=13;$m<=15;$m++){					
 					// $month = $this->oBudget->arrPeriod[$m];
-					$month = $this->oBudget->arrPeriod[$m];
-					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
-				}
-				echo '<td class=\'budget-decimal budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
-				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total_AM'],0,'.',','),'</td>';
+					// echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
+				// }
+				// echo '<td class=\'budget-decimal budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
+				// echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total_AM'],0,'.',','),'</td>';
 				echo "</tr>\r\n";
 				$prtGHQ = $rw['prtGHQ'];
 			}
@@ -168,8 +163,8 @@ class Reports{
 	
 	function offByRoute($sqlWhere){
 		
-		$sql = "SELECT OFF_Route, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", 
-				SUM(".$this->oBudget->getYTDSQL().") as Total, 
+		$sql = "SELECT OFF_Route, ".$this->oBudget->getMonthlySumSQL(1,15).", 
+				SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total, 
 				SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
 				FROM vw_sales {$sqlWhere} AND posted=1 AND kpi=1 AND unit='TEU' AND OFF_Route IS NOT NULL AND scenario='{$this->oBudget->id}'
 				GROUP BY OFF_Route";
@@ -214,11 +209,7 @@ class Reports{
 				$arrTotal['Total']+=$rw['Total'];
 				$arrTotal['Total_AM']+=$rw['Total_AM'];
 				
-				$arrQuarter = Array('Q1'=>$rw['jan']+$rw['feb']+$rw['mar'],
-									'Q2'=>$rw['apr']+$rw['may']+$rw['jun'],
-									'Q3'=>$rw['jul']+$rw['aug']+$rw['sep'],
-									'Q4'=>$rw['oct']+$rw['nov']+$rw['dec'],
-									'Q5'=>$rw['jan_1']+$rw['feb_1']+$rw['mar_1']);
+				$arrQuarter = $this->_getQuarterTotals($rw);
 				
 				for ($q=1;$q<5;$q++){		
 					$quarter = 'Q'.$q;
@@ -277,8 +268,8 @@ class Reports{
 		$empty = 1894;
 		
 		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
-		$sql = "SELECT customer, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length, $arrRates).", 
-						SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates).") as Total,
+		$sql = "SELECT customer, ".$this->oBudget->getMonthlySumSQL(1,15, $arrRates).", 
+						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates).") as Total,
 						SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as Total_AM 
 		FROM reg_master 
 		{$sqlWhere} AND item='".Items::REVENUE."' AND scenario='{$this->oBudget->id}'
@@ -288,8 +279,8 @@ class Reports{
 			$arrRevenue[$rw['customer']] = $rw;
 		}
 		
-		$sql = "SELECT cntTitle,customer, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", 
-					SUM(".$this->oBudget->getYTDSQL().") as Total,
+		$sql = "SELECT cntTitle,customer, ".$this->oBudget->getMonthlySumSQL(1,15).", 
+					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total,
 					SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
 				FROM reg_rent 
 				LEFT JOIN vw_customer ON cntID=customer
@@ -305,12 +296,12 @@ class Reports{
 					<th>Customer</th>
 					<th>Revenue per sqm</th>
 					<?php 
-					echo $this->oBudget->getTableHeader(); 
+					echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset,12+$this->oBudget->offset); 
 					echo $this->oBudget->getTableHeader('quarterly'); 
 					?>
 					<th class='budget-ytd'>Total</th>
-					<th>Q5</th>
-					<th class='budget-ytd'>Apr-Mar</th>
+					<!--<th>Q5</th>
+					<th class='budget-ytd'>Apr-Mar</th>-->
 				</tr>
 			</thead>			
 			<tbody>
@@ -343,11 +334,7 @@ class Reports{
 						$arrUtil['Total_AM']+=$rw['Total_AM'];
 				}
 				
-				$arrQuarter = Array('Q1'=>($rw['jan']+$rw['feb']+$rw['mar'])/3,
-									'Q2'=>($rw['apr']+$rw['may']+$rw['jun'])/3,
-									'Q3'=>($rw['jul']+$rw['aug']+$rw['sep'])/3,
-									'Q4'=>($rw['oct']+$rw['nov']+$rw['dec'])/3,
-									'Q5'=>($rw['jan_1']+$rw['feb_1']+$rw['mar_1'])/3);
+				$arrQuarter = _getQuarterTotals($rw,'average');
 				
 				if ($rw['customer']!=$empty){
 						$arrUtil['Q1']+=$arrQuarter['Q1'];
@@ -470,11 +457,7 @@ class Reports{
 					$arrTotal[$rw['unit']][$month] += $rw[$month];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
 				}
-				$arrQuarter = Array('Q1'=>$rw['jan']+$rw['feb']+$rw['mar'],
-									'Q2'=>$rw['apr']+$rw['may']+$rw['jun'],
-									'Q3'=>$rw['jul']+$rw['aug']+$rw['sep'],
-									'Q4'=>$rw['oct']+$rw['nov']+$rw['dec'],
-									'Q5'=>$rw['jan_1']+$rw['feb_1']+$rw['mar_1']);
+				$arrQuarter = _getQuarterTotals($rw);
 				
 				for ($q=1;$q<5;$q++){		
 					$quarter = 'Q'.$q;
@@ -828,7 +811,13 @@ class Reports{
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
-				<tr><th>Activity</th><th>Account</th><th>Title</th><?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?><th class='budget-ytd'>Total</th></tr>
+				<tr>
+					<th>Activity</th>
+					<th>Account</th>
+					<th>Title</th>
+					<?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?>
+					<th class='budget-ytd'>Total</th>
+				</tr>
 			</thead>			
 			<tbody>
 			<?php			
@@ -1390,7 +1379,7 @@ class Reports{
 					<th><?php echo $firstLevelTitle; ?></th>
 					<th>Account</th>					
 					<?php 
-						echo $this->oBudget->getTableHeader();
+						echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset,12+$this->oBudget->offset);
 						echo $this->oBudget->getTableHeader('quarterly');
 					?>		
 					<th class='budget-ytd'><?php echo $this->oBudget->type=='Budget'?'Budget':'FYE';?></th>
@@ -1409,7 +1398,7 @@ class Reports{
 						<th>Diff</th>
 					<?php
 					}					
-					if ($this->oBudget->type=='FYE'){
+					if (strpos($this->oBudget->type,'FYE')!== false) {
 					?>
 					<th class='budget-ytd FYE_analysis'>YTD Actual</th>
 					<th class='FYE_analysis'>YTD Budget</th>
@@ -2022,7 +2011,8 @@ class Reports{
 			// echo '<pre>';print_r($arrRates);echo '</pre>';
 			$res=	$this->oBudget->getMonthlySumSQL(1,15,$arrRates, $this->Denominator).", \r\n".
 					$this->oBudget->getQuarterlySumSQL($arrRates, $this->Denominator).", \r\n 
-					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $this->Denominator).") as Total ,\r\n
+					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates, $this->Denominator).") as Total,\r\n
+					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $this->Denominator).") as Total_JD ,\r\n
 					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $this->Denominator).") as Total_AM ,\r\n
 					0 as estimate, 
 					0 as estimate_AM, 
@@ -2036,6 +2026,7 @@ class Reports{
 			$res=	str_repeat('0,',15)." \r\n".
 					str_repeat('0,',5)." \r\n".
 					"0 as Total, \r\n".
+					"0 as Total_JD, \r\n".
 					"0 as Total_AM, \r\n".
 					"SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $this->Denominator).") as estimate ,
 					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $this->Denominator).") as estimate_AM ,
@@ -2062,7 +2053,7 @@ class Reports{
 		
 		$res['actual']=	"SUM(`{$cm}`)/{$arrRates[$cm]} as CM_A, 
 						0 as CM_B,								
-						SUM(".$this->oBudget->getYTDSQL(1,$nCurrent,$arrRates).") as YTD_A ,
+						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,$nCurrent,$arrRates).") as YTD_A ,
 						0 as YTD_B, 
 						SUM(`$nm`)/{$arrRates[$nm]} as NM_A , 
 						0 as NM_B";
@@ -2075,7 +2066,7 @@ class Reports{
 		$res['budget'] = "0 as CM_A, 
 						SUM(`{$cm}`)/{$arrRates[$cm]} as CM_B,								
 						0 as YTD_A,
-						SUM(".$this->oBudget->getYTDSQL(1,$nCurrent,$arrRates).") as YTD_B, 
+						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,$nCurrent,$arrRates).") as YTD_B, 
 						0 as NM_A , 
 						SUM(`$nm`)/{$arrRates[$nm]} as NM_B";
 		
@@ -2109,7 +2100,7 @@ class Reports{
 			<td class='budget-decimal'><em><?php self::render_ratio($data['NM_A'],$data['NM_B']);?></em></td>
 		<?php
 		} else {
-			for ($m=1;$m<=12;$m++){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 				// $month = $this->oBudget->arrPeriod[$m];
 				$month = $this->oBudget->arrPeriod[$m];
 				?>
@@ -2118,10 +2109,10 @@ class Reports{
 			}
 			
 			//--------------------- quarterly data -----------------------
-			if(isset($data['Q1'])){
-				for ($q=1;$q<5;$q++){
+			if(isset($data['Q1']) || isset($data['Q2']) || isset($data['Q3']) || isset($data['Q4']) || isset($data['Q5'])){
+				for ($q=1+$this->oBudget->offset/3;$q<5+$this->oBudget->offset/3;$q++){
 					?>
-					<td class='budget-decimal budget-quarterly budget-<?php echo 'q'.$m;?>'><?php self::render($data['Q'.$q],0);?></td>
+					<td class='budget-decimal budget-quarterly budget-<?php echo 'q'.$q;?>'><?php self::render($data['Q'.$q],0);?></td>
 					<?php
 				}
 			}
@@ -2149,7 +2140,7 @@ class Reports{
 					<td class='budget-decimal'><?php self::render($data['estimate_AM'],0);?></td>				
 					<td class='budget-decimal'><?php self::render($data['Total_AM'] - $data['estimate_AM'],0);?></td>				
 				<?php };
-				if ($this->oBudget->type == 'FYE' || $this->oBudget->type == 'Actual'){ 
+				if (strpos($this->oBudget->type,'FYE')!== false || strpos($this->oBudget->type,'Actual')!==false){ 
 				?>					
 					<!--Data for YTD actual-->
 					<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
@@ -2337,6 +2328,23 @@ class Reports{
 		return($sql);
 		
 	}
+	
+	private function _getQuarterTotals($rw, $type=''){
+		
+		if($type=='average'){
+			$divider = 3;
+		} else {
+			$divider=1;
+		}
+	
+		$res = Array('Q1'=>($rw['jan']+$rw['feb']+$rw['mar'])/$divider,
+					'Q2'=>($rw['apr']+$rw['may']+$rw['jun'])/$divider,
+					'Q3'=>($rw['jul']+$rw['aug']+$rw['sep'])/$divider,
+					'Q4'=>($rw['oct']+$rw['nov']+$rw['dec'])/$divider,
+					'Q5'=>($rw['jan_1']+$rw['feb_1']+$rw['mar_1'])/$divider);
+		return ($res);
+	}
+	
 }
 
 ?>

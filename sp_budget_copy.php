@@ -56,11 +56,12 @@ $sql [] = "SELECT @refID:=scnLastID FROM tbl_scenario WHERE scnID='{$new_budget}
 switch ($oNewBudget->type){
 // if ($oNewBudget->type=='FYE'){
 	case 'FYE':
+	case 'FYE_AM':
 		$sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item, source, estimate, ytd, roy, scenario, active)
 				SELECT company, pc, activity, customer, account, item, 'Estimate', 
-						SUM(".$oBudget->getYTDSQL().") as FYE,
-						SUM(".$oBudget->getYTDSQL(1,date('n',$oNewBudget->date_start)-1).") as YTD, 
-						SUM(".$oBudget->getYTDSQL(date('n',$oNewBudget->date_start),12).") as ROY, 
+						SUM(".$oBudget->getYTDSQL(1+$oNewBudget->offset,12+$oNewBudget->offset).") as FYE,
+						SUM(".$oBudget->getYTDSQL(1+$oNewBudget->offset,date('n',$oNewBudget->date_start)-1).") as YTD, 
+						SUM(".$oBudget->getYTDSQL(date('n',$oNewBudget->date_start),12+$oNewBudget->offset).") as ROY, 
 						'{$new_budget}', active
 					FROM reg_master WHERE scenario=@refID AND active=1 AND estimate=0
 					GROUP BY company, pc, activity, customer, account, item
@@ -72,7 +73,7 @@ switch ($oNewBudget->type){
 	default:
 		$sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item, source, estimate, scenario, active)
 					SELECT company, pc, activity, customer, account, item, 'Estimate', 
-							SUM(".$oBudget->getYTDSQL(1,12).") as FYE,						
+							SUM(".$oBudget->getYTDSQL(1+$oNewBudget->offset,12+$oNewBudget->offset).") as FYE,						
 							'{$new_budget}', active
 						FROM reg_master WHERE scenario=@refID AND active=1 AND estimate=0
 						GROUP BY company, pc, activity, customer, account, item
@@ -157,7 +158,10 @@ foreach ($arrEntity as $entity=>$entity_data){
 					case $prefix."InsertDate":
 					case $prefix."EditDate":
 						$arrSet[] = "`{$field}`=NOW()";
-						break;						
+						break;
+					case $prefix."CopyOf":
+						$arrSet[] = "`{$field}`=".$oSQL->e($rw[$prefix."ID"]);
+						break;
 					default:									
 						if ($fieldData['Null']=='YES' && !$rw[$field]){
 							$arrSet[] = "`{$field}`=NULL";						
