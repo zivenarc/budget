@@ -9,6 +9,7 @@ include ('includes/inc_report_settings.php');
 $oBudget = new Budget($budget_scenario);
 $ytd = date('n',$oBudget->date_start-1);echo $ytd;
 
+
 echo $oBudget->type;
 if (strpos($oBudget->type,'Budget')) die('Wrong budget type, cannot fill in the actuals');
 
@@ -56,6 +57,15 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 					AND source='Actual'
 					AND scenario=@scnID
 					AND `{$month}`<>0;";
+	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_resignation SET end_date=rsgDateEnd, `{$month}`=IF(rsgDateEnd<@repDateStart,0,`{$month}`)
+				WHERE 
+					rsgStateID BETWEEN 1030 AND 1081
+					AND rsgDateEnd >= '".date('Y-m-d',$oBudget->date_start)."'  
+					AND rsgEmployeeID=empID 
+					AND empGUID1C=particulars
+					AND source='Actual'
+					AND scenario=@scnID					
+					AND `{$month}`=1;";
 	
 }
 
@@ -68,7 +78,8 @@ for ($i=0;$i<count($sql);$i++){
 }
 
 $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empTitleLocal, empFunction, empSalary, empStartDate, empEndDate, end_date, 
-						locTitle as 'Location', prtGHQ as 'Activity', funTitle, funTitleLocal, pccTitle,pccTitleLocal , ".$oBudget->getMonthlySumSQL().", SUM(".$oBudget->getYTDSQL().")/12 as Total 
+						locTitle as 'Location', prtGHQ as 'Activity', funTitle, funTitleLocal, pccTitle,pccTitleLocal , "
+						.$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset).", SUM(".$oBudget->getYTDSQL(1+$oBudget->offset,12+$oBudget->offset).")/12 as Total 
 					FROM `reg_headcount`
 					LEFT JOIN vw_function ON funGUID=function
 					LEFT JOIN vw_product_type ON prtID=activity
