@@ -125,7 +125,7 @@ class Reports{
 					$month = $this->oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
 				}
-				$arrQuarter = _getQuarterTotals($rw);
+				$arrQuarter = $this->_getQuarterTotals($rw);
 				
 				for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 					$quarter = 'Q'.$q;
@@ -334,7 +334,7 @@ class Reports{
 						$arrUtil['Total_AM']+=$rw['Total_AM'];
 				}
 				
-				$arrQuarter = _getQuarterTotals($rw,'average');
+				$arrQuarter = $this->_getQuarterTotals($rw,'average');
 				
 				if ($rw['customer']!=$empty){
 						$arrUtil['Q1']+=$arrQuarter['Q1'];
@@ -457,7 +457,7 @@ class Reports{
 					$arrTotal[$rw['unit']][$month] += $rw[$month];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
 				}
-				$arrQuarter = _getQuarterTotals($rw);
+				$arrQuarter = $this->_getQuarterTotals($rw);
 				
 				for ($q=1;$q<5;$q++){		
 					$quarter = 'Q'.$q;
@@ -1928,8 +1928,8 @@ class Reports{
 		while ($rw = $oSQL->f($rs)){			
 			$rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
 			
-			$rw['YTD_A'] = $rw['YTD_A']/$cm;
-			$rw['YTD_B'] = $rw['YTD_B']/$cm;
+			$rw['YTD_A'] = $rw['YTD_A']/($cm-$this->oBudget->offset);
+			$rw['YTD_B'] = $rw['YTD_B']/($cm-$this->oBudget->offset);
 			
 			$this->echoBudgetItemString($rw);
 		}
