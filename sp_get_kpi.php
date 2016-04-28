@@ -95,7 +95,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 };
 
 for ($i=0;$i<count($sql);$i++){	
-	if (!$oSQL->q($sql[$i])){
+	if (!$oSQL->q($sql[$i]) || $_GET['debug']){
 		echo '<h2>Error:</h2>';
 		echo '<pre>',$sql[$i],'</pre>';
 	}
