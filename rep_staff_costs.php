@@ -10,7 +10,7 @@ $oBudget = new Budget($budget_scenario);
 $ytd = date('n',$oBudget->date_start-1);echo $ytd;
 
 echo $oBudget->type;
-if ($oBudget->type=='Budget') die('Wrong budget type, cannot fill in the actuals');
+if (strpos($oBudget->type,'Budget')) die('Wrong budget type, cannot fill in the actuals');
 
 
 //------------------------------------Fill in the actual data-------------------
@@ -20,7 +20,7 @@ $sql[] = "SET @scnID:='{$budget_scenario}';";
 $sql[] = "SET @item:='453d8da7-963b-4c4f-85ca-99e26d9fc7a2', @yact:='J00801';";
 $sql[] = "DELETE FROM reg_headcount WHERE scenario=@scnID and source='Actual';";
 
-for($m=1;$m<=$ytd;$m++){
+for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 	$year = date('Y',$oBudget->date_start-1);
 	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
 	$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
@@ -104,7 +104,7 @@ include ('includes/inc-frame_top.php');
 					<th>Salary</th>		
 					<th>Start date</th>		
 					<th>Resignation date</th>					
-				<?php echo $oBudget->getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
+				<?php echo $oBudget->getTableHeader('monthly',1+$oBudget->offset,12+$oBudget->offset); ?><th class='budget-ytd'>Average</th></tr>
 			</thead>			
 			<tbody>
 			<?php
@@ -115,7 +115,7 @@ include ('includes/inc-frame_top.php');
 					<tr class="budget-subtotal">
 						<td colspan="10">Subtotal <?php echo $pcc;?></td>
 						<?php				
-						for ($m=1;$m<13;$m++){
+						for ($m=1+$oBudget->offset;$m=12+$oBudget->offset;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $oBudget->arrPeriod[$m];
 							echo "<td class='budget-decimal budget-$month'>",Reports::render($subtotal[$pcc][$month],1),'</td>';							
@@ -138,7 +138,7 @@ include ('includes/inc-frame_top.php');
 					<td><?php echo $rw['empStartDate'];?></td>
 					<td><?php echo $rw['empEndDate']?$rw['empEndDate']:($rw['end_date']?'('.$rw['end_date'].')':'');?></td>				
 				<?php				
-				for ($m=1;$m<13;$m++){
+				for ($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
 					// $month = date('M',mktime(0,0,0,$m,15));
 					$month = $oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-$month'>",Reports::render($rw[$month],1),'</td>';
@@ -157,7 +157,7 @@ include ('includes/inc-frame_top.php');
 			<tr class='budget-subtotal'>
 			<td colspan="10">Total</td>
 			<?php
-				for ($m=1;$m<13;$m++){
+				for ($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
 					// $month = date('M',mktime(0,0,0,$m,15));
 					$month = $oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-$month'>",Reports::render($total[$month],1),'</td>';					

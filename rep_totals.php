@@ -26,9 +26,10 @@ if ($bu_group){
 
 $oBudget = new Budget($budget_scenario);
 $oReference = new Budget($reference);
-$mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1;
-$mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12;
-$strLastTitle = $oBudget->type=='FYE'?'Budget':$reference;
+$mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1+$oBudget->offset;
+$mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12+$oBudget->offset;
+// $strLastTitle = $oBudget->type=='FYE'?'Budget':$reference;
+$strLastTitle = $reference;
 
 $arrRates_this = $oBudget->getMonthlyRates($currency);
 $arrRates_last = $oReference->getMonthlyRates($currency);
@@ -37,7 +38,7 @@ $arrRates_last = $oReference->getMonthlyRates($currency);
 $arrJS[] = 'js/rep_totals.js';
 $arrActions[] = Array('title'=>'Apr-Mar','action'=>'?mthStart=4&mthEnd=15');
 $arrActions[] = Array('title'=>'Jan-Dec','action'=>'?mthStart=1&mthEnd=12');
-$arrActions[] = Array('title'=>'YTD','action'=>'?mthStart=1&mthEnd='.$oBudget->cm);
+$arrActions[] = Array('title'=>'YTD','action'=>'?mthStart='.(1+$oBudget->offset).'&mthEnd='.$oBudget->cm);
 $arrActions[] = Array('title'=>'This month','action'=>'?mthStart='.$oBudget->cm.'&mthEnd='.$oBudget->cm);
 $arrActions[] = Array('title'=>'Next month','action'=>'?mthStart='.$oBudget->nm.'&mthEnd='.$oBudget->nm);
 

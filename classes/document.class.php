@@ -513,12 +513,12 @@ class Document extends easyForm{
 		if(!$this->grid) return (false);
 		$start = (integer)date('n',$this->budget->date_start);
 		
-		for ($m=1;$m<=$this->budget->length;$m++){
+		for ($m=1+$this->budget->offset;$m<=$this->budget->length;$m++){
 			
 			$flagDisabled = !$this->flagUpdate;
 			$strClassDisabled = '';
 			
-			if ($this->budget->type=='FYE'){				
+			if (strpos($this->budget->type,'FYE')){				
 				if ($m < $start && $flagDisableActual) {
 					$flagDisabled = true;
 					$strClassDisabled = ' budget-inactive';

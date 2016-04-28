@@ -8,7 +8,7 @@ include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
 
-if ($oBudget->type=='Budget') die('Wrong budget type, cannot fill in the actuals');
+if (strpos($oBudget->type,'Budget')) die('Wrong budget type, cannot fill in the actuals');
 
 $ytd = date('n',$oBudget->date_start-1);echo $ytd;
 $year = date('Y',$oBudget->date_start-1);
@@ -37,7 +37,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 	
 	$sql[] = "SELECT  @prtID:=prtID, @jobGHQ:=prtGHQ, @unit:=prtUnit 
 				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']};";
-	for($m=1;$m<=$ytd;$m++){
+	for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 	
 	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
 	$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
@@ -73,7 +73,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 	
 	$sql[] = "SELECT  @prtID:=prtID, @jobGHQ:=prtGHQ, @unit:=prtUnit 
 				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']};";
-	for($m=1;$m<=$ytd;$m++){
+	for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
 	$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
 	$month = $oBudget->arrPeriod[$m];

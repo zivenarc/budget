@@ -120,7 +120,7 @@ class Reports{
 				};
 				echo "<td><a href='javascript:getCustomerKPI({activity:{$rw['prtID']}});'>",$rw['Activity'],'</a></td>';
 				echo '<td class="unit">',$rw['Unit'],'</td>';
-				for ($m=1;$m<13;$m++){
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
@@ -465,7 +465,7 @@ class Reports{
 					<td><?php echo $rw['Customer'];?></td>
 					<td><?php echo $rw['unit'];?></td>
 				<?php
-				for ($m=1;$m<13;$m++){
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
 					$arrTotal[$rw['unit']][$month] += $rw[$month];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
@@ -500,7 +500,7 @@ class Reports{
 				<tr class="budget-subtotal">
 					<td colspan="2">Total <?php echo $unit?$unit:"<...>";?></td>
 					<?php
-					for ($m=1;$m<13;$m++){
+					for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 						$month = $this->oBudget->arrPeriod[$m];
 						?>
 						<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month]);?></td>
@@ -553,7 +553,7 @@ class Reports{
 				echo '<tr>';
 				echo '<td>',$rw['Supplier'],'</td>';
 				echo '<td>',$rw['Unit'],'</td>';
-				for ($m=1;$m<13;$m++){
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-$month'>",$rw[$month],'</td>';
 				}
@@ -573,8 +573,8 @@ class Reports{
 		ob_start();
 			
 			$sqlSelect = "SELECT prtGHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pc, pccTitle,pccTitleLocal , wc,
-						".$this->oBudget->getMonthlySumSQL().", 
-						SUM(".$this->oBudget->getYTDSQL().")/12 as Total 
+						".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
+						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
 					FROM `reg_headcount`
 					LEFT JOIN vw_function ON funGUID=function
 					LEFT JOIN vw_product_type ON prtID=activity
@@ -596,7 +596,7 @@ class Reports{
 			<div style="display:none;"><pre><?php echo $sql;?></pre></div>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
-				<tr><th>Activity</th><?php echo $this->oBudget->getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
+				<tr><th>Activity</th><?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?><th class='budget-ytd'>Average</th></tr>
 			</thead>			
 			<tbody>
 			<?php
@@ -606,7 +606,7 @@ class Reports{
 					<td><?php echo $rw['prtGHQ'], ": ",($rw['wc']?'White':'Blue');?></td>					
 				<?php
 				self::_renderHeadcountArray($rw);
-				for ($m=1;$m<13;$m++){
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$headcount[$m] += $rw[$this->oBudget->arrPeriod[$m]];
 				}
 				$headcount['ytd'] += $rw['Total'];
@@ -615,7 +615,7 @@ class Reports{
 			$sql = $sqlSelect." GROUP BY `location`";
 			$rs = $oSQL->q($sql);			
 			?>
-			<tr><th>Location</th><?php echo $this->oBudget->getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
+			<tr><th>Location</th><?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?><th class='budget-ytd'>Average</th></tr>
 			<?php
 			while ($rw=$oSQL->f($rs)){
 				?>
@@ -628,7 +628,7 @@ class Reports{
 			$sql = $sqlSelect." GROUP BY `function` ORDER BY funRHQ, funFlagWC";
 			$rs = $oSQL->q($sql);			
 			?>
-			<tr><th>Function</th><?php echo $this->oBudget->getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
+			<tr><th>Function</th><?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?><th class='budget-ytd'>Average</th></tr>
 			<?php
 			while ($rw=$oSQL->f($rs)){
 				?>
@@ -643,7 +643,7 @@ class Reports{
 			$rs = $oSQL->q($sql);			
 			if ($oSQL->num_rows($rs)>1){
 				?>
-				<tr><th>Business unit</th><?php echo $this->oBudget->getTableHeader('monthly'); ?><th class='budget-ytd'>Average</th></tr>
+				<tr><th>Business unit</th><?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?><th class='budget-ytd'>Average</th></tr>
 				<?php
 				while ($rw=$oSQL->f($rs)){
 					?>
@@ -658,7 +658,7 @@ class Reports{
 			
 			<tr class='budget-subtotal'><td>Total headcount</td>
 			<?php
-			for ($m=1;$m<13;$m++){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 				echo '<td class="budget-decimal">',self::render($headcount[$m],1),'</td>';
 			}
 			
@@ -666,7 +666,8 @@ class Reports{
 				<td class="budget-decimal budget-ytd"><?php self::render($headcount['ytd'],1);?></td>
 			</tr>
 			<?php
-				$sql = "SELECT account, ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().")/12 as Total 
+				$sql = "SELECT account, ".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
+							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
 						FROM `reg_master`
 						$sqlWhere
 							AND account IN ('J00400','J00802') AND active=1
@@ -676,21 +677,21 @@ class Reports{
 					while ($rw = $oSQL->f($rs)){
 						if ($rw['account']=='J00400'){
 							?>
-							<tr>
-								<td>Revenue, RUBx1,000</td>
+							<tr><td>Revenue, RUBx1,000</td>
 								<?php
-								for ($m=1;$m<13;$m++){
+								for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 									$month = $this->oBudget->arrPeriod[$m];
 									echo '<td class="budget-decimal">',self::render($rw[$month]/$denominator),'</td>';
-									$arrRevenuePerFTE[$m] = $rw[$month]/$headcount[$m]/$denominator;									
+									if ($headcount[$m]){
+										$arrRevenuePerFTE[$m] = $rw[$month]/$headcount[$m]/$denominator;									
+									}
 								}
 								?>
 								<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']/$denominator);?></td>
 							</tr>
-							<tr>
-								<td>Revenue per FTE</td>
+							<tr><td>Revenue per FTE</td>
 								<?php
-								for ($m=1;$m<13;$m++){									
+								for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){						
 									echo '<td class="budget-decimal">',self::render($arrRevenuePerFTE[$m]),'</td>';									
 								}
 								?>
@@ -698,28 +699,28 @@ class Reports{
 							</tr>
 							<?php
 						}
-						for ($m=1;$m<13;$m++){
+						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 							$month = $this->oBudget->arrPeriod[$m];
 							$arrGP[$month] += $rw[$month];
 						}
 						$arrGP['Total'] += $rw['Total'];
 					}
 					?>
-					<tr>
-						<td>Gross profit, RUBx1,000</td>
+					<tr><td>Gross profit, RUBx1,000</td>
 						<?php
-						for ($m=1;$m<13;$m++){
+						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 									$month = $this->oBudget->arrPeriod[$m];
 									echo '<td class="budget-decimal">',self::render($arrGP[$month]/$denominator),'</td>';
-									$arrGPPerFTE[$m] = $arrGP[$month]/$headcount[$m]/$denominator;
+									if ($headcount[$m]){
+										$arrGPPerFTE[$m] = $arrGP[$month]/$headcount[$m]/$denominator;
+									}
 						}
 						?>
 						<td class='budget-decimal budget-ytd'><?php self::render($arrGP['Total']/$denominator);?></td>
 					</tr>
-					<tr class='budget-subtotal'>
-						<td>GP per FTE</td>
+					<tr class='budget-subtotal'><td>GP per FTE</td>
 						<?php
-						for ($m=1;$m<13;$m++){
+						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 							$month = $this->oBudget->arrPeriod[$m];						
 							?>
 							<td class="budget-decimal"><?php self::render_ratio($arrGP[$month]/100/$denominator,$headcount[$m],0);?></td>
@@ -732,7 +733,8 @@ class Reports{
 				}
 				
 				//---------------- Total staff costs
-				$sql = "SELECT account, ".$this->oBudget->getMonthlySumSQL().", SUM(".$this->oBudget->getYTDSQL().")/12 as Total 
+				$sql = "SELECT account, ".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
+							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
 						FROM `vw_master`
 						$sqlWhere
 							AND Group_code IN (95)
@@ -741,10 +743,9 @@ class Reports{
 				if ($oSQL->num_rows($rs)){
 					while ($rw = $oSQL->f($rs)){						
 							?>
-							<tr>
-								<td>Staff costs, RUBx1,000</td>
+							<tr><td>Staff costs, RUBx1,000</td>
 								<?php
-								for ($m=1;$m<13;$m++){
+								for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 									$month = $this->oBudget->arrPeriod[$m];
 									echo '<td class="budget-decimal">',number_format(-$rw[$month]/$denominator,0,'.',','),'</td>';
 									$arrSC[$month] = -$rw[$month];
@@ -760,7 +761,7 @@ class Reports{
 					<tr>
 						<td>Gross profit/Staff costs</td>
 						<?php
-						for ($m=1;$m<13;$m++){
+						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 									$month = $this->oBudget->arrPeriod[$m];
 									?>
 									<td class="budget-decimal"><?php self::render_ratio($arrGP[$month]/100,$arrSC[$month],1);?></td>
@@ -772,7 +773,7 @@ class Reports{
 					<tr class='budget-subtotal'>
 						<td>Cost per FTE</td>
 						<?php
-						for ($m=1;$m<13;$m++){
+						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 							$month = $this->oBudget->arrPeriod[$m];						
 							echo '<td class="budget-decimal">',self::render_ratio($arrSC[$month]/100/$denominator,$headcount[$m],0),'</td>';									
 						}
@@ -793,7 +794,7 @@ class Reports{
 	}
 	
 	private function _renderHeadcountArray($data, $meta=Array()){
-		for ($m=1;$m<13;$m++){
+		for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
 					?>
 					<td class="budget-decimal budget-<?php echo $month;?>" data-meta='<?php echo json_encode($meta);?>'><?php self::render($data[$month],1);?></td>
@@ -810,7 +811,8 @@ class Reports{
 		global $oSQL;
 		
 		ob_start();
-			$sql = "SELECT prtGHQ, account, Title, ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total 
+			$sql = "SELECT prtGHQ, account, Title, ".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
+							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).") as Total 
 			FROM `vw_master`
 			$sqlWhere
 			GROUP BY prtGHQ, account
@@ -826,7 +828,7 @@ class Reports{
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
-				<tr><th>Activity</th><th>Account</th><th>Title</th><?php echo $this->oBudget->getTableHeader(); ?><th class='budget-ytd'>Total</th></tr>
+				<tr><th>Activity</th><th>Account</th><th>Title</th><?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?><th class='budget-ytd'>Total</th></tr>
 			</thead>			
 			<tbody>
 			<?php			
@@ -835,7 +837,7 @@ class Reports{
 				echo '<th>',$rw['prtGHQ'],'</th>';
 				echo '<th>',$rw['account'],'</th>';
 				echo '<th>',$rw['Title'],'</th>';
-				for ($m=1;$m<13;$m++){
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
 					?>
@@ -1581,7 +1583,7 @@ class Reports{
 				
 				//------------------------Collecting subtotals---------------------------------------
 				$local_subtotal = 0;
-				for ($m=1;$m<13;$m++){
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
 					$subtotal[$rw['Group']][$month]+=$rw[$month];					
 					$subtotal[$rw['Group']]['Q'.$m]+=$rw['Q'.$m];					
@@ -1690,7 +1692,7 @@ class Reports{
 				
 				//------------------------Collecting subtotals---------------------------------------
 				$local_subtotal = 0;
-				for ($m=1;$m<13;$m++){
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
 					$subtotal[$rw['Group']][$month]+=$rw[$month];					
@@ -2024,9 +2026,9 @@ class Reports{
 					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $this->Denominator).") as Total_AM ,\r\n
 					0 as estimate, 
 					0 as estimate_AM, 
-					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates, $this->Denominator).") as YTD_A, 
+					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, (integer)date('n',$this->oBudget->date_start)-1,$arrRates, $this->Denominator).") as YTD_A, 
 					0 as YTD, 
-					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates, $this->Denominator).") as ROY_A, 
+					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12+$this->oBudget->offset,$arrRates, $this->Denominator).") as ROY_A, 
 					0 as ROY";
 			break;
 		case 'last':
@@ -2038,9 +2040,9 @@ class Reports{
 					"SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $this->Denominator).") as estimate ,
 					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $this->Denominator).") as estimate_AM ,
 					0 as YTD_A,
-					SUM(".$this->oBudget->getYTDSQL(1, (integer)date('n',$this->oBudget->date_start)-1,$arrRates, $this->Denominator).") as YTD, 
+					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, (integer)date('n',$this->oBudget->date_start)-1,$arrRates, $this->Denominator).") as YTD, 
 					0 as ROY_A,
-					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12,$arrRates, $this->Denominator).") as ROY";
+					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12+$this->oBudget->offset,$arrRates, $this->Denominator).") as ROY";
 					
 			break;
 		}

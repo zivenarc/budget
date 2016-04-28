@@ -29,6 +29,11 @@ class Budget{
 		$this->id = $scenario;
 		$this->timestamp = "Updated by ".$rw['usrTitle']." on ".date('d.m.Y H:i',strtotime($rw['scnEditDate'])).", <a href='{$rw['script']}?{$rw['prefix']}ID={$rw['id']}'>".$rw['title']." #".$rw['id']."</a>";
 		$this->type = $rw['scnType'];
+				
+		if (strpos($this->type,'AM')){
+			$this->offset = 3;
+		}
+		
 		$this->length = $rw['scnLength'];
 		
 		$this->flagUpdate = !$rw['scnFlagReadOnly'];
@@ -102,7 +107,7 @@ class Budget{
 		
 		switch ($period_type){
 			case 'ytd':
-				return($this->getYTDSQL(1,$nCurrent,$arrRates));
+				return($this->getYTDSQL(1+$this->offset,$nCurrent,$arrRates));
 				break;
 			case 'am':
 				return($this->getYTDSQL(4,15,$arrRates));
@@ -114,7 +119,7 @@ class Budget{
 				return($this->getYTDSQL($nCurrent,$nCurrent,$arrRates));
 				break;
 			case 'roy':
-				return($this->getYTDSQL($nCurrent+1,12,$arrRates));
+				return($this->getYTDSQL($nCurrent+1+$this->offset,12+$this->offset,$arrRates));
 				break;
 			case 'q1':
 				return($this->getYTDSQL(1,3,$arrRates));
@@ -132,7 +137,7 @@ class Budget{
 				return($this->getYTDSQL(13,15,$arrRates));
 				break;
 			default:
-				return($this->getYTDSQL(1,12,$arrRates));
+				return($this->getYTDSQL(1+$this->offset,12+$this->offset,$arrRates));
 				break;
 		}
 		
@@ -214,8 +219,14 @@ class Budget{
 			default:
 				for($m=$start;$m<=$end;$m++){
 					// $month = date('M',mktime(0,0,0,$m,15));
-					$month = $this->arrPeriod[$m];
+					if ($m>12){
+						$month = $this->arrPeriod[$m-12]."'".($this->year-1999);
+					} else {
+						$month = $this->arrPeriod[$m];
+					};
+					
 					$arrRes[] = ucfirst($month);
+					
 				}
 				$res = '<th class="budget-monthly">'.implode('</th><th class="budget-monthly">',$arrRes).'</th>';
 				return($res);
@@ -439,10 +450,10 @@ class Budget{
 		
 		switch ($params['type']){
 			case 'FYE':
-				$sqlWhere .= "scnType IN('FYE','Actual') ";
+				$sqlWhere .= "scnType IN('FYE','Actual','FYE_AM','Actual_AM') ";
 				break;
 			case 'Budget':
-				$sqlWhere .= "scnType='Budget' ";
+				$sqlWhere .= "scnType IN ('Budget','Budget_AM') ";
 				break;
 			default:
 				break;
@@ -498,6 +509,7 @@ class Budget{
 		if ($this->oSQL->n($rs)){
 			switch($this->type){
 				case 'FYE':
+				case 'FYE_AM':
 					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate) as Rate
 								FROM common_db.tbl_rate_history
 								WHERE erhCurrencyID={$currency} 
@@ -539,6 +551,7 @@ class Budget{
 					
 					break;
 				case 'Budget':
+				case 'Budget_AM':
 					$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency
 								WHERE curTitle=scvVariableID 
 									AND scvScenarioID='{$this->id}'
@@ -616,6 +629,15 @@ class Budget{
 		<?php
 			
 	}
+	
+	////////////-----------to finalize snippets
+	function syncCustomerSales($cntID){
+		$sql = "UPDATE reg_master,	common_db.tbl_counterparty 
+				SET sales = UCASE( cntUserID ) 
+				WHERE cntID = customer AND scenario IN ('{$this->id}','{$this->reference_scenario->id}') 
+					AND customer ={$cntID}";
+	}
+	
 }
 
 ?>

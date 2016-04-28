@@ -26,7 +26,7 @@ switch ($_POST['DataAction']){
 $oBudget->getSettings();
 $arrData = $oBudget->extendedSettings;
 
-$sql = "SELECT * FROM vw_currency";
+$sql = "SELECT * FROM vw_currency JOIN tbl_variable ON curTitle=varID";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	$arrRates[$rw['curTitle']] = $oBudget->getMonthlyRates($rw['curID']);
@@ -72,9 +72,7 @@ Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> 
 		<tr>
 		<th>Currency</th>
 		<?php
-		foreach($oBudget->arrPeriod as $month){
-			echo '<th>',ucfirst($month),'</th>';
-		}
+		echo $oBudget->getTableHeader('monthly', 1+$oBudget->offset, 12+$oBudget->offset);
 		?>
 		</tr>
 	</thead>
@@ -85,7 +83,8 @@ Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> 
 		<tr>
 		<td><?php echo $cur;?></td>
 		<?php
-		foreach($oBudget->arrPeriod as $month){
+		for ($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
+			$month = $oBudget->arrPeriod[$m];		
 			//$month = $oBudget->arrPeriod[$m];
 			echo '<td class="budget-decimal">',number_format($data[$month],4,'.',','),'</td>';
 		}
