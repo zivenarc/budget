@@ -115,7 +115,7 @@ include ('includes/inc-frame_top.php');
 					<tr class="budget-subtotal">
 						<td colspan="10">Subtotal <?php echo $pcc;?></td>
 						<?php				
-						for ($m=1+$oBudget->offset;$m=12+$oBudget->offset;$m++){
+						for ($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $oBudget->arrPeriod[$m];
 							echo "<td class='budget-decimal budget-$month'>",Reports::render($subtotal[$pcc][$month],1),'</td>';							
