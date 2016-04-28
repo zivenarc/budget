@@ -352,7 +352,7 @@ class Sales extends Document{
 						$row->hbl = $_POST['hbl'][$id];				
 						$row->sales = $this->sales;				
 						$row->route = $this->route;				
-						for ($m=1;$m<=$this->budget->length;$m++){
+						for ($m=1;$m<=15;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
@@ -436,7 +436,7 @@ class Sales extends Document{
 					
 					$master_row->account = $account;
 					$master_row->item = $activity->item_income;
-					for($m=1;$m<=$this->budget->length;$m++){
+					for($m=1;$m<=15;$m++){
 						// $month = date('M',mktime(0,0,0,$m,15));
 						
 						$month = $this->budget->arrPeriod[$m];	
@@ -481,7 +481,7 @@ class Sales extends Document{
 						
 						$master_row->account = $account;
 						$master_row->item = $activity->item_cost;
-						for($m=1;$m<=$this->budget->length;$m++){
+						for($m=1;$m<=15;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = -($record->{$month})*$record->buying_rate*$this->settings[strtolower($record->buying_curr)];
@@ -532,7 +532,7 @@ class Sales extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item->id;
 						
-						for($m=1;$m<=$this->budget->length;$m++){
+						for($m=1;$m<=15;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])/2;
@@ -568,7 +568,7 @@ class Sales extends Document{
 							$master_row->account = $item->getYACT($master_row->profit);
 							$master_row->item = $item->id;
 							
-							for($m=1;$m<=$this->budget->length;$m++){
+							for($m=1;$m<=15;$m++){
 								// $month = date('M',mktime(0,0,0,$m,15));
 								$month = $this->budget->arrPeriod[$m];									
 								//------Update for Project bridge since 1st April 2016-----------
@@ -594,7 +594,7 @@ class Sales extends Document{
 							$master_row->account = $item->getYACT($master_row->profit);
 							$master_row->item = $item->id;
 							
-							for($m=1;$m<=$this->budget->length;$m++){
+							for($m=1;$m<=15;$m++){
 								// $month = date('M',mktime(0,0,0,$m,15));
 								$month = $this->budget->arrPeriod[$m];									
 								//------Update for Project bridge since 1st April 2016-----------
@@ -624,7 +624,7 @@ class Sales extends Document{
 							$master_row->account = $item->getYACT($master_row->profit);
 							$master_row->item = $item->id;
 							
-							for($m=1;$m<=$this->budget->length;$m++){
+							for($m=1;$m<=15;$m++){
 								// $month = date('M',mktime(0,0,0,$m,15));
 								$month = $this->budget->arrPeriod[$m];									
 								//------Update for Project bridge since 1st April 2016-----------
@@ -650,7 +650,7 @@ class Sales extends Document{
 							$master_row->account = $item->getYACT($master_row->profit);
 							$master_row->item = $item->id;
 							
-							for($m=1;$m<=$this->budget->length;$m++){
+							for($m=1;$m<=15;$m++){
 								// $month = date('M',mktime(0,0,0,$m,15));
 								$month = $this->budget->arrPeriod[$m];									
 								//------Update for Project bridge since 1st April 2016-----------
@@ -683,7 +683,7 @@ class Sales extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item->id;
 						
-						for($m=1;$m<=$this->budget->length;$m++){
+						for($m=1;$m<=15;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
@@ -704,7 +704,7 @@ class Sales extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item->id;
 						
-						for($m=1;$m<=$this->budget->length;$m++){
+						for($m=1;$m<=15;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = ($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
@@ -725,7 +725,7 @@ class Sales extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item->id;
 						
-						for($m=1;$m<=$this->budget->length;$m++){
+						for($m=1;$m<=15;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = ($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
@@ -746,7 +746,7 @@ class Sales extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item->id;
 						
-						for($m=1;$m<=$this->budget->length;$m++){
+						for($m=1;$m<=15;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])*$this->ps_rate/100;
