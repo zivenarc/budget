@@ -2376,10 +2376,10 @@ class Reports{
 				return (false);
 		};
 			?>
-			<table id='<?php echo $tableID;?>' class='budget'>
+			<table id='<?php echo $tableID;?>' class='budget' style='font-size:1.3em;'>
 			<thead>
 				<tr>					
-					<th rowspan="2" colspan="2">Account</th>
+					<th rowspan="2" colspan="2"><?php echo number_format($this->Denominator);?></th>
 					<?php echo $this->oBudget->getTableHeader('mr'); 							
 					?>					
 			</thead>			
@@ -2387,7 +2387,6 @@ class Reports{
 		<?php
 		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
 		
-		//------ Gross revenue -------
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = 'J00400')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
@@ -2397,7 +2396,6 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		//------ Gross revenue -------
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (item = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
@@ -2407,7 +2405,6 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		//------ Gross revenue -------
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00400','J00802'))", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
@@ -2417,7 +2414,6 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		//------ Operating income -------
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
@@ -2427,8 +2423,7 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		//------ Operating income -------
-		
+	
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE 'SZ%')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
@@ -2436,7 +2431,11 @@ class Reports{
 			$rw['Budget item'] = "Profit before tax";
 			$this->echoBudgetItemString($rw, 'budget-subtotal');
 		}
-
+		
+		?>
+		</tbody>
+		</table>
+		<?php
 		
 	}
 	
