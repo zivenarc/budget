@@ -510,9 +510,9 @@ class Budget{
 			switch($this->type){
 				case 'FYE':
 				case 'FYE_AM':
-					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate) as Rate
-								FROM common_db.tbl_rate_history
-								WHERE erhCurrencyID={$currency} 
+					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate)/curDecRate as Rate
+								FROM common_db.tbl_rate_history, common_db.tbl_currency
+								WHERE erhCurrencyID={$currency} AND erhCurrencyID=curID
 									AND YEAR(erhDate)={$this->year} 
 									AND MONTH(erhDate)<{$start_month}
 								GROUP BY DATE_FORMAT(erhDate,'%b')";

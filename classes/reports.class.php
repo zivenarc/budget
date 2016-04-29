@@ -2242,10 +2242,8 @@ class Reports{
 		
 				$total += $data[$i]['amount'];	
 				?>
-				<tr id="tr_<?php echo $data[$i]['guid'];?>" class="<?php echo ($data[$i]['posted']?'journal-posted':'')?> <?php echo ($data[$i]['deleted']?'journal-deleted':'')?>">
-					<td><?php echo $data[$i]['title'];?></td>
-					<td><?php echo $data[$i]['id'];?></td>
-					<td><a class="budget-document-link" target="_blank" href="<?php echo $data[$i]['script'].'?'.$data[$i]['prefix'].'ID='.$data[$i]['id'];?>"><?php echo $data[$i]['guid'];?></a></td>
+				<tr id="tr_<?php echo $data[$i]['guid'];?>" class="<?php echo ($data[$i]['posted']?'journal-posted':'')?> <?php echo ($data[$i]['deleted']?'journal-deleted':'')?>">					
+					<td><a class="budget-document-link" target="_blank" href="<?php echo $data[$i]['script'].'?'.$data[$i]['prefix'].'ID='.$data[$i]['id'];?>"><?php echo $data[$i]['title'],' #',$data[$i]['id'];?></a></td>
 					<td class="td-posted <?php echo ($data[$i]['posted']?'budget-icon-posted':'');?>">&nbsp;</td>
 					<td class="td-deleted <?php echo ($data[$i]['deleted']?'budget-icon-deleted':'');?>">&nbsp;</td>
 					<td id="amount_<?php echo $data[$i]['guid'];?>" class="journal-current budget-decimal"><?php self::render($data[$i]['amount']);?></td>
@@ -2266,9 +2264,9 @@ class Reports{
 			<table id='sources' class='log'>
 				<thead>
 					<tr>
-						<th>Document type</th>
-						<th>ID</th>
-						<th>GUID</th>
+						<th>Document</th>
+						<!--<th>ID</th>
+						<th>GUID</th>-->
 						<th>Posted</th>
 						<th>Deleted</th>
 						<th class='journal-current'>Amount</th>
