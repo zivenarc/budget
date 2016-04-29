@@ -213,8 +213,8 @@ class Depreciation extends Document{
 			$month = $this->budget->arrPeriod[$m];
 					
 			$this->grid->Columns[] = Array(
-			// 'title'=>''//hidden
-			'title'=>$month
+			'title'=>''//hidden
+			// 'title'=>$month
 			,'field'=>strtolower($month)
 			,'class'=>'budget-month'
 			,'type'=>'integer'
