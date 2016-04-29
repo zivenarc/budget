@@ -20,19 +20,23 @@ class Budget{
 		$rw = $this->oSQL->f($rs);
 			
 		$this->arrPeriod = Array(1=>'jan',2=>'feb',3=>'mar',4=>'apr',5=>'may',6=>'jun',7=>'jul',8=>'aug',9=>'sep',10=>'oct',11=>'nov',12=>'dec',13=>'jan_1',14=>'feb_1',15=>'mar_1');
+		$this->type = $rw['scnType'];
+		if (strpos($this->type,'AM')){
+			$this->offset = 3;
+		}
+		
 		$this->year = $rw['scnYear'];
 		$this->date_start = strtotime($rw['scnDateStart']);
+		$this->date_end = mktime(23,59,59,12+$this->offset,31,$this->year);
 		$this->cm = date('n',$this->date_start-1); 
 		$this->nm = $this->cm+1;
 		$this->title = $rw["scnTitle$strLocal"];
 		$this->total = $rw['scnTotal'];
 		$this->id = $scenario;
 		$this->timestamp = "Updated by ".$rw['usrTitle']." on ".date('d.m.Y H:i',strtotime($rw['scnEditDate'])).", <a href='{$rw['script']}?{$rw['prefix']}ID={$rw['id']}'>".$rw['title']." #".$rw['id']."</a>";
-		$this->type = $rw['scnType'];
+		
 				
-		if (strpos($this->type,'AM')){
-			$this->offset = 3;
-		}
+
 		
 		$this->length = $rw['scnLength'];
 		
@@ -508,6 +512,38 @@ class Budget{
 		
 		if ($this->oSQL->n($rs)){
 			switch($this->type){
+				case 'Actual':
+					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate)/curDecRate as Rate
+					FROM common_db.tbl_rate_history, common_db.tbl_currency
+					WHERE erhCurrencyID={$currency} AND erhCurrencyID=curID
+						AND erhDate BETWEEN '{$this->year}-01-01' AND '{$this->year}-12-31'									
+					GROUP BY DATE_FORMAT(erhDate,'%b')";
+					// echo $sql;
+					$rs = $this->oSQL->q($sql);
+					$i=0;
+					while ($rw = $this->oSQL->f($rs)){
+						$res[strtolower($rw['month'])] = $rw['Rate'];
+						$ytd_rate+=$rw['Rate'];
+						$i++;
+					}
+					$res['YTD'] = $ytd_rate/$i;
+					break;
+				case 'Actual_AM':
+					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate)/curDecRate as Rate
+								FROM common_db.tbl_rate_history, common_db.tbl_currency
+								WHERE erhCurrencyID={$currency} AND erhCurrencyID=curID
+									AND erhDate BETWEEN '{$this->year}-04-01' AND '".($this->year+1)."-03-31'									
+								GROUP BY DATE_FORMAT(erhDate,'%b')";
+					// echo $sql;
+					$rs = $this->oSQL->q($sql);
+					$i=0;
+					while ($rw = $this->oSQL->f($rs)){
+						$res[strtolower($rw['month'])] = $rw['Rate'];
+						$ytd_rate+=$rw['Rate'];
+						$i++;
+					}
+					$res['YTD'] = $ytd_rate/$i;
+					break;
 				case 'FYE':
 				case 'FYE_AM':
 					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate)/curDecRate as Rate
@@ -537,7 +573,7 @@ class Budget{
 						$res[$month] = $rw['Rate'];
 					}
 					
-					if ($start_month>1) {
+					if ($start_month>1+$this->offset) {
 						$res['ROY'] = $res[$this->arrPeriod[$start_month]];
 					}
 					
@@ -566,7 +602,7 @@ class Budget{
 							$quarter = 'Q'.$m;
 							$res[$quarter] =  $res['dec'];
 					}
-					$res['Total'] = $res['dec'];
+					$res['Total'] = $res[$this->arrPeriod[12+$this->offset]];
 					break;
 			}
 			

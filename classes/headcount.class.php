@@ -712,15 +712,19 @@ class Headcount extends Document{
 			}
 		}
 		
-		$dateEstStart = ($oBudget->year-2).'-10-01';
-		$dateEstEnd = ($oBudget->year-1).'-09-30 23:59:59';
 		
-		$dateBudgetStart = ($oBudget->year).'-01-01';
-		if ($oBudget->length ==15){
-			$dateBudgetEnd = ($oBudget->year+1).'-03-31 23:59:59';
-		} else {
-			$dateBudgetEnd = ($oBudget->year).'-12-31 23:59:59';
-		}
+		
+		$dateBudgetStart = date('Y-m-d',$oBudget->date_start);
+		$dateBudgetEnd = date('Y-m-d h:i:s',$oBudget->date_end);
+		
+		$dateEstStart = date('Y-m-d',$oBudget->date_start-365*24*60*60);
+		$dateEstEnd = date('Y-m-d h:i:s',$oBudget->date_end-365*24*60*60);
+		
+		// if ($oBudget->length ==15){
+			// $dateBudgetEnd = ($oBudget->year+1).'-03-31 23:59:59';
+		// } else {
+			// $dateBudgetEnd = ($oBudget->year).'-12-31 23:59:59';
+		// }
 		
 		$sql = "select empProfitID, SUM(case when (datediff(empStartDate, '{$dateEstStart}')<0 and datediff (ifnull(empEndDate, '9999-12-31'), '{$dateEstStart}')>0) THEN 1 ELSE 0 END) AS hc_opening,
 				SUM(case when (datediff(empStartDate, '{$dateEstEnd}')<0 and datediff (ifnull(empEndDate, '9999-12-31'), '{$dateEstEnd}')>0) THEN 1 ELSE 0 END) AS hc_closing,
