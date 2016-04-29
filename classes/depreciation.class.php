@@ -443,7 +443,7 @@ class Depreciation extends Document{
 						$master_row->item = $record->item;
 						
 						if ($this->disposal_date){
-							$disposal_month = date('Ym', $this->disposal_date) - date('Ym',$this->budget->date_start)+1+$this->budget->offset;
+							$disposal_month = date('Ym', $this->disposal_date) - date('Y01',$this->budget->date_start)+1;
 						} else {
 							$disposal_month = 15;
 						}
