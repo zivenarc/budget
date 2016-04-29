@@ -101,8 +101,7 @@ class Depreciation extends Document{
 	public function defineGrid(){
 		
 		GLOBAL $Items;
-		GLOBAL $FixedAssets;
-				
+		GLOBAL $FixedAssets;	
 		
 		if ($this->type=='current'){
 			$this->grid->Columns[] = Array(
@@ -166,7 +165,7 @@ class Depreciation extends Document{
 		
 		
 		$this->grid->Columns[] =Array(
-			'title'=>'Value Jan'
+			'title'=>'Value '.$this->budget->arrPeriod[1+$this->budget->offset]
 			,'field'=>'value_primo'
 			,'type'=>'money'
 			,'disabled'=>true
@@ -174,7 +173,7 @@ class Depreciation extends Document{
 		);
 		
 		$this->grid->Columns[] =Array(
-			'title'=>'Value Dec'
+			'title'=>'Value '.$this->budget->arrPeriod[12+$this->budget->offset]
 			,'field'=>'value_ultimo'
 			,'type'=>'money'
 			,'disabled'=>true
@@ -210,14 +209,15 @@ class Depreciation extends Document{
 		
 
 		
-		for ($m=1;$m<13;$m++){
+		for ($m=1+$this->budget->offset;$m<=12+$this->budget->offset;$m++){
 			$month = $this->budget->arrPeriod[$m];
 					
 			$this->grid->Columns[] = Array(
-			'title'=>''//hidden
+			// 'title'=>''//hidden
+			'title'=>$month
 			,'field'=>strtolower($month)
 			,'class'=>'budget-month'
-			,'type'=>'decimal'
+			,'type'=>'integer'
 			, 'mandatory' => true
 			, 'disabled'=>true//
 			,'totals'=>true
@@ -226,7 +226,7 @@ class Depreciation extends Document{
 		$this->grid->Columns[] =Array(
 			'title'=>'Total'
 			,'field'=>'YTD'
-			,'type'=>'decimal'
+			,'type'=>'integer'
 			,'totals'=>true
 			,'disabled'=>true
 		);
@@ -443,7 +443,7 @@ class Depreciation extends Document{
 						$master_row->item = $record->item;
 						
 						if ($this->disposal_date){
-							$disposal_month = date('Ym', $this->disposal_date) - date('Ym',$this->budget->date_start)+1;
+							$disposal_month = date('Ym', $this->disposal_date) - date('Ym',$this->budget->date_start)+1+$this->budget->offset;
 						} else {
 							$disposal_month = 15;
 						}
@@ -505,6 +505,61 @@ class Depreciation extends Document{
 				$oMaster->save();
 				$this->markPosted();
 			}
+	}
+	
+	private function fill(){
+		
+		if (is_array($this->records[$this->gridName])){
+			foreach($this->records[$this->gridName] as $id=>$record){
+				$record->flagDeleted = true;
+			}
+		}
+		
+		$dateBudgetStart = date('Y-m-d',$this->budget->date_start);
+		$dateBudgetEnd = date('Y-m-d h:i:s',$this->budget->date_end);
+		
+		$sql = "SELECT *, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart)) AS months,
+				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValuePrimo,
+				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetEnd}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValueUltimo
+				FROM vw_fixed_assets 
+				LEFT JOIN vw_item ON itmID=fixItemID
+				WHERE fixProfitID=".$this->profit." AND DATEDIFF(fixDeprEnd,'{$dateBudgetStart}')>0 AND fixFlagDeleted=0
+				ORDER BY fixItemID";//die($sql);
+		$rs = $this->oSQL->q($sql);
+		while ($rw=$this->oSQL->f($rs)){
+			
+			$row = $this->add_record();
+			$row->flagUpdated = true;				
+			$row->profit = $this->profit;
+			$row->particulars = $rw['fixGUID'];				
+			$row->item = $rw['itmGUID'];				
+			$row->duration = $rw['fixDeprDuration'];				
+			$row->activity = $rw['fixProductTypeID'];				
+			$row->date_start = $rw['fixDeprStart'];				
+			$row->date_end = $rw['fixDeprEnd'];				
+			$row->value_start = (double)$rw['fixValueStart'];				
+			$row->value_primo = (double)$rw['fixValuePrimo'];				
+			$row->value_ultimo = max(0,(double)$rw['fixValueUltimo']);				
+			
+			$arrDescr = null;
+			if ($rw['fixPlateNo']) $arrDescr[] = $rw['fixPlateNo'];
+			if ($rw['fixVIN']) $arrDescr[] = $rw['fixVIN'];
+			if (is_array($arrDescr)) $row->comment = implode('|',$arrDescr);				
+			
+			$dateEnd = strtotime($rw['fixDeprEnd']);
+			
+			for($m=1+$this->budget->offset;$m<=max($this->budget->length,12+$this->budget->offset);$m++){
+				// $month = date('M',mktime(0,0,0,$m,15));
+				$month = $this->budget->arrPeriod[$m];
+				$eom = mktime(0,0,0,$m+1,0, $this->budget->year);
+				if ($dateEnd>=$eom){
+					$row->{$month} = 1;
+				} else {
+					$row->{$month} = 0;
+				}
+			}
+			
+		}
 	}
 	
 }

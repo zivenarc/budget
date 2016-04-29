@@ -16,56 +16,8 @@ if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
 	if($_POST['DataAction']=='fill'){
 		
-		if (is_array($oDocument->records[$oDocument->gridName])){
-			foreach($oDocument->records[$oDocument->gridName] as $id=>$record){
-				$record->flagDeleted = true;
-			}
-		}
+		$oDocument->fill();
 		
-		$dateBudgetStart = date('Y-m-d',$oDocument->budget->date_start);
-		$dateBudgetEnd = ($oDocument->budget->year+1).'-01-01';
-		
-		$sql = "SELECT *, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart)) AS months,
-				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValuePrimo,
-				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetEnd}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValueUltimo
-				FROM vw_fixed_assets 
-				LEFT JOIN vw_item ON itmID=fixItemID
-				WHERE fixProfitID=".$oDocument->profit." AND DATEDIFF(fixDeprEnd,'{$dateBudgetStart}')>0 AND fixFlagDeleted=0
-				ORDER BY fixItemID";//die($sql);
-		$rs = $oSQL->q($sql);
-		while ($rw=$oSQL->f($rs)){
-			$row = $oDocument->add_record();
-			$row->flagUpdated = true;				
-			$row->profit = $oDocument->profit;
-			$row->particulars = $rw['fixGUID'];				
-			$row->item = $rw['itmGUID'];				
-			$row->duration = $rw['fixDeprDuration'];				
-			$row->activity = $rw['fixProductTypeID'];				
-			$row->date_start = $rw['fixDeprStart'];				
-			$row->date_end = $rw['fixDeprEnd'];				
-			$row->value_start = (double)$rw['fixValueStart'];				
-			$row->value_primo = (double)$rw['fixValuePrimo'];				
-			$row->value_ultimo = max(0,(double)$rw['fixValueUltimo']);				
-			
-			$arrDescr = null;
-			if ($rw['fixPlateNo']) $arrDescr[] = $rw['fixPlateNo'];
-			if ($rw['fixVIN']) $arrDescr[] = $rw['fixVIN'];
-			if (is_array($arrDescr)) $row->comment = implode('|',$arrDescr);				
-			
-			$dateEnd = strtotime($rw['fixDeprEnd']);
-			
-			for($m=1;$m<=$oBudget->length;$m++){
-				// $month = date('M',mktime(0,0,0,$m,15));
-				$month = $oBudget->arrPeriod[$m];
-				$eom = mktime(0,0,0,$m+1,0, $oBudget->year);
-				if ($dateEnd>=$eom){
-					$row->{$month} = 1;
-				} else {
-					$row->{$month} = 0;
-				}
-			}
-			
-		}		
 	}
 	
 	if ($oDocument->save($_POST['DataAction'])){
