@@ -35,7 +35,9 @@ class Reports{
 				}
 			}
 			$this->sqlWhere = "WHERE ".implode (" AND ",$arrWhere);		
-		}		
+		} else {
+			$this->sqlWhere = "WHERE TRUE ";
+		}
 	}
 	
 	public function salesByActivity($sqlWhere=''){
@@ -1168,8 +1170,8 @@ class Reports{
 	
 	public function monthlyReport($type='ghq'){
 		
-		GLOBAL $budget_scenario;
-		$oBudget = new Budget($budget_scenario);
+		// GLOBAL $budget_scenario;
+		// $oBudget = new Budget($budget_scenario);
 		
 		$sqlWhere = $this->sqlWhere;
 		
@@ -1238,7 +1240,7 @@ class Reports{
 				ORDER BY `level1_code`, `Group`, `itmOrder` ASC";
 			
 			
-			self::firstLevelReportMR($sql, $strGroupTitle, $oBudget);
+			self::firstLevelReportMR($sql, $strGroupTitle, $this->oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
 			self::noFirstLevelReportMR($this->currency);
@@ -2051,24 +2053,24 @@ class Reports{
 				
 		$nCurrent = (integer)date('m',$this->oBudget->date_start - 1);
 		
-		$res['actual']=	"SUM(`{$cm}`)/{$arrRates[$cm]} as CM_A, 
+		$res['actual']=	"SUM(`{$cm}`)/{$arrRates[$cm]}/{$this->Denominator} as CM_A, 
 						0 as CM_B,								
-						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,$nCurrent,$arrRates).") as YTD_A ,
+						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,$nCurrent,$arrRates).")/{$this->Denominator} as YTD_A ,
 						0 as YTD_B, 
-						SUM(`$nm`)/{$arrRates[$nm]} as NM_A , 
+						SUM(`$nm`)/{$arrRates[$nm]}/{$this->Denominator} as NM_A , 
 						0 as NM_B";
 		$res['next']=	"0 as CM_A, 
 						0 as CM_B,								
 						0 as YTD_A ,
 						0 as YTD_B, 
-						SUM(`$nm`)/{$arrRates[$nm]} as NM_A , 
+						SUM(`$nm`)/{$arrRates[$nm]}/{$this->Denominator} as NM_A , 
 						0 as NM_B";
 		$res['budget'] = "0 as CM_A, 
-						SUM(`{$cm}`)/{$arrRates[$cm]} as CM_B,								
+						SUM(`{$cm}`)/{$arrRates[$cm]}/{$this->Denominator} as CM_B,								
 						0 as YTD_A,
-						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,$nCurrent,$arrRates).") as YTD_B, 
+						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,$nCurrent,$arrRates).")/{$this->Denominator} as YTD_B, 
 						0 as NM_A , 
-						SUM(`$nm`)/{$arrRates[$nm]} as NM_B";
+						SUM(`$nm`)/{$arrRates[$nm]}/{$this->Denominator} as NM_B";
 		
 		$res['from_a'] = $this->oBudget->id;
 		$res['from_b'] = $this->oReference->id;
@@ -2341,6 +2343,101 @@ class Reports{
 					'Q4'=>($rw['oct']+$rw['nov']+$rw['dec'])/$divider,
 					'Q5'=>($rw['jan_1']+$rw['feb_1']+$rw['mar_1'])/$divider);
 		return ($res);
+	}
+
+	public function shortMonthlyReport(){
+		
+		$sqlWhere = $this->sqlWhere;
+
+		$strFields = self::_getMRFields();
+		
+		$sqlGroup = "GROUP BY `item`";
+		
+		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
+					{$strFields['actual']}
+			FROM `vw_master`			
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}'
+			{$sqlGroup}	
+			UNION ALL
+				SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
+				{$strFields['budget']}
+			FROM `vw_master`				
+			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND `item` IS NOT NULL
+			{$sqlGroup}			
+			ORDER BY `Group`, `itmOrder` ASC";
+		
+		$sql = self::_unionMRQueries($sql, $sqlGroup);
+		
+		$tableID = "SUMMARY_".md5($sql);
+		
+		if (!$rs = $this->oSQL->q($sql)){
+				echo "<div class='error'>SQL error:</div>";
+				echo "<pre>$sql</pre>";
+				return (false);
+		};
+			?>
+			<table id='<?php echo $tableID;?>' class='budget'>
+			<thead>
+				<tr>					
+					<th rowspan="2" colspan="2">Account</th>
+					<?php echo $this->oBudget->getTableHeader('mr'); 							
+					?>					
+			</thead>			
+			<tbody>
+		<?php
+		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
+		
+		//------ Gross revenue -------
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = 'J00400')", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Gross revenue";
+			$this->echoBudgetItemString($rw);
+		}
+		
+		//------ Gross revenue -------
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (item = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95')", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Net revenue";
+			$this->echoBudgetItemString($rw);
+		}
+		
+		//------ Gross revenue -------
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00400','J00802'))", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Gross profit";
+			$this->echoBudgetItemString($rw);
+		}
+		
+		//------ Operating income -------
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Operating income";
+			$this->echoBudgetItemString($rw);
+		}
+		
+		//------ Operating income -------
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE 'SZ%')", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Profit before tax";
+			$this->echoBudgetItemString($rw, 'budget-subtotal');
+		}
+
+		
 	}
 	
 }
