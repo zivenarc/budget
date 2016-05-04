@@ -2368,7 +2368,7 @@ class Reports{
 		
 		$sql = self::_unionMRQueries($sql, $sqlGroup);
 		
-		$tableID = "SUMMARY_".md5($sql);
+		//$tableID = "SUMMARY_".md5($sql);
 		
 		if (!$rs = $this->oSQL->q($sql)){
 				echo "<div class='error'>SQL error:</div>";
@@ -2376,7 +2376,7 @@ class Reports{
 				return (false);
 		};
 			?>
-			<table id='<?php echo $tableID;?>' class='budget' style='font-size:1.3em;'>
+			<table id='<?php echo $this->ID;?>' class='budget' style='font-size:1.3em;'>
 			<thead>
 				<tr>					
 					<th rowspan="2" colspan="2"><?php echo number_format($this->Denominator);?></th>
@@ -2435,6 +2435,9 @@ class Reports{
 		?>
 		</tbody>
 		</table>
+		<ul class='link-footer'>
+				<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
+		</ul>
 		<?php
 		
 	}

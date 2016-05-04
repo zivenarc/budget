@@ -97,10 +97,10 @@ class Waterfall {
 		}
 		?>
 		</table>
-		<nav>
+		<ul class='link-footer'>
 		<li><a href="javascript:SelectContent('table_<?php echo $this->chartID;?>');">Select table</a></li>
-		<li><a id="chart_png_href">Get chart as image</a></li>
-		</nav>
+		<li><a target="_blank" id="chart_png_href">Get chart as image</a></li>
+		</ul>
 		<?php
 	}
 	
