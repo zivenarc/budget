@@ -50,7 +50,7 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 				AND empFlagDeleted=0
 				AND empSalary>0;";
 	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_vacation SET salary=0 
-				WHERE vacVactypeID IN (4,5) 
+				WHERE vacVactypeID IN (3,4,5) ## Unpaid leave or maternity leave
 					AND ((@repDateStart BETWEEN vacDateStart AND vacDateEnd) OR (@repDateEnd BETWEEN vacDateStart AND vacDateEnd))  
 					AND vacEmployeeID=empID 
 					AND empGUID1C=particulars
