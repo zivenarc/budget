@@ -94,6 +94,17 @@ for ($i=0; $i<count($arrKPI);$i++){
 	};
 };
 
+////////// Special arrangement for TOYOTA
+$sql[] = "SELECT @cntUserID:=cntUserID FROM common_db.tbl_counterparty WHERE cntID=17218;";
+for($m=1+$oBudget->offset;$m<=$ytd;$m++){
+	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
+	$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
+	$month = $oBudget->arrPeriod[$m];
+	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
+			SELECT 3, 4, 'CCD', 17218, COUNT(shpID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID
+			FROM tnt.tbl_shipment WHERE shpCCendDate BETWEEN @dateStart AND @dateEnd";
+};
+
 for ($i=0;$i<count($sql);$i++){	
 	if (!$oSQL->q($sql[$i]) || $_GET['debug']){
 		echo '<h2>Error:</h2>';
