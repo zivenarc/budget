@@ -1994,10 +1994,22 @@ class Reports{
 			while ($rw = $oSQL->f($rs)){			
 				$rw['Budget item'] = $rw['Customer_name'];
 				$this->echoBudgetItemString($rw);
+				foreach ($rw as $key=>$value){
+					$arrSubtotal[$key] += $value;
+				}
 			}
+			$arrSubtotal['Budget item'] = "Total";
 			?>
 			</tbody>
+			<tfoot>
+			<?php
+				$this->echoBudgetItemString($arrSubtotal, 'budget-subtotal');
+			?>
+			</tfoot>
 			</table>
+			<ul class='link-footer'>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+			</ul>
 			<?php
 		} else {
 			echo '<h3>No records found</h3>';
