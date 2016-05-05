@@ -104,6 +104,9 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 			SELECT 3, 4, 'CCD', 17218, COUNT(shpID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID
 			FROM tnt.tbl_shipment WHERE shpCCendDate BETWEEN @dateStart AND @dateEnd";
 	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
+			SELECT 3, 3, 'Trips', 17218, COUNT(shpID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID
+			FROM tnt.tbl_shipment WHERE shpTMMREndDate BETWEEN @dateStart AND @dateEnd";
+	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
 			SELECT 3, 50, 'CCD', 17218, COUNT(ashID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID
 			FROM tnt.tbl_air_shipment WHERE ashCCDate BETWEEN @dateStart AND @dateEnd";
 };
