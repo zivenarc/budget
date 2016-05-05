@@ -153,9 +153,11 @@ include ('includes/inc-frame_top.php');
 					// $month = date('M',mktime(0,0,0,$m,15));
 					$month = $oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-$month'>",Reports::render($rw[$month],1),'</td>';
-					$total[$month] += $rw[$month];
-					$subtotal[$rw['pccTitle']][$month] += $rw[$month];
+					$total[$month] += $rw[$month];		
+					$subtotal[$rw['pccTitle']][$month] += $rw[$month];					
 				}
+				$totalPayroll += $rw['empSalary'];
+				$subtotalPayroll[$rw['pccTitle']] += $rw['empSalary'];
 				?>
 					<td class='budget-decimal budget-ytd'><?php echo Reports::render($rw['Total'],1);?></td>
 				</tr>
@@ -166,15 +168,18 @@ include ('includes/inc-frame_top.php');
 			?>
 			<tfoot>
 			<tr class='budget-subtotal'>
-			<td colspan="10">Total</td>
-			<?php
-				for ($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
-					// $month = date('M',mktime(0,0,0,$m,15));
-					$month = $oBudget->arrPeriod[$m];
-					echo "<td class='budget-decimal budget-$month'>",Reports::render($total[$month],1),'</td>';					
-				}
-			?>
-			<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($total)/12,1);?></td>
+				<td colspan="7">Total</td>
+				<td class="budget-decimal"><?php Reports::render($totalPayroll);?></td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<?php
+					for ($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
+						// $month = date('M',mktime(0,0,0,$m,15));
+						$month = $oBudget->arrPeriod[$m];
+						echo "<td class='budget-decimal budget-$month'>",Reports::render($total[$month],1),'</td>';					
+					}
+				?>
+				<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($total)/12,1);?></td>
 			</tr>
 			</tfoot>
 			</tbody>
