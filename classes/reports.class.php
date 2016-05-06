@@ -1712,8 +1712,8 @@ class Reports{
 					$grandTotal['ROY'] += $rw['ROY'];
 					
 					for ($q = 1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){
-						$subtotal[$rw['Group']]['Q'.$m]+=$rw['Q'.$m];	
-						$grandTotal['Q'.$m] += $rw['Q'.$m];
+						$subtotal[$rw['Group']]['Q'.$q]+=$rw['Q'.$q];	
+						$grandTotal['Q'.$q] += $rw['Q'.$q];
 					}
 					
 				}
