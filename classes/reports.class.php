@@ -462,7 +462,7 @@ class Reports{
 				}
 				$arrQuarter = $this->_getQuarterTotals($rw);
 				
-				for ($q=1;$q<5;$q++){		
+				for ($q=1+$this->oBudget->offset/3;$q<5+$this->oBudget->offset/3;$q++){		
 					$quarter = 'Q'.$q;
 					$arrQTotal[$rw['unit']][$quarter] += $arrQuarter[$quarter];
 					?>
