@@ -491,7 +491,7 @@ class Reports{
 						<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month]);?></td>
 						<?php
 					}
-					for ($q=1;$q<5;$q++){		
+					for ($q=1+$this->oBudget->offset/3;$q<5+$this->oBudget->offset/3;$q++){		
 						$quarter = 'Q'.$q;						
 						?>
 						<td class='budget-decimal budget-quarterly budget-<?php echo $quarter;?>'><?php self::render($arrQTotal[$unit][$quarter])?></td>
@@ -1682,25 +1682,26 @@ class Reports{
 				
 				//------------------------Collecting subtotals---------------------------------------
 				$local_subtotal = 0;
-				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-					// $month = $this->oBudget->arrPeriod[$m];
-					$month = $this->oBudget->arrPeriod[$m];
-					$subtotal[$rw['Group']][$month]+=$rw[$month];					
-					$subtotal[$rw['Group']]['Q'.$m]+=$rw['Q'.$m];					
-					$local_subtotal += $rw[$month];
-					$grandTotal[$month] += $rw[$month];
-					$grandTotal['Q'.$m] += $rw['Q'.$m];
-				}
-				$subtotal[$rw['Group']]['Total'] += $rw['Total'];
-				$subtotal[$rw['Group']]['Total_AM'] += $rw['Total_AM'];
-				$subtotal[$rw['Group']]['estimate'] += $rw['estimate'];
-				$subtotal[$rw['Group']]['estimate_AM'] += $rw['estimate_AM'];
-				$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
-				$subtotal[$rw['Group']]['YTD'] += $rw['YTD'];
-				$subtotal[$rw['Group']]['ROY_A'] += $rw['ROY_A'];
-				$subtotal[$rw['Group']]['ROY'] += $rw['ROY'];
-				
+
 				if($rw['item']){
+											
+					$subtotal[$rw['Group']]['Total'] += $rw['Total'];
+					$subtotal[$rw['Group']]['Total_AM'] += $rw['Total_AM'];
+					$subtotal[$rw['Group']]['estimate'] += $rw['estimate'];
+					$subtotal[$rw['Group']]['estimate_AM'] += $rw['estimate_AM'];
+					$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
+					$subtotal[$rw['Group']]['YTD'] += $rw['YTD'];
+					$subtotal[$rw['Group']]['ROY_A'] += $rw['ROY_A'];
+					$subtotal[$rw['Group']]['ROY'] += $rw['ROY'];
+					
+					for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+					// $month = $this->oBudget->arrPeriod[$m];
+						$month = $this->oBudget->arrPeriod[$m];
+						$subtotal[$rw['Group']][$month]+=$rw[$month];														
+						$local_subtotal += $rw[$month];
+						$grandTotal[$month] += $rw[$month];					
+					}
+					
 					$grandTotal['Total'] += $rw['Total'];
 					$grandTotal['Total_AM'] += $rw['Total_AM'];
 					$grandTotal['estimate'] += $rw['estimate'];
@@ -1709,6 +1710,12 @@ class Reports{
 					$grandTotal['YTD'] += $rw['YTD'];
 					$grandTotal['ROY_A'] += $rw['ROY_A'];
 					$grandTotal['ROY'] += $rw['ROY'];
+					
+					for ($q = 1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){
+						$subtotal[$rw['Group']]['Q'.$m]+=$rw['Q'.$m];	
+						$grandTotal['Q'.$m] += $rw['Q'.$m];
+					}
+					
 				}
 				
 				$this->echoBudgetItemString($rw,$tr_class);				
