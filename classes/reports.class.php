@@ -413,7 +413,7 @@ class Reports{
 	public function salesByCustomer($sqlWhere=''){
 		
 		ob_start();
-			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL(1,$this->oBudget->length).", SUM(".$this->oBudget->getYTDSQL().") as Total, usrTitle as responsible, sales
+			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL(1,15).", SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total, usrTitle as responsible, sales
 					FROM `reg_sales`
 					LEFT JOIN vw_customer ON customer=cntID					
 					LEFT JOIN vw_profit ON pc=pccID	
@@ -434,7 +434,7 @@ class Reports{
 			<thead>
 				<tr><th>Customer</th><th>Unit</th>
 					<?php 
-					echo $this->oBudget->getTableHeader(); 
+					echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset,12+$this->oBudget->offset); 
 					echo $this->oBudget->getTableHeader('quarterly'); 
 					?>
 				<th class='budget-ytd'>Total</th></tr>
@@ -472,7 +472,6 @@ class Reports{
 				
 				?>
 				<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']);?></td>				
-				<td class='budget-decimal'><?php self::render($arrQuarter['Q5']);?></td>				
 				</tr>
 				<?php
 				$responsible = $rw['responsible'];
@@ -500,7 +499,6 @@ class Reports{
 					}
 					?>
 					<td class='budget-decimal budget-ytd'><?php self::render(array_sum($data));?></td>
-					<td class='budget-decimal budget-<?php echo $quarter;?>'><?php self::render($arrQTotal[$unit]['Q5'])?></td>
 				</tr>
 				<?php 
 				}
