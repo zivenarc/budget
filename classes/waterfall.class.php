@@ -1,5 +1,6 @@
 <?php
 $arrJS[] = 'https://www.google.com/jsapi';
+$arrJS[] = 'js/waterfall.js';
 class Waterfall {
 	
 	private $arrReport, $arrChart, $chartID;
@@ -14,6 +15,10 @@ class Waterfall {
 	}
 	
 	private function _initData(){
+	
+		$this->arrReport = Array();
+		$this->arrChart = Array();
+	
 		GLOBAL $oSQL;
 		$sql = "SELECT SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
 		({$this->sqlBase}) Q1";
@@ -99,66 +104,20 @@ class Waterfall {
 		</table>
 		<ul class='link-footer'>
 		<li><a href="javascript:SelectContent('table_<?php echo $this->chartID;?>');">Select table</a></li>
-		<li><a target="_blank" id="chart_png_href">Get chart as image</a></li>
+		<li><a target="_blank" id="chart_png_href_<?php echo $this->chartID;?>">Get chart as image</a></li>
 		</ul>
 		<?php
 	}
 	
-	public function drawChart(){
-			$chartID = "chart_div_".md5(time());
+	public function drawChart(){			
 		?>
-		<div id="<?php echo $chartID;?>" style="width: 1200px; height: 700px;"></div>
+		<div id="<?php echo $this->chartID;?>" class="google_chart" style="width: 1200px; height: 700px;"></div>
 		<div id="toolbar_div"></div>
 		<script>
-			google.load("visualization", "1", {packages:["corechart"]});
-				  google.setOnLoadCallback(draw);
+				
+			google_chart_data["<?php echo $this->chartID;?>"] = {data:<?php echo json_encode($this->arrChart);?>,title:'<?php echo $this->title;?>'};
+			// google_chart_data["<?php echo $chartID;?>"]['title'] = '<?php echo $this->title;?>';
 				  
-				  function draw(){
-					drawChart();
-					drawToolbar();
-				  };
-				  
-				 function drawToolbar() {
-
-				};
-				  
-				  
-				  function drawChart() {
-					var data = new google.visualization.DataTable();
-					data.addColumn({'type':'string'});
-					data.addColumn({'type':'number'});
-					data.addColumn({'type':'number'});
-					data.addColumn({'type':'number'});
-					data.addColumn({'type':'number'});
-					data.addColumn({'type':'string','role':'tooltip','p':{'html': true}});
-					// var data = google.visualization.arrayToDataTable(<?php echo json_encode($arrChart);?>, true);		
-					data.addRows(<?php echo json_encode($this->arrChart);?>);		
-					// data.setColumnProperty(5,'p','html');
-					// data.setColumnProperty(5,'role','tooltip');
-					
-					var options = {
-						title: '<?php echo $this->title;?>',
-					  legend: 'none',
-					  bar: { groupWidth: '100%' }, 
-					  candlestick: {
-						fallingColor: { strokeWidth: 0, fill: '#EFA8B4' }, 
-						risingColor: { strokeWidth: 0, fill: '#A8D1EF' }   
-					  },
-					  tooltip: {isHtml: true},
-					  hAxis: {slantedTextAngle:90, textStyle:{fontSize: 10}},
-					  vAxis: {textStyle:{fontSize: 10}},
-					  chartArea: {top:'10%', bottom:'50%', height: '50%'}
-					};
-
-					var chart = new google.visualization.CandlestickChart(document.getElementById('<?php echo $chartID;?>'));
-					
-					google.visualization.events.addListener(chart, 'ready', function () {
-					document.getElementById('chart_png_href').href = chart.getImageURI();
-					//console.log(chart_div.innerHTML);
-				  });
-					
-					chart.draw(data, options);
-				  }
 			</script>
 		<?php
 	}

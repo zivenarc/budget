@@ -20,7 +20,7 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 					// init_panel(ui.panel); 
 					console.log(ui);
 					localStorage.repPnlTab = $(this).tabs('option','active');
-					drawChart();
+					draw();
 				},	
 			};
 

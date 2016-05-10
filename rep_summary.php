@@ -82,9 +82,37 @@ if(!isset($_GET['pccGUID'])){
 									GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
 							'tolerance'=>0.05,
 							'limit'=>10);	
-
+	
 	$oWF = new Waterfall($settings['gpcus']);
-
+	$oWF->draw();
+	
+	$settings['pbt'] = Array('title'=>"PBT by factors",
+						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
+											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
+											{$sqlActual} as Actual, 
+											0 as Budget, 
+											{$sqlActual} as Diff
+									FROM vw_master 
+									LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+									{$sqlWhere}
+										AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
+									GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
+									UNION ALL
+									SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
+											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
+											0 as Actual, 
+									{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+									FROM vw_master 
+									LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+									{$sqlWhere}
+										AND scenario='{$oReference->id}' 
+										AND source<>'Estimate' 
+										AND account IN ('J00400', 'J00802')										
+									GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
+							'tolerance'=>0.05,
+							'limit'=>10);
+	
+	$oWF = new Waterfall($settings['pbt']);
 	$oWF->draw();
 	?>
 	</div>
