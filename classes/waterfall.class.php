@@ -105,8 +105,9 @@ class Waterfall {
 	}
 	
 	public function drawChart(){
+			$chartID = "chart_div_".md5(time());
 		?>
-		<div id="chart_div" style="width: 1200px; height: 700px;"></div>
+		<div id="<?php echo $chartID;?>" style="width: 1200px; height: 700px;"></div>
 		<div id="toolbar_div"></div>
 		<script>
 			google.load("visualization", "1", {packages:["corechart"]});
@@ -149,7 +150,7 @@ class Waterfall {
 					  chartArea: {top:'10%', bottom:'50%', height: '50%'}
 					};
 
-					var chart = new google.visualization.CandlestickChart(document.getElementById('chart_div'));
+					var chart = new google.visualization.CandlestickChart(document.getElementById('<?php echo $chartID;?>'));
 					
 					google.visualization.events.addListener(chart, 'ready', function () {
 					document.getElementById('chart_png_href').href = chart.getImageURI();
