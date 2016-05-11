@@ -71,8 +71,11 @@ if(!isset($_GET['pccGUID'])){
 										AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
 									GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
 									UNION ALL
-									SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 0 as Actual, 
-									{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+									SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), 
+									IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 
+									0 as Actual, 
+									{$sqlBudget}  as Budget, 
+									-{$sqlBudget} as Diff
 									FROM vw_master 
 									LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 									{$sqlWhere}
@@ -96,7 +99,7 @@ if(!isset($_GET['pccGUID'])){
 									LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 									{$sqlWhere}
 										AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
-									GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
+									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)
 									UNION ALL
 									SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
 											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
@@ -108,7 +111,7 @@ if(!isset($_GET['pccGUID'])){
 										AND scenario='{$oReference->id}' 
 										AND source<>'Estimate' 
 										AND account IN ('J00400', 'J00802')										
-									GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
+									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)",
 							'tolerance'=>0.05,
 							'limit'=>10);
 	
