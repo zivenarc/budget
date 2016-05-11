@@ -96,7 +96,6 @@ if(!isset($_GET['pccGUID'])){
 											0 as Budget, 
 											{$sqlActual} as Diff
 									FROM vw_master 
-									LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 									{$sqlWhere}
 										AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)
@@ -106,7 +105,6 @@ if(!isset($_GET['pccGUID'])){
 											0 as Actual, 
 									{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 									FROM vw_master 
-									LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 									{$sqlWhere}
 										AND scenario='{$oReference->id}' 
 										AND source<>'Estimate' 
