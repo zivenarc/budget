@@ -294,6 +294,7 @@ class Distribution extends Document{
 							$master_row->profit = $this->profit;
 							$master_row->activity = $total['activity'];
 							$master_row->customer = $record->customer;					
+							$master_row->sales = $this->getSales($record->customer);					
 							$item = $Items->getById($total['item']);
 							$master_row->account = $item->getYACT($this->profit);
 							$master_row->item = $total['item'];
@@ -310,7 +311,8 @@ class Distribution extends Document{
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
 					$master_row->activity = $total['activity'];
-					$master_row->customer = self::EMPTY_CUSTOMER;					
+					$master_row->customer = self::EMPTY_CUSTOMER;	
+					$master_row->sales = $this->getSales($master_row->customer);					
 					$item = $Items->getById($total['item']);
 					$master_row->account = $item->getYACT($this->profit);
 					$master_row->item = $total['item'];

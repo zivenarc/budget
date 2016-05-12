@@ -543,6 +543,13 @@ class Document extends easyForm{
 	function log($data){
 		$this->log[] = var_export($data, true);
 	}
-	
+
+	function getSales($customer=0){
+		$sql = "SELECT cntUserID FROM common_db.tbl_counterparty WHERE cntID={$customer}";
+		$rs = $this->oSQL->q($sql);
+		$res = strtoupper($this->oSQL->get_data($rs));
+		return($res);
+	}
 }
+
 ?>
