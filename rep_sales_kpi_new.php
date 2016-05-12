@@ -84,7 +84,7 @@ if(!isset($_GET['pccGUID'])){
 	if ($_GET['pccGUID']=='all'){
 		$sqlWhere = " WHERE customer IN (".implode(',',$arrCounterparty['codes']).")"; 
 	} else {
-		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND customer IN (".implode(',',$arrCnt).")";
+		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND customer IN (".implode(',',$arrCounterparty['codes']).")";
 	}
 	
 	$filter['customer'] = $arrCounterparty['codes'];	
