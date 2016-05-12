@@ -35,17 +35,26 @@ class Waterfall {
 		$sql = Array();
 
 		if ($this->limit!=0){
+			
+			$sqlLimit = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
+			({$this->sqlBase}) Q1
+			GROUP BY optValue
+			ORDER BY SUM(DIFF) DESC
+			";
+			$rs = $oSQL->q($sqlLimit);
+			$limit = (integer)min($this->limit,$oSQL->n($rs)/2);
+		
 			$sql[] = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
 			({$this->sqlBase}) Q1
 			GROUP BY optText
 			ORDER BY SUM(DIFF) DESC
-			LIMIT {$this->limit}";
+			LIMIT {$limit}";
 
 			$sql[] = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
 			({$this->sqlBase}) Q1
 			GROUP BY optText
 			ORDER BY SUM(DIFF) ASC
-			LIMIT {$this->limit}";
+			LIMIT {$limit}";
 		} else {
 			$sql[] = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
 			({$this->sqlBase}) Q1
