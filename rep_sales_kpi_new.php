@@ -56,7 +56,7 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$oBudget->title,' :: ',$arrUsrData["pagTitle$strLocal"],'</h1>';
 	
-	if (count($arrCnt>1)){
+	if (count($arrCounterparty['codes']>1)){
 		foreach ($arrCounterparty['titles'] as $sales=>$customers){
 			echo '<h4>',($sales?$sales:"Unassigned"),'</h4>';
 			echo '<div>';
@@ -82,7 +82,7 @@ if(!isset($_GET['pccGUID'])){
 	
 	include ('includes/inc_report_buttons.php');
 	if ($_GET['pccGUID']=='all'){
-		$sqlWhere = " WHERE customer IN (".implode(',',$arrCnt).")"; 
+		$sqlWhere = " WHERE customer IN (".implode(',',$arrCounterparty['codes']).")"; 
 	} else {
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND customer IN (".implode(',',$arrCnt).")";
 	}
