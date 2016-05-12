@@ -3,6 +3,7 @@ $flagNoAuth = true;
 // $_DEBUG = true;
 include('common/auth.php');
 require ('classes/budget.class.php');
+require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
 
@@ -56,7 +57,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 										{$sqlActual} as Diff
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
-								WHERE scenario='{$actual}' AND account IN ('J00400', 'J00802')
+								WHERE scenario='{$actual}' ".Reports::GP_FILTER."
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
 								UNION ALL
 								SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 0 as Actual, 
@@ -64,7 +65,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE
-								scenario='{$budget}' AND source<>'Estimate' AND account IN ('J00400', 'J00802')
+								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
 						'tolerance'=>0.05,
 						'limit'=>10);
@@ -77,7 +78,8 @@ $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 										{$sqlActual} as Diff
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
-								WHERE scenario='{$actual}' AND account IN ('J00400', 'J00802') AND pc NOT in (5,15)
+								WHERE scenario='{$actual}' ".Reports::GP_FILTER." 
+								AND pc NOT in (5,15)
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
 								UNION ALL
 								SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 0 as Actual, 
@@ -85,7 +87,8 @@ $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE
-								scenario='{$budget}' AND source<>'Estimate' AND account IN ('J00400', 'J00802') AND pc NOT in (5,15)
+								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
+								AND pc NOT in (5,15)
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
 						'tolerance'=>0.05,
 						'limit'=>10);
@@ -97,13 +100,13 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}' AND account IN ('J00400', 'J00802')
+			WHERE scenario='{$actual}' ".Reports::GP_FILTER."
 			GROUP BY pc
 			UNION ALL
 			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE
-			scenario='{$budget}' AND source<>'Estimate' AND account IN ('J00400', 'J00802')
+			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 			GROUP BY pc",
 			'tolerance'=>0.05
 			);
@@ -115,13 +118,12 @@ $settings['opbu'] = Array('title'=>"OP by business unit",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}' AND LEFT(account,1) NOT IN ('6', '7')
-			GROUP BY pc
+			WHERE scenario='{$actual}'  ".Reports::OP_FILTER."
 			UNION ALL
 			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE
-			scenario='{$budget}' AND source<>'Estimate' AND LEFT(account,1) NOT IN ('6', '7')
+			scenario='{$budget}' AND source<>'Estimate' ".Reports::OP_FILTER."
 			GROUP BY pc"
 			);
 

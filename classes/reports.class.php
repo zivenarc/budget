@@ -11,7 +11,9 @@ class Reports{
 	
 	const GP_CODE = 94;
 	const CNT_GROUP_EXEMPTION = 723;
-	
+	const OP_FILTER = "AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%') ";	
+	const GP_FILTER = "AND account IN ('J00400', 'J00802') ";
+		
 	function __construct($params){
 		
 		GLOBAL $oSQL;
@@ -654,7 +656,8 @@ class Reports{
 							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
 						FROM `reg_master`
 						$sqlWhere
-							AND account IN ('J00400','J00802') AND active=1
+						".self::GP_FILTER."
+						AND active=1
 						GROUP BY account";
 				$rs = $oSQL->q($sql);	
 				if ($oSQL->num_rows($rs)){
@@ -1010,13 +1013,13 @@ class Reports{
 		
 		$sql = "SELECT {$sqlSelect}
 				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')";
+				{$sqlWhere} AND scenario='{$this->oBudget->id}' ".self::OP_FILTER;
 		$rs = $this->oSQL->q($sql);
 		$rwOP = $this->oSQL->f($rs);
 		
 		$sql = "SELECT {$sqlSelect}
 				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oReference->id}' AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')";
+				{$sqlWhere} AND scenario='{$this->oReference->id}' ".self::OP_FILTER;
 		$rs = $this->oSQL->q($sql);
 		$rwBOP = $this->oSQL->f($rs);
 		
