@@ -362,7 +362,7 @@ class MSF extends Document{
 			$row->flagUpdated = true;				
 			$row->unit = $rw['unit'];
 			$row->pc = $rw['pc'];			
-			for ($m=1;$m<=$this->budget->length;$m++){
+			for ($m=1;$m<=15;$m++){
 				// $month = date('M',mktime(0,0,0,$m,15));							
 				$month = $this->budget->arrPeriod[$m];
 				$row->set_month_value($m, $rw[$month]);
