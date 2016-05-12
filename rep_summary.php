@@ -97,7 +97,8 @@ if(!isset($_GET['pccGUID'])){
 											{$sqlActual} as Diff
 									FROM vw_master 
 									{$sqlWhere}
-										AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
+										AND  scenario='{$oBudget->id}' 
+										AND Group_code<>121
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)
 									UNION ALL
 									SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
@@ -108,7 +109,7 @@ if(!isset($_GET['pccGUID'])){
 									{$sqlWhere}
 										AND scenario='{$oReference->id}' 
 										AND source<>'Estimate' 
-										AND account IN ('J00400', 'J00802')										
+										AND Group_code<>121								
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)",
 							'tolerance'=>0.05,
 							'limit'=>10);
