@@ -50,6 +50,11 @@ if ($_GET['tab']){
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
 	echo Budget::getScenarioTabs(true);
+	?>
+	<ul class='link-footer'>
+		<li><a href="?ownerID=<?php echo $arrUsrData['usrID'];?>">My documents</a>
+	</ul>
+	<?php
 	include ('includes/inc-frame_bottom.php');
 }
 ?>
