@@ -8,7 +8,7 @@ include ('includes/inc_report_settings.php');
 
 session_start();
 
-$cntID = isset($_GET['cntID'])?(integer)$_GET['cntID']:(isset($_SESSION['cntID'])?$_SESSION['cntID']:31153);//new if not defined
+$cntID = isset($_GET['cntID'])?(integer)$_GET['cntID']:(isset($_SESSION['cntID'])?$_SESSION['cntID']:33239);//new if not defined
 $_SESSION['cntID'] = $cntID;
 
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
@@ -16,16 +16,31 @@ $oBudget = new Budget($budget_scenario);
 
 include ('includes/inc_report_pcfilter.php');
 
-$sql = "SELECT cntID, cntTitle$strLocal as cntTitle, cntUserID, usrTitle$strLocal as Sales, cntFlagFolder
+// set_time_limit (10);
+$arrCounterparty = getCnt($cntID);
+
+function getCnt($cntID, &$arrCounterparty=Array()){
+	GLOBAL $oSQL;
+	
+	$sql = "SELECT cntID, cntTitle$strLocal as cntTitle, cntUserID, usrTitle$strLocal as Sales, cntFlagFolder
 		FROM common_db.tbl_counterparty 
 		LEFT JOIN stbl_user ON usrID=cntUserID
-		WHERE cntID={$cntID} 
-			OR cntParentCode1C=(SELECT cntCode1C FROM common_db.tbl_counterparty WHERE cntID={$cntID})
+		WHERE (cntID={$cntID} AND cntFlagFolder=0)
+			OR (cntParentCode1C=(SELECT cntCode1C FROM common_db.tbl_counterparty WHERE cntID={$cntID}))
 		ORDER BY cntUserID, cntTitle$strLocal";
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	$arrCnt[] = $rw['cntID'];
-	$arrCntTitle[$rw['Sales']][$rw['cntID']] = $rw;
+	// echo "<pre>",$sql,"</pre>";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		// $arrCnt[] = $rw['cntID'];
+		$arrCounterparty['codes'][] = $rw['cntID'];
+		// $arrCntTitle[$rw['Sales']][$rw['cntID']] = $rw;
+		$arrCounterparty['titles'][$rw['Sales']][$rw['cntID']] = $rw;
+		if ($rw['cntFlagFolder']){
+			$arrCounterparty = getCnt($rw['cntID'],$arrCounterparty);
+		}	
+	}
+	
+	return ($arrCounterparty);
 }
 
 if(!isset($_GET['pccGUID'])){
@@ -42,7 +57,7 @@ if(!isset($_GET['pccGUID'])){
 	echo '<h1>',$oBudget->title,' :: ',$arrUsrData["pagTitle$strLocal"],'</h1>';
 	
 	if (count($arrCnt>1)){
-		foreach ($arrCntTitle as $sales=>$customers){
+		foreach ($arrCounterparty['titles'] as $sales=>$customers){
 			echo '<h4>',($sales?$sales:"Unassigned"),'</h4>';
 			echo '<div>';
 			foreach ($customers as $id=>$data){
@@ -61,7 +76,7 @@ if(!isset($_GET['pccGUID'])){
 	?>
 	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 	<?php
-	Budget::getProfitTabs('reg_sales', false, Array('customer'=>$arrCnt));	
+	Budget::getProfitTabs('reg_sales', false, Array('customer'=>$arrCounterparty['codes']));	
 	include ('includes/inc-frame_bottom.php');
 } else {
 	
@@ -72,7 +87,7 @@ if(!isset($_GET['pccGUID'])){
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND customer IN (".implode(',',$arrCnt).")";
 	}
 	
-	$filter['customer'] = $arrCnt;	
+	$filter['customer'] = $arrCounterparty['codes'];	
 	
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
 	
