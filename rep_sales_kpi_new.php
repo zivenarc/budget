@@ -80,7 +80,7 @@ if(!isset($_GET['pccGUID'])){
 	?>
 		<div id='graph'/>
 	<?php
-	if ($oBudget->type=='FYE'){
+	if (strpos($oBudget->type,'FYE')!== false){
 		$oReport->monthlyReport($type);	
 	} else {
 		$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
