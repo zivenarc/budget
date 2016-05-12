@@ -89,6 +89,8 @@ class Distribution extends Document{
 					,'mandatory'=>true
 					, 'disabled'=>!$this->flagUpdate
 				);
+		
+		$this->Columns[] = $this->getResponsibleEF();
 			
 	}
 	
