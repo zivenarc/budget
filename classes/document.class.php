@@ -295,7 +295,7 @@ class Document extends easyForm{
 		$sql[] = "UPDATE `{$this->table}` 
 			SET `{$this->prefix}FlagPosted`=1, `{$this->prefix}EditBy`='{$arrUsrData['usrID']}', `{$this->prefix}EditDate`=NOW() 
 			WHERE `{$this->prefix}ID`={$this->ID} LIMIT 1;";
-		$sql[] = "UPDATE `{$this->table}`, (SELECT SUM(`Jan`+`Feb`+`Mar`+`Apr`+`May`+`Jun`+`Jul`+`Aug`+`Sep`+`Oct`+`Nov`+`Dec`) as Total, source FROM reg_master GROUP BY source) Budget 
+		$sql[] = "UPDATE `{$this->table}`, (SELECT SUM(".$this->budget->getYTDSQL(1+$this->budget->offset,max($this->budget->length,12+$this->budget->offset)).") as Total, source FROM reg_master GROUP BY source) Budget 
 			SET `{$this->prefix}Amount`=`Budget`.`Total`
 			WHERE `{$this->prefix}ID`={$this->ID} AND `{$this->prefix}GUID`=`Budget`.`source`;";
 		$sql[] = "UPDATE `{$this->register}` SET posted=1 WHERE source='{$this->GUID}';";
