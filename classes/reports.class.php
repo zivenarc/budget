@@ -979,7 +979,7 @@ class Reports{
 		
 		$arrGraph[] = Array('Period','Gross revenue','GP','Budget GP','Staff costs','OP','Budget OP');
 		
-		$sqlSelect = $this->oBudget->getMonthlySumSQL(1,15,$arrRates_this, $this->Denominator).", ".
+		$sqlSelect = $this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset,max($this->oBudget->length,12+$this->oBudget->offset),$arrRates_this, $this->Denominator).", ".
 				"SUM(".$this->oBudget->getYTDSQL(1,3,$arrRates_this, $this->Denominator).") as Q1, ".
 				"SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates_this, $this->Denominator).") as Total_AM";
 		
@@ -1020,7 +1020,9 @@ class Reports{
 		$rs = $this->oSQL->q($sql);
 		$rwBOP = $this->oSQL->f($rs);
 		
-		foreach ($this->oBudget->arrPeriod as $period){
+		for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+			$period = $this->oBudget->arrPeriod[$m];
+		// foreach ($this->oBudget->arrPeriod as $period){
 			$arrGraph[] = Array($period,(double)$rwGR[$period],(double)$rwGP[$period], (double)$rwBGP[$period], -(double)$rwSC[$period], (double)$rwOP[$period], (double)$rwBOP[$period]);
 		}
 		// echo '<pre>';print_r($arrGraph);echo '</pre>';
@@ -1029,108 +1031,122 @@ class Reports{
 		<tr>
 			<th>Period</th>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			// foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<th>',$period,'</th>';
 			}
 		?>
-		<th>Q1</th><th>FY Apr-Mar</th>
+		<th>FYE</th>
 		</tr>
 		<tr><td>Gross revenue</td>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			// foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',self::render($rwGR[$period]),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render($rwGR['Q1']),'</td>';
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwGR['Q1']),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwGR['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr><td>Gross profit</td>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',self::render($rwGP[$period]),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render($rwGP['Q1']),'</td>';
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwGP['Q1']),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwGP['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr class="budget-ratio"><td>Profitability, %</td>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',self::render_ratio($rwGP[$period],$rwGR[$period]),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwGP['Q1'], $rwGR['Q1']),'</td>';
+		// echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwGP['Q1'], $rwGR['Q1']),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwGP['Total_AM'], $rwGR['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr><td>Gross profit, <?php echo $this->oReference->id;?></td>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',self::render($rwBGP[$period]),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render($rwBGP['Q1']),'</td>';
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwBGP['Q1']),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwBGP['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr><td>Diff</td>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',self::render($rwGP[$period]-$rwBGP[$period]),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render($rwGP['Q1']-$rwBGP['Q1']),'</td>';
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwGP['Q1']-$rwBGP['Q1']),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwGP['Total_AM']-$rwBGP['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr><td>Staff costs</td>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',self::render(-$rwSC[$period]),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render(-$rwSC['Q1']),'</td>';
+		// echo '<td class="budget-decimal budget-quarterly">',self::render(-$rwSC['Q1']),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render(-$rwSC['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr class="budget-ratio"><td>Staff efficiency</td>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',self::render_ratio($rwGP[$period],-$rwSC[$period]*100),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwGP['Q1'], -$rwSC['Q1']*100),'</td>';
+		// echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwGP['Q1'], -$rwSC['Q1']*100),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwGP['Total_AM'],-$rwSC['Total_AM']*100),'</td>';
 		?>
 		</tr>
 		<tr><td>Operating income</td>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',self::render($rwOP[$period]),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']),'</td>';
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwOP['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr class="budget-ratio"><td>Profitability%</td>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',self::render_ratio($rwOP[$period],$rwGR[$period]),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwOP['Q1'], $rwGR['Q1']),'</td>';
+		// echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwOP['Q1'], $rwGR['Q1']),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwOP['Total_AM'],$rwGR['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr><td>Op.income, <?php echo $this->oReference->id;?></td>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',self::render($rwBOP[$period]),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render($rwBOP['Q1']),'</td>';
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwBOP['Q1']),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwBOP['Total_AM']),'</td>';
 		?>
 		</tr>
 		<tr><td>Diff</td>
 		<?php
-			foreach ($this->oBudget->arrPeriod as $period){
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',self::render($rwOP[$period]-$rwBOP[$period]),'</td>';
 			}
-		echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']-$rwBOP['Q1']),'</td>';
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']-$rwBOP['Q1']),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwOP['Total_AM']-$rwBOP['Total_AM']),'</td>';
 		?>
 		</tr>
