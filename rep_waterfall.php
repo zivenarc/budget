@@ -121,6 +121,7 @@ $settings['opbu'] = Array('title'=>"OP by business unit",
 					{$sqlActual} as Diff
 			FROM vw_master 			
 			WHERE scenario='{$actual}'  ".Reports::OP_FILTER."
+			GROUP BY pc
 			UNION ALL
 			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
