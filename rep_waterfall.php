@@ -72,6 +72,27 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 						'tolerance'=>0.05,
 						'limit'=>10);
 
+$settings['gpsal'] = Array('title'=>"GP by sales",
+					'sqlBase' => "SELECT sales as optValue, 
+										usrTitle as optText, 
+										{$sqlActual} as Actual, 
+										0 as Budget, 
+										{$sqlActual} as Diff
+								FROM vw_master 
+								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+								WHERE scenario='{$actual}' ".Reports::GP_FILTER."
+								GROUP BY sales
+								UNION ALL
+								SELECT sales, usrTitle as optText, 0 as Actual, 
+								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+								FROM vw_master 
+								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+								WHERE
+								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
+								GROUP BY sales",
+						'tolerance'=>0.05,
+						'limit'=>10);						
+						
 $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 					'sqlBase' => "SELECT IF(C.cntParentID<>723,C.cntParentID, C.cntID) as optValue, 
 										IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 
