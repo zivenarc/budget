@@ -268,11 +268,15 @@ class MSF extends Document{
 															// *$total[$month]															
 															// *($values[$month]/$arrPCSubtotal[$record->pc][$month]);	
 									if ($record->{$month}){
+										if ($arrPCSubtotal[$record->pc][$month]) {
 										$master_row->{$month} = round(
 																	$record->{$month}/$this->subtotal[strtolower($month)]
 																	*$item_values[$month]															
 																	*($values[$month]/$arrPCSubtotal[$record->pc][$month])
 																,2);
+										} else {
+											$master_row->{$month} = 0;
+										}
 									}									
 								}				
 														
