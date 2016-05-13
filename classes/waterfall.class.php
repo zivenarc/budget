@@ -63,7 +63,9 @@ class Waterfall {
 		}
 
 		for ($i=0;$i<count($sql);$i++){
-			// echo '<pre>',$sql[$i],'</pre>';
+			if ($_GET['debug']){
+				echo '<pre>',$sql[$i],'</pre>';
+			}
 			$rs = $oSQL->q($sql[$i]);
 			while ($rw = $oSQL->f($rs)){
 				
