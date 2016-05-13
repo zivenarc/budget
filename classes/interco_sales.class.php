@@ -262,7 +262,8 @@ class Interco_sales extends Document{
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
 					$master_row->activity = $record->activity;
-					$master_row->customer = $record->customer;							
+					$master_row->customer = $record->customer;	
+					$master_row->sales = $this->getSales($master_row->customer);					
 					$activity = $Activities->getByCode($record->activity);
 					$account = 'J00400';			
 					$master_row->account = $account;
@@ -277,7 +278,7 @@ class Interco_sales extends Document{
 					$master_row->profit = $this->profit;
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;				
-					
+					$master_row->sales = $this->getSales($master_row->customer);
 					$activity = $Activities->getByCode($record->activity);
 					$account = 'J00802';
 					
@@ -293,7 +294,7 @@ class Interco_sales extends Document{
 					$master_row->profit = $this->customer;
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;				
-					
+					$master_row->sales = $this->getSales($master_row->customer);
 					$activity = $Activities->getByCode($record->activity);
 					$account = 'J00802';
 					
@@ -309,7 +310,7 @@ class Interco_sales extends Document{
 					$master_row->profit = 99;
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;				
-					
+					$master_row->sales = $this->getSales($master_row->customer);
 					$activity = $Activities->getByCode($record->activity);
 					$account = 'J00400';
 					
@@ -325,7 +326,7 @@ class Interco_sales extends Document{
 					$master_row->profit = 99;
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;				
-					
+					$master_row->sales = $this->getSales($master_row->customer);
 					$activity = $Activities->getByCode($record->activity);
 					$account = 'J00802';
 					
@@ -341,7 +342,7 @@ class Interco_sales extends Document{
 					$master_row->profit = $this->customer;
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;				
-					
+					$master_row->sales = $this->getSales($master_row->customer);
 					$activity = $Activities->getByCode($record->activity);
 					$account = 'J00802';
 					
