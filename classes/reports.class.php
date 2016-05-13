@@ -2055,6 +2055,7 @@ class Reports{
 					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $this->Denominator).") as Total_JD ,\r\n
 					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $this->Denominator).") as Total_AM ,\r\n
 					0 as estimate, 
+					0 as estimate_JD, 
 					0 as estimate_AM, 
 					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, (integer)date('n',$this->oBudget->date_start)-1,$arrRates, $this->Denominator).") as YTD_A, 
 					0 as YTD, 
@@ -2064,11 +2065,12 @@ class Reports{
 		case 'last':
 			$arrRates = $this->oReference->getMonthlyRates($this->Currency);
 			$res=	str_repeat('0,',15)." \r\n".
-					str_repeat('0,',5)." \r\n".
-					"0 as Total, \r\n".
-					"0 as Total_JD, \r\n".
-					"0 as Total_AM, \r\n".
-					"SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $this->Denominator).") as estimate ,
+					str_repeat('0,',5)." \r\n
+					0 as Total, \r\n
+					0 as Total_JD, \r\n
+					0 as Total_AM, \r\n
+					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates, $this->Denominator).") as estimate ,
+					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $this->Denominator).") as estimate_JD ,
 					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $this->Denominator).") as estimate_AM ,
 					0 as YTD_A,
 					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, (integer)date('n',$this->oBudget->date_start)-1,$arrRates, $this->Denominator).") as YTD, 
