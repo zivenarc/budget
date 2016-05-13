@@ -78,15 +78,13 @@ $settings['gpsal'] = Array('title'=>"GP by sales",
 										{$sqlActual} as Actual, 
 										0 as Budget, 
 										{$sqlActual} as Diff
-								FROM vw_master 
-								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+								FROM vw_master 							
 								WHERE scenario='{$actual}' ".Reports::GP_FILTER."
 								GROUP BY sales
 								UNION ALL
 								SELECT sales, usrTitle as optText, 0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
-								FROM vw_master 
-								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+								FROM vw_master 								
 								WHERE
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 								GROUP BY sales",
