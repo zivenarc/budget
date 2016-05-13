@@ -211,7 +211,7 @@ class Interco_sales extends Document{
 						$row->selling_curr = $_POST['selling_curr'][$id];				
 						$row->buying_rate = (double)str_replace(',','',$_POST['buying_rate'][$id]);				
 						$row->buying_curr = $_POST['buying_curr'][$id];				
-						for ($m=1;$m<=$this->budget->length;$m++){
+						for ($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
 						}					
