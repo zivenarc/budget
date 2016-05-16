@@ -146,7 +146,8 @@ $settings['opbu'] = Array('title'=>"OP by business unit",
 			FROM vw_master 			
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::OP_FILTER."
-			GROUP BY pc"
+			GROUP BY pc",
+			'tolerance'=>0.07
 			);
 
 			
