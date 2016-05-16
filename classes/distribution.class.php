@@ -280,7 +280,7 @@ class Distribution extends Document{
 					$strItemFilter = $this->item;
 				}
 				
-				$sql = "SELECT activity, item, ".$this->budget->getMonthlySumSQL(1+$this->budget->offset,max($this->budget->length,3+$this->budget->offset))." FROM reg_master
+				$sql = "SELECT activity, item, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_master
 						WHERE scenario='{$this->scenario}'
 							AND pc='{$this->profit}'
 							AND item IN ('{$strItemFilter}')
