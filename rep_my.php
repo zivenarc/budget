@@ -43,12 +43,12 @@ echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 ?>
 <div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 <?php
-$sqlWhere .= "WHERE scenario='$budget_scenario' AND sales = ".$oSQL->e($ownerID);
+$sqlWhere .= "WHERE sales = ".$oSQL->e($ownerID);
 
 
 $oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>Array('sales'=>$ownerID)));
 
-if ($oBudget->type=='FYE'){
+if (strpos($oBudget->type,'FYE')!==false){
 	$oReport->monthlyReport($type);
 } else {
 	switch ($type){
