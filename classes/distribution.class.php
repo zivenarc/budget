@@ -239,7 +239,7 @@ class Distribution extends Document{
 			$row->flagUpdated = true;				
 			$row->unit = $rw['unit'];
 			$row->customer = $rw['customer'];			
-			for ($m=1;$m<=$this->budget->length;$m++){
+			for ($m=1;$m<=15;$m++){
 				$month = $this->budget->arrPeriod[$m];				
 				$row->set_month_value($m, $rw[$month]);
 				$arrSubtotal[$month] += $rw[$month];
@@ -280,7 +280,7 @@ class Distribution extends Document{
 					$strItemFilter = $this->item;
 				}
 				
-				$sql = "SELECT activity, item, ".$this->budget->getMonthlySumSQL(1,$this->budget->length)." FROM reg_master
+				$sql = "SELECT activity, item, ".$this->budget->getMonthlySumSQL(1+$this->budget->offset,max($this->budget->length,3+$this->budget->offset))." FROM reg_master
 						WHERE scenario='{$this->scenario}'
 							AND pc='{$this->profit}'
 							AND item IN ('{$strItemFilter}')
