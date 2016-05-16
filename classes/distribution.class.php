@@ -300,7 +300,7 @@ class Distribution extends Document{
 							$item = $Items->getById($total['item']);
 							$master_row->account = $item->getYACT($this->profit);
 							$master_row->item = $total['item'];
-							for($m=1;$m<=$this->budget->length;$m++){
+							for($m=1;$m<=15;$m++){
 								$month = $this->budget->arrPeriod[$m];
 								$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]*$total[$month];
 							}				
