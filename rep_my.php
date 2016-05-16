@@ -72,5 +72,8 @@ if (strpos($oBudget->type,'FYE')!==false){
 	<?php
 	$oReport->salesByCustomer(' and sales='.$oSQL->e($ownerID));
 }
+
+include ('includes/inc_subordinates.php');
+
 include ('includes/inc-frame_bottom.php');
 ?>
