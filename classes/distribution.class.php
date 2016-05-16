@@ -46,7 +46,7 @@ class Distribution extends Document{
 			while($rw = $this->oSQL->f($rs)){
 				// print_r($rw);
 				$this->records[$this->gridName][$rw['id']] = new distribution_record($this->GUID, $this->scenario, $rw['id'], $rw);			
-				for($m=1;$m<=$this->budget->length;$m++){
+				for($m=1;$m<=15;$m++){
 					$month = $this->budget->arrPeriod[$m];
 					$this->subtotal[$month] += $rw[$month];
 				}				
@@ -318,7 +318,7 @@ class Distribution extends Document{
 					$item = $Items->getById($total['item']);
 					$master_row->account = $item->getYACT($this->profit);
 					$master_row->item = $total['item'];
-					for($m=1;$m<=$this->budget->length;$m++){
+					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -$total[$month];
 					}
