@@ -162,7 +162,7 @@ class Distribution extends Document{
 						$row->item = $this->item;						
 						$row->customer = isset($_POST['customer'][$id]) ? $_POST['customer'][$id] : $this->customer;						
 						$row->unit = $_POST['unit'][$id];					
-						for ($m=1;$m<=$this->budget->length;$m++){
+						for ($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
 							$row->{$month} = (double)$_POST[strtolower($month)][$id];
 						}					
