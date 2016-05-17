@@ -169,7 +169,8 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
-			'tolerance'=>0.07);
+			'tolerance'=>0.07,
+			'limit'=>10);
 
 $settings['pbtwwh'] = Array('title'=>"PBT by factors w/o Warehouse",
 'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
