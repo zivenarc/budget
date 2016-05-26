@@ -2088,7 +2088,7 @@ class Reports{
 	private function _getMRFields(){
 				
 		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
-		
+		echo date('Ym',$this->oBudget->date_start - 1);
 		$cm = $this->oBudget->arrPeriod[(integer)(date('Ym',$this->oBudget->date_start - 1)-$this->oBudget->year*100)];
 		$res['cm'] = $cm;
 		$nm = $this->oBudget->arrPeriod[(integer)(date('Ym',$this->oBudget->date_start)-$this->oBudget->year*100)];
