@@ -28,8 +28,18 @@ class Budget{
 		$this->year = $rw['scnYear'];
 		$this->date_start = strtotime($rw['scnDateStart']);
 		$this->date_end = mktime(23,59,59,12+$this->offset,31,$this->year);
-		$this->cm = date('n',$this->date_start-1); 
-		$this->nm = $this->cm+1;
+		
+		if ($this->type=='Actual' || $this->type=='Budget'){
+			$this->cm=12;
+			$this->nm = 99;
+		} elseif ($this->type=='Actual_AM' || $this->type=='Budget_AM') {
+			$this->cm=15;
+			$this->nm = 99;
+		} else {
+			$this->cm = date('n',$this->date_start-1); 
+			$this->nm = $this->cm+1;
+		};
+		
 		$this->title = $rw["scnTitle$strLocal"];
 		$this->total = $rw['scnTotal'];
 		$this->id = $scenario;

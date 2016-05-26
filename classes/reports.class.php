@@ -2088,10 +2088,10 @@ class Reports{
 	private function _getMRFields(){
 				
 		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
-		echo date('Ym',$this->oBudget->date_start - 1);
-		$cm = $this->oBudget->arrPeriod[(integer)(date('Ym',$this->oBudget->date_start - 1)-$this->oBudget->year*100)];
+		
+		$cm = $this->oBudget->arrPeriod[$this->oBudget->cm];
 		$res['cm'] = $cm;
-		$nm = $this->oBudget->arrPeriod[(integer)(date('Ym',$this->oBudget->date_start)-$this->oBudget->year*100)];
+		$nm = $this->oBudget->arrPeriod[$this->oBudget->nm];
 		$res['nm'] = $nm;		
 		
 		$sqlNM = $nm?"SUM(`$nm`)/{$arrRates[$nm]}/{$this->Denominator}":"0";
@@ -2120,7 +2120,7 @@ class Reports{
 		$res['from_a'] = $this->oBudget->id;
 		$res['from_b'] = $this->oReference->id;
 		
-		echo '<pre>';print_r($res); echo '</pre>'; 
+		// echo '<pre>';print_r($res); echo '</pre>'; 
 		
 		return ($res);
 		
