@@ -2096,7 +2096,7 @@ class Reports{
 		
 		$sqlNM = $nm?"SUM(`$nm`)/{$arrRates[$nm]}/{$this->Denominator}":"0";
 		
-		$nCurrent = (integer)date('m',$this->oBudget->date_start - 1);
+		$nCurrent = $this->oBudget->cm;
 		
 		$res['actual']=	"SUM(`{$cm}`)/{$arrRates[$cm]}/{$this->Denominator} as CM_A, 
 						0 as CM_B,								
