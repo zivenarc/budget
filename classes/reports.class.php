@@ -2120,7 +2120,7 @@ class Reports{
 		$res['from_a'] = $this->oBudget->id;
 		$res['from_b'] = $this->oReference->id;
 		
-		// echo '<pre>';print_r($res); echo '</pre>'; 
+		echo '<pre>';print_r($res); echo '</pre>'; 
 		
 		return ($res);
 		
