@@ -18,6 +18,10 @@ if ($bu_group){
 	
 	$oBudget = new Budget($budget_scenario);
 	$oReference = new Budget($reference);
+	
+	if ($_GET['debug']){
+		echo '<pre>';print_r($oBudget);echo '</pre>';
+	}
 
 if(!isset($_GET['pccGUID'])){
 
