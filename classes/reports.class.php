@@ -1768,20 +1768,21 @@ class Reports{
 		
 		$strFields = self::_getMRFields($currency);
 		
-		$sqlGroup = "GROUP BY `Budget item`, `item`, `Group`, `Group_code`";
+		$sqlGroup = "`Budget item`, `item`, `Group`, `Group_code`";
+		$sqlOrder = "`Group`, `itmOrder` ASC";
 		
 		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
 					{$strFields['actual']}
 			FROM `vw_master`			
 			{$sqlWhere}  AND scenario='{$strFields['from_a']}'
-			{$sqlGroup}	
+			GROUP BY {$sqlGroup}	
 			UNION ALL
 				SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
 				{$strFields['budget']}
 			FROM `vw_master`				
 			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND `item` IS NOT NULL
-			{$sqlGroup}			
-			ORDER BY `Group`, `itmOrder` ASC";
+			GROUP BY {$sqlGroup}			
+			ORDER BY {$sqlOrder}";
 			
 		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
 		
@@ -1838,7 +1839,7 @@ class Reports{
 		//------ Operating income -------
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
-		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
 		$rs = $oSQL->q($sqlOps);
 		while ($rw = $oSQL->f($rs)){
 			$rw['Budget item'] = "Operating income";
@@ -1848,7 +1849,7 @@ class Reports{
 		//------ Gross revenue -------
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = 'J00400')", $sql);
-		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
 		$rs = $oSQL->q($sqlOps);
 		while ($rw = $oSQL->f($rs)){
 			$rw['Budget item'] = "Gross revenue";
@@ -2355,16 +2356,17 @@ class Reports{
 		}
 	}
 		
-	private function _unionMRQueries($sql, $sqlGroup){
-		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
+	private function _unionMRQueries($sql, $sqlGroup="`Budget item`, `item`, `Group`, `Group_code`,`itmOrder`", $sqlOrder="`Group`, `itmOrder` ASC"){
+		$sql = "SELECT ".($sqlGroup?"{$sqlGroup},":'')."
 					SUM(CM_A) as CM_A,
 					SUM(CM_B) as CM_B,
 					SUM(YTD_A) as YTD_A,
 					SUM(YTD_B) as YTD_B,
 					SUM(NM_A) as NM_A,
 					SUM(NM_B) as NM_B
-				FROM ({$sql}) U {$sqlGroup} 
-				ORDER BY `Group`, `itmOrder` ASC";
+				FROM ({$sql}) U 
+				".($sqlGroup?"GROUP BY {$sqlGroup}":'')."
+				".($sqlOrder?"ORDER BY {$sqlOrder}":'');
 		return($sql);
 		
 	}
@@ -2391,22 +2393,20 @@ class Reports{
 
 		$strFields = self::_getMRFields();
 		
-		$sqlGroup = "GROUP BY `item`";
+		//$sqlGroup = "GROUP BY `item`";
 		
-		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
+		$sql = "SELECT 
 					{$strFields['actual']}
 			FROM `vw_master`			
-			{$sqlWhere}  AND scenario='{$strFields['from_a']}'
-			{$sqlGroup}	
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND `item` IS NOT NULL			
 			UNION ALL
-				SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
+				SELECT 
 				{$strFields['budget']}
 			FROM `vw_master`				
-			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND `item` IS NOT NULL
-			{$sqlGroup}			
-			ORDER BY `Group`, `itmOrder` ASC";
+			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND `item` IS NOT NULL			
+			";
 		
-		$sql = self::_unionMRQueries($sql, $sqlGroup);
+		$sql = self::_unionMRQueries($sql,'','');
 		
 		//$tableID = "SUMMARY_".md5($sql);
 		
@@ -2433,7 +2433,7 @@ class Reports{
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Gross revenue";
-			$this->echoBudgetItemString($rw);
+			$this->echoBudgetItemString($rw, 'budget-ratio');
 		}
 		
 		
@@ -2445,25 +2445,79 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00802'))", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Direct costs";
+			$this->echoBudgetItemString($rw);
+		}
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00400','J00802'))", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Gross profit";
+			$this->echoBudgetItemString($rw, 'budget-subtotal');
+		}
+		
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W'))", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Reclassified fixed costs";
 			$this->echoBudgetItemString($rw);
 		}
 		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00400','J00802','J00801','J00803','J00804','J00805','J00806','J00808','J0080W'))", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Gross operating profit";
+			$this->echoBudgetItemString($rw, 'budget-subtotal');
+		}
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '5%' AND (pccFlagProd=1 OR pc IN(9,130)))", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Selling & general";
+			$this->echoBudgetItemString($rw);
+		}
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '5%' AND (pccFlagProd=0 AND pc NOT IN (9,130)))", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Corporate costs";
+			$this->echoBudgetItemString($rw);
+		}
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Operating income";
+			$this->echoBudgetItemString($rw, 'budget-subtotal');
+		}
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '60%')", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Non-operating income";
 			$this->echoBudgetItemString($rw);
 		}
 		
-	
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '65%')", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Non-operating losses";
+			$this->echoBudgetItemString($rw);
+		}
+		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE 'SZ%')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
