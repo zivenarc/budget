@@ -2089,34 +2089,38 @@ class Reports{
 				
 		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
 		
-		$cm = $this->oBudget->arrPeriod[date('n',$this->oBudget->date_start - 1)];
-		$nm = $this->oBudget->arrPeriod[date('n',$this->oBudget->date_start)];
-				
+		$cm = $this->oBudget->arrPeriod[(integer)(date('Ym',$this->oBudget->date_start - 1)-$this->oBudget->year*100)];
+		$res['cm'] = $cm;
+		$nm = $this->oBudget->arrPeriod[(integer)(date('Ym',$this->oBudget->date_start)-$this->oBudget->year*100)];
+		$res['nm'] = $nm;		
+		
+		$sqlNM = $nm?"SUM(`$nm`)/{$arrRates[$nm]}/{$this->Denominator}":"0";
+		
 		$nCurrent = (integer)date('m',$this->oBudget->date_start - 1);
 		
 		$res['actual']=	"SUM(`{$cm}`)/{$arrRates[$cm]}/{$this->Denominator} as CM_A, 
 						0 as CM_B,								
 						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,$nCurrent,$arrRates).")/{$this->Denominator} as YTD_A ,
 						0 as YTD_B, 
-						SUM(`$nm`)/{$arrRates[$nm]}/{$this->Denominator} as NM_A , 
+						{$sqlNM} as NM_A , 
 						0 as NM_B";
 		$res['next']=	"0 as CM_A, 
 						0 as CM_B,								
 						0 as YTD_A ,
 						0 as YTD_B, 
-						SUM(`$nm`)/{$arrRates[$nm]}/{$this->Denominator} as NM_A , 
+						{$sqlNM} as NM_A , 
 						0 as NM_B";
 		$res['budget'] = "0 as CM_A, 
 						SUM(`{$cm}`)/{$arrRates[$cm]}/{$this->Denominator} as CM_B,								
 						0 as YTD_A,
 						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,$nCurrent,$arrRates).")/{$this->Denominator} as YTD_B, 
 						0 as NM_A , 
-						SUM(`$nm`)/{$arrRates[$nm]}/{$this->Denominator} as NM_B";
+						{$sqlNM} as NM_B";
 		
 		$res['from_a'] = $this->oBudget->id;
 		$res['from_b'] = $this->oReference->id;
 		
-		// echo '<pre>',$res,'</pre>'; 
+		// echo '<pre>';print_r($res); echo '</pre>'; 
 		
 		return ($res);
 		
