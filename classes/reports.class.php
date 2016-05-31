@@ -23,6 +23,11 @@ class Reports{
 		$this->oReference = $params['reference']?new Budget($params['reference']):$this->oBudget->reference_scenario;
 		
 		$this->Currency = $params['currency']?$params['currency']:643;
+		
+		$sql = "SELECT curTitle FROM common_db.tbl_currency WHERE curID={$this->Currency}";
+		$rs = $this->oSQL->q($sql);
+		$this->CurrencyTitle = $this->oSQL->get_data($rs);
+		
 		$this->Denominator = $params['denominator']?$params['denominator']:1;
 		$this->ID = md5(time());
 		
@@ -2423,7 +2428,7 @@ class Reports{
 			<table id='<?php echo $this->ID;?>' class='budget' style='font-size:1.3em;'>
 			<thead>
 				<tr>					
-					<th rowspan="2" colspan="2"><?php echo number_format($this->Denominator);?></th>
+					<th rowspan="2" colspan="2"><?php echo $this->CurrencyTitle, "&nbsp;", number_format($this->Denominator);?></th>
 					<?php echo $this->oBudget->getTableHeader('mr'); 							
 					?>					
 			</thead>			
