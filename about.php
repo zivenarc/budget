@@ -69,7 +69,9 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 										{$sqlActual} as Diff
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
-								WHERE scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
+								WHERE scenario='{$oBudget->id}' 
+									AND account IN ('J00400', 'J00802')
+									{$sqlActivityFilter}
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
 								UNION ALL
 								SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 0 as Actual, 
