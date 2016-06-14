@@ -132,6 +132,24 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 			'tolerance'=>0.05
 			);
 
+$settings['gpact'] = Array('title'=>"GP by activity",
+'sqlBase' => "SELECT activity as optValue, 
+					Activity_title as optText, 
+					{$sqlActual} as Actual, 
+					0 as Budget, 
+					{$sqlActual} as Diff
+			FROM vw_master 			
+			WHERE scenario='{$actual}' ".Reports::GP_FILTER."
+			GROUP BY activity
+			UNION ALL
+			SELECT activity, Activity_title, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+			FROM vw_master 			
+			WHERE
+			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
+			GROUP BY activity",
+			'tolerance'=>0.05
+			);			
+			
 $settings['opbu'] = Array('title'=>"OP by business unit",
 'sqlBase' => "SELECT pc as optValue, 
 					Profit as optText, 
