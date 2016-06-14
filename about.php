@@ -4,6 +4,25 @@ require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 
+if (isset($_GET['no_activity'])){
+	$arrNoActivity = $_GET['no_activity'];
+	$sqlActivityFilter = " AND activity NOT IN(".implode(",",$arrNoActivity).") ";
+	
+	$sql = "SELECT prtID FROM vw_product_type WHERE activity NOT IN (".implode(",",$arrNoActivity).") ";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$filter['activity'][] = $rw['prtID'];
+	}
+	
+	$sql = "SELECT prtTitle FROM vw_product_type WHERE activity IN (".implode(",",$arrNoActivity).") ";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrActivityFilter[] = $rw['prtTitle'];
+	}
+	$strActivity = implode(", ",$arrActivityFilter)." excluded";
+	
+}
+
    $arrActions[] = Array(
    "title" => ShowFieldTitle('Print')
    , "class" => "print"
@@ -31,6 +50,9 @@ $oReference = new Budget($arrSetup['stpScenarioID']);
 </nav>
 <br/>
 <?php
+if ($strActivity) {
+	echo '<div class="info">',$strActivity,'</div>';
+}
 
 $oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>643, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
 $oReport->shortMonthlyReport();	
@@ -40,11 +62,6 @@ $oReport->shortMonthlyReport();
 <div>
 <?php
 $period_type = 'cm';
-
-if (isset($_GET['no_activity'])){
-	$arrNoActivity = $_GET['no_activity'];
-	$sqlActivityFilter = " AND activity NOT IN(".implode(",",$arrNoActivity).") ";
-}
 
 $sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
 $sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
