@@ -37,7 +37,7 @@ class Reports{
 		if(is_array($this->filter)){
 			foreach($this->filter as $key=>$value){
 				if (strpos($key,'no_')!==false){
-					$key = replace("no_","",$key);
+					$key = str_replace("no_","",$key);
 										if (is_array($value)){
 						$arrWhere[] = $key." NOT IN ('".implode("','",$value)."')";
 					} else {
