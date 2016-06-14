@@ -36,10 +36,19 @@ class Reports{
 		$this->filter = $params['filter'];
 		if(is_array($this->filter)){
 			foreach($this->filter as $key=>$value){
-				if (is_array($value)){
-					$arrWhere[] = $key." IN ('".implode("','",$value)."')";
+				if (strpos($key,'no_')!==false){
+					$key = replace("no_","",$key);
+										if (is_array($value)){
+						$arrWhere[] = $key." NOT IN ('".implode("','",$value)."')";
+					} else {
+						$arrWhere[] = $key." <> '{$value}'";
+					}
 				} else {
-					$arrWhere[] = $key." = '{$value}'";
+					if (is_array($value)){
+						$arrWhere[] = $key." IN ('".implode("','",$value)."')";
+					} else {
+						$arrWhere[] = $key." = '{$value}'";
+					}
 				}
 			}
 			$this->sqlWhere = "WHERE ".implode (" AND ",$arrWhere);		
