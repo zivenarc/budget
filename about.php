@@ -43,7 +43,7 @@ $period_type = 'cm';
 
 if (isset($_GET['no_activity'])){
 	$arrNoActivity = $_GET['no_activity'];
-	$sqlActivityFilter = " AND activity NOT IN(".implode(",",$arrNoActiviy).") ";
+	$sqlActivityFilter = " AND activity NOT IN(".implode(",",$arrNoActivity).") ";
 }
 
 $sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
