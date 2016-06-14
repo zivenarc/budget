@@ -147,7 +147,7 @@ $settings['gpact'] = Array('title'=>"GP by activity",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 			GROUP BY activity",
-			'tolerance'=>0.05
+			'tolerance'=>0.1
 			);			
 			
 $settings['opbu'] = Array('title'=>"OP by business unit",
