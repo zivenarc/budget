@@ -13,6 +13,7 @@ if (isset($_GET['no_activity'])){
 	while ($rw = $oSQL->f($rs)){
 		$filter['activity'][] = $rw['prtID'];
 	}
+	$filter['activity'][]='';
 	
 	$sql = "SELECT prtTitle FROM vw_product_type WHERE prtID IN (".implode(",",$arrNoActivity).") ";
 	$rs = $oSQL->q($sql);
