@@ -40,6 +40,12 @@ $oReport->shortMonthlyReport();
 <div>
 <?php
 $period_type = 'cm';
+
+if (isset($_GET['no_activity'])){
+	$arrNoActivity = $_GET['no_activity'];
+	$sqlActivityFilter = " AND activity NOT IN(".implode(",",$arrNoActiviy).") ";
+}
+
 $sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
 $sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
 $settings['gpcus'] = Array('title'=>"GP by customer",
@@ -58,7 +64,10 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE
-								scenario='{$oReference->id}' AND source<>'Estimate' AND account IN ('J00400', 'J00802')
+								scenario='{$oReference->id}' 
+									AND source<>'Estimate' 
+									AND account IN ('J00400', 'J00802')
+									{$sqlActivityFilter}
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
 						'tolerance'=>0.05,
 						'limit'=>10);	
