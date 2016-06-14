@@ -8,13 +8,13 @@ if (isset($_GET['no_activity'])){
 	$arrNoActivity = $_GET['no_activity'];
 	$sqlActivityFilter = " AND activity NOT IN(".implode(",",$arrNoActivity).") ";
 	
-	$sql = "SELECT prtID FROM vw_product_type WHERE activity NOT IN (".implode(",",$arrNoActivity).") ";
+	$sql = "SELECT prtID FROM vw_product_type WHERE prtID NOT IN (".implode(",",$arrNoActivity).") ";
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
 		$filter['activity'][] = $rw['prtID'];
 	}
 	
-	$sql = "SELECT prtTitle FROM vw_product_type WHERE activity IN (".implode(",",$arrNoActivity).") ";
+	$sql = "SELECT prtTitle FROM vw_product_type WHERE prtID IN (".implode(",",$arrNoActivity).") ";
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
 		$arrActivityFilter[] = $rw['prtTitle'];
