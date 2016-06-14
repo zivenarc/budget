@@ -2455,7 +2455,7 @@ class Reports{
 		}
 		
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (item = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95')", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND account='J00400' AND (item = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
