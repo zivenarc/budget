@@ -8,7 +8,7 @@ if (isset($_GET['no_activity'])){
 	$arrNoActivity = $_GET['no_activity'];
 	$sqlActivityFilter = " AND activity NOT IN(".implode(",",$arrNoActivity).") ";
 	
-	$filter['no_activity']=$_GET['no_activity']
+	$filter['no_activity']=$_GET['no_activity'];
 	
 	$sql = "SELECT prtTitle FROM vw_product_type WHERE prtID IN (".implode(",",$arrNoActivity).") ";
 	$rs = $oSQL->q($sql);
