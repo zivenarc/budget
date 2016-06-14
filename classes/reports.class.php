@@ -13,7 +13,8 @@ class Reports{
 	const CNT_GROUP_EXEMPTION = 723;
 	const OP_FILTER = "AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%') ";	
 	const GP_FILTER = "AND account IN ('J00400', 'J00802') ";
-		
+	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';
+	
 	function __construct($params){
 		
 		GLOBAL $oSQL;
@@ -2455,7 +2456,7 @@ class Reports{
 		}
 		
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND account='J00400' AND (item = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95')", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (item = '".self::REVENUE_ITEM."')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
@@ -2463,7 +2464,7 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00802'))", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00802')) AND item<>'".self::REVENUE_ITEM."'", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
