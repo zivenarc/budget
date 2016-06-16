@@ -456,10 +456,10 @@ class Headcount extends Document{
 						
 						
 						if ($eligible) {						
-							$salary[$month] = ($record->{$month})*$record->salary*($m<$this->settings['salary_review_month']?1:1+$this->settings['salary_increase_ratio']);
+							$salary[$month] = ($record->{$month})*($record->salary+$record->monthly_bonus)*($m<$this->settings['salary_review_month']?1:1+$this->settings['salary_increase_ratio']);
 						} else {
 							if (true || $this->type=='current'){
-								$salary[$month] = ($record->{$month})*$record->salary;
+								$salary[$month] = ($record->{$month})*($record->salary+$record->monthly_bonus);
 							} else {
 								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 								$current_month_end = mktime(0,0,0,$m+1,0,$oBudget->year);
@@ -470,7 +470,7 @@ class Headcount extends Document{
 								} else {
 									$record->hc = 0;
 								}
-								$salary[$month] = $record->hc*$record->salary;
+								$salary[$month] = $record->hc*($record->salary+$record->monthly_bonus);
 							}
 						}
 						
