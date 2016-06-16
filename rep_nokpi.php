@@ -31,9 +31,11 @@ if ($_GET['tab']){
 			Reports::getJournalEntries($data);
 
 	}
-	$sql = "SELECT source FROM reg_sales 
+	$sql = "SELECT source FROM reg_master 
 			LEFT JOIN vw_product_type ON prtID=activity
-			WHERE scenario='{$_GET['tab']}' GROUP BY source HAVING COUNT(DISTINCT prtGHQ)>1";
+			WHERE scenario='{$_GET['tab']}' AND account='J00400'
+			GROUP BY source 
+			HAVING COUNT(DISTINCT prtGHQ)>1";
 	$rs =$oSQL->q($sql);
 	if ($oSQL->n($rs)){
 	$arrSource = Array();
