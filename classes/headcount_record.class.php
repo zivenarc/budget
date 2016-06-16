@@ -23,6 +23,7 @@ class headcount_record extends table_record{
 			$this->job = $data['function'];
 			$this->employee = $data['particulars'];
 			$this->salary = $data['salary'];
+			$this->monthly_bonus = $data['monthly_bonus'];
 			$this->mobile_limit = $data['mobile_limit'];
 			$this->fuel = $data['fuel'];
 			$this->insurance = $data['insurance'];
@@ -64,6 +65,7 @@ class headcount_record extends table_record{
 			$arrRes[] = "`activity`=".(integer)$this->activity;
 			$arrRes[] = "`pc_profile`=".(integer)$this->pc_profile;
 			$arrRes[] = "`salary`=".(double)$this->salary;
+			$arrRes[] = "`monthly_bonus`=".(double)$this->monthly_bonus;
 			$arrRes[] = "`insurance`=".(double)$this->insurance;
 			$arrRes[] = "`mobile_limit`=".(double)$this->mobile_limit;
 			$arrRes[] = "`wc`=".($this->wc?1:0);

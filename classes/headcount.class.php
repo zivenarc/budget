@@ -214,6 +214,15 @@ class Headcount extends Document{
 		);
 		
 		$this->grid->Columns[] =Array(
+			'title'=>'M.bonus'
+			,'field'=>'monthly_bonus'
+			,'type'=>'money'
+			,'width'=>'70px'							
+			,'mandatory'=>false
+			,'totals'=>true
+		);
+		
+		$this->grid->Columns[] =Array(
 			'title'=>'Mobile'
 			,'field'=>'mobile_limit'
 			,'type'=>'money'
@@ -332,6 +341,7 @@ class Headcount extends Document{
 						$row->vks = (integer)$_POST['vks'][$id];			
 						$row->insurance = (double)str_replace(',','',$_POST['insurance'][$id]);							
 						$row->salary = (double)str_replace(',','',$_POST['salary'][$id]);							
+						$row->monthly_bonus = (double)str_replace(',','',$_POST['monthly_bonus'][$id]);							
 						$row->mobile_limit = (double)str_replace(',','',$_POST['mobile_limit'][$id]);							
 						$row->fuel = (double)str_replace(',','',$_POST['fuel'][$id]);
 						
@@ -752,6 +762,7 @@ class Headcount extends Document{
 		
 		$sql = "SELECT empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,funMobile,funFuel,
 						IF(empID IN ({$strMaternity}),0,empSalary) as empSalary
+						,empMonthly
 						,(SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
 					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090 AND DATEDIFF(rsgDateEnd,'".date('Y-m-d',$oBudget->date_start)."')>0) as empEndDate
 					FROM vw_employee_select 
@@ -772,6 +783,7 @@ class Headcount extends Document{
 			$row->location = $rw['empLocationID'];			
 			$row->activity = $rw['empProductTypeID'];			
 			$row->salary = $rw['empSalary'];
+			$row->monthly_bonus = $rw['empMonthly'];
 			$row->insurance = $rw['insurance'];
 			$row->mobile_limit = $rw['funMobile'];
 			$row->fuel = $rw['funFuel'];
