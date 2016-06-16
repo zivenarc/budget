@@ -7,6 +7,7 @@ if ($_GET['tab']){
 	?>
 	<div id='div_<?php echo $_GET['tab'];?>'>
 	<?php
+	$data = Array();
 	$sql = "SELECT source FROM reg_sales WHERE scenario='{$_GET['tab']}' GROUP BY source HAVING SUM(kpi)=0";
 	$rs =$oSQL->q($sql);
 	if ($oSQL->n($rs)){
@@ -31,6 +32,8 @@ if ($_GET['tab']){
 			Reports::getJournalEntries($data);
 
 	}
+	
+	$data = Array();
 	$sql = "SELECT source FROM reg_master 
 			LEFT JOIN vw_product_type ON prtID=activity
 			WHERE scenario='{$_GET['tab']}' AND account='J00400' AND source NOT IN ('Actual','Estimate')
