@@ -33,7 +33,7 @@ if ($_GET['tab']){
 	}
 	$sql = "SELECT source FROM reg_master 
 			LEFT JOIN vw_product_type ON prtID=activity
-			WHERE scenario='{$_GET['tab']}' AND account='J00400'
+			WHERE scenario='{$_GET['tab']}' AND account='J00400' AND source NOT IN ('Actual','Estimate')
 			GROUP BY source 
 			HAVING COUNT(DISTINCT prtGHQ)>1";
 	$rs =$oSQL->q($sql);
