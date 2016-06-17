@@ -2181,7 +2181,7 @@ class Reports{
 			<td class='budget-decimal'><?php self::render($data['NM_A']-$data['NM_B'],0);?></td>
 			<td class='budget-decimal'><em><?php self::render_ratio($data['NM_A'],$data['NM_B']);?></em></td>
 		<?php		
-		} elseif (isset($data['Apr'])) {
+		} elseif (isset($data['apr'])) {
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 				// $month = $this->oBudget->arrPeriod[$m];
 				$month = $this->oBudget->arrPeriod[$m];
