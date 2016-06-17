@@ -31,7 +31,7 @@ if(!isset($_GET['prtGHQ'])){
 
 	
 	if ($_GET['prtGHQ']=='all'){
-		$sqlWhere = " WHERE prtGHQ='%'";
+		$sqlWhere = " WHERE TRUE";
 		// $filter = Array();
 	} else {
 		$sqlWhere = " WHERE prtGHQ=".$oSQL->e(urldecode($_GET['prtGHQ']));
@@ -50,6 +50,7 @@ if(!isset($_GET['prtGHQ'])){
 	$period_type = 'fye';
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
+	
 	$settings['gpcus'] = Array('title'=>"GP by customer",
 						'sqlBase' => "SELECT IF(C.cntParentID<>723,C.cntParentID, C.cntID) as optValue, 
 											IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 
@@ -80,7 +81,7 @@ if(!isset($_GET['prtGHQ'])){
 	$oWF = new Waterfall($settings['gpcus']);
 	$oWF->draw();
 	
-	$settings['pbt'] = Array('title'=>"GOP by factors",
+	$settings['gop'] = Array('title'=>"GOP by factors",
 						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
 											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
 											{$sqlActual} as Actual, 
