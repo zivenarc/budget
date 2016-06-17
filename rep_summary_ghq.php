@@ -111,7 +111,56 @@ if(!isset($_GET['prtGHQ'])){
 	?>
 	</div>
 	<?php
+	//==================== Top 10 customers ==========================/
+	$sql = "SELECT {$sqlActual} as Actual 
+					FROM vw_master 
+					{$sqlWhere}
+					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')";
+	$rs = $oSQL->q($sql);
+	$rw = $oSQL->f($rs);
+	$arrReport['other']['fye'] = $rw['Actual'];
+	$arrReport['total']['fye'] = $rw['Actual'];
 	
+	$sql = "SELECT IF(C.cntParentID<>723,C.cntParentID, C.cntID) as optValue, 
+						IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 
+						{$sqlActual} as Actual, 
+						0 as Budget, 
+						{$sqlActual} as Diff
+				FROM vw_master 
+				LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+				{$sqlWhere}
+					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
+				GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
+				ORDER BY Actual DESC
+				LIMIT 10";
+				
+	$rs = $oSQL->q($sql);
+	?>
+	<table class="budget">
+		<tr>
+			<th>Customer</th>
+			<th>GP</th>
+			<th>% of total</th>
+		</tr>
+	<?php
+	while ($rw = $oSQL->f($rs)){
+		?>
+		<tr>
+			<td><?php echo $rw['optText'];?></td>
+			<td><?php echo number_format($rw['Actual'],0,'.',',');?></td>
+			<td><?php echo number_format($rw['Actual']/$arrReport['total']['fye']*100,0,'.',',');?>%</td>
+		</tr>
+		<?php
+		$arrReport['other']['fye'] -=  $rw['Actual'];
+	}
+	?>
+	<tr>
+			<td>Others</td>
+			<td><?php echo number_format($arrReport['other']['fye'],0,'.',',');?></td>
+			<td><?php echo number_format($arrReport['other']['fye']/$arrReport['total']['fye']*100,0,'.',',');?>%</td>
+		</tr>
+	</table>	
+	<?php
 }
 
 
