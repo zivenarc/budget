@@ -2623,8 +2623,7 @@ class Reports{
 			$rs = $this->oSQL->q($sql);
 			if ($this->oSQL->n($rs)){
 				?>
-				<tr><th colspan="14">Operational KPIs</th></tr>
-				<tr class='sql'><td><pre><?php echo $sql;?></pre></td></tr>
+				<tr><th colspan="14">Operational KPIs</th></tr>				
 				<?php		
 				while ($rw = $this->oSQL->f($rs)){			
 					$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
