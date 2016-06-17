@@ -24,7 +24,7 @@ if(isset($_GET['currency'])){
 // include ('includes/inc_report_ghqfilter.php'); /// filter and tabs for GHQ product
 if (isset($_GET['prtGHQ'])){
 	
-	$filter['prtGHQ'] = $oSQL->e(urldecode($_GET['prtGHQ']));	
+	$filter['prtGHQ'] = urldecode($_GET['prtGHQ']);	
 	
 }
 
