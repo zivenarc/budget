@@ -106,7 +106,7 @@ if(!isset($_GET['prtGHQ'])){
 							'tolerance'=>0.05,
 							'limit'=>10);
 	
-	$oWF = new Waterfall($settings['pbt']);
+	$oWF = new Waterfall($settings['gop']);
 	$oWF->draw();
 	?>
 	</div>
