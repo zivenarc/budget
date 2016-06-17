@@ -82,8 +82,8 @@ if(!isset($_GET['prtGHQ'])){
 	$oWF->draw();
 	
 	$settings['rfc'] = Array('title'=>"RFC by elements",
-						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
-											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
+						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
+											IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
 											{$sqlActual} as Actual, 
 											0 as Budget, 
 											{$sqlActual} as Diff
@@ -91,10 +91,10 @@ if(!isset($_GET['prtGHQ'])){
 									{$sqlWhere}
 										AND  scenario='{$oBudget->id}' 
 										AND (account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W')) 									
-									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)
+									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)
 									UNION ALL
-									SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
-											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
+									SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
+											IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
 											0 as Actual, 
 									{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 									FROM vw_master 
@@ -102,7 +102,7 @@ if(!isset($_GET['prtGHQ'])){
 										AND scenario='{$oReference->id}' 
 										AND source<>'Estimate' 						
 										AND (account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W')) 	
-									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)",
+									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
 							'tolerance'=>0.05,
 							'limit'=>10);
 	
