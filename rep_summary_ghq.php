@@ -81,7 +81,7 @@ if(!isset($_GET['prtGHQ'])){
 	$oWF = new Waterfall($settings['gpcus']);
 	$oWF->draw();
 	
-	$settings['gop'] = Array('title'=>"GOP by factors",
+	$settings['rfc'] = Array('title'=>"RFC by elements",
 						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
 											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
 											{$sqlActual} as Actual, 
@@ -90,7 +90,7 @@ if(!isset($_GET['prtGHQ'])){
 									FROM vw_master 
 									{$sqlWhere}
 										AND  scenario='{$oBudget->id}' 
-										AND (account IN ('J00400','J00802','J00801','J00803','J00804','J00805','J00806','J00808','J0080W')) 									
+										AND (account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W')) 									
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)
 									UNION ALL
 									SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
@@ -101,12 +101,12 @@ if(!isset($_GET['prtGHQ'])){
 									{$sqlWhere}
 										AND scenario='{$oReference->id}' 
 										AND source<>'Estimate' 						
-										AND (account IN ('J00400','J00802','J00801','J00803','J00804','J00805','J00806','J00808','J0080W')) 	
+										AND (account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W')) 	
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)",
 							'tolerance'=>0.05,
 							'limit'=>10);
 	
-	$oWF = new Waterfall($settings['gop']);
+	$oWF = new Waterfall($settings['rfc']);
 	$oWF->draw();
 	?>
 	</div>
