@@ -1,16 +1,9 @@
 <?php
+$flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
-
-if ($bu_group){
-	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		$arrBus[] = $rw['pccID']; 
-	}
-}
 
 	$denominator = 1000;	
 	$budget_scenario = $_GET['budget_scenario']?$_GET['budget_scenario']:$arrSetup['stpFYEID'];
@@ -23,7 +16,7 @@ if ($bu_group){
 		echo '<pre>';print_r($oBudget);echo '</pre>';
 	}
 
-if(!isset($_GET['pccGUID'])){
+if(!isset($_GET['prtGHQ'])){
 
 	$arrJS[] = "js/rep_summary.js";
 
@@ -31,39 +24,30 @@ if(!isset($_GET['pccGUID'])){
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,' vs ',$oReference->title,'</h1>';	
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	
-	$oBudget->getProfitTabs('reg_master', true);
+	$oBudget->getGHQTabs();
 	
 	include ('includes/inc-frame_bottom.php');
 } else {
 
 	
-	if ($_GET['pccGUID']=='all'){
-		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-
-		$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
-
-		$rs = $oSQL->q($sql);
-		while ($rw = $oSQL->f($rs)){
-			$arrPC[] = $rw['pcrProfitID'];
-		}
-		$sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
-		$filter = Array('pc'=>$arrPC);
+	if ($_GET['prtGHQ']=='all'){
+		$sqlWhere = " WHERE prtGHQ='%'";
+		// $filter = Array();
 	} else {
-		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
-		
-		$sql = "SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']);
-		$arrPC = $oSQL->get_data($sql);
-		$filter = Array('pc'=>$arrPC);
+		$sqlWhere = " WHERE prtGHQ=".$oSQL->e(urldecode($_GET['prtGHQ']));
+		$filter = Array('prtGHQ'=>urldecode($_GET['prtGHQ']));
 	}
 	
 	
 	$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>643, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
 	$oReport->shortMonthlyReport();	
+	$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>643, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
+	$oReport->shortMonthlyReport('fye');	
 	
 	?>
 	<div>
 	<?php
-	$period_type = 'cm';
+	$period_type = 'fye';
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
 	$settings['gpcus'] = Array('title'=>"GP by customer",
@@ -96,7 +80,7 @@ if(!isset($_GET['pccGUID'])){
 	$oWF = new Waterfall($settings['gpcus']);
 	$oWF->draw();
 	
-	$settings['pbt'] = Array('title'=>"PBT by factors",
+	$settings['pbt'] = Array('title'=>"GOP by factors",
 						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
 											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
 											{$sqlActual} as Actual, 
@@ -104,8 +88,8 @@ if(!isset($_GET['pccGUID'])){
 											{$sqlActual} as Diff
 									FROM vw_master 
 									{$sqlWhere}
-										AND  scenario='{$oBudget->id}'
-										AND account NOT LIKE 'SZ%'																				
+										AND  scenario='{$oBudget->id}' 
+										AND (account IN ('J00400','J00802','J00801','J00803','J00804','J00805','J00806','J00808','J0080W')) 									
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)
 									UNION ALL
 									SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
@@ -115,8 +99,8 @@ if(!isset($_GET['pccGUID'])){
 									FROM vw_master 
 									{$sqlWhere}
 										AND scenario='{$oReference->id}' 
-										AND source<>'Estimate' 	
-										AND account NOT LIKE 'SZ%'										
+										AND source<>'Estimate' 						
+										AND (account IN ('J00400','J00802','J00801','J00803','J00804','J00805','J00806','J00808','J0080W')) 	
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)",
 							'tolerance'=>0.05,
 							'limit'=>10);

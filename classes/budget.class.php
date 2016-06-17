@@ -228,7 +228,31 @@ class Budget{
 					<th>%</th>
 				</tr>
 				<?php
-				$res = ob_get_contents();
+				$res = ob_get_clean();				
+				break;
+			case 'roy':
+				ob_start();
+				?>
+					<th colspan="4">YTD</th>
+					<th colspan="4">Rest of year</th>				
+					<th colspan="4">FYE</th>
+				</tr>
+				<tr>
+					<th class='budget-ytd'>Actual</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+					<th class='budget-ytd'>Forecast</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+					<th class='budget-quarterly'>Forecast</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+				</tr>
+				<?php
+				$res = ob_get_clean();				
 				break;
 			default:
 				for($m=$start;$m<=$end;$m++){
@@ -242,10 +266,35 @@ class Budget{
 					$arrRes[] = ucfirst($month);
 					
 				}
-				$res = '<th class="budget-monthly">'.implode('</th><th class="budget-monthly">',$arrRes).'</th>';
-				return($res);
+				$res = '<th class="budget-monthly">'.implode('</th><th class="budget-monthly">',$arrRes).'</th>';				
 				break;
 		}
+		return($res);
+	}
+	
+	public function getGHQTabs(){
+		GLOBAL $oSQL;
+		GLOBAL $arrUsrData;
+		
+		$sql = "SELECT DISTINCT prtGHQ FROM vw_product_type ORDER BY prtGHQ";
+		$rs = $oSQL->q($sql);
+		ob_start();
+		?>
+		<div id='tabs' class='tabs'>
+			<ul>
+			<?php
+			while ($rw=$oSQL->f($rs)){
+				$arrGET['prtGHQ'] = urlencode($rw['prtGHQ']);				
+				echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>",($rw['prtGHQ']?$rw['prtGHQ']:'[None]'),"</a></li>\r\n";
+				
+			}
+			$arrGET['prtGHQ'] = 'all';	
+			echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>All</a></li>\r\n";
+			?>
+			</ul>
+		</div>
+		<?php
+		ob_flush();
 	}
 	
 	public function getProfitTabs($register='', $acl = false, $params = Array()){
@@ -300,38 +349,6 @@ class Budget{
 			}
 			$arrGET['pccGUID'] = 'all';	
 			echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>All</a></li>\r\n";
-			?>
-			</ul>
-		</div>
-		<?php
-		ob_flush();
-	}
-	
-	public function getGHQTabs($register='', $acl = false){
-		GLOBAL $oSQL;
-		GLOBAL $arrUsrData;
-		GLOBAL $budget_scenario;
-			
-		ob_start();
-		?>
-		<div id='tabs' class='tabs'>
-			<ul>
-			<?php
-			if (!$register){
-				$sql = "SELECT DISTINCT prtGHQ FROM vw_product_type";
-			} else {
-				$sql = "SELECT DISTINCT prtGHQ 
-						FROM `$register`
-						JOIN vw_product_type ON prtID=activity						
-						 $sqlWhere
-						";
-				
-			}
-			$rs = $oSQL->q($sql);
-			while ($rw=$oSQL->f($rs)){
-				echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&prtGHQ=",urlencode($rw['prtGHQ']),"'>",($rw['prtGHQ']?$rw['prtGHQ']:'[None]'),"</a></li>\r\n";
-			}
-			echo "<li><a href='",$_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&prtGHQ=all'>All</a></li>\r\n";
 			?>
 			</ul>
 		</div>
