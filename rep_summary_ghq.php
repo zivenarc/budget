@@ -137,6 +137,7 @@ if(!isset($_GET['prtGHQ'])){
 	$rs = $oSQL->q($sql);
 	?>
 	<table class="budget">
+		<caption>Top 10 customers, <?php echo urldecode($_GET['prtGHQ']);?></caption>
 		<tr>
 			<th>Customer</th>
 			<th>GP</th>
