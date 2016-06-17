@@ -2246,10 +2246,10 @@ class Reports{
 			
 			<td class='budget-decimal budget-ytd'><?php self::render($data['ROY_A'],0);?></td>
 			<td class='budget-decimal'><?php self::render($data['ROY_B'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['ROY_A']-$data['NM_B'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['ROY_A']-$data['ROY_B'],0);?></td>
 			<td class='budget-decimal'><em><?php self::render_ratio($data['ROY_A'],$data['ROY_B']);?></em></td>
 			
-			<td class='budget-decimal budget-ytd'><?php self::render($data['FYE_A'],0);?></td>
+			<td class='budget-decimal budget-quarterly'><?php self::render($data['FYE_A'],0);?></td>
 			<td class='budget-decimal'><?php self::render($data['FYE_B'],0);?></td>
 			<td class='budget-decimal'><?php self::render($data['FYE_A']-$data['FYE_B'],0);?></td>
 			<td class='budget-decimal'><em><?php self::render_ratio($data['FYE_A'],$data['FYE_B']);?></em></td>
