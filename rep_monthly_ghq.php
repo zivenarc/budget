@@ -23,13 +23,8 @@ if(isset($_GET['currency'])){
 
 // include ('includes/inc_report_ghqfilter.php'); /// filter and tabs for GHQ product
 if (isset($_GET['prtGHQ'])){
-	$sql = "SELECT * FROM common_db.tbl_product_type WHERE prtGHQ=".$oSQL->e($_GET['prtGHQ']);
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		$arrPRT[] = $rw['prtID'];
-	}
 	
-	$filter['activity'] = $arrPRT;	
+	$filter['prtGHQ'] = $oSQL->e(urldecode($_GET['prtGHQ']));	
 	
 }
 
