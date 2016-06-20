@@ -27,8 +27,8 @@ $arrActions[] = Array('title'=>'Jan-Mar', 'action'=>'?mthStart=1&mthEnd=3');
 $arrActions[] = Array('title'=>'Jan-Dec', 'action'=>'?mthStart=1&mthEnd=12');
 $arrActions[] = Array('title'=>'Apr-Mar', 'action'=>'?mthStart=4&mthEnd=15');
 $arrActions[] = Array('title'=>'Jan-Mar', 'action'=>'?mthStart=1&mthEnd=15');
-$startMonth = isset($_GET['mthStart'])?$_GET['mthStart']:1;
-$endMonth = isset($_GET['mthEnd'])?$_GET['mthEnd']:$oBudget->length;
+$startMonth = isset($_GET['mthStart'])?$_GET['mthStart']:1+$oBudget->offset;
+$endMonth = isset($_GET['mthEnd'])?$_GET['mthEnd']:12+$oBudget->offset;
 $colspan = $endMonth - $startMonth + 3;
 
 
@@ -253,7 +253,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'Control PBT';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate'";
+		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account NOT LIKE 'SZ%'";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
