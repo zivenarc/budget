@@ -36,6 +36,15 @@ if(!isset($_GET['prtGHQ'])){
 	} else {
 		$sqlWhere = " WHERE prtGHQ=".$oSQL->e(urldecode($_GET['prtGHQ']));
 		$filter = Array('prtGHQ'=>urldecode($_GET['prtGHQ']));
+		
+		$sql = "SELECT * FROM vw_product_type {$sqlWhere}";
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){
+			$arrProducts[] = $rw['prtTitle'];
+		}
+		?>
+		<p><?php echo implode(', ',$arrProducts);?></p>
+		<?php
 	}
 	
 	
@@ -44,7 +53,9 @@ if(!isset($_GET['prtGHQ'])){
 	$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>643, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
 	$oReport->shortMonthlyReport('fye');	
 	
-	?>
+	
+	
+	?>	
 	<div>
 	<?php
 	$period_type = 'fye';
