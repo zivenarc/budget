@@ -187,19 +187,23 @@ class Reports{
 	
 	function offByRoute($sqlWhere){
 		
-		$sql = "SELECT OFF_Route, ".$this->oBudget->getMonthlySumSQL(1,15).", 
+		$sql = "SELECT prtTitle, ".$this->oBudget->getMonthlySumSQL(1,15).", 
 				SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total, 
 				SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
-				FROM vw_sales {$sqlWhere} AND posted=1 AND kpi=1 AND unit='TEU' AND OFF_Route IS NOT NULL AND scenario='{$this->oBudget->id}'
-				GROUP BY OFF_Route";
+				FROM vw_sales 
+				JOIN tbl_sales ON salGUID=source
+				{$sqlWhere} 
+					AND salBO=714
+					AND posted=1 AND kpi=1 AND activity IN (48,63) AND scenario='{$this->oBudget->id}'
+				GROUP BY activity";
 		$rs = $this->oSQL->q($sql); 
 		$tableID = "kpi_".md5($sql);
 			?>
-			<h2>Freehand OFF by route:</h2>
+			<h2>Freehand OFF</h2>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr>
-					<th>Route</th>
+					<th>Activity</th>
 					<?php 
 					echo $this->oBudget->getTableHeader(); 
 					echo $this->oBudget->getTableHeader('quarterly'); 
