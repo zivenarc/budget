@@ -227,7 +227,7 @@ class Reports{
 					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
 					<?php
 				};
-				echo "<td>",$rw['OFF_Route'],'</td>';				
+				echo "<td>",$rw['prtTitle'],'</td>';				
 				for ($m=1;$m<=12;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
@@ -2600,29 +2600,23 @@ class Reports{
 			$sql = "SELECT activity, unit, prtTitle,
 						{$strFields['actual']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND source='Actual'
+				{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND unit<>'' AND source='Actual'
 				GROUP BY activity, unit
 				UNION ALL
 				SELECT activity, unit, prtTitle, 
 						{$strFields['next']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1
+				{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND unit<>'' 
 				GROUP BY activity, unit
 				UNION ALL
 					SELECT activity, unit, prtTitle,
 					{$strFields['budget']}
 				FROM `vw_sales`				
-				{$sqlWhere} AND scenario='{$strFields['from_b']}' AND kpi=1 AND posted=1 
+				{$sqlWhere} AND scenario='{$strFields['from_b']}' AND kpi=1 AND posted=1 AND unit<>'' 
 				GROUP BY activity, unit
 				ORDER BY activity, unit";
 				
-			$sql = "SELECT prtTitle, activity, unit, 
-						".implode(',',$arrUnion)."				
-					FROM ($sql) U
-					##LEFT JOIN vw_product_type ON activity=prtID
-					WHERE unit<>''
-					GROUP BY activity, unit
-					";
+			$sql = self::_unionMRQueries($sql,"`prtTitle`, `activity`, `unit`",'', $arrUnion);
 			
 			$rs = $this->oSQL->q($sql);
 			if ($this->oSQL->n($rs)){
