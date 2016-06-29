@@ -13,7 +13,7 @@ if (strpos($oBudget->type,'Budget')) die('Wrong budget type, cannot fill in the 
 $ytd = date('n',$oBudget->date_start-1);echo $ytd;
 $year = date('Y',$oBudget->date_start-1);
 
-$arrKPI[] = Array('prtID'=>48,'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'jobETAPort');
+$arrKPI[] = Array('prtID'=>48,'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)');
 $arrKPI[] = Array('prtID'=>63,'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>46,'ghq'=>'Air import','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobETAPort');
 $arrKPI[] = Array('prtID'=>47,'ghq'=>'Air export','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobShipmentDate');
