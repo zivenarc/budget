@@ -5,7 +5,7 @@ require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 
 include ('includes/inc_report_settings.php');
-include eiseIntraAbsolutePath."inc-frame_top.php";	
+include ('includes/inc-frame_top.php');
 
 $arrCSS[] = "../common/report.css";
 
@@ -42,90 +42,90 @@ for ($i=0; $i<count($arrKPI);$i++){
 				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']};";
 	for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 	
-	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
-	$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
-	$month = $oBudget->arrPeriod[$m];
+		$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
+		$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
+		$month = $oBudget->arrPeriod[$m];
 
-	$sql[] = "SET @dateStart:='{$repDateStart}', @dateEnd:='{$repDateEnd}'";
-	$sql[] = "INSERT INTO budget.reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
-				SELECT jobProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1,cntUserID
-				FROM nlogjc.tbl_job
-				JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
-				WHERE {$arrKPI[$i]['date']} BETWEEN @dateStart AND @dateEnd
-					AND jobStatusID BETWEEN 15 AND 40
-					AND (SELECT COUNT(jitGUID) 
-								FROM nlogjc.tbl_job_item 
-								LEFT JOIN common_db.tbl_product ON prdID=jitProductID 
-								WHERE jitJobID=jobID AND prdCategoryID=@prtID
-								)>0				
-				GROUP BY jobCustomerID, jobProfitID
-				HAVING `{$month}` IS NOT NULL";
-				// HAVING  {$arrKPI[$i]['kpi']} IS NOT NULL";
-	};
-	
-	switch ($arrKPI[$i]['prtID']){
-		case 48:
-		case 63:
-			$sqlDetails = "SELECT jobID, cntTitle, {$arrKPI[$i]['kpi']} as 'TEU', jobShipmentDate, jobETAPort, jobATAPort, jobOrigin, jobDestination
-				FROM nlogjc.tbl_job
-				JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
-				WHERE {$arrKPI[$i]['date']} BETWEEN '{$repDateStart}' AND '{$repDateEnd}'
-					AND jobStatusID BETWEEN 15 AND 40
-					AND (SELECT COUNT(jitGUID) 
-								FROM nlogjc.tbl_job_item 
-								LEFT JOIN common_db.tbl_product ON prdID=jitProductID 
-								WHERE jitJobID=jobID AND prdCategoryID='{$arrKPI[$i]['prtID']}'
-								)>0				
-				GROUP BY jobID
-				ORDER BY jobID";
-			$rsDetails = $oSQL->q($sqlDetails);
-			$nSumKPI = 0; $j=1;
-			$tableID = "details_".$arrKPI[$i]['prtID'];
-			?>
-			<table class="budget" id="<?php echo $tableID;?>">
-				<thead>
-					<caption><?php echo $arrKPI[$i]['ghq'],' from ',$repDateStart,' to ',$repDateEnd;?></caption>
+		$sql[] = "SET @dateStart:='{$repDateStart}', @dateEnd:='{$repDateEnd}'";
+		$sql[] = "INSERT INTO budget.reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
+					SELECT jobProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1,cntUserID
+					FROM nlogjc.tbl_job
+					JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
+					WHERE {$arrKPI[$i]['date']} BETWEEN @dateStart AND @dateEnd
+						AND jobStatusID BETWEEN 15 AND 40
+						AND (SELECT COUNT(jitGUID) 
+									FROM nlogjc.tbl_job_item 
+									LEFT JOIN common_db.tbl_product ON prdID=jitProductID 
+									WHERE jitJobID=jobID AND prdCategoryID=@prtID
+									)>0				
+					GROUP BY jobCustomerID, jobProfitID
+					HAVING `{$month}` IS NOT NULL";
+					// HAVING  {$arrKPI[$i]['kpi']} IS NOT NULL";
+		
+		
+		switch ($arrKPI[$i]['prtID']){
+			case 48:
+			case 63:
+				$sqlDetails = "SELECT jobID, cntTitle, {$arrKPI[$i]['kpi']} as 'TEU', jobShipmentDate, jobETAPort, jobATAPort, jobOrigin, jobDestination
+					FROM nlogjc.tbl_job
+					JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
+					WHERE {$arrKPI[$i]['date']} BETWEEN '{$repDateStart}' AND '{$repDateEnd}'
+						AND jobStatusID BETWEEN 15 AND 40
+						AND (SELECT COUNT(jitGUID) 
+									FROM nlogjc.tbl_job_item 
+									LEFT JOIN common_db.tbl_product ON prdID=jitProductID 
+									WHERE jitJobID=jobID AND prdCategoryID='{$arrKPI[$i]['prtID']}'
+									)>0				
+					GROUP BY jobID
+					ORDER BY jobID";
+				$rsDetails = $oSQL->q($sqlDetails);
+				$nSumKPI = 0; $j=1;
+				$tableID = "details_".$arrKPI[$i]['prtID'];
+				?>
+				<table class="budget" id="<?php echo $tableID;?>">
+					<thead>
+						<caption><?php echo $arrKPI[$i]['ghq'],' from ',$repDateStart,' to ',$repDateEnd;?></caption>
+						<tr>
+							<th>#</th>
+							<th>Job</th>
+							<th>Customer</th>
+							<th>TEU</th>
+							<th>From</th>
+							<th>To</th>
+							<th>ATD</th>
+							<th>ETA</th>
+							<th>ATA</th>
+						</tr>
+					</thead>
+				<?php
+				while ($rw = $oSQL->f($rsDetails)){
+					?>
 					<tr>
-						<th>#</th>
-						<th>Job</th>
-						<th>Customer</th>
-						<th>TEU</th>
-						<th>From</th>
-						<th>To</th>
-						<th>ATD</th>
-						<th>ETA</th>
-						<th>ATA</th>
+						<td><?php echo $j;?></td>
+						<td><?php echo $rw['jobID'];?></td>
+						<td><?php echo $rw['cntTitle'];?></td>
+						<td><?php echo $rw['TEU'];?></td>
+						<td><?php echo $rw['jobOrigin'];?></td>
+						<td><?php echo $rw['jobDestination'];?></td>
+						<td><?php echo $rw['jobShipmentDate'];?></td>
+						<td><?php echo $rw['jobETAPort'];?></td>
+						<td><?php echo $rw['jobATAPort'];?></td>
 					</tr>
-				</thead>
-			<?php
-			while ($rw = $oSQL->f($rsDetails)){
+					<?php
+					$j++;
+					$nSumKPI += $rw['TEU'];
+				}
 				?>
 				<tr>
-					<td><?php echo $j;?></td>
-					<td><?php echo $rw['jobID'];?></td>
-					<td><?php echo $rw['cntTitle'];?></td>
-					<td><?php echo $rw['TEU'];?></td>
-					<td><?php echo $rw['jobOrigin'];?></td>
-					<td><?php echo $rw['jobDestination'];?></td>
-					<td><?php echo $rw['jobShipmentDate'];?></td>
-					<td><?php echo $rw['jobETAPort'];?></td>
-					<td><?php echo $rw['jobATAPort'];?></td>
+					<td colspan="3">Total:</td>
+					<td><?php echo number_format($nSumKPI,0,'.',',');?></td>
 				</tr>
 				<?php
-				$j++;
-				$nSumKPI += $rw['TEU'];
-			}
-			?>
-			<tr>
-				<td colspan="3">Total:</td>
-				<td><?php echo number_format($nSumKPI,0,'.',',');?></td>
-			</tr>
-			<?php
-		break;
-		default:
-			// do not report		
+			break;
+			default:
+				// do not report		
+		};
 	};
-	
 };
 
 //-------------- Intercompany -----------------
@@ -185,5 +185,5 @@ for ($i=0;$i<count($sql);$i++){
 	}
 }
 
-include eiseIntraAbsolutePath."inc-frame_bottom.php";
+include ('includes/inc-frame_bottom.php');
 ?>
