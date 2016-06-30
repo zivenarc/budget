@@ -102,7 +102,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 					?>
 					<tr>
 						<td><?php echo $j;?></td>
-						<td><?php echo $rw['jobID'];?></td>
+						<td><a target='job' href="/nlogjc/job_form.php?jobID=<?php echo $rw['jobID'];?>"><?php echo $rw['jobID'];?></a></td>
 						<td><?php echo $rw['cntTitle'];?></td>
 						<td><?php echo $rw['TEU'];?></td>
 						<td><?php echo $rw['jobOrigin'];?></td>
