@@ -5,6 +5,9 @@ require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 
 include ('includes/inc_report_settings.php');
+include eiseIntraAbsolutePath."inc-frame_top.php";	
+
+$arrCSS[] = "../common/report.css";
 
 $oBudget = new Budget($budget_scenario);
 
@@ -182,5 +185,5 @@ for ($i=0;$i<count($sql);$i++){
 	}
 }
 
-
+include eiseIntraAbsolutePath."inc-frame_bottom.php";
 ?>
