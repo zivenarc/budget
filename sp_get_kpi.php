@@ -63,7 +63,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 	switch ($arrKPI[$i]['prtID']){
 		case 48:
 		case 63:
-			$sqlDetails = "SELECT jobID, cntTitle, {$arrKPI[$i]['kpi']} as 'TEU', jobShipmentDate, jobETAPort, jobATAPort
+			$sqlDetails = "SELECT jobID, cntTitle, {$arrKPI[$i]['kpi']} as 'TEU', jobShipmentDate, jobETAPort, jobATAPort, jobOrigin, jobDestination
 				FROM nlogjc.tbl_job
 				JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
 				WHERE {$arrKPI[$i]['date']} BETWEEN '{$repDateStart}' AND '{$repDateEnd}'
@@ -87,6 +87,8 @@ for ($i=0; $i<count($arrKPI);$i++){
 						<th>Job</th>
 						<th>Customer</th>
 						<th>TEU</th>
+						<th>From</th>
+						<th>To</th>
 						<th>ATD</th>
 						<th>ETA</th>
 						<th>ATA</th>
@@ -100,12 +102,14 @@ for ($i=0; $i<count($arrKPI);$i++){
 					<td><?php echo $rw['jobID'];?></td>
 					<td><?php echo $rw['cntTitle'];?></td>
 					<td><?php echo $rw['TEU'];?></td>
+					<td><?php echo $rw['jobOrigin'];?></td>
+					<td><?php echo $rw['jobDestination'];?></td>
 					<td><?php echo $rw['jobShipmentDate'];?></td>
 					<td><?php echo $rw['jobETAPort'];?></td>
 					<td><?php echo $rw['jobATAPort'];?></td>
 				</tr>
 				<?php
-				$i++;
+				$j++;
 				$nSumKPI += $rw['TEU'];
 			}
 			?>
