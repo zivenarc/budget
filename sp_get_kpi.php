@@ -59,6 +59,66 @@ for ($i=0; $i<count($arrKPI);$i++){
 				HAVING `{$month}` IS NOT NULL";
 				// HAVING  {$arrKPI[$i]['kpi']} IS NOT NULL";
 	};
+	
+	switch ($arrKPI[$i]['prtID']){
+		case 48:
+		case 63:
+			$sqlDetails = "SELECT jobID, cntTitle, {$arrKPI[$i]['kpi']} as 'TEU', jobShipmentDate, jobETAPort, jobATAPort
+				FROM nlogjc.tbl_job
+				JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
+				WHERE {$arrKPI[$i]['date']} BETWEEN '{$repDateStart}' AND '{$repDateEnd}'
+					AND jobStatusID BETWEEN 15 AND 40
+					AND (SELECT COUNT(jitGUID) 
+								FROM nlogjc.tbl_job_item 
+								LEFT JOIN common_db.tbl_product ON prdID=jitProductID 
+								WHERE jitJobID=jobID AND prdCategoryID='{$arrKPI[$i]['prtID']}'
+								)>0				
+				GROUP BY jobID
+				ORDER BY jobID";
+			$rsDetails = $oSQL->q($sqlDetails);
+			$nSumKPI = 0; $j=1;
+			$tableID = "details_".$arrKPI[$i]['prtID'];
+			?>
+			<table class="budget" id="<?php echo $tableID;?>">
+				<thead>
+					<caption><?php echo $arrKPI[$i]['ghq'],' from ',$repDateStart,' to ',$repDateEnd;?></caption>
+					<tr>
+						<th>#</th>
+						<th>Job</th>
+						<th>Customer</th>
+						<th>TEU</th>
+						<th>ATD</th>
+						<th>ETA</th>
+						<th>ATA</th>
+					</tr>
+				</thead>
+			<?php
+			while ($rw = $oSQL->f($rsDetails)){
+				?>
+				<tr>
+					<td><?php echo $j;?></td>
+					<td><?php echo $rw['jobID'];?></td>
+					<td><?php echo $rw['cntTitle'];?></td>
+					<td><?php echo $rw['TEU'];?></td>
+					<td><?php echo $rw['jobShipmentDate'];?></td>
+					<td><?php echo $rw['jobETAPort'];?></td>
+					<td><?php echo $rw['jobATAPort'];?></td>
+				</tr>
+				<?php
+				$i++;
+				$nSumKPI += $rw['TEU'];
+			}
+			?>
+			<tr>
+				<td colspan="3">Total:</td>
+				<td><?php echo number_format($nSumKPI,0,'.',',');?></td>
+			</tr>
+			<?php
+		break;
+		default:
+			// do not report		
+	};
+	
 };
 
 //-------------- Intercompany -----------------
