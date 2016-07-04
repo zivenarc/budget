@@ -85,6 +85,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 									{$sqlActivityFilter}
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
 						'tolerance'=>0.05,
+						'denominator'=>$denominator,
 						'limit'=>10);	
 
 $oWF = new Waterfall($settings['gpcus']);
