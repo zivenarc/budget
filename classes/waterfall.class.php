@@ -18,8 +18,21 @@ class Waterfall {
 		$this->title = $options['title'];
 		$this->tolerance = $options['tolerance']?$options['tolerance']:0.1;
 		$this->currency = $options['currency']?$options['currency']:'RUB';
+		$this->denominator = $options['denominator']?$options['denominator']:1;
 		$this->actual_title = $options['actual_title']?$options['actual_title']:'Actual';
 		$this->budget_title = $options['budget_title']?$options['budget_title']:'Budget';
+		
+		switch ($this->denominator){
+			case 1000:
+				$this->denominator_title = "k";
+				break;
+			case 1000000:
+				$this->denominator_title = "M";
+				break;
+			default:
+				$this->denominator_title = "";			
+		}
+		
 	}
 	
 	private function _initData(){
@@ -157,7 +170,7 @@ class Waterfall {
 																text: '<?php echo $this->currency;?>'
 															}},
 													legend: {enabled: false},
-													tooltip: {pointFormat: '<b>{point.y:,.2f}</b> <?php echo $this->currency;?>'},
+													tooltip: {pointFormat: '<b>{point.y:,.0f}<?php echo $this->denominator_title;?></b> <?php echo $this->currency;?>'},
 													series: [{upColor: 'green',
 															color: 'red',
 													data: <?php echo json_encode($this->arrHSChart);?>,
