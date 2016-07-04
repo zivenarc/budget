@@ -98,7 +98,7 @@ class Waterfall {
 			$this->arrReport[] = Array('Other',$thisBalance, $thatBalance, $diffBalance);
 			$this->arrChart[] = Array('Other',(integer)$lastValue,(integer)$lastValue, (integer)($lastValue+$diffBalance), (integer)($lastValue+$diffBalance)
 							, $this->getTooltip('Other factors not included before',$diffBalance));
-			$this->arrHSChart[] = Array('name'=>$rw['optText'],'y'=>(integer)$diffBalance);
+			$this->arrHSChart[] = Array('name'=>'Other','y'=>(integer)$diffBalance);
 		}
 		$this->arrReport[] = Array('Actual',null, null, $baseData['Actual'],'budget-subtotal');
 		$this->arrChart[] = Array('Actual',0,0,(integer)$baseData['Actual'],(integer)$baseData['Actual'], $this->getTooltip('Actual',$baseData['Actual']));
