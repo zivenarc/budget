@@ -47,10 +47,11 @@ for ($i=0; $i<count($arrKPI);$i++){
 		$month = $oBudget->arrPeriod[$m];
 
 		$sql[] = "SET @dateStart:='{$repDateStart}', @dateEnd:='{$repDateEnd}'";
-		$sql[] = "INSERT INTO budget.reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
-					SELECT jobProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1,cntUserID
+		$sql[] = "INSERT INTO budget.reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales, bdv)
+					SELECT jobProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1, cntUserID, usrProfitID
 					FROM nlogjc.tbl_job
 					JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
+					JOIN common_db.stbl_user ON usrID=cntUserID
 					WHERE {$arrKPI[$i]['date']} BETWEEN @dateStart AND @dateEnd
 						AND jobStatusID BETWEEN 15 AND 40
 						AND (SELECT COUNT(jitGUID) 
@@ -145,10 +146,11 @@ for ($i=0; $i<count($arrKPI);$i++){
 	$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
 	$month = $oBudget->arrPeriod[$m];
 	$sql[] = "SET @dateStart:='{$repDateStart}', @dateEnd:='{$repDateEnd}'";
-	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
-				SELECT jobOwnerProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1,cntUserID
+	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales, bdv)
+				SELECT jobOwnerProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1,cntUserID, usrProfitID
 				FROM intercompany.tbl_job
 				JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
+				JOIN common_db.stbl_user ON usrID=cntUserID
 				WHERE {$arrKPI[$i]['date']} BETWEEN @dateStart AND @dateEnd
 					AND jobStatusID BETWEEN 15 AND 40
 					AND (SELECT COUNT(jitGUID) 
@@ -162,19 +164,22 @@ for ($i=0; $i<count($arrKPI);$i++){
 };
 
 ////////// Special arrangement for TOYOTA
-$sql[] = "SELECT @cntUserID:=cntUserID FROM common_db.tbl_counterparty WHERE cntID=17218;";
+$sql[] = "SELECT @cntUserID:=cntUserID, @usrProfitID:=usrProfitID
+			FROM common_db.tbl_counterparty 
+			JOIN commond_db.stbl_user ON usrID=cntUserID
+			WHERE cntID=17218;";
 for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
 	$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
 	$month = $oBudget->arrPeriod[$m];
-	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
-			SELECT 3, 4, 'CCD', 17218, COUNT(shpID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID
+	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales, bdv)
+			SELECT 3, 4, 'CCD', 17218, COUNT(shpID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID, @usrProfitID
 			FROM tnt.tbl_shipment WHERE shpCCendDate BETWEEN @dateStart AND @dateEnd";
-	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
-			SELECT 3, 3, 'Trips', 17218, COUNT(shpID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID
+	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales, bdv)
+			SELECT 3, 3, 'Trips', 17218, COUNT(shpID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID, @usrProfitID
 			FROM tnt.tbl_shipment WHERE shpTransitFromPort BETWEEN @dateStart AND @dateEnd";
-	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales)
-			SELECT 3, 50, 'CCD', 17218, COUNT(ashID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID
+	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales, bdv)
+			SELECT 3, 50, 'CCD', 17218, COUNT(ashID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID, @usrProfitID
 			FROM tnt.tbl_air_shipment WHERE ashCCDate BETWEEN @dateStart AND @dateEnd";
 };
 
