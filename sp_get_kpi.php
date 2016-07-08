@@ -167,7 +167,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 ////////// Special arrangement for TOYOTA
 $sql[] = "SELECT @cntUserID:=cntUserID, @usrProfitID:=usrProfitID
 			FROM common_db.tbl_counterparty 
-			JOIN commond_db.stbl_user ON usrID=cntUserID
+			JOIN common_db.stbl_user ON usrID=cntUserID
 			WHERE cntID=17218;";
 for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
