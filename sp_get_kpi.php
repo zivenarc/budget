@@ -54,6 +54,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 					JOIN common_db.stbl_user ON usrID=cntUserID
 					WHERE {$arrKPI[$i]['date']} BETWEEN @dateStart AND @dateEnd
 						AND jobStatusID BETWEEN 15 AND 40
+						AND jobProfitID IS NOT NULL
 						AND (SELECT COUNT(jitGUID) 
 									FROM nlogjc.tbl_job_item 
 									LEFT JOIN common_db.tbl_product ON prdID=jitProductID 
