@@ -498,6 +498,17 @@ foreach($arrProfit as $pc=>$flag){
 ?>
 <td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome['last']) - array_sum($arrTotal['last'][GROSS_PROFIT]));?></td>	
 </tr>
+<tr>
+	<td>Op.cost per headcount</td>
+<?php
+foreach($arrProfit as $pc=>$flag){
+	?>
+	<td class='budget-decimal'><?php Reports::render_ratio(($arrOpIncome['this'][$pc]-$arrTotal['this'][GROSS_PROFIT][$pc])/100,$arrHeadcount['FTE'][$pc],0);?></td>
+	<?php
+}
+?>
+	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio((array_sum($arrOpIncome['this'])-array_sum($arrTotal['this'][GROSS_PROFIT]))/100,array_sum($arrHeadcount['FTE']),0);?></td>
+</tr>
 <?php
 foreach ($arrGP as $customer=>$data){
 	renderDataByPC($data, $arrProfit, $customer);	
