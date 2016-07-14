@@ -288,6 +288,10 @@ class Budget{
 				echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>",($rw['prtGHQ']?$rw['prtGHQ']:'[None]'),"</a></li>\r\n";
 				
 			}
+			$arrGET['prtGHQ'] = 'OFF';	
+			echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>OFF</a></li>\r\n";
+			$arrGET['prtGHQ'] = 'AFF';	
+			echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>AFF</a></li>\r\n";
 			$arrGET['prtGHQ'] = 'all';	
 			echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>All</a></li>\r\n";
 			?>

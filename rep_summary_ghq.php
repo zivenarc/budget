@@ -33,6 +33,14 @@ if(!isset($_GET['prtGHQ'])){
 	if ($_GET['prtGHQ']=='all'){
 		$sqlWhere = " WHERE TRUE";
 		// $filter = Array();
+	} elseif ($_GET['prtGHQ']=='OFF') {
+		$sqlWhere = " WHERE prtGHQ IN ('Ocean import','Ocean export')";
+		$filter = Array('prtGHQ'=>Array('Ocean import','Ocean export'));
+		
+	} elseif ($_GET['prtGHQ']=='AFF') {
+		$sqlWhere = " WHERE prtGHQ IN ('Air import','Air export')";
+		$filter = Array('prtGHQ'=>Array('Air import','Air export'));
+
 	} else {
 		$sqlWhere = " WHERE prtGHQ=".$oSQL->e(urldecode($_GET['prtGHQ']));
 		$filter = Array('prtGHQ'=>urldecode($_GET['prtGHQ']));
