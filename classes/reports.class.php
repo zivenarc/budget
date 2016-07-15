@@ -586,14 +586,20 @@ class Reports{
 						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
 					FROM `reg_headcount`
 					LEFT JOIN vw_function ON funGUID=function
-					LEFT JOIN vw_product_type ON prtID=activity
+					LEFT JOIN common_db.tbl_profit ON pccID=pc
+					LEFT JOIN vw_product_type ON prtID=IFNULL(activity, pccProductTypeID)
 					LEFT JOIN vw_location ON locID=location
-					LEFT JOIN vw_profit ON pccID=pc
-					$sqlWhere AND posted=1 AND active=1 AND salary>0";
+					{$sqlWhere} 
+					AND posted=1 AND active=1 AND salary>10000";
 			
 			$sql = $sqlSelect." GROUP BY `prtGHQ`,wc
 					ORDER BY prtRHQ,wc";
-			$rs = $oSQL->q($sql);			
+			try {
+				$rs = $oSQL->q($sql);
+			} catch (Exception $e) {
+				echo '<pre>',$sql,'</pre>';
+			};
+			
 			if (!$oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
 				return (false);
