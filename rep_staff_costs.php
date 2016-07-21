@@ -37,7 +37,7 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 				SELECT 'OOO'
 					, IFNULL((SELECT ephProfitID FROM common_db.tbl_employee_profit WHERE ephEmployeeGUID1C=empGUID1C AND DATEDIFF(@repDateEnd, ephDate)>=0 ORDER BY ephDate DESC LIMIT 1),1)
 					, empLocationID
-					, empProductTypeID
+					, IFNULL(empProductTypeID,(SELECT pccProductTypeID FROM common_db.tbl_profit WHERE pccID=empProfitID))
 					, IF (empStartDate BETWEEN @repDateStart AND @repDateEnd, 1 - DATEDIFF(empStartDate, @repDateStart)/DATEDIFF(@repDateEnd,@repDateStart),1)
 						- IF (empEndDate BETWEEN @repDateStart AND @repDateEnd, DATEDIFF(@repDateEnd, empEndDate )/DATEDIFF(@repDateEnd,@repDateStart),0) as FTE
 						, 'Actual', @scnID, empGUID1C, IFNULL(empYACT,@yact),@item, empFunctionGUID
@@ -49,7 +49,8 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 				AND (empEndDate IS NULL OR empEndDate >=@repDateStart) 
 				AND empFlagDeleted=0
 				AND empSalary>0;";
-	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_vacation SET salary=0 
+	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_vacation 
+				SET salary=0 
 				WHERE vacVactypeID IN (3,4,5) ## Unpaid leave or maternity leave
 					AND ((@repDateStart BETWEEN vacDateStart AND vacDateEnd) OR (@repDateEnd BETWEEN vacDateStart AND vacDateEnd))  
 					AND vacEmployeeID=empID 
@@ -57,7 +58,8 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 					AND source='Actual'
 					AND scenario=@scnID
 					AND `{$month}`<>0;";
-	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_resignation SET end_date=rsgDateEnd, `{$month}`=IF(rsgDateEnd<@repDateStart,0,`{$month}`)
+	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_resignation 
+				SET end_date=rsgDateEnd, `{$month}`=IF(rsgDateEnd<@repDateStart,0,`{$month}`)
 				WHERE 
 					rsgStateID BETWEEN 1030 AND 1081
 					AND rsgDateEnd >= '".date('Y-m-d',$oBudget->date_start)."'  
