@@ -53,6 +53,7 @@ class ProfitCenter {
 		$this->name = $params["pccTitle$strLocal"];
 		$this->prod = $params["pccFlagProd"];
 		$this->location = $params["pccDefaultLocation"];
+		$this->activity = $params["pccProductTypeID"];
 		// $this->manager = parent::getByCode($params['empManagerID']);
 	}
 	

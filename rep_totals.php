@@ -39,6 +39,7 @@ $arrJS[] = 'js/rep_totals.js';
 $arrActions[] = Array('title'=>'Apr-Mar','action'=>'?mthStart=4&mthEnd=15');
 $arrActions[] = Array('title'=>'Jan-Dec','action'=>'?mthStart=1&mthEnd=12');
 $arrActions[] = Array('title'=>'YTD','action'=>'?mthStart='.(1+$oBudget->offset).'&mthEnd='.$oBudget->cm);
+$arrActions[] = Array('title'=>'ROY','action'=>'?mthStart='.$oBudget->nm.'&mthEnd='.(12+$oBudget->offset));
 $arrActions[] = Array('title'=>'This month','action'=>'?mthStart='.$oBudget->cm.'&mthEnd='.$oBudget->cm);
 $arrActions[] = Array('title'=>'Next month','action'=>'?mthStart='.$oBudget->nm.'&mthEnd='.$oBudget->nm);
 
@@ -116,13 +117,13 @@ while ($rw=$oSQL->f($rs)){
 $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd).")/".($mthEnd-$mthStart+1)." as Total, 0 as Estimate
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='{$oBudget->id}' and posted=1 and salary>50 {$sqlWherePC}
+		WHERE scenario='{$oBudget->id}' and posted=1 and salary>10000 {$sqlWherePC}
 		GROUP BY Profit
 		UNION ALL
 		SELECT pccTitle as Profit, pccFlagProd, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd).")/".($mthEnd-$mthStart+1)." as Estimate
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='{$reference}' and posted=1 and salary>50 {$sqlWherePC}
+		WHERE scenario='{$reference}' and posted=1 and salary>10000 {$sqlWherePC}
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);

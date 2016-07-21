@@ -11,6 +11,7 @@ include_once ('classes/profit.class.php');
 $YACT = new YACT_COA();
 $Items = new Items();
 $ProfitCenters = new ProfitCenters();
+$Employees = new Employees();
 
 class Headcount extends Document{
 
@@ -152,6 +153,14 @@ class Headcount extends Document{
 				,'type'=>'date'				
 				,'width'=>'60px'				
 				, 'disabled'=>false
+			);
+			$this->grid->Columns[] =Array(
+				'title'=>'Compensation'
+				,'field'=>'compensation'
+				,'type'=>'money'
+				,'width'=>'70px'							
+				,'mandatory'=>false
+				,'totals'=>true
 			);
 		}
 		
@@ -301,6 +310,7 @@ class Headcount extends Document{
 		GLOBAL $Items;
 		GLOBAL $oBudget;
 		GLOBAL $ProfitCenters;
+		GLOBAL $Employees;
 		
 		parent::save($mode);
 		
@@ -341,6 +351,7 @@ class Headcount extends Document{
 						$row->vks = (integer)$_POST['vks'][$id];			
 						$row->insurance = (double)str_replace(',','',$_POST['insurance'][$id]);							
 						$row->salary = (double)str_replace(',','',$_POST['salary'][$id]);							
+						$row->compensation = (double)str_replace(',','',$_POST['compensation'][$id]);							
 						$row->monthly_bonus = (double)str_replace(',','',$_POST['monthly_bonus'][$id]);							
 						$row->mobile_limit = (double)str_replace(',','',$_POST['mobile_limit'][$id]);							
 						$row->fuel = (double)str_replace(',','',$_POST['fuel'][$id]);
@@ -435,11 +446,14 @@ class Headcount extends Document{
 					$start_date = strtotime($record->start_date);
 					$probation = $start_date + 91*24*60*60;
 					$eligible = ($start_date < $eligible_date) && ($this->settings['salary_review_month']>date('m',$oMaster->budget->date_start));
-
+						
+					$oEmployee = $Employees->getByCode($record->employee);
+					// echo '<pre>';print_r($oEmployee);echo '</pre>';
+						
 					//-----------------------------------------------------------------Salary, gross
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->pc->code; 
-					$master_row->activity = $record->activity;
+					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 					$master_row->customer = $record->customer;
 					$master_row->particulars = $record->employee;
 					$master_row->part_type = 'EMP';
@@ -447,13 +461,15 @@ class Headcount extends Document{
 					$master_row->item = Items::SALARY;
 					
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
 					
 					$social_tax = Array();					
 					$salarySubtotal = 0;
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
 						
+						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
+						$current_month_end = mktime(23,59,59,$m+1,0,$oBudget->year);
 						
 						if ($eligible) {						
 							$salary[$month] = ($record->{$month})*($record->salary+$record->monthly_bonus)*($m<$this->settings['salary_review_month']?1:1+$this->settings['salary_increase_ratio']);
@@ -474,8 +490,19 @@ class Headcount extends Document{
 							}
 						}
 						
+
+						
 						$salarySubtotal += $salary[$month];
 						$master_row->{$month} = -$salary[$month]*(20.5-1.67)/20.5;
+						$hcCount[$month][$record->wc] += $record->{$month};
+						$payroll[$month] += $salary[$month];
+						
+						if($record->end_date>=$current_month_start && $record->end_date<=$current_month_end){
+							$master_row->{$month} -= $record->compensation;
+							$salarySubtotal += $record->compensation;
+							$salary[$month] += $record->compensation;
+						}
+						
 						$social_tax[$month] = $this->_getSocialTax($salary[$month],$m)*(1-$record->vks) + $this->settings['social_tax_accident'] * $salary[$month] ;
 						// if ($salarySubtotal<$this->settings['social_cap']){
 							// $social_tax[$month] = ($this->settings['social_tax_1']*(1-$record->vks)+$this->settings['social_tax_accident']) * $salary[$month];
@@ -485,21 +512,34 @@ class Headcount extends Document{
 												// + $this->settings['social_tax_2']*(1-$record->vks)* min($salary[$month],($salarySubtotal - $this->settings['social_cap']));
 						// }
 
-						$hcCount[$month][$record->wc] += $record->{$month};
-						$payroll[$month] += $salary[$month];
+
 						
 					}				
+					
+					//-----------------------------------------------------------------Unused vacation accrual
+					$master_row = $oMaster->add_master();
+					$master_row->profit = $this->pc->code;
+					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
+					$master_row->customer = $record->customer;							
+					$master_row->item = Items::UNUSED_VACATION_ACCRUAL;
+					$oItem = $Items->getById($master_row->item);
+					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+						
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
+						$master_row->{$month} = - 2.33/29.4 * ($record->{$month})*($record->salary+$record->monthly_bonus);
+					}
 					
 					//-----------------------------------------------------------------Social tax
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->pc->code;
-					$master_row->activity = $record->activity;
+					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 					$master_row->customer = $record->customer;					
 					$master_row->particulars = $record->employee;
 					$master_row->part_type = 'EMP';	
 					$master_row->item = Items::SOCIAL_TAX;
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
 					
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
@@ -510,14 +550,14 @@ class Headcount extends Document{
 					//-----------------------------------------------------------------Mobile costs
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->pc->code;
-					$master_row->activity = $record->activity;
+					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 					$master_row->customer = $record->customer;
 					$master_row->particulars = $record->employee;
 					$master_row->part_type = 'EMP';					
 					$master_row->item = Items::MOBILE;
 					
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
 					
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
@@ -528,14 +568,14 @@ class Headcount extends Document{
 					if ($this->type=='new'){
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $this->pc->code;
-						$master_row->activity = $record->activity;
+						$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 						$master_row->customer = $record->customer;
 						// $master_row->particulars = $record->employee;
 						// $master_row->part_type = 'EMP';					
 						$master_row->item = Items::IT_EQUIPMENT;
 						
 						$oItem = $Items->getById($master_row->item);
-						$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
+						$master_row->account = $this->pc->prod ? ($record->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
 						
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
@@ -547,33 +587,34 @@ class Headcount extends Document{
 						}
 					}
 					//-----------------------------------------------------------------Fuel costs
-					$master_row = $oMaster->add_master();
-					$master_row->profit = $this->pc->code;
-					$master_row->activity = $record->activity;
-					$master_row->customer = $record->customer;
-					$master_row->particulars = $record->employee;
-					$master_row->part_type = 'EMP';					
-					$master_row->item = Items::FUEL;
-					
-					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
-					
-					for($m=1;$m<=15;$m++){
-						$month = $this->budget->arrPeriod[$m];
-						$master_row->{$month} = - $record->{$month}*$record->fuel;
+					if ($record->fuel>0){
+						$master_row = $oMaster->add_master();
+						$master_row->profit = $this->pc->code;
+						$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
+						$master_row->customer = $record->customer;
+						$master_row->particulars = $record->employee;
+						$master_row->part_type = 'EMP';					
+						$master_row->item = Items::FUEL;
+						
+						$oItem = $Items->getById($master_row->item);
+						$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+						
+						for($m=1;$m<=15;$m++){
+							$month = $this->budget->arrPeriod[$m];
+							$master_row->{$month} = - $record->{$month}*$record->fuel;
+						}
 					}
-					
 					//-----------------------------------------------------------------Bonus
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->pc->code;
-					$master_row->activity = $record->activity;
+					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 					$master_row->customer = $record->customer;
 					$master_row->particulars = $record->employee;
 					$master_row->part_type = 'EMP';					
 					
 					$master_row->item = Items::BONUS;
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
 					
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
@@ -587,14 +628,14 @@ class Headcount extends Document{
 					//-----------------------------------------------------------------Medical insurance
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->pc->code;
-					$master_row->activity = $record->activity;					
+					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;				
 					$master_row->customer = $record->customer;
 					$master_row->particulars = $record->employee;
 					$master_row->part_type = 'EMP';					
 					
 					$master_row->item = Items::MEDICAL_INSURANCE;
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
 					
 					$insurance_base = $record->insurance/12;
 					$insurance_roy = $insurance_base*(1+$this->settings['medical_insurance_index']);
@@ -625,14 +666,14 @@ class Headcount extends Document{
 						//-----------------------------------------------------------------Hiring for newcomers
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $this->pc->code;
-						$master_row->activity = $record->activity;					
+						$master_row->activity = $record->activity?$record->activity:$this->pc->activity;		
 						$master_row->customer = $record->customer;
 						$master_row->particulars = $record->employee;
 						$master_row->part_type = 'EMP';	
 						
 						$master_row->item = Items::HIRING_COSTS;
 						$oItem = $Items->getById($master_row->item);
-						$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
+						$master_row->account = $this->pc->prod ? ($record->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
 												
 						
 						for($m=1;$m<=15;$m++){
@@ -651,7 +692,7 @@ class Headcount extends Document{
 				if ($this->type=='current'){
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->pc->code;
-					// $master_row->activity = $record->activity;
+					$master_row->activity = $this->pc->activity;	
 					// $master_row->customer = $record->customer;					
 					
 					$master_row->item = Items::HIRING_COSTS;
@@ -666,7 +707,7 @@ class Headcount extends Document{
 				//-----------------------------------------------------------------Overtime
 				$master_row = $oMaster->add_master();
 				$master_row->profit = $this->pc->code;
-				// $master_row->activity = $record->activity;
+				$master_row->activity = $this->pc->activity;	
 				// $master_row->customer = $record->customer;					
 				
 				$master_row->item = Items::OVERTIME_WORK;
@@ -677,24 +718,11 @@ class Headcount extends Document{
 					$month = $this->budget->arrPeriod[$m];
 					$master_row->{$month} = - $payroll[$month] * $this->overtime/100;
 				}
-				//-----------------------------------------------------------------Unused vacation accrual
-				$master_row = $oMaster->add_master();
-				$master_row->profit = $this->pc->code;
-				// $master_row->activity = $record->activity;
-				// $master_row->customer = $record->customer;								
-				$master_row->item = Items::UNUSED_VACATION_ACCRUAL;
-				$oItem = $Items->getById($master_row->item);
-				$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
-					
-				for($m=1;$m<=15;$m++){
-					$month = $this->budget->arrPeriod[$m];
-					$master_row->{$month} = - 2.33/29.4 * $payroll[$month];
-				}
 				
 				//-----------------------------------------------------------------Canteen
 				$master_row = $oMaster->add_master();
 				$master_row->profit = $this->pc->code;
-				// $master_row->activity = $record->activity;
+				$master_row->activity = $this->pc->activity;	
 				// $master_row->customer = $record->customer;					
 				$master_row->item = Items::CANTEEN;
 				$oItem = $Items->getById($master_row->item);
@@ -781,7 +809,7 @@ class Headcount extends Document{
 			$row->job = $rw['empFunctionGUID'];
 			$row->wc = $rw['funFlagWC'];				
 			$row->location = $rw['empLocationID'];			
-			$row->activity = $rw['empProductTypeID'];			
+			$row->activity = $rw['empProductTypeID']?$rw['empProductTypeID']:$this->pc->activity;			
 			$row->salary = $rw['empSalary'];
 			$row->monthly_bonus = $rw['empMonthly'];
 			$row->insurance = $rw['insurance'];
@@ -792,7 +820,7 @@ class Headcount extends Document{
 			
 			for ($m=1;$m<=15;$m++){
 				$month = $this->budget->arrPeriod[$m];
-				$row->{$month} = $row->getFTE($m, $oBudget->year);
+				$row->{$month} = $row->getFTE($m, $oBudget->year);						
 			}
 		}	
 	}
