@@ -476,7 +476,7 @@ class Headcount extends Document{
 					$probation = $start_date + 91*24*60*60;
 					$eligible = ($start_date < $eligible_date) && ($this->settings['salary_review_month']>date('m',$oMaster->budget->date_start));
 						
-					$oEmployee = $Employees->getByCode($record->employee);
+					$oEmployee = $Employees->getById($record->employee);
 					// echo '<pre>';print_r($oEmployee);echo '</pre>';
 						
 					//-----------------------------------------------------------------Salary, gross
@@ -491,7 +491,7 @@ class Headcount extends Document{
 					
 					$oItem = $Items->getById($master_row->item);
 					$master_row->account = $this->pc->prod ? (($oEmployee->activity || !$record->wc)?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
-					
+								
 					$social_tax = Array();					
 					$salarySubtotal = 0;
 					for($m=1;$m<=15;$m++){
