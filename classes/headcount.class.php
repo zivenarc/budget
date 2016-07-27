@@ -838,7 +838,7 @@ class Headcount extends Document{
 			$row->job = $rw['empFunctionGUID'];
 			$row->wc = $rw['funFlagWC'];				
 			$row->location = $rw['empLocationID'];			
-			$row->activity = $rw['empProductTypeID']?$rw['empProductTypeID']:$this->pc->activity;			
+			$row->activity = $rw['empProductTypeID'];//?$rw['empProductTypeID']:$this->pc->activity;			
 			$row->salary = $rw['empSalary'];
 			$row->monthly_bonus = $rw['empMonthly'];
 			$row->insurance = $rw['insurance'];
