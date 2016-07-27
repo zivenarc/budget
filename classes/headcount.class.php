@@ -440,6 +440,35 @@ class Headcount extends Document{
 			$oMaster = new Master($this->scenario, $this->GUID);
 			
 			if(is_array($this->records[$this->gridName])){
+			
+					//--------------------------------- Calculate vacations for the department
+					$arrVacation = Array();	
+					for($m=1;$m<=15;$m++){ 
+						$month = $this->budget->arrPeriod[$m];
+						
+						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
+						$current_month_end = mktime(23,59,59,$m+1,0,$oBudget->year);
+						
+						$sqlV = Array();
+						$sqlV[]="SET @dateStart:='".date('Y-m-d',$current_month_start)."',@dateEnd:='".date('Y-m-d',$current_month_end)."', @daysMonth = nlogjc.fn_daycount(@dateStart, @dateEnd, 'workdays');";
+						$sqlV[] = "SELECT empGUID1C, vacEmployeeID, empTitle, vacDateStart, vacDateEnd, IF(vacDateStart<@dateStart,@dateStart, vacDateStart),IF(vacDateEnd>@dateEnd,@dateEnd, vacDateEnd), 
+							nlogjc.fn_daycount(IF(vacDateStart<@dateStart,@dateStart, vacDateStart),IF(vacDateEnd>@dateEnd,@dateEnd, vacDateEnd),'workdays') as Duration,@daysMonth as daysMonth
+						FROM treasury.tbl_vacation
+						JOIN common_db.tbl_employee ON empID=vacEmployeeID
+						WHERE ((vacDateStart BETWEEN @dateStart AND @dateEnd) OR (vacDateEnd BETWEEN @dateStart AND @dateEnd))
+						AND vacStateID BETWEEN 420 AND 450
+						AND empProfitID={$this->pc->code}";
+						
+						for($i=0;$i<count($sqlV);$i++){
+							$rs = $this->oSQL->q($sqlV[$i]);
+						};
+						while ($rw = $this->oSQL->f($rs)){
+							$arrVacation[$rw['empGUID1C']][$month] = $rw['Duration']/$rw['daysMonth'];
+						}
+						
+					}
+			
+			
 				foreach($this->records[$this->gridName] as $id=>$record){
 				
 					$eligible_date = time(0,0,0,10,1,$oMaster->budget->year-1);
@@ -470,7 +499,7 @@ class Headcount extends Document{
 						
 						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 						$current_month_end = mktime(23,59,59,$m+1,0,$oBudget->year);
-						
+											
 						if ($eligible) {						
 							$salary[$month] = ($record->{$month})*($record->salary+$record->monthly_bonus)*($m<$this->settings['salary_review_month']?1:1+$this->settings['salary_increase_ratio']);
 						} else {
@@ -493,7 +522,7 @@ class Headcount extends Document{
 
 						
 						$salarySubtotal += $salary[$month];
-						$master_row->{$month} = -$salary[$month]*(20.5-1.67)/20.5;
+						$master_row->{$month} = -$salary[$month]*(1 - $arrVacation[$record->employee][$month]);
 						$hcCount[$month][$record->wc] += $record->{$month};
 						$payroll[$month] += $salary[$month];
 						

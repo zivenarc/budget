@@ -138,17 +138,17 @@ while ($rw=$oSQL->f($rs)){
 }
 
 //------------------------------ GROSS PROFIT ---------------------------
-$sql = "SELECT account,Customer_group_code, Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
+$sql = "SELECT account,Customer_group_code, customer, Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM vw_master		
 		WHERE scenario='{$oBudget->id}' {$sqlWherePC}
 			AND account IN('J00400','J00802')
-		GROUP BY account, Customer_group_code, Profit
+		GROUP BY account, Customer_group_code, customer, Profit
 		UNION ALL
-		SELECT account,Customer_group_code, Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
+		SELECT account,Customer_group_code, customer,  Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM vw_master		
 		WHERE scenario='{$reference}' {$sqlWherePC}
 			AND account IN('J00400','J00802')
-		GROUP BY account,Customer_group_code, Profit
+		GROUP BY account,Customer_group_code, customer, Profit
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
@@ -165,7 +165,14 @@ while ($rw=$oSQL->f($rs)){
 	
 	switch ($rw['Customer_group_code']){
 		case 33239:
-			$cusGroup = 'New customers';
+			switch ($rw['customer']){
+				case 33242:
+					$cusGroup = 'New customers';
+					break;
+				default:
+					$cusGroup = "New and landed";
+					break;
+			}
 			break;
 		case 31153:
 			$cusGroup = 'Brought in 2015';
