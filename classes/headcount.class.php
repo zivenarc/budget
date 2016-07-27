@@ -490,7 +490,7 @@ class Headcount extends Document{
 					$master_row->item = Items::SALARY;
 					
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? (($oEmployee->activity || !$record->wc)?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
 					
 					$social_tax = Array();					
 					$salarySubtotal = 0;
