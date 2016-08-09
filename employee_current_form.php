@@ -30,7 +30,7 @@ if ($_POST['DataAction']){
 	
 	 if($_POST['DataAction']=='fill'){
 		
-		$oDocument->fillData($oBudget);
+		$oDocument->fillData($oDocument->budget);
 		
 	}
 		

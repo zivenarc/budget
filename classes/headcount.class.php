@@ -828,6 +828,7 @@ class Headcount extends Document{
 					ORDER BY empSalary DESC, empFunctionGUID, empTitleLocal";//die($sql);
 					
 		// echo $sql;
+		// echo '<pre>';print_r($oBudget);echo '</pre>';
 		
 		$rs = $this->oSQL->q($sql);
 		while ($rw=$this->oSQL->f($rs)){
