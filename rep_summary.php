@@ -68,7 +68,7 @@ if(!isset($_GET['pccGUID'])){
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
 	$settings['gpcus'] = Array('title'=>"GP by customer",
 						'sqlBase' => "SELECT common_db.fn_parentl2(customer) as optValue, 
-											(SELECT cntTitle FROM common_db.tbl_counterparty WHERE cntID=common_db.fn_parentl2(customer)) as optText, 
+											common_db.fn_parentl2_title(customer) as optText, 
 											{$sqlActual} as Actual, 
 											0 as Budget, 
 											{$sqlActual} as Diff
@@ -79,7 +79,7 @@ if(!isset($_GET['pccGUID'])){
 									GROUP BY common_db.fn_parentl2(customer)
 									UNION ALL
 									SELECT common_db.fn_parentl2(customer) as optValue, 
-									(SELECT cntTitle FROM common_db.tbl_counterparty WHERE cntID=common_db.fn_parentl2(customer)) as optText, 
+									common_db.fn_parentl2_title(customer)as optText, 
 									0 as Actual, 
 									{$sqlBudget}  as Budget, 
 									-{$sqlBudget} as Diff
