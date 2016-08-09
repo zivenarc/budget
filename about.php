@@ -68,7 +68,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM vw_master 
-								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+								##LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE scenario='{$oBudget->id}' 
 									AND account IN ('J00400', 'J00802')
 									{$sqlActivityFilter}
@@ -79,7 +79,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 											0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 
-								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+								##LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE
 								scenario='{$oReference->id}' 
 									AND source<>'Estimate' 
