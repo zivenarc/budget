@@ -62,8 +62,8 @@ $period_type = 'cm';
 $sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
 $sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
 $settings['gpcus'] = Array('title'=>"GP by customer",
-					'sqlBase' => "SELECT IF(C.cntParentID<>723,C.cntParentID, C.cntID) as optValue, 
-										IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 
+					'sqlBase' => "SELECT common_db.fn_parentl2(customer) as optValue, 
+											common_db.fn_parentl2_title(customer) as optText,  
 										{$sqlActual} as Actual, 
 										0 as Budget, 
 										{$sqlActual} as Diff
@@ -72,9 +72,11 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								WHERE scenario='{$oBudget->id}' 
 									AND account IN ('J00400', 'J00802')
 									{$sqlActivityFilter}
-								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
+								GROUP BY common_db.fn_parentl2(customer)
 								UNION ALL
-								SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 0 as Actual, 
+								SELECT common_db.fn_parentl2(customer) as optValue, 
+											common_db.fn_parentl2_title(customer) as optText,  
+											0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
@@ -83,7 +85,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 									AND source<>'Estimate' 
 									AND account IN ('J00400', 'J00802')
 									{$sqlActivityFilter}
-								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
+								GROUP BY common_db.fn_parentl2(customer)",
 						'tolerance'=>0.05,
 						'denominator'=>$denominator,
 						'limit'=>10);	
