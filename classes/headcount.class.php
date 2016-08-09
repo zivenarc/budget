@@ -824,7 +824,7 @@ class Headcount extends Document{
 					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090 AND DATEDIFF(rsgDateEnd,'".date('Y-m-d',$oBudget->date_start)."')>0) as empEndDate
 					FROM vw_employee_select 
 					WHERE empProfitID={$this->pc->code}
-						AND empFlagDeleted=0 AND (empEndDate IS NULL OR empEndDate > '".date('Y-m-d',$oBudget->date_start)."')
+						AND empFlagDeleted=0 AND (empEndDate IS NULL OR DATEDIFF(empEndDate,'".date('Y-m-d',$oBudget->date_start)."')>=0)
 					ORDER BY empSalary DESC, empFunctionGUID, empTitleLocal";//die($sql);
 					
 		// echo $sql;
