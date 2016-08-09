@@ -47,7 +47,7 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 				FROM common_db.tbl_employee
 				WHERE empStartDate <= @repDateEnd 
 				AND (empEndDate IS NULL OR empEndDate >=@repDateStart) 
-				AND empFlagDeleted=0
+				##AND empFlagDeleted=0
 				AND empSalary>0;";
 	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_vacation 
 				SET salary=0 
