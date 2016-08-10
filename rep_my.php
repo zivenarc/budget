@@ -48,21 +48,7 @@ $oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$c
 if (strpos($oBudget->type,'FYE')!==false){
 	$oReport->monthlyReport($type);
 } else {
-	switch ($type){
-		case 'activity':		
-			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity'));	
-			break;
-		case 'ghq':
-			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
-			break;		
-		case 'pc':
-			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'pc','field_title'=>'Profit','title'=>'PC'));	
-			break;	
-		case 'customer':
-		default:			
-			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'customer','field_title'=>'Customer_name','title'=>'Customer'));
-			break;
-	}
+	$oReport->periodicPnL($sqlWhere,$type);
 
 	?>
 	<h2>KPI</h2>

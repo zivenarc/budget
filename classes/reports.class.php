@@ -934,7 +934,32 @@ class Reports{
 		
 	}
 	
-	public function periodicPnL($sqlWhere, $params = Array('field_data','field_title','title','yact'=>false)){
+	public function periodicPnL($sqlWhere, $type='ghq'){ //$params = Array('field_data','field_title','title','yact'=>false)){
+		
+		switch ($type){
+			case 'activity':		
+				$params = Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity');	
+				break;
+			case 'ghq':
+				$params = Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ');	
+				break;
+			case 'sales':			
+				$params = Array('field_data'=>'sales','field_title'=>'usrTitle','title'=>'Responsible');	
+				break;
+			case 'bdv':			
+				$params = Array('field_data'=>'bdv','field_title'=>'bdvTitle','title'=>'Selling unit');	
+				break;
+			case 'pc':			
+				$params = Array('field_data'=>'pc','field_title'=>'Profit','title'=>'PC');	
+				break;
+			case 'customer':
+				$params = Array('field_data'=>'customer','field_title'=>'Customer_name','title'=>'Customer');
+				break;
+			case 'customer_group':
+			default:			
+				$params = Array('field_data'=>'customer_group_code','field_title'=>'customer_group_title','title'=>'Customer group');
+				break;
+		};		
 		
 		$strFields_this = $this->_getMonthlyFields();
 		$strFields_last = $this->_getMonthlyFields('last');
@@ -1232,8 +1257,8 @@ class Reports{
 				$strGroupTitle = 'Customer';
 				break;
 			case 'customer_group':
-				$sqlMeasure = "CASE WHEN Customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN Customer_name ELSE Customer_group_title END as 'Level1_title'
-						, CASE WHEN Customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN customer ELSE Customer_group_code END as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$sqlMeasure = "CASE WHEN customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN Customer_name ELSE customer_group_title END as 'Level1_title'
+						, CASE WHEN customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN customer ELSE customer_group_code END as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
 				$strGroupTitle = 'Customer group';
 				break;
 			case 'sales':
@@ -1318,8 +1343,8 @@ class Reports{
 				$strGroupTitle = 'Customer';
 				break;
 			case 'customer_group':
-				$sqlMeasure = "CASE WHEN Customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN Customer_name ELSE Customer_group_title END as 'Level1_title'
-						, CASE WHEN Customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN customer ELSE Customer_group_code END as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$sqlMeasure = "CASE WHEN customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN Customer_name ELSE customer_group_title END as 'Level1_title'
+						, CASE WHEN customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN customer ELSE customer_group_code END as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
 				$strGroupTitle = 'Customer group';
 				break;
 			case 'sales':
@@ -2000,26 +2025,26 @@ class Reports{
 		$strFields = self::_getMRFields(643);
 		
 		
-		$sql = "SELECT customer,cntTitle, Customer_group_code,Customer_group_title, 
+		$sql = "SELECT customer,cntTitle, customer_group_code,customer_group_title, 
 					{$strFields['actual']}
 			FROM `vw_sales`			
 			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND source='Actual'
 			GROUP BY customer
 			UNION ALL
-			SELECT customer,cntTitle, Customer_group_code,Customer_group_title, 
+			SELECT customer,cntTitle, customer_group_code,customer_group_title, 
 					{$strFields['next']}
 			FROM `vw_sales`			
 			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1
 			GROUP BY customer
 			UNION ALL
-				SELECT customer,cntTitle, Customer_group_code,Customer_group_title , 
+				SELECT customer,cntTitle, customer_group_code,customer_group_title , 
 				{$strFields['budget']}
 			FROM `vw_sales`				
 			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND kpi=1 AND posted=1 
 			GROUP BY customer
 			ORDER BY customer";
 			
-		$sql = "SELECT cntTitle, CASE WHEN Customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN cntTitle ELSE CONCAT('&#x1F4C2;',Customer_group_title) END as 'Customer_name',
+		$sql = "SELECT cntTitle, CASE WHEN customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN cntTitle ELSE CONCAT('&#x1F4C2;',customer_group_title) END as 'Customer_name',
 					SUM(CM_A) as CM_A,
 					SUM(CM_B) as CM_B,
 					SUM(YTD_A) as YTD_A,

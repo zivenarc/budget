@@ -31,7 +31,7 @@ $sqlWhere = "WHERE `item` IN ($strItems)";
 ?>
 <div id='report_content'>
 <?php
-$oReport->periodicPnL($sqlWhere,Array('field_data'=>'pc','field_title'=>'Profit','title'=>'PC'));	
+$oReport->periodicPnL($sqlWhere,'pc');	
 ?>
 </div>
 <?php
