@@ -471,7 +471,7 @@ class Reports{
 				if ($rw['responsible']!=$responsible){
 					?>
 					<tr>
-						<th colspan="21">By <a target="sales_report" href="rep_my.php?usrID=<?php echo $rw['sales'];?>"><?php echo $rw['responsible'];?></a></th>
+						<th colspan="21">By <a target="sales_report" href="rep_my.php?ownerID=<?php echo $rw['sales'];?>"><?php echo $rw['responsible'];?></a></th>
 					</tr>
 					<?php 
 				}				
@@ -1257,8 +1257,8 @@ class Reports{
 				$strGroupTitle = 'Customer';
 				break;
 			case 'customer_group':
-				$sqlMeasure = "CASE WHEN customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN Customer_name ELSE customer_group_title END as 'Level1_title'
-						, CASE WHEN customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN customer ELSE customer_group_code END as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
+				$sqlMeasure = "customer_group_title as 'Level1_title'
+						, customer_group_code as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
 				$strGroupTitle = 'Customer group';
 				break;
 			case 'sales':

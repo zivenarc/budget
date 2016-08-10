@@ -71,29 +71,27 @@ if(!isset($_GET['prtGHQ'])){
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
 	
 	$settings['gpcus'] = Array('title'=>"GP by customer",
-						'sqlBase' => "SELECT IF(C.cntParentID<>723,C.cntParentID, C.cntID) as optValue, 
-											IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 
+						'sqlBase' => "SELECT customer_group_code as optValue, 
+											customer_group_title as optText,  
 											{$sqlActual} as Actual, 
 											0 as Budget, 
 											{$sqlActual} as Diff
 									FROM vw_master 
-									LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 									{$sqlWhere}
 										AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
-									GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
+									GROUP BY customer_group_code
 									UNION ALL
-									SELECT IF(C.cntParentID<>723,C.cntParentID,C.cntID), 
-									IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 
+									SELECT customer_group_code as optValue, 
+											customer_group_title as optText,  
 									0 as Actual, 
 									{$sqlBudget}  as Budget, 
 									-{$sqlBudget} as Diff
 									FROM vw_master 
-									LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 									{$sqlWhere}
 										AND scenario='{$oReference->id}' 
 										AND source<>'Estimate' 
 										AND account IN ('J00400', 'J00802')										
-									GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
+									GROUP BY customer_group_code",
 							'tolerance'=>0.05,
 							'limit'=>10);	
 	
