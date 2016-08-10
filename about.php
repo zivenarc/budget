@@ -62,8 +62,8 @@ $period_type = 'cm';
 $sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
 $sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
 $settings['gpcus'] = Array('title'=>"GP by customer",
-					'sqlBase' => "SELECT common_db.fn_parentl2(customer) as optValue, 
-											common_db.fn_parentl2_title(customer) as optText,  
+					'sqlBase' => "SELECT customer_group_code as optValue, 
+											customer_group_title as optText,  
 										{$sqlActual} as Actual, 
 										0 as Budget, 
 										{$sqlActual} as Diff
@@ -72,10 +72,10 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								WHERE scenario='{$oBudget->id}' 
 									AND account IN ('J00400', 'J00802')
 									{$sqlActivityFilter}
-								GROUP BY common_db.fn_parentl2(customer)
+								GROUP BY customer_group_code
 								UNION ALL
-								SELECT common_db.fn_parentl2(customer) as optValue, 
-											common_db.fn_parentl2_title(customer) as optText,  
+								SELECT customer_group_code as optValue, 
+											customer_group_title as optText,  
 											0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 
@@ -85,7 +85,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 									AND source<>'Estimate' 
 									AND account IN ('J00400', 'J00802')
 									{$sqlActivityFilter}
-								GROUP BY common_db.fn_parentl2(customer)",
+								GROUP BY customer_group_code",
 						'tolerance'=>0.05,
 						'denominator'=>$denominator,
 						'limit'=>10);	

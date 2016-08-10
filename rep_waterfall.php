@@ -52,23 +52,23 @@ $sqlActual = "SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).")/{$d
 $sqlBudget = "SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
 
 $settings['gpcus'] = Array('title'=>"GP by customer",
-					'sqlBase' => "SELECT common_db.fn_parentl2(customer) as optValue, 
-											common_db.fn_parentl2_title(customer) as optText,
+					'sqlBase' => "SELECT customer_group_code as optValue, 
+											customer_group_title as optText,
 										{$sqlActual} as Actual, 
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM vw_master 								
 								WHERE scenario='{$actual}' ".Reports::GP_FILTER."
-								GROUP BY common_db.fn_parentl2(customer)
+								GROUP BY customer_group_code
 								UNION ALL
-								SELECT common_db.fn_parentl2(customer) as optValue, 
-											common_db.fn_parentl2_title(customer) as optText, 
+								SELECT customer_group_code as optValue, 
+											customer_group_title as optText, 
 											0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 								
 								WHERE
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
-								GROUP BY common_db.fn_parentl2(customer)",
+								GROUP BY customer_group_code",
 						'tolerance'=>0.05,
 						'limit'=>10);
 

@@ -46,6 +46,7 @@ class sales_record extends table_record{
 			$arrRes[] = "`source`='".$this->source."'";
 			$arrRes[] = "`scenario`='".$this->scenario."'";
 			$arrRes[] = "`customer`=".(integer)$this->customer;
+			$arrRes[] = "`customer_group_code`=common_db.fn_parentl2(".(integer)$this->customer.")";
 			$arrRes[] = "`comment`=".$oSQL->e($this->comment);
 			$arrRes[] = "`product`=".(integer)$this->product;
 			$arrRes[] = "`selling_rate`=".(double)$this->selling_rate;
@@ -56,6 +57,7 @@ class sales_record extends table_record{
 			$arrRes[] = "`unit`='".$oProduct->unit."'";
 			$arrRes[] = "`formula`=".$oSQL->e($this->formula);
 			$arrRes[] = "`sales`=".$oSQL->e($this->sales);
+			$arrRes[] = "`bdv`=(SELECT usrProfitID FROM stbl_user WHERE usrID=".$oSQL->e($this->sales).")";
 			$arrRes[] = "`route`=".($this->route?(integer)$this->route:'NULL');
 			$arrRes[] = "`kpi`=".(integer)$this->kpi;
 			$arrRes[] = "`hbl`=".(integer)$this->hbl;

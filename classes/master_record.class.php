@@ -57,10 +57,11 @@ class master_record{
 		$arrRes[] = "`source`='".$this->source."'";
 		$arrRes[] = "`scenario`='".$this->scenario."'";
 		$arrRes[] = "`customer`=".($this->customer?(integer)$this->customer:'NULL');
+		$arrRes[] = "`customer_group_code`="($this->customer?"`common_db`.`fn_parentl2`(".(integer)$this->customer.")":'NULL');
 		$arrRes[] = "`activity`=".($this->activity?(integer)$this->activity:'NULL');
 		$arrRes[] = "`part_type`=".($this->part_type?$oSQL->e($this->part_type):'NULL');
 		$arrRes[] = "`particulars`=".$oSQL->e($this->particulars);
-		$arrRes[] = "`sales`=".($this->sales?$oSQL->e($this->sales):'NULL');
+		$arrRes[] = "`sales`=".($this->sales?$oSQL->e($this->sales):'NULL');		
 		//$arrRes[] = "`part_type`=".(is_object($this->particulars['obj'])?"'".$this->particulars['obj']->TYPE."'":'NULL');
 		$res = "INSERT INTO `reg_master` SET ". implode(',',$arrRes).';';
 		return $res;
