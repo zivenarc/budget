@@ -39,13 +39,7 @@ switch ($_POST['DataAction']){
 			$arrJS[]='js/rep_pnl.js';
 			// $arrJS[]='js/input_form.js';	
 			
-			$arrActions[] = Array ('title'=>'By customer group','action'=>"?type=customer_group");
-			$arrActions[] = Array ('title'=>'By customer','action'=>"?type=customer");
-			$arrActions[] = Array ('title'=>'By activity','action'=>"?type=activity");
-			$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
-			$arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");	
-			$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");	
-			$arrActions[] = Array ('title'=>'By BDV dept','action'=>"?type=bdv");	
+			include('includes/inc_group_buttons.php');
 			
 			?>
 				<script>

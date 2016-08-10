@@ -1,15 +1,15 @@
 <?php
-// $flagNoAuth = true;
+$flagNoAuth = true;
 // $arrUsrData['usrID'] = 'ZHAROVA';
 
 require ('common/auth.php');
 
 
-$ownerID = isset($_GET['ownerID'])?$_GET['ownerID']:($_COOKIE['ownerID']?$_COOKIE['ownerID']:$arrUsrData['usrID']);
-if ($_GET['ownerID']=='MYSELF'){
-	$ownerID = $arrUsrData['usrID'];
+$bdv = isset($_GET['bdv'])?$_GET['bdv']:($_COOKIE['bdv']?$_COOKIE['bdv']:$arrUsrData['usrID']);
+if ($_GET['bdv']=='MYSELF'){
+	$bdv = $arrUsrData['usrProfitID'];
 }
-SetCookie('ownerID',$ownerID,0);
+SetCookie('bdv',$bdv,0);
 
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
@@ -28,10 +28,10 @@ if(isset($currency)){
 		echo '<h2>',$rw["curTitle$strLocal"],'</h2>';
 }
 
-$sql = "SELECT * FROM stbl_user WHERE usrID=".$oSQL->e($ownerID);
+$sql = "SELECT * FROM common_db.tbl_profit WHERE pccID=".$oSQL->e($bdv);
 $rs = $oSQL->q($sql);
 $rw = $oSQL->f($rs);
-$arrUsrData["pagTitle$strLocal"] = 'Sales by '.($rw['usrTitle']?$rw['usrTitle']:'<Unknown>');
+$arrUsrData["pagTitle$strLocal"] = 'Sales by '.($rw['pccTitle']?$rw['pccTitle']:'<Unknown>');
 	
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
@@ -40,10 +40,10 @@ echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 ?>
 <div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 <?php
-$sqlWhere .= "WHERE sales = ".$oSQL->e($ownerID);
+$sqlWhere .= "WHERE bdv = ".$oSQL->e($bdv);
 
 
-$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>Array('sales'=>$ownerID)));
+$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>Array('bdv'=>$bdv)));
 
 if (strpos($oBudget->type,'FYE')!==false){
 	$oReport->monthlyReport($type);
@@ -67,10 +67,8 @@ if (strpos($oBudget->type,'FYE')!==false){
 	?>
 	<h2>KPI</h2>
 	<?php
-	$oReport->salesByCustomer(' and sales='.$oSQL->e($ownerID));
+	$oReport->salesByCustomer(' and bdv='.$oSQL->e($bdv));
 }
-
-include ('includes/inc_subordinates.php');
 
 include ('includes/inc-frame_bottom.php');
 ?>
