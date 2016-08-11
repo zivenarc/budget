@@ -705,6 +705,41 @@ class Budget{
 					AND customer ={$cntID}";
 	}
 	
+	function delete(){
+		GLOBAL $oSQL;
+		$sql = "SELECT entPrefix, entTable, entRegister FROM stbl_entity";
+		$rs = $oSQL->q($sql);
+		
+		$sqlAction = Array();
+		$sqlAction[] = "DELETE FROM tbl_scenario_variable WHERE scvScenarioID='{$this->id}';";
+		$sqlAction[] = "DELETE FROM reg_master WHERE scenario='{$this->id}';";
+		$sqlAction[] = "DELETE FROM reg_profit_ghq WHERE scenario='{$this->id}';";
+		
+		
+		while ($rw = $oSQL->f($rs)){
+			$sqlAction[] = "DELETE FROM `{$rw['entTable']}` WHERE `{$rw['entPrefix']}Scenario`='{$this->id}';";
+			$sqlAction[] = "DELETE FROM `{$rw['entRegister']}` WHERE `scenario`='{$this->id}';";
+		}
+		
+		$sql = "SELECT guid FROM vw_journal WHERE scenario='{$this->id}';";
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){
+			$sqlAction[] = "DELETE FROM stbl_action_log WHERE aclGUID='{$rw['guid']}';";
+		}
+		
+		$sqlAction[] = "DELETE FROM tbl_scenario WHERE scnID='{$this->id}';";
+		
+		$sqlAction[] = "COMMIT;";
+		
+		for ($i=0;$i<count($sqlAction);$i++){
+			echo '<pre>',$sqlAction[$i],'</pre>';
+			$rs = $oSQL->q($sqlAction[$i]);
+			echo "<pre style='color:red;'>## Affected rows - ",$oSQL->affected_rows,'</pre>';
+		}
+		
+		return (true);
+	}
+	
 }
 
 ?>

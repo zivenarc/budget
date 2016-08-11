@@ -5,6 +5,11 @@ include ('classes/budget.class.php');
 if ($_GET['tab']){
 $oBudget = new Budget($_GET['tab']);
 
+if ($_GET['DataAction']=='delete'){
+	$oBudget->delete();
+	die();
+}
+
 switch ($_POST['DataAction']){
 	case 'readonly':
 		$oBudget->readOnly(true);
@@ -17,7 +22,7 @@ switch ($_POST['DataAction']){
 		break;
 	case 'unarchive':
 		$oBudget->archive(false);
-		break;
+		break;	
 	default:
 		//do nothing
 		break;
