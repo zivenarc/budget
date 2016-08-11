@@ -195,7 +195,7 @@ class Reports{
 				JOIN tbl_sales ON salGUID=source
 				{$sqlWhere} 
 					AND salBO=714
-					AND posted=1 AND kpi=1 AND activity IN (48,63) AND scenario='{$this->oBudget->id}'
+					AND activity IN (48,63) AND scenario='{$this->oBudget->id}'
 				GROUP BY activity";
 		$rs = $this->oSQL->q($sql); 
 		$tableID = "kpi_".md5($sql);
@@ -2207,9 +2207,9 @@ class Reports{
 						0 as YTD_B, 
 						{$sqlNM} as NM_A , 
 						0 as NM_B,
-						0 as ROY_A,
+						SUM(".$this->oBudget->getYTDSQL($nCurrent+1,12+$this->oBudget->offset,$arrRates).")/{$denominator} as ROY_A,
 						0 as ROY_B,
-						0 as FYE_A,
+						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates).")/{$denominator} as FYE_A,
 						0 as FYE_B";
 		$res['budget'] = "0 as CM_A, 
 						SUM(`{$cm}`)/{$arrRates[$cm]}/{$denominator} as CM_B,								
@@ -2667,25 +2667,27 @@ class Reports{
 			$sql = "SELECT activity, unit, prtTitle,
 						{$strFields['actual']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND unit<>'' AND source='Actual'
+				{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND source='Actual'
 				GROUP BY activity, unit
 				UNION ALL
 				SELECT activity, unit, prtTitle, 
 						{$strFields['next']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND unit<>'' 
+				{$sqlWhere}  AND scenario='{$strFields['from_a']}'  
 				GROUP BY activity, unit
 				UNION ALL
 					SELECT activity, unit, prtTitle,
 					{$strFields['budget']}
 				FROM `vw_sales`				
-				{$sqlWhere} AND scenario='{$strFields['from_b']}' AND kpi=1 AND posted=1 AND unit<>'' 
+				{$sqlWhere} AND scenario='{$strFields['from_b']}' 
 				GROUP BY activity, unit
-				ORDER BY activity, unit";
+				";
 				
 			$sql = self::_unionMRQueries($sql,"`prtTitle`, `activity`, `unit`",'', $arrUnion);
 			
+			// echo '<pre>',$sql,'</pre>';
 			$rs = $this->oSQL->q($sql);
+			
 			if ($this->oSQL->n($rs)){
 				?>
 				<tr><th colspan="14">Operational KPIs</th></tr>				
