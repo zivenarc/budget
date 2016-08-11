@@ -146,15 +146,15 @@ if(!isset($_GET['pccGUID'])){
 	$oWF->draw();
 	
 	$settings['nextCosts'] = Array('title'=>"Costs, next month changes",
-						'sqlBase' => "SELECT  IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
-											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
+						'sqlBase' => "SELECT  IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
+											IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
 											{$sqlActual} as Actual, 
 											{$sqlBudget} as Budget, 
 											({$sqlActual}-{$sqlBudget}) as Diff
 									FROM vw_master 
 									{$sqlWhere}
 										AND  scenario='{$oBudget->id}' AND account NOT IN ('J00400', 'J00802') AND account NOT LIKE 'SZ%'
-									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)",
+									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
 							'denominator'=>$denominator,
 							'budget_title'=>'This month',
 							'actual_title'=>'Next month',
