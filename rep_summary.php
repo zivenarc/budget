@@ -88,6 +88,7 @@ if(!isset($_GET['pccGUID'])){
 										AND source<>'Estimate' 
 										AND account IN ('J00400', 'J00802')										
 									GROUP BY customer_group_code",
+							'denominator'=>$denominator,
 							'tolerance'=>0.05,
 							'limit'=>10);	
 	
@@ -116,6 +117,7 @@ if(!isset($_GET['pccGUID'])){
 										AND source<>'Estimate' 	
 										AND account NOT LIKE 'SZ%'										
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)",
+							'denominator'=>$denominator,
 							'tolerance'=>0.05,
 							'limit'=>10);
 	
