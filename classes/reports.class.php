@@ -581,29 +581,37 @@ class Reports{
 		$denominator = 1000;
 		ob_start();
 			
-			$sqlSelect = "SELECT prtGHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pc, pccTitle,pccTitleLocal , wc,
-						".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
-						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
-					FROM `reg_headcount`
-					LEFT JOIN vw_function ON funGUID=function
-					LEFT JOIN common_db.tbl_profit ON pccID=pc
-					LEFT JOIN vw_product_type ON prtID=IFNULL(activity, pccProductTypeID)
-					LEFT JOIN vw_location ON locID=location
-					{$sqlWhere} 
-					AND posted=1 AND active=1 AND salary>10000";
+			// $sqlSelect = "SELECT prtGHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pc, pccTitle,pccTitleLocal , wc,
+						// ".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
+						// SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
+					// FROM `reg_headcount`
+					// LEFT JOIN vw_function ON funGUID=function
+					// LEFT JOIN common_db.tbl_profit ON pccID=pc
+					// LEFT JOIN vw_product_type ON prtID=IFNULL(activity, pccProductTypeID)
+					// LEFT JOIN vw_location ON locID=location
+					// {$sqlWhere} 
+					// AND posted=1 AND active=1 AND salary>10000";
+			
+				$sqlSelect = "SELECT prtGHQ, Location, Activity, funTitle, funTitleLocal, pc, pccTitle, pccTitleLocal , wc,
+				".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
+				SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(Q1) as Q1, SUM(Q2) as Q2, SUM(Q3) as Q3, SUM(Q4) as Q4, SUM(Q5) as Q5
+			FROM `vw_headcount`			
+			{$sqlWhere} 
+				AND salary>10000";
 			
 			$sql = $sqlSelect." GROUP BY `prtGHQ`,wc
 					ORDER BY prtRHQ,wc";
 			try {
 				$rs = $oSQL->q($sql);
+				if (!$oSQL->num_rows($rs)){
+					echo "<div class='warning'>No data found</div>";
+				return (false);
+				}
 			} catch (Exception $e) {
-				echo '<pre>',$sql,'</pre>';
+				echo  "<div class='error'>SQL error</div>",'<pre>',$sql,'</pre>';
 			};
 			
-			if (!$oSQL->num_rows($rs)){
-				echo "<div class='warning'>No data found</div>";
-				return (false);
-			}
+
 			
 			$tableID = md5($sql);
 			
@@ -640,7 +648,7 @@ class Reports{
 				self::_renderHeadcountArray($rw, Array('location'=>$rw['location']));
 				
 			}
-			$sql = $sqlSelect." GROUP BY `function` ORDER BY funRHQ, funFlagWC";
+			$sql = $sqlSelect." GROUP BY `function` ORDER BY funRHQ, wc";
 			$rs = $oSQL->q($sql);			
 			?>
 			<tr><th>Function</th><?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?><th class='budget-ytd'>Average</th></tr>
