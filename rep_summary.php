@@ -64,8 +64,8 @@ if(!isset($_GET['pccGUID'])){
 	<div>
 	<?php
 	$period_type = 'cm';
-	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
-	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
+	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
+	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	$settings['gpcus'] = Array('title'=>"GP by customer",
 						'sqlBase' => "SELECT  customer_group_code as optValue, 
 											customer_group_title as optText,  
