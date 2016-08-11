@@ -59,7 +59,13 @@ if(!isset($_GET['pccGUID'])){
 		}
 		$sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
 	} else {
-		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
+		
+		$sql = "SELECT pccID FROM common_db.tbl_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID'])." LIMIT 1";
+		$rs = $oSQL->q($sql);
+		$pccID = $oSQL->get_data($rs);
+		$filter['pc']=$pccID;
+	
+		$sqlWhere = "WHERE pc='{$pccID}'";
 	}
 	
 	if ($_GET['nowh']){

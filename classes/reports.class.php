@@ -14,6 +14,7 @@ class Reports{
 	const OP_FILTER = "AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%') ";	
 	const GP_FILTER = "AND account IN ('J00400', 'J00802') ";
 	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';
+	const SALARY_THRESHOLD = 10000;
 	
 	function __construct($params){
 		
@@ -584,7 +585,7 @@ class Reports{
 			// $sqlSelect = "SELECT prtGHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pc, pccTitle,pccTitleLocal , wc,
 						// ".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
 						// SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
-					// FROM `reg_headcount`
+					// FROM `vw_headcount`
 					// LEFT JOIN vw_function ON funGUID=function
 					// LEFT JOIN common_db.tbl_profit ON pccID=pc
 					// LEFT JOIN vw_product_type ON prtID=IFNULL(activity, pccProductTypeID)
@@ -1829,6 +1830,7 @@ class Reports{
 		$sqlWhere = $this->sqlWhere;
 		
 		$strFields = self::_getMRFields($currency);
+		$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
 		
 		$sqlGroup = "`Budget item`, `item`, `Group`, `Group_code`";
 		$sqlOrder = "`Group`, `itmOrder` ASC";
@@ -1931,21 +1933,21 @@ class Reports{
 		//------- KPIs -----------------
 		
 		$sql = "SELECT activity, unit, 
-					{$strFields['actual']}
+					{$strFieldsKPI['actual']}
 			FROM `reg_sales`			
-			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND source='Actual'
+			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND kpi=1 AND posted=1 AND source='Actual'
 			GROUP BY activity, unit
 			UNION ALL
 			SELECT activity, unit, 
-					{$strFields['next']}
+					{$strFieldsKPI['next']}
 			FROM `reg_sales`			
-			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1
+			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND kpi=1 AND posted=1
 			GROUP BY activity, unit
 			UNION ALL
 				SELECT activity, unit, 
-				{$strFields['budget']}
+				{$strFieldsKPI['budget']}
 			FROM `reg_sales`				
-			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND kpi=1 AND posted=1 
+			{$sqlWhere} AND scenario='{$strFieldsKPI['from_b']}' AND kpi=1 AND posted=1 
 			GROUP BY activity, unit
 			ORDER BY activity, unit";
 			
@@ -1978,29 +1980,48 @@ class Reports{
 			}
 		}
 		//------- Headcount -----------------
+		$this->_getMRHeadcount($sqlWhere);
 		
-		echo '<tr><th colspan="14">Headcount</th></tr>';
+	}
+	
+	private function _getMRHeadcount($sqlWhere, $type='collars'){
 		
-		$sql = "SELECT  wc, 
-					{$strFields['actual']}
-			FROM `reg_headcount`			
-			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND posted=1 AND source='Actual' AND salary>50
-			GROUP BY  wc
+		$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
+		?>
+		<tr><th colspan="14">Headcount</th></tr>
+		<?php
+		
+		switch($type){
+			case 'funRHQ':
+				$field = "IF(funRHQ='',funTitleLocal, funRHQ)";
+				$groupBy = "IF(funRHQ='',funTitleLocal, funRHQ)";	
+				break;
+			default:
+				$field = "IF(`wc`=1,'White collars','Blue collars')";
+				$groupBy = 'wc';
+				break;
+		}
+		
+		$sql = "SELECT  {$field} as `Budget item`, 
+					{$strFieldsKPI['actual']}
+			FROM `vw_headcount`			
+			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND source='Actual' AND salary>".self::SALARY_THRESHOLD."
+			GROUP BY  {$groupBy}
 			UNION ALL
-			SELECT  wc, 
-					{$strFields['next']}
-			FROM `reg_headcount`			
-			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND posted=1 AND salary>50
-			GROUP BY  wc
+			SELECT   {$field}, 
+					{$strFieldsKPI['next']}
+			FROM `vw_headcount`			
+			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}'  AND salary>".self::SALARY_THRESHOLD."
+			GROUP BY  {$groupBy}
 			UNION ALL
-				SELECT  wc, 
-				{$strFields['budget']}
-			FROM `reg_headcount`				
-			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND posted=1  AND salary>50
-			GROUP BY  wc
-			ORDER BY  wc";
+				SELECT   {$field}, 
+				{$strFieldsKPI['budget']}
+			FROM `vw_headcount`				
+			{$sqlWhere} AND scenario='{$strFieldsKPI['from_b']}' AND salary>".self::SALARY_THRESHOLD."
+			GROUP BY  {$groupBy}
+			";
 			
-		$sql = "SELECT  wc, 
+		$sql = "SELECT  `Budget item`, 
 					SUM(CM_A) as CM_A,
 					SUM(CM_B) as CM_B,
 					SUM(YTD_A) as YTD_A,
@@ -2008,18 +2029,24 @@ class Reports{
 					SUM(NM_A) as NM_A,
 					SUM(NM_B) as NM_B					
 				FROM ($sql) U	
-				GROUP BY wc
-				ORDER BY wc";
+				GROUP BY `Budget item`
+				ORDER BY `Budget item`";
 		// echo '<pre>',$sql,'</pre>';
 		
 		$cm = date('n',$this->oBudget->date_start - 1);
 		
-		$rs = $oSQL->q($sql);
-		while ($rw = $oSQL->f($rs)){			
-			$rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
+		$rs = $this->oSQL->q($sql);
+		if (!$this->oSQL->n($rs)){
+			echo '<pre>',$sql,'</pre>';
+		}
+		while ($rw = $this->oSQL->f($rs)){			
+			// $rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
 			
 			$rw['YTD_A'] = $rw['YTD_A']/($cm-$this->oBudget->offset);
 			$rw['YTD_B'] = $rw['YTD_B']/($cm-$this->oBudget->offset);
+			
+			$rw['ROY_A'] = $rw['ROY_A']/(12-($cm-$this->oBudget->offset));
+			$rw['ROY_B'] = $rw['ROY_B']/(12-($cm-$this->oBudget->offset));
 			
 			$this->echoBudgetItemString($rw);
 		}
@@ -2490,6 +2517,7 @@ class Reports{
 		$sqlWhere = $this->sqlWhere;
 
 		$strFields = self::_getMRFields();
+		$strFieldsKPI = self::_getMRFields(643);
 		
 		//$sqlGroup = "GROUP BY `item`";
 		
@@ -2584,7 +2612,7 @@ class Reports{
 			$this->echoBudgetItemString($rw, 'budget-subtotal');
 		}
 		
-		if (!($this->filter['prtGHQ'])){
+		if (!($this->filter['activity'])){
 			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '5%' AND (pccFlagProd=1 OR pc IN(9,130)))", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
@@ -2673,6 +2701,11 @@ class Reports{
 				}
 			}
 		}
+		
+		$this->_getMRHeadcount($sqlWhere);
+		$this->_getMRHeadcount($sqlWhere,'funRHQ');
+		
+		
 		?>
 		</tbody>
 		</table>

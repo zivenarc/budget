@@ -33,25 +33,33 @@ if(!isset($_GET['prtGHQ'])){
 	if ($_GET['prtGHQ']=='all'){
 		$sqlWhere = " WHERE TRUE";
 		// $filter = Array();
-	} elseif ($_GET['prtGHQ']=='OFF') {
-		$sqlWhere = " WHERE prtGHQ IN ('Ocean import','Ocean export')";
+	} else {
+		if ($_GET['prtGHQ']=='OFF') {
+		$sqlWhereP = " WHERE prtGHQ IN ('Ocean import','Ocean export')";
 		$filter = Array('prtGHQ'=>Array('Ocean import','Ocean export'));
 		
-	} elseif ($_GET['prtGHQ']=='AFF') {
-		$sqlWhere = " WHERE prtGHQ IN ('Air import','Air export')";
-		$filter = Array('prtGHQ'=>Array('Air import','Air export'));
+		} elseif ($_GET['prtGHQ']=='AFF') {
+			$sqlWhereP = " WHERE prtGHQ IN ('Air import','Air export')";
+			$filter = Array('prtGHQ'=>Array('Air import','Air export'));
 
-	} else {
-		$sqlWhere = " WHERE prtGHQ=".$oSQL->e(urldecode($_GET['prtGHQ']));
-		$filter = Array('prtGHQ'=>urldecode($_GET['prtGHQ']));
+		} else {
+			$sqlWhereP = " WHERE prtGHQ=".$oSQL->e(urldecode($_GET['prtGHQ']));
+			$filter = Array('prtGHQ'=>urldecode($_GET['prtGHQ']));
+			
+		}
 		
-		$sql = "SELECT * FROM vw_product_type {$sqlWhere}";
+		$sql = "SELECT * FROM vw_product_type {$sqlWhereP}";
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){
-			$arrProducts[] = $rw['prtTitle'];
+			$arrProducts['title'][] = $rw['prtTitle'];
+			$arrProducts['id'][] = $rw['prtID'];
 		}
+		
+		$sqlWhere = "WHERE activity IN (".implode(',',$arrProducts['id']).")";
+		$filter = Array('activity'=>$arrProducts['id']);
+		
 		?>
-		<p><?php echo implode(', ',$arrProducts);?></p>
+		<p><?php echo implode(', ',$arrProducts['title']);?></p>
 		<?php
 	}
 	
@@ -66,6 +74,7 @@ if(!isset($_GET['prtGHQ'])){
 	?>	
 	<div>
 	<?php
+	die();
 	$period_type = 'fye';
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
@@ -138,16 +147,15 @@ if(!isset($_GET['prtGHQ'])){
 	$arrReport['other']['fye'] = $rw['Actual'];
 	$arrReport['total']['fye'] = $rw['Actual'];
 	
-	$sql = "SELECT IF(C.cntParentID<>723,C.cntParentID, C.cntID) as optValue, 
-						IF(C.cntParentID<>723,(SELECT P.cntTitle FROM common_db.tbl_counterparty P WHERE P.cntID=C.cntParentID),cntTitle) as optText, 
+	$sql = "SELECT customer_group_code as optValue, 
+						customer_group_title as optText,  
 						{$sqlActual} as Actual, 
 						0 as Budget, 
 						{$sqlActual} as Diff
-				FROM vw_master 
-				LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
+				FROM vw_master 				
 				{$sqlWhere}
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
-				GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
+				GROUP BY customer_group_code
 				ORDER BY Actual DESC
 				LIMIT 10";
 				

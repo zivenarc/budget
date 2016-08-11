@@ -21,12 +21,7 @@ if(!isset($_GET['pccGUID'])){
 	$arrJS[]='js/rep_pnl.js';
 	// $arrJS[]='js/input_form.js';	
 	
-	$arrActions[] = Array ('title'=>'By customer group','action'=>"?type=customer_group");
-	$arrActions[] = Array ('title'=>'By customer','action'=>"?type=customer");
-	$arrActions[] = Array ('title'=>'By activity','action'=>"?type=activity");
-	$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
-	$arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");
-	$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");
+	include('includes/inc_group_buttons.php');
 		
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
@@ -66,27 +61,7 @@ if(!isset($_GET['pccGUID'])){
 	// $sqlWhere .= " AND scenario='$budget_scenario'";
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator,'reference'=>$reference, 'yact'=>true));
 	
-	switch ($type){
-		case 'activity':		
-			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity'));	
-			break;
-		case 'ghq':
-			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ'));	
-			break;
-		case 'sales':			
-			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'sales','field_title'=>'usrTitle','title'=>'Responsible'));	
-			break;
-		case 'pc':			
-			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'pc','field_title'=>'Profit','title'=>'PC'));	
-			break;
-		case 'customer':
-			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'customer','field_title'=>'Customer_name','title'=>'Customer'));
-			break;
-		case 'customer_group':
-		default:			
-			$oReport->periodicPnL($sqlWhere,Array('field_data'=>'CASE WHEN Customer_group_code=723 THEN customer ELSE Customer_group_code END','field_title'=>'CASE WHEN Customer_group_code=723 THEN Customer_name ELSE Customer_group_title END','title'=>'Customer group'));
-			break;
-	}
+	$oReport->periodicPnL($sqlWhere,$type);	
 
 }
 

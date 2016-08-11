@@ -59,16 +59,15 @@ $oReport->shortMonthlyReport();
 <?php
 $period_type = 'cm';
 
-$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
-$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
-$settings['gpcus'] = Array('title'=>"GP by customer",
+$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
+$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
+$settings['gpcus'] = Array('title'=>"GP by customer, current month",
 					'sqlBase' => "SELECT customer_group_code as optValue, 
 											customer_group_title as optText,  
 										{$sqlActual} as Actual, 
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM vw_master 
-								##LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE scenario='{$oBudget->id}' 
 									AND account IN ('J00400', 'J00802')
 									{$sqlActivityFilter}
@@ -79,7 +78,6 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 											0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 
-								##LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE
 								scenario='{$oReference->id}' 
 									AND source<>'Estimate' 
