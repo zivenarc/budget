@@ -47,7 +47,7 @@ class Waterfall {
 
 		$rs = $oSQL->q($sql);
 		$baseData = $oSQL->f($rs);
-		$this->arrReport[] = Array('Budget',null,null,$baseData['Budget']/$this->denominator, 'budget-subtotal');
+		$this->arrReport[] = Array($this->budget_title,null,null,$baseData['Budget']/$this->denominator, 'budget-subtotal');
 		$this->arrChart[] = Array('Budget',0,0,(integer)$baseData['Budget'],(integer)$baseData['Budget'], $this->getTooltip('Budget',$baseData['Budget']));
 		$this->arrHSChart[] = Array('name'=>$this->budget_title,'y'=>(integer)$baseData['Budget'], 'color'=>'blue');
 		$diffBalance = $baseData['Diff'];
@@ -113,7 +113,7 @@ class Waterfall {
 							, $this->getTooltip('Other factors not included before',$diffBalance));
 			$this->arrHSChart[] = Array('name'=>'Other','y'=>(integer)$diffBalance);
 		}
-		$this->arrReport[] = Array('Actual',null, null, $baseData['Actual']/$this->denominator,'budget-subtotal');
+		$this->arrReport[] = Array($this->actual_title,null, null, $baseData['Actual']/$this->denominator,'budget-subtotal');
 		$this->arrChart[] = Array('Actual',0,0,(integer)$baseData['Actual'],(integer)$baseData['Actual'], $this->getTooltip('Actual',$baseData['Actual']));
 		$this->arrHSChart[] = Array('name'=>$this->actual_title,'y'=>(integer)$baseData['Actual'],'isSum'=>true, 'color'=>'blue');
 		
