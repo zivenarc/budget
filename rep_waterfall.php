@@ -69,9 +69,6 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 								GROUP BY customer_group_code",
 						'tolerance'=>0.05,
-						'denominator'=>$denominator,
-						'actual_title'=>_getPeriodTitle($oActual),
-						'budget_title'=>_getPeriodTitle($oBudget),
 						'limit'=>10);
 
 $settings['gpsal'] = Array('title'=>"GP by sales",
@@ -91,9 +88,6 @@ $settings['gpsal'] = Array('title'=>"GP by sales",
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 								GROUP BY sales",
 						'tolerance'=>0.05,
-						'denominator'=>$denominator,
-						'actual_title'=>_getPeriodTitle($oActual),
-						'budget_title'=>_getPeriodTitle($oBudget),
 						'limit'=>10);						
 						
 $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
@@ -117,9 +111,6 @@ $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 								AND pc NOT in (5,15)
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
 						'tolerance'=>0.05,
-						'denominator'=>$denominator,
-						'actual_title'=>_getPeriodTitle($oActual),
-						'budget_title'=>_getPeriodTitle($oBudget),
 						'limit'=>10);
 						
 $settings['gpbu'] = Array('title'=>"GP by business unit",
@@ -137,9 +128,6 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 			GROUP BY pc",
-			'denominator'=>$denominator,
-			'actual_title'=>_getPeriodTitle($oActual),
-			'budget_title'=>_getPeriodTitle($oBudget),
 			'tolerance'=>0.05
 			);
 
@@ -158,9 +146,6 @@ $settings['gpact'] = Array('title'=>"GP by activity",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 			GROUP BY activity",
-			'denominator'=>$denominator,
-			'actual_title'=>_getPeriodTitle($oActual),
-			'budget_title'=>_getPeriodTitle($oBudget),
 			'tolerance'=>0.1
 			);			
 			
@@ -179,10 +164,7 @@ $settings['opbu'] = Array('title'=>"OP by business unit",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::OP_FILTER."
 			GROUP BY pc",
-			'denominator'=>$denominator,
-			'actual_title'=>_getPeriodTitle($oActual),
-			'budget_title'=>_getPeriodTitle($oBudget),
-			'tolerance'=>0.07
+			'tolerance'=>0.05
 			);
 
 			
@@ -205,9 +187,6 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 			scenario='{$budget}' AND source<>'Estimate' AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
 			'tolerance'=>0.07,
-			'denominator'=>$denominator,
-			'actual_title'=>_getPeriodTitle($oActual),
-			'budget_title'=>_getPeriodTitle($oBudget),
 			'limit'=>5);
 
 $settings['pbtwwh'] = Array('title'=>"PBT by factors w/o Warehouse",
@@ -226,9 +205,6 @@ $settings['pbtwwh'] = Array('title'=>"PBT by factors w/o Warehouse",
 			FROM vw_master 			
 			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc NOT IN (5,15) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
-			'denominator'=>$denominator,
-			'actual_title'=>_getPeriodTitle($oActual),
-			'budget_title'=>_getPeriodTitle($oBudget),
 			'tolerance'=>0.07);
 
 $settings['whp'] = Array('title'=>"PBT Pokrov",
@@ -247,9 +223,6 @@ $settings['whp'] = Array('title'=>"PBT Pokrov",
 			FROM vw_master 			
 			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc IN (5) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)",
-			'denominator'=>$denominator,
-			'actual_title'=>_getPeriodTitle($oActual),
-			'budget_title'=>_getPeriodTitle($oBudget),
 			'tolerance'=>0.05);
 			
 $settings['whs'] = Array('title'=>"PBT Shushary",
@@ -268,14 +241,16 @@ $settings['whs'] = Array('title'=>"PBT Shushary",
 			FROM vw_master 			
 			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc IN (15) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)",
-			'denominator'=>$denominator,
-			'actual_title'=>_getPeriodTitle($oActual),
-			'budget_title'=>_getPeriodTitle($oBudget),
 			'tolerance'=>0.05);
 			
 $type = $_GET['type']?$_GET['type']:'gpcus';
 			
 if (is_array($settings[$type])){
+	$settings[$type]['title'] .= ', '.$arrPeriodType[$period_type];
+	$settings[$type]['actual_title'] = $oActual->title;
+	$settings[$type]['budget_title'] = $oBudget->title;
+	$settings[$type]['denominator'] = $denominator;
+	
 	$oWF = new Waterfall($settings[$type]);
 } else {
 	die('Wrong report type');
