@@ -164,7 +164,7 @@ class Waterfall {
 			
 			//google_chart_data["<?php echo $this->chartID;?>"] = {data:<?php echo json_encode($this->arrChart);?>,title:'<?php echo $this->title;?>'};			
 			hs_data["<?php echo $this->chartID;?>"] = {chart: {type: 'waterfall'},
-													title: {text: '<?php echo $this->title;?>'},
+													title: {text: '<?php echo $this->title, ': ', $this->actual_title,' vs ',$this->budget_title;?>'},
 													xAxis: {type: 'category'},
 													yAxis: {title: {
 																text: '<?php echo $this->currency;?>'
