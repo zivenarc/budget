@@ -126,8 +126,8 @@ class Waterfall {
 		?>		
 		<p>Tolerance = <?php echo ($this->tolerance*100).'%';?></p>
 		<table id="table_<?php echo $this->chartID;?>" class="<?php echo $strClass;?>" style="width:auto;">
-		<thead>
-			<caption><?php echo $this->title, ': ', $this->actual_title,' vs ',$this->budget_title, ', ', $this->currency, 'x', $this->denominator;?></caption>
+		<caption><?php echo $this->title, ': ', $this->actual_title,' vs ',$this->budget_title, ', ', $this->currency, 'x', $this->denominator;?></caption>
+		<thead>			
 			<tr>
 				<th>Factors</th>			
 				<th><?php echo $this->actual_title;?></th>			
@@ -164,7 +164,7 @@ class Waterfall {
 			
 			//google_chart_data["<?php echo $this->chartID;?>"] = {data:<?php echo json_encode($this->arrChart);?>,title:'<?php echo $this->title;?>'};			
 			hs_data["<?php echo $this->chartID;?>"] = {chart: {type: 'waterfall'},
-													title: {text: '<?php echo $this->title, ': ', $this->actual_title,' vs ',$this->budget_title;?>'},
+													title: {text: '<?php echo $this->title, ': "', $this->actual_title,'" vs "',$this->budget_title,'"';?>'},
 													xAxis: {type: 'category'},
 													yAxis: {title: {
 																text: '<?php echo $this->currency;?>'

@@ -2552,7 +2552,8 @@ class Reports{
 		};
 			?>
 			<table id='<?php echo $this->ID;?>' class='budget' style='font-size:1.3em;'>
-			<thead>
+			<caption><?php echo $this->oBudget->title,' vs ',$this->oReference->title;?></caption>
+			<thead>				
 				<tr>					
 					<th rowspan="2" colspan="2"><?php echo $this->CurrencyTitle, "&nbsp;", number_format($this->Denominator);?></th>
 					<?php echo $strHeader; ?>					
