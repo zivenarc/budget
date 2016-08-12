@@ -41,7 +41,7 @@ include ('includes/inc_report_selectors.php');
 $sqlWhere .= "WHERE sales = ".$oSQL->e($ownerID);
 
 
-$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>Array('sales'=>$ownerID)));
+$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>Array('sales'=>$ownerID)));
 
 if (strpos($oBudget->type,'FYE')!==false){
 	$oReport->monthlyReport($type);
