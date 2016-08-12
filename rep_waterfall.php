@@ -48,8 +48,8 @@ foreach($arrPeriodType as $id=>$title){
 	$arrActions[] = Array ('title'=>$title,'action'=>$url);
 }
 
-$sqlActual = "SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
-$sqlBudget = "SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
+$sqlActual = "SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).")";
+$sqlBudget = "SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")";
 
 $settings['gpcus'] = Array('title'=>"GP by customer",
 					'sqlBase' => "SELECT customer_group_code as optValue, 
@@ -70,6 +70,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 								GROUP BY customer_group_code",
 						'tolerance'=>0.05,
+						'denominator'=>$denominator,
 						'limit'=>10);
 
 $settings['gpsal'] = Array('title'=>"GP by sales",
@@ -89,6 +90,7 @@ $settings['gpsal'] = Array('title'=>"GP by sales",
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 								GROUP BY sales",
 						'tolerance'=>0.05,
+						'denominator'=>$denominator,
 						'limit'=>10);						
 						
 $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
@@ -112,6 +114,7 @@ $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 								AND pc NOT in (5,15)
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
 						'tolerance'=>0.05,
+						'denominator'=>$denominator,
 						'limit'=>10);
 						
 $settings['gpbu'] = Array('title'=>"GP by business unit",
@@ -129,6 +132,7 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 			GROUP BY pc",
+			'denominator'=>$denominator,
 			'tolerance'=>0.05
 			);
 
@@ -147,6 +151,7 @@ $settings['gpact'] = Array('title'=>"GP by activity",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 			GROUP BY activity",
+			'denominator'=>$denominator,
 			'tolerance'=>0.1
 			);			
 			
@@ -165,6 +170,7 @@ $settings['opbu'] = Array('title'=>"OP by business unit",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::OP_FILTER."
 			GROUP BY pc",
+			'denominator'=>$denominator,
 			'tolerance'=>0.07
 			);
 
@@ -188,6 +194,7 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 			scenario='{$budget}' AND source<>'Estimate' AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
 			'tolerance'=>0.07,
+			'denominator'=>$denominator,
 			'limit'=>5);
 
 $settings['pbtwwh'] = Array('title'=>"PBT by factors w/o Warehouse",
@@ -206,6 +213,7 @@ $settings['pbtwwh'] = Array('title'=>"PBT by factors w/o Warehouse",
 			FROM vw_master 			
 			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc NOT IN (5,15) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
+			'denominator'=>$denominator,
 			'tolerance'=>0.07);
 
 $settings['whp'] = Array('title'=>"PBT Pokrov",
@@ -224,7 +232,9 @@ $settings['whp'] = Array('title'=>"PBT Pokrov",
 			FROM vw_master 			
 			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc IN (5) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)",
+			'denominator'=>$denominator,
 			'tolerance'=>0.05);
+			
 $settings['whs'] = Array('title'=>"PBT Shushary",
 'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
 					IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
@@ -241,6 +251,7 @@ $settings['whs'] = Array('title'=>"PBT Shushary",
 			FROM vw_master 			
 			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc IN (15) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)",
+			'denominator'=>$denominator,
 			'tolerance'=>0.05);
 			
 $type = $_GET['type']?$_GET['type']:'gpcus';
@@ -257,8 +268,9 @@ require ('includes/inc-frame_top.php');
 
 ?>
 <h1>Waterfall<?php echo ': ',$oActual->title, ": ",$arrPeriodType[$period_type];?></h1>
-<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 <?php
+include ('includes/inc_report_selectors.php');
+
 if($currency!=643){
 		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
 		$rs = $oSQL->q($sql);
