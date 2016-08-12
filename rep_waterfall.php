@@ -70,6 +70,8 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								GROUP BY customer_group_code",
 						'tolerance'=>0.05,
 						'denominator'=>$denominator,
+						'actual_title'=>_getPeriodTitle($oActual),
+						'budget_title'=>_getPeriodTitle($oBudget),
 						'limit'=>10);
 
 $settings['gpsal'] = Array('title'=>"GP by sales",
@@ -90,6 +92,8 @@ $settings['gpsal'] = Array('title'=>"GP by sales",
 								GROUP BY sales",
 						'tolerance'=>0.05,
 						'denominator'=>$denominator,
+						'actual_title'=>_getPeriodTitle($oActual),
+						'budget_title'=>_getPeriodTitle($oBudget),
 						'limit'=>10);						
 						
 $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
@@ -114,6 +118,8 @@ $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
 						'tolerance'=>0.05,
 						'denominator'=>$denominator,
+						'actual_title'=>_getPeriodTitle($oActual),
+						'budget_title'=>_getPeriodTitle($oBudget),
 						'limit'=>10);
 						
 $settings['gpbu'] = Array('title'=>"GP by business unit",
@@ -132,6 +138,8 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 			GROUP BY pc",
 			'denominator'=>$denominator,
+			'actual_title'=>_getPeriodTitle($oActual),
+			'budget_title'=>_getPeriodTitle($oBudget),
 			'tolerance'=>0.05
 			);
 
@@ -151,6 +159,8 @@ $settings['gpact'] = Array('title'=>"GP by activity",
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 			GROUP BY activity",
 			'denominator'=>$denominator,
+			'actual_title'=>_getPeriodTitle($oActual),
+			'budget_title'=>_getPeriodTitle($oBudget),
 			'tolerance'=>0.1
 			);			
 			
@@ -170,6 +180,8 @@ $settings['opbu'] = Array('title'=>"OP by business unit",
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::OP_FILTER."
 			GROUP BY pc",
 			'denominator'=>$denominator,
+			'actual_title'=>_getPeriodTitle($oActual),
+			'budget_title'=>_getPeriodTitle($oBudget),
 			'tolerance'=>0.07
 			);
 
@@ -194,6 +206,8 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
 			'tolerance'=>0.07,
 			'denominator'=>$denominator,
+			'actual_title'=>_getPeriodTitle($oActual),
+			'budget_title'=>_getPeriodTitle($oBudget),
 			'limit'=>5);
 
 $settings['pbtwwh'] = Array('title'=>"PBT by factors w/o Warehouse",
@@ -213,6 +227,8 @@ $settings['pbtwwh'] = Array('title'=>"PBT by factors w/o Warehouse",
 			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc NOT IN (5,15) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
 			'denominator'=>$denominator,
+			'actual_title'=>_getPeriodTitle($oActual),
+			'budget_title'=>_getPeriodTitle($oBudget),
 			'tolerance'=>0.07);
 
 $settings['whp'] = Array('title'=>"PBT Pokrov",
@@ -232,6 +248,8 @@ $settings['whp'] = Array('title'=>"PBT Pokrov",
 			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc IN (5) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)",
 			'denominator'=>$denominator,
+			'actual_title'=>_getPeriodTitle($oActual),
+			'budget_title'=>_getPeriodTitle($oBudget),
 			'tolerance'=>0.05);
 			
 $settings['whs'] = Array('title'=>"PBT Shushary",
@@ -251,6 +269,8 @@ $settings['whs'] = Array('title'=>"PBT Shushary",
 			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc IN (15) AND Group_code<>121
 			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)",
 			'denominator'=>$denominator,
+			'actual_title'=>_getPeriodTitle($oActual),
+			'budget_title'=>_getPeriodTitle($oBudget),
 			'tolerance'=>0.05);
 			
 $type = $_GET['type']?$_GET['type']:'gpcus';
@@ -261,6 +281,7 @@ if (is_array($settings[$type])){
 	die('Wrong report type');
 }
 					
+$arrJS[] = 'js/rep_pnl.js';					
 require ('includes/inc-frame_top.php');
 
 // echo '<pre>';print_r($settings);echo '</pre>';
@@ -287,19 +308,7 @@ if ($denominator!=1) {
 
 	$oWF->draw();
 ?>
-<script>
-var tabs_options = {};
-$(document).ready(function(){
-	$('#tabs').tabs(tabs_options);
-	$('#budget_scenario').change(function(){		
-		$(this).wrap($('<form>',{method:'GET',id:'scenario'}));		
-		console.log($(this));
-		$('#scenario').submit();
-	});
-		
-	
-});
-</script>
+
 <nav>
 <ul class='link-footer'>
 <?php
@@ -315,5 +324,21 @@ foreach($settings as $type=>$data){
 <?php 
 if ($_DEBUG) echo '<pre>',$oWF->sqlBase,'</pre>';
 require ('includes/inc-frame_bottom.php');
+
+function _getPeriodTitle($scenario){
+	$prefix = strtoupper(substr($scenario->title,0,3));
+	switch($prefix){
+		case 'FYE':
+			return('Forecast');
+			break;
+		case 'BUD':
+			return('Budget');
+			break;
+		case 'ACT':
+			return('Actual');
+			break;		
+	}
+	
+}
 
 ?>
