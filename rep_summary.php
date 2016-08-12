@@ -25,7 +25,8 @@ if ($bu_group){
 	}
 
 if(!isset($_GET['pccGUID'])){
-
+	
+	$arrJS[]='js/rep_pnl.js';
 	$arrJS[] = "js/rep_summary.js";
 
 	include ('includes/inc-frame_top.php');
