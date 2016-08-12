@@ -155,7 +155,7 @@ if(!isset($_GET['pccGUID'])){
 											({$sqlActual}-{$sqlBudget}) as Diff
 									FROM vw_master 
 									{$sqlWhere}
-										AND  scenario='{$oBudget->id}' AND account NOT IN ('J00400', 'J00802') AND item is not null
+										AND  scenario='{$oBudget->id}' AND account NOT IN ('J00400', 'J00802') AND item<>''
 									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
 							'denominator'=>$denominator,
 							'budget_title'=>'This month',
