@@ -8,11 +8,10 @@ require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
 
 $oActual = new Budget($budget_scenario);
+$oBudget = new Budget($reference);
 
 $actual = $oActual->id;
-$budget = $oActual->reference_scenario->id;
-
-$oBudget = new Budget($budget);
+$budget = $oBudget->id;
 
 $arrActualRates = $oActual->getMonthlyRates($currency);
 $arrBudgetRates = $oBudget->getMonthlyRates($currency);
