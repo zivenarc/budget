@@ -35,6 +35,9 @@ $colspan = $endMonth - $startMonth + 3;
 $sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
 		GROUP BY prtGHQ, pc";
 $rs = $oSQL->q($sql);
+if(!$oSQL->n($rs)){
+	die("<div class='error'>No base for cost distribution. Prepare the <a href='rep_ration.php?budget_scenario={$budget_scenario}&DataAction=update'>revenue register</a> first</div>");
+}
 
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
