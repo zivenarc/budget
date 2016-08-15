@@ -4,10 +4,11 @@ require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
+include ('includes/inc_report_settings.php');
 
 	$denominator = 1000;	
-	$budget_scenario = $_GET['budget_scenario']?$_GET['budget_scenario']:$arrSetup['stpFYEID'];
-	$reference = $_GET['reference']?$_GET['reference']:$arrSetup['stpScenarioID'];
+	// $budget_scenario = $_GET['budget_scenario']?$_GET['budget_scenario']:$arrSetup['stpFYEID'];
+	// $reference = $_GET['reference']?$_GET['reference']:$arrSetup['stpScenarioID'];
 	
 	$oBudget = new Budget($budget_scenario);
 	$oReference = new Budget($reference);
@@ -22,6 +23,7 @@ if(!isset($_GET['prtGHQ'])){
 
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,' vs ',$oReference->title,'</h1>';	
+	include ('includes/inc_report_selectors.php');
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	
 	$oBudget->getGHQTabs();

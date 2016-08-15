@@ -14,8 +14,8 @@ if ($bu_group){
 }
 
 	$denominator = 1000;	
-	$budget_scenario = $_GET['budget_scenario']?$_GET['budget_scenario']:$arrSetup['stpFYEID'];
-	$reference = $_GET['reference']?$_GET['reference']:$arrSetup['stpScenarioID'];
+	// $budget_scenario = $_GET['budget_scenario']?$_GET['budget_scenario']:$arrSetup['stpFYEID'];
+	// $reference = $_GET['reference']?$_GET['reference']:$arrSetup['stpScenarioID'];
 	
 	$oBudget = new Budget($budget_scenario);
 	$oReference = new Budget($reference);
