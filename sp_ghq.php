@@ -36,7 +36,7 @@ $sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $
 		GROUP BY prtGHQ, pc";
 $rs = $oSQL->q($sql);
 if(!$oSQL->n($rs)){
-	die("<div class='error'>No base for cost distribution. Prepare the <a href='rep_ration.php?budget_scenario={$budget_scenario}&DataAction=update'>revenue register</a> first</div>");
+	die("<div class='error'>No base for cost distribution. Prepare the <a href='rep_ratios.php?budget_scenario={$budget_scenario}&DataAction=update'>revenue register</a> first</div>");
 }
 
 while ($rw = $oSQL->f($rs)){
