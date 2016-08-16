@@ -19,6 +19,7 @@ include ('includes/inc_report_settings.php');
 
 if(!isset($_GET['prtGHQ'])){
 
+	$arrJS[]='js/rep_pnl.js';
 	$arrJS[] = "js/rep_summary.js";
 
 	include ('includes/inc-frame_top.php');
