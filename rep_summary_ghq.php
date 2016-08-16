@@ -77,10 +77,10 @@ if(!isset($_GET['prtGHQ'])){
 	?>	
 	<div>
 	<?php
-	die();
+	// die();
 	$period_type = 'fye';
-	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")/{$denominator}";
-	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")/{$denominator}";
+	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
+	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	
 	$settings['gpcus'] = Array('title'=>"GP by customer",
 						'sqlBase' => "SELECT customer_group_code as optValue, 
@@ -105,6 +105,7 @@ if(!isset($_GET['prtGHQ'])){
 										AND account IN ('J00400', 'J00802')										
 									GROUP BY customer_group_code",
 							'tolerance'=>0.05,
+							'denominator'=>$denominator,
 							'limit'=>10);	
 	
 	$oWF = new Waterfall($settings['gpcus']);
@@ -133,6 +134,7 @@ if(!isset($_GET['prtGHQ'])){
 										AND (account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W')) 	
 									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
 							'tolerance'=>0.05,
+							'denominator'=>$denominator,
 							'limit'=>10);
 	
 	$oWF = new Waterfall($settings['rfc']);
