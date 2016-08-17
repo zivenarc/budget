@@ -1,5 +1,5 @@
 <?php
-$flagNoAuth = true;
+// $flagNoAuth = true;
 // $arrUsrData['usrID'] = 'ZHAROVA';
 
 require ('common/auth.php');
