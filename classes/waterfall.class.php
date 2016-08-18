@@ -40,13 +40,19 @@ class Waterfall {
 		$this->arrReport = Array();
 		$this->arrChart = Array();
 		$this->arrHSChart = Array();
-	
+		
+		
+		
 		GLOBAL $oSQL;
 		$sql = "SELECT SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
 		({$this->sqlBase}) Q1";
 
 		$rs = $oSQL->q($sql);
 		$baseData = $oSQL->f($rs);
+		
+		$this->min = $baseData['Budget'];
+		$this->max = $baseData['Budget'];
+		
 		$this->arrReport[] = Array($this->budget_title,null,null,$baseData['Budget']/$this->denominator, 'budget-subtotal');
 		$this->arrChart[] = Array('Budget',0,0,(integer)$baseData['Budget'],(integer)$baseData['Budget'], $this->getTooltip('Budget',$baseData['Budget']));
 		$this->arrHSChart[] = Array('name'=>$this->budget_title,'y'=>(integer)$baseData['Budget'], 'color'=>'blue');
@@ -96,6 +102,7 @@ class Waterfall {
 				
 				if (abs($rw['Diff'])>=$this->tolerance*abs($baseData['Diff'])){
 					// $this->arrReport[] = Array($rw['optText'],$rw['Diff']);
+					
 					$this->arrReport[] = Array($rw['optText'],$rw['Actual']/$this->denominator,$rw['Budget']/$this->denominator,$rw['Diff']/$this->denominator);
 					$this->arrChart[] = Array($rw['optText'],(integer)$lastValue,(integer)$lastValue,(integer)($lastValue+$rw['Diff']),(integer)($lastValue+$rw['Diff']), $strTooltip);
 					$this->arrHSChart[] = Array('name'=>$rw['optText'],'y'=>(integer)$rw['Diff']);
@@ -103,6 +110,14 @@ class Waterfall {
 					$diffBalance -= $rw['Diff'];
 					$thisBalance -= $rw['Actual'];
 					$thatBalance -= $rw['Budget'];
+					
+					if ($lastValue > $this->max){
+						$this->max = $lastValue;
+					}
+					if ($lastValue < $this->min){
+						$this->min = $lastValue;
+					}
+					
 				}
 			}
 		}
@@ -116,9 +131,28 @@ class Waterfall {
 		$this->arrReport[] = Array($this->actual_title,null, null, $baseData['Actual']/$this->denominator,'budget-subtotal');
 		$this->arrChart[] = Array('Actual',0,0,(integer)$baseData['Actual'],(integer)$baseData['Actual'], $this->getTooltip('Actual',$baseData['Actual']));
 		$this->arrHSChart[] = Array('name'=>$this->actual_title,'y'=>(integer)$baseData['Actual'],'isSum'=>true, 'color'=>'blue');
+
+		if ($baseData['Actual'] > $this->max){
+			$this->max = $baseData['Actual'];
+		}
+		if ($baseData['Actual'] < $this->min){
+			$this->min = $baseData['Actual'];
+		}
 		
 		$this->arrReport[] = Array('Total diff',null, null, $baseData['Diff']/$this->denominator,'budget-subtotal');
 		$this->arrReport[] = Array('Ratio',null, null, $baseData['Actual']/$baseData['Budget']*100,'budget-ratio');
+		
+		if ($this->min > 0){
+			$this->min *= 0.95;
+		} else {
+			$this->min *= 1.05;	
+		}
+		
+		if ($this->max > 0){
+			$this->max *= 1.05;
+		} else {
+			$this->max *= 0.95;
+		}
 		
 	}
 	
@@ -166,7 +200,10 @@ class Waterfall {
 			hs_data["<?php echo $this->chartID;?>"] = {chart: {type: 'waterfall'},
 													title: {text: '<?php echo $this->title, ': "', $this->actual_title,'" vs "',$this->budget_title,'"';?>'},
 													xAxis: {type: 'category'},
-													yAxis: {title: {
+													yAxis: {
+															min: <?php echo (integer)$this->min;?>,
+															max: <?php echo (integer)$this->max;?>,
+															title: {
 																text: '<?php echo $this->currency;?>'
 															}},
 													legend: {enabled: false},
