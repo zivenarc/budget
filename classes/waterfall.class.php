@@ -142,17 +142,17 @@ class Waterfall {
 		$this->arrReport[] = Array('Total diff',null, null, $baseData['Diff']/$this->denominator,'budget-subtotal');
 		$this->arrReport[] = Array('Ratio',null, null, $baseData['Actual']/$baseData['Budget']*100,'budget-ratio');
 		
-		if ($this->min > 0){
-			$this->min *= 0.95;
-		} else {
-			$this->min *= 1.05;	
-		}
+		// if ($this->min > 0){
+			// $this->min *= 0.95;
+		// } else {
+			// $this->min *= 1.05;	
+		// }
 		
-		if ($this->max > 0){
-			$this->max *= 1.05;
-		} else {
-			$this->max *= 0.95;
-		}
+		// if ($this->max > 0){
+			// $this->max *= 1.05;
+		// } else {
+			// $this->max *= 0.95;
+		// }
 		
 	}
 	
