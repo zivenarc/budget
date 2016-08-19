@@ -1369,9 +1369,20 @@ class Reports{
 			
 			$sql = "SELECT {$sqlSelect}
 					FROM `vw_sales` 			
-					{$sqlWhere} AND scenario='{$this->oReference->id}' AND activity={$activity}";
+					{$sqlWhere} AND scenario='{$this->oReference->id}' AND activity={$activity} AND source='Actual'";
 			$rs = $this->oSQL->q($sql);
 			$res['Budget'] = $this->oSQL->f($rs);
+			
+			$sql = "SELECT {$sqlSelect}
+					FROM `vw_sales` 			
+					{$sqlWhere} AND scenario='{$this->oReference->id}' AND activity={$activity} AND source<>'Actual'";
+			$rs = $this->oSQL->q($sql);
+			$rw = $this->oSQL->f($rs); 
+			for ($m=(integer)date('n',$this->oReference->date_start);$m<=12+$this->oBudget->offset;$m++){
+				$month = $this->oBudget->arrPeriod[$m];
+				$res['Budget'][$month] += (integer)$rw[$month];
+				$res['Budget']['Total_AM'] += (integer)$rw[$month];
+			}
 			
 			$sql = "SELECT {$sqlSelect}
 					FROM `vw_sales` 			
