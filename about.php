@@ -43,8 +43,8 @@ $oReference = new Budget($arrSetup['stpScenarioID']);
 	<a href="rep_monthly.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Monthly report</a>|
 	<a href="rep_pnl.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Full-year estimate</a>|
 	<a href="rep_totals.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Results per BU</a>|
-	<a href="rep_waterfall.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Waterfall</a>
-	<a href="rep_charts.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Charts</a>
+	<a href="rep_waterfall.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Waterfall</a>|
+	<a href="rep_graphs.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Charts</a>
 </nav>
 <br/>
 <?php
