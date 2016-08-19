@@ -1022,6 +1022,9 @@ class Reports{
 	}
 	
 	public function periodicGraph($sqlWhere){
+				
+		
+
 		
 		$strFields_this = $this->_getMonthlyFields();
 		$strFields_last = $this->_getMonthlyFields('last');
@@ -1086,16 +1089,90 @@ class Reports{
 		$rs = $this->oSQL->q($sql);
 		$rwBOP = $this->oSQL->f($rs);
 		
+		
+		//-----------------------------------Natural KPIs------------------------
+		$arrKPI = Array(
+					'AFF'=>Array(
+							'Export'=>Array('activity'=>47),
+							'Import'=>Array('activity'=>46)
+					),
+					'OFF'=>Array(
+							'Export'=>Array('activity'=>63),
+							'Import'=>Array('activity'=>48)
+					)
+				);
+		
+		foreach($arrKPI as $segment=>$activity){
+			foreach($activity as $key=>$arrData){
+				$arrKPI[$segment][$key] = $this->_getKPIGraphData($sqlWhere,$arrData['activity']);				
+			};
+		}
+		
+		// echo '<pre>';print_r($arrKPI);echo '</pre>';		
+		
+		$arrHighChartsAFF = Array(
+				'title'=>Array('text'=>'AFF volumes','x'=>-20),				
+				'subtitle'=>Array('text'=>$this->oBudget->title." vs ".$this->oReference->title,'x'=>-20),						
+				'chart'=>Array('type'=>'column'),
+				'yAxis'=>Array('min'=>0,'title'=>Array('text'=>'Kg')),
+				'plotOptions'=>Array('column'=>Array('stacking'=>'normal'))
+		);
+
+		$arrHighChartsOFF = Array(
+				'title'=>Array('text'=>'OFF volumes','x'=>-20),				
+				'subtitle'=>Array('text'=>$this->oBudget->title." vs ".$this->oReference->title,'x'=>-20),						
+				'chart'=>Array('type'=>'column'),
+				'yAxis'=>Array('min'=>0,'title'=>Array('text'=>'TEU')),
+				'plotOptions'=>Array('column'=>Array('stacking'=>'normal'))
+		);
+		
+		//-------------------------------------------------------------------------
+		$arrHighCharts = Array(
+						'title'=>Array('text'=>'Performance by month','x'=>-20),
+						'subtitle'=>Array('text'=>$this->oBudget->title." vs ".$this->oReference->title,'x'=>-20)						
+					);
 		for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 			$period = $this->oBudget->arrPeriod[$m];
-		// foreach ($this->oBudget->arrPeriod as $period){
+		
 			$arrGraph[] = Array($period,(double)$rwGR[$period],(double)$rwGP[$period], (double)$rwBGP[$period], -(double)$rwSC[$period], (double)$rwOP[$period], (double)$rwBOP[$period]);
+			$arrHighCharts['xAxis']['categories'][] = $period;
+			$arrHighChartsAFF['xAxis']['categories'][] = $period;
+			$arrHighChartsOFF['xAxis']['categories'][] = $period;
+			$arrHSSeries[0][] = (integer)$rwGR[$period];
+			$arrHSSeries[1][] = (integer)$rwGP[$period];
+			$arrHSSeries[2][] = (integer)$rwBGP[$period];
+			$arrHSSeries[3][] = -(integer)$rwSC[$period];
+			$arrHSSeries[4][] = (integer)$rwOP[$period];
+			$arrHSSeries[5][] = (integer)$rwBOP[$period];
+						
 		}
+		$arrHighCharts['series']=Array(
+									Array('name'=>'Gross revenue','data'=>$arrHSSeries[0])
+									,Array('name'=>'Gross profit, actual','data'=>$arrHSSeries[1])
+									,Array('name'=>'Gross profit, budget','data'=>$arrHSSeries[2])
+									,Array('name'=>'Staff costs','data'=>$arrHSSeries[3])
+									,Array('name'=>'OP, actual','data'=>$arrHSSeries[4])
+									,Array('name'=>'OP, budget','data'=>$arrHSSeries[5])
+								);
+								
+		$arrHighChartsAFF['series'] = Array(
+									Array('name'=>'Export, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Export']['Actual'],0,12))))									
+									,Array('name'=>'Import, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Import']['Actual'],0,12))))									
+									,Array('name'=>'Export, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Export']['Budget'],0,12))))									
+									,Array('name'=>'Import, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Import']['Budget'],0,12))))									
+								);
+								
+		$arrHighChartsOFF['series'] = Array(
+									Array('name'=>'Export, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Export']['Actual'],0,12))))									
+									,Array('name'=>'Import, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Import']['Actual'],0,12))))									
+									,Array('name'=>'Export, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Export']['Budget'],0,12))))									
+									,Array('name'=>'Import, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Import']['Budget'],0,12))))									
+								);		
 		// echo '<pre>';print_r($arrGraph);echo '</pre>';
 		?>
 		<table class='budget' id='<?php echo $this->ID;?>'>
 		<tr>
-			<th>Period</th>
+			<th colspan="2">Period</th>
 		<?php
 			// foreach ($this->oBudget->arrPeriod as $period){
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
@@ -1105,7 +1182,7 @@ class Reports{
 		?>
 		<th>FYE</th>
 		</tr>
-		<tr><td>Gross revenue</td>
+		<tr><td colspan="2">Gross revenue</td>
 		<?php
 			// foreach ($this->oBudget->arrPeriod as $period){
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
@@ -1116,7 +1193,7 @@ class Reports{
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwGR['Total_AM']),'</td>';
 		?>
 		</tr>
-		<tr><td>Gross profit</td>
+		<tr><td rowspan="4">Gross profit</td><td>This</td>
 		<?php
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 				$period = $this->oBudget->arrPeriod[$m];
@@ -1126,7 +1203,7 @@ class Reports{
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwGP['Total_AM']),'</td>';
 		?>
 		</tr>
-		<tr class="budget-ratio"><td>Profitability, %</td>
+		<tr class="budget-ratio"><td>%</td>
 		<?php
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 				$period = $this->oBudget->arrPeriod[$m];
@@ -1136,7 +1213,7 @@ class Reports{
 		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwGP['Total_AM'], $rwGR['Total_AM']),'</td>';
 		?>
 		</tr>
-		<tr><td>Gross profit, <?php echo $this->oReference->id;?></td>
+		<tr><td><?php echo $this->oReference->id;?></td>
 		<?php
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 				$period = $this->oBudget->arrPeriod[$m];
@@ -1156,27 +1233,7 @@ class Reports{
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwGP['Total_AM']-$rwBGP['Total_AM']),'</td>';
 		?>
 		</tr>
-		<tr><td>Staff costs</td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render(-$rwSC[$period]),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render(-$rwSC['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render(-$rwSC['Total_AM']),'</td>';
-		?>
-		</tr>
-		<tr class="budget-ratio"><td>Staff efficiency</td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render_ratio($rwGP[$period],-$rwSC[$period]*100),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwGP['Q1'], -$rwSC['Q1']*100),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwGP['Total_AM'],-$rwSC['Total_AM']*100),'</td>';
-		?>
-		</tr>
-		<tr><td>Operating income</td>
+		<tr><td rowspan="4">Operating income</td><td>This</td>
 		<?php
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 				$period = $this->oBudget->arrPeriod[$m];
@@ -1186,7 +1243,7 @@ class Reports{
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwOP['Total_AM']),'</td>';
 		?>
 		</tr>
-		<tr class="budget-ratio"><td>Profitability%</td>
+		<tr class="budget-ratio"><td>% of revenue</td>
 		<?php
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 				$period = $this->oBudget->arrPeriod[$m];
@@ -1196,7 +1253,7 @@ class Reports{
 		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwOP['Total_AM'],$rwGR['Total_AM']),'</td>';
 		?>
 		</tr>
-		<tr><td>Op.income, <?php echo $this->oReference->id;?></td>
+		<tr><td><?php echo $this->oReference->id;?></td>
 		<?php
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 				$period = $this->oBudget->arrPeriod[$m];
@@ -1216,37 +1273,124 @@ class Reports{
 		echo '<td class="budget-decimal budget-ytd">',self::render($rwOP['Total_AM']-$rwBOP['Total_AM']),'</td>';
 		?>
 		</tr>
+		<tr><td colspan="2">Staff costs</td>
+		<?php
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
+				echo '<td class="budget-decimal">',self::render(-$rwSC[$period]),'</td>';
+			}
+		// echo '<td class="budget-decimal budget-quarterly">',self::render(-$rwSC['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render(-$rwSC['Total_AM']),'</td>';
+		?>
+		</tr>
+		<tr class="budget-ratio"><td colspan="2">Staff efficiency (GP/Cost)</td>
+		<?php
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
+				echo '<td class="budget-decimal">',self::render_ratio($rwGP[$period],-$rwSC[$period]*100),'</td>';
+			}
+		// echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwGP['Q1'], -$rwSC['Q1']*100),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwGP['Total_AM'],-$rwSC['Total_AM']*100),'</td>';
+		?>
+		</tr>
+		<tr><td rowspan="2">AFF volume</td><td>Export</td>
+		<?php
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
+				echo '<td class="budget-decimal">',self::render($arrKPI['AFF']['Export']['Actual'][$period]),'</td>';
+			}
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($arrKPI['AFF']['Export']['Actual']['Total_AM']),'</td>';
+		?>
+		</tr>
+		<tr><td>Import</td>
+		<?php
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
+				echo '<td class="budget-decimal">',self::render($arrKPI['AFF']['Import']['Actual'][$period]),'</td>';
+			}
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($arrKPI['AFF']['Import']['Actual']['Total_AM']),'</td>';
+		?>
+		</tr>
+		<tr><td rowspan="2">OFF volume</td><td>Export</td>
+		<?php
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
+				echo '<td class="budget-decimal">',self::render($arrKPI['OFF']['Export']['Actual'][$period]),'</td>';
+			}
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($arrKPI['OFF']['Export']['Actual']['Total_AM']),'</td>';
+		?>
+		</tr>
+		<tr><td>Import</td>
+		<?php
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
+				echo '<td class="budget-decimal">',self::render($arrKPI['OFF']['Import']['Actual'][$period]),'</td>';
+			}
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($arrKPI['OFF']['Import']['Actual']['Total_AM']),'</td>';
+		?>
+		</tr>
 		</table>
 		<ul class='link-footer'>
 			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
 		</ul>
 		<div id='graph_<?php echo $this->ID;?>'>Line chart loading...</div>
+		<div id='aff_<?php echo $this->ID;?>'>AFF chart loading...</div>
+		<div id='off_<?php echo $this->ID;?>'>OFF chart loading...</div>
 		<script type='text/javascript'>
 			console.log('Here should be a chart!');
-			var target = 'graph_<?php echo $this->ID;?>'
-			$('#'+target).ready(function(){
-				var arrData = <?php echo json_encode($arrGraph);?>;
-				var options = {
-					title: 'Monthly performance',
-					legend: { position: 'bottom' },
-					height:600,
-					hAxis: {gridlines: {count: 4}},
-					series: {0:{targetAxisIndex:0},
-								1: {targetAxisIndex:1, color: 'red', lineWidth:4},
-								2: {targetAxisIndex:1, color: 'red', lineDashStyle:[3,3]},
-								3: {targetAxisIndex:1},
-								4: {targetAxisIndex:1, color:'purple', lineWidth:4},
-								5: {targetAxisIndex:1, color:'purple', lineDashStyle:[3,3]}
-					}
-				};
-				
-				console.log(arrData);
-				target = document.getElementById(target);
-				drawGraph(arrData, target, options);
+			var target = '#graph_<?php echo $this->ID;?>';
+			var targetAFF = '#aff_<?php echo $this->ID;?>';
+			var targetOFF = '#off_<?php echo $this->ID;?>';
+			$(target).ready(function(){				
+				var options = <?php echo json_encode($arrHighCharts);?>;		
+				var optionsAFF = <?php echo json_encode($arrHighChartsAFF);?>;		
+				var optionsOFF = <?php echo json_encode($arrHighChartsOFF);?>;		
+				console.log(optionsAFF);
+				// target = document.getElementById(target);	
+				// drawGraph(arrData, target, options);
+				$(target).highcharts(options);
+				$(targetAFF).highcharts(optionsAFF);
+				$(targetOFF).highcharts(optionsOFF);
 			});
 		</script>
 		<?php			
 		ob_flush();
+	}
+	
+	private function _getKPIGraphData($sqlWhere,$activity){
+			
+			$sqlSelect = $this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset,max($this->oBudget->length,12+$this->oBudget->offset)).", ".				
+				"SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates_this, $this->Denominator).") as Total_AM";
+			
+			
+			$sql = "SELECT {$sqlSelect}
+					FROM `vw_sales` 			
+					{$sqlWhere} AND scenario='{$this->oReference->id}' AND activity={$activity}";
+			$rs = $this->oSQL->q($sql);
+			$res['Budget'] = $this->oSQL->f($rs);
+			
+			$sql = "SELECT {$sqlSelect}
+					FROM `vw_sales` 			
+					{$sqlWhere} AND scenario='{$this->oBudget->id}' AND activity={$activity} AND source='Actual'";
+			$rs = $this->oSQL->q($sql);			
+			$res['Actual'] = $this->oSQL->f($rs);
+			
+			$sql = "SELECT {$sqlSelect}
+					FROM `vw_sales` 			
+					{$sqlWhere} AND scenario='{$this->oBudget->id}' AND activity={$activity} AND source<>'Actual'";
+			$rs = $this->oSQL->q($sql);
+			$rw = $this->oSQL->f($rs); 
+			for ($m=(integer)date('n',$this->oBudget->date_start);$m<=12+$this->oBudget->offset;$m++){
+				$month = $this->oBudget->arrPeriod[$m];
+				$res['Actual'][$month] += (integer)$rw[$month];
+				$res['Actual']['Total_AM'] += (integer)$rw[$month];
+			}
+			
+			return($res);
 	}
 	
 	public function monthlyReport($type='ghq'){

@@ -22,7 +22,12 @@ if(!isset($_GET['pccGUID'])){
 		$reference = $oBudget->reference_scenario->id;
 	}
 	
-	$arrJS[] = 'https://www.google.com/jsapi';
+	// $arrJS[] = 'https://www.google.com/jsapi';
+	
+	$arrJS[]="https://code.highcharts.com/highcharts.js";
+	$arrJS[]="https://code.highcharts.com/highcharts-more.js";
+	$arrJS[]="https://code.highcharts.com/modules/exporting.js";
+	
 	$arrJS[]='js/rep_pnl.js';
 	// $arrJS[]='js/input_form.js';	
 	
@@ -43,7 +48,7 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc-frame_bottom.php');
 } else {
 	require ('classes/reports.class.php');
-	include ('includes/inc_report_buttons.php');
+	// include ('includes/inc_report_buttons.php');
 	
 	if ($_GET['pccGUID']=='all'){
 		
