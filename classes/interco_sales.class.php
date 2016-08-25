@@ -190,6 +190,7 @@ class Interco_sales extends Document{
 			$this->profit = isset($_POST[self::Prefix.'ProfitID'])?$_POST[self::Prefix.'ProfitID']:$this->profit;
 			$this->product_folder = isset($_POST[self::Prefix.'ProductFolderID'])?$_POST[self::Prefix.'ProductFolderID']:$this->product_folder;			
 			$this->customer = isset($_POST[self::Prefix.'CustomerID'])?$_POST[self::Prefix.'CustomerID']:$this->customer;
+			$this->sales = isset($_POST[$this->prefix.'UserID'])?$_POST[$this->prefix.'UserID']:$this->sales;						
 		}
 		
 		//-------------------Updating grid records---------------------------------
@@ -205,7 +206,8 @@ class Interco_sales extends Document{
 						$row->flagUpdated = true;				
 						$row->profit = $_POST[$this->prefix.'ProfitID'];
 						$row->product = $_POST['product'][$id];				
-						$row->customer = $_POST['customer'][$id];				
+						$row->customer = $_POST['customer'][$id];
+						$row->sales = $this->sales;							
 						$row->comment = $_POST['comment'][$id];				
 						$row->selling_rate = (double)str_replace(',','',$_POST['selling_rate'][$id]);				
 						$row->selling_curr = $_POST['selling_curr'][$id];				
