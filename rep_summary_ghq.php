@@ -139,6 +139,35 @@ if(!isset($_GET['prtGHQ'])){
 	
 	$oWF = new Waterfall($settings['rfc']);
 	$oWF->draw();
+	
+	$settings['sga'] = Array('title'=>"SG&A by elements",
+						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
+											IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
+											{$sqlActual} as Actual, 
+											0 as Budget, 
+											{$sqlActual} as Diff
+									FROM vw_master 
+									{$sqlWhere}
+										AND  scenario='{$oBudget->id}' 
+										AND (account LIKE '5%') 									
+									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)
+									UNION ALL
+									SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
+											IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
+											0 as Actual, 
+									{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+									FROM vw_master 
+									{$sqlWhere}
+										AND scenario='{$oReference->id}' 
+										AND source<>'Estimate' 						
+										AND (account LIKE '5%') 	
+									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
+							'tolerance'=>0.05,
+							'denominator'=>$denominator,
+							'limit'=>10);
+	
+	$oWF = new Waterfall($settings['sga']);
+	$oWF->draw();
 	?>
 	</div>
 	<?php
