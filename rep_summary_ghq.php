@@ -287,7 +287,7 @@ if(!isset($_GET['prtGHQ'])){
 	</tbody>
 	<tfoot>
 	<tr class='budget-subtotal'>
-			<td colspan="3">Total</td>
+			<td colspan="4">Total</td>
 			<td class='budget-decimal'><?php echo Reports::render($totalPayroll);?></td>
 			<td class='budget-decimal'><?php echo Reports::render($totalMB);?></td>
 			<?php
