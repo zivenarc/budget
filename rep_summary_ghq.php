@@ -221,6 +221,81 @@ if(!isset($_GET['prtGHQ'])){
 		</tr>
 	</table>	
 	<?php
+	//==================== Staff ==========================/
+	$sql = "SELECT salary,monthly_bonus, empTitleLocal, funTitleLocal, prtTitleLocal,funFlagWC,funRHQ,".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset)." 
+			FROM reg_headcount 
+			LEFT JOIN vw_product_type ON prtID=activity
+			LEFT JOIN common_db.tbl_employee ON empGUID1C=particulars
+			LEFT JOIN common_db.tbl_function ON empFunctionGUID=funGUID
+			WHERE activity IN (".implode(',',$arrProducts['id']).") AND scenario='{$budget_scenario}' AND salary>".Reports::SALARY_THRESHOLD."
+			GROUP BY particulars, function
+			ORDER BY funRHQ, funTitle, empTitleLocal";
+	$rs = $oSQL->q($sql);
+	?>
+	<style>
+	.blurry {
+	   color: transparent;
+	   text-shadow: 0 0 5px rgba(0,0,0,0.5);
+	}
+	</style>
+	<table class="budget" id='headcount'>
+	<caption>Employees</caption>
+	<thead>
+		<tr>
+			<th>Employee</th>
+			<th>Function</th>
+			<th>Activity</th>
+			<th>Payroll</th>
+			<?php
+			echo $oBudget->getTableHeader('monhtly',1+$oBudget->offset, 12+$oBudget->offset); 
+			?>
+			<th>Average</th>
+		</tr>
+	</thead>
+	<tbody>
+	<?php
+	while ($rw = $oSQL->f($rs)){
+	?>
+		<tr>
+			<td><?php echo $rw['empTitleLocal'];?></td>			
+			<td><?php echo $rw['funRHQ'],' | ',$rw['funTitleLocal'];?></td>			
+			<td><?php echo $rw['prtTitleLocal'];?></td>
+			<td class='budget-decimal blurry' ><?php echo Reports::render($rw['salary']);?></td>
+			<?php
+			$totalPayroll += $rw['salary'];
+			$hc = 0;
+			for($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
+				$month = $oBudget->arrPeriod[$m];
+				$hc += $rw[$month];
+				$arrSubtotal[$month] += $rw[$month];
+			?>
+			<td class='budget-decimal'><?php echo Reports::render($rw[$month],1);?></td>
+			<?php
+			}
+			?>
+			<td class='budget-decimal budget-subtotal'><?php echo Reports::render($hc/12,1);?></td>
+		</tr>		
+		<?php
+	}
+	?>
+	</tbody>
+	<tfoot>
+	<tr class='budget-subtotal'>
+			<td colspan="3">Total</td>
+			<td class='budget-decimal'><?php echo Reports::render($totalPayroll);?></td>
+			<?php
+			for($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
+				$month = $oBudget->arrPeriod[$m];			
+			?>
+			<td class='budget-decimal'><?php echo Reports::render($arrSubtotal[$month],1);?></td>
+			<?php
+			}
+			?>
+			<td class='budget-decimal budget-subtotal'><?php echo Reports::render(array_sum($arrSubtotal)/12,1);?></td>
+		</tr>
+	</tfoot>
+	</table>
+	<?php
 }
 
 

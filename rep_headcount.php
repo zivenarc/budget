@@ -13,7 +13,7 @@ if($_POST['pccGUID'] && $_POST['activity']){
 	$sql = "SELECT ".$oBudget->getMonthlySumSQL()." FROM reg_headcount 
 				LEFT JOIN vw_product_type ON prtID=activity
 				WHERE scenario=".$oSQL->e($_POST['budget_scenario'])."
-					AND posted=1 AND salary>0
+					AND posted=1 AND salary>".Reports::SALARY_THRESHOLD."
 					AND prtGHQ=(SELECT DISTINCT prtGHQ FROM vw_product_type WHERE prtTitle=".$oSQL->e($_POST['activity']).")
 					AND pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_POST['pccGUID']).")
 					GROUP BY activity";
