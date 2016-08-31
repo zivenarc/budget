@@ -60,7 +60,7 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 					AND `{$month}`<>0;";
 	$sql[] = "UPDATE reg_headcount, common_db.tbl_employee, treasury.tbl_sickleave 
 				SET salary=0 
-				WHERE DATEDIFF(sklDateEnd,sklDateStart)=>138
+				WHERE DATEDIFF(sklDateEnd,sklDateStart) > 138
 					AND ((@repDateStart BETWEEN sklDateStart AND sklDateEnd) OR (@repDateEnd BETWEEN sklDateStart AND sklDateEnd))  
 					AND sklEmployeeID=empID 
 					AND empGUID1C=particulars
