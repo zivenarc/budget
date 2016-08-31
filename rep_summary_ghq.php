@@ -226,7 +226,7 @@ if(!isset($_GET['prtGHQ'])){
 			FROM reg_headcount 
 			LEFT JOIN vw_product_type ON prtID=activity
 			LEFT JOIN common_db.tbl_employee ON empGUID1C=particulars
-			LEFT JOIN common_db.tbl_function ON empFunctionGUID=funGUID
+			LEFT JOIN common_db.tbl_function ON function=funGUID
 			WHERE activity IN (".implode(',',$arrProducts['id']).") AND scenario='{$budget_scenario}' AND salary>".Reports::SALARY_THRESHOLD."
 			GROUP BY particulars, function
 			ORDER BY funRHQ, funTitle, empTitleLocal";
