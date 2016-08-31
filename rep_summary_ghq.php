@@ -222,7 +222,7 @@ if(!isset($_GET['prtGHQ'])){
 	</table>	
 	<?php
 	//==================== Staff ==========================/
-	$sql = "SELECT pccTitle, SUM(salary) as salary,SUM(monthly_bonus) as monthly_bonus, empTitleLocal, funTitleLocal, prtTitleLocal,funFlagWC,funRHQ,".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset)." 
+	$sql = "SELECT pccTitle, salary, monthly_bonus, empTitleLocal, funTitleLocal, prtTitleLocal,funFlagWC,funRHQ,".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset)." 
 			FROM reg_headcount 
 			LEFT JOIN vw_product_type ON prtID=activity
 			LEFT JOIN common_db.tbl_employee ON empGUID1C=particulars
