@@ -227,10 +227,10 @@ if(!isset($_GET['prtGHQ'])){
 			LEFT JOIN vw_product_type ON prtID=activity
 			LEFT JOIN common_db.tbl_employee ON empGUID1C=particulars
 			LEFT JOIN common_db.tbl_function ON function=funGUID
-			LEFT JOIN common_db.tbl_profit ON profit=pccID
+			LEFT JOIN common_db.tbl_profit ON pc=pccID
 			WHERE activity IN (".implode(',',$arrProducts['id']).") AND scenario='{$budget_scenario}' AND salary>".Reports::SALARY_THRESHOLD."
-			GROUP BY particulars, function, profit
-			ORDER BY funRHQ, profit,funTitle, empTitleLocal";
+			GROUP BY particulars, function, pc
+			ORDER BY funRHQ, pc,funTitle, empTitleLocal";
 	$rs = $oSQL->q($sql);
 	?>
 	<style>
