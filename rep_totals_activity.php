@@ -7,6 +7,9 @@ require ('classes/item.class.php');
 
 include ('includes/inc_rep_activity.php');
 
+$mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1+$oBudget->offset;
+$mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12+$oBudget->offset;
+
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 echo '<h2>',$subtitle,'</h2>';
@@ -35,7 +38,7 @@ if(true || !isset($_GET['ghq'])){
 <?php
 }
 
-$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
+$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM vw_master
 		WHERE scenario='{$budget_scenario}'
 		{$sqlActivityFilter}
@@ -59,7 +62,7 @@ while ($rw=$oSQL->f($rs)){
 	$arrProfit[$keyProfit] = $rw['pccFlagProd'];
 }
 
-$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL().")/12 as Total
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/12 as Total
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='$budget_scenario' and posted=1
@@ -72,7 +75,7 @@ while ($rw=$oSQL->f($rs)){
 	$arrHeadcount['FTE'][$keyProfit] += $rw['Total'];	
 }
 
-$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='$budget_scenario' and active=1
@@ -87,7 +90,7 @@ while ($rw=$oSQL->f($rs)){
 	$arrGrossRevenueEstimate += $rw['Estimate'];	
 }
 
-$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='$budget_scenario' and active=1
@@ -102,7 +105,7 @@ while ($rw=$oSQL->f($rs)){
 	$arrOpIncomeEstimate += $rw['Estimate'];	
 }
 
-$sql = "SELECT prtTitle, unit, pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL().")/$denominator as Total
+$sql = "SELECT prtTitle, unit, pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total
 		##, SUM(estimate)/$denominator as Estimate
 		FROM reg_sales
 		LEFT JOIN vw_profit ON pccID=pc
