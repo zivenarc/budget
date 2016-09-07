@@ -363,7 +363,7 @@ foreach($arrProfit as $pc=>$flag){
 	<?php
 }
 ?>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotal)/array_sum($arrReport[GROSS_PROFIT]['Revenue']),1);?></td>
+	<td class='budget-decimal'><?php Reports::render_ratio(array_sum($arrGrandTotal),array_sum($arrReport[GROSS_PROFIT]['Revenue']));?></td>
 </tr>
 <tr class="budget-subtotal">
 	<td>Headcount</td>
