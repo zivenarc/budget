@@ -470,8 +470,7 @@ foreach($arrProfit as $pc=>$flag){
 }
 ?>
 	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOpIncome['this']),array_sum($arrGrossRevenue));?></td>	
-	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOpIncome['last']),$arrGrossRevenueEstimate);?></td>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrOpIncome['this'])/array_sum($arrGrossRevenue)*100-array_sum($arrOpIncome['last'])/$arrGrossRevenueEstimate*100,1);?></td>
+	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOpIncome['last']),$arrGrossRevenueEstimate);?></td>	
 </tr>
 <tr>
 	<td>OI per headcount</td>
