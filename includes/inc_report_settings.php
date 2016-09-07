@@ -74,7 +74,7 @@ if (isset($_GET['denominator'])) {
 } elseif (isset($_COOKIE['report_denominator'])){
 	$denominator = $_COOKIE['report_denominator'];
 } else {
-	$denominator = 1;
+	$denominator = 1000;
 }
 SetCookie('report_denominator',$denominator,0,'/budget/');
 
