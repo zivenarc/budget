@@ -129,7 +129,7 @@ class Headcount extends Document{
 				,'field'=>'particulars'
 				,'type'=>'combobox'
 				,'width'=>'200px'
-				,'source'=>'vw_employee_select'
+				//,'source'=>'vw_employee_select'
 				,'prefix'=>'emp'
 				,'sql'=>"SELECT empGUID1C as optValue, empTitleLocal as optText FROM vw_employee_select WHERE empProfitID={$this->profit}"
 				, 'disabled'=>false
