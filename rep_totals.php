@@ -418,7 +418,7 @@ foreach($arrProfit as $pc=>$flag){
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
-	<td class='budget-decimal'><?php Reports::render($arrGrossRevenue[$pc]/array_sum($arrGrossRevenue)*100,1);?></td>
+	<td class='budget-decimal'><?php Reports::render_ratio($arrGrossRevenue[$pc],array_sum($arrGrossRevenue));?></td>
 	<?php
 }
 ?>
