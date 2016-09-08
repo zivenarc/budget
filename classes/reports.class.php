@@ -2809,6 +2809,14 @@ class Reports{
 				$this->echoBudgetItemString($rw);
 			}
 			
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '7%')", $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "Extraordinary";
+				$this->echoBudgetItemString($rw);
+			}
+			
 			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE 'SZ%')", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
