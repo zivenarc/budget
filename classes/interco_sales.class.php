@@ -107,6 +107,15 @@ class Interco_sales extends Document{
 			, 'disabled'=>!$this->flagUpdate
 		);
 		
+		$this->Columns[] = Array( 
+			'title'=>'Type'
+			,'field'=>self::Prefix.'Type'
+			,'type'=>'combobox'
+			,'sql'=>Array('DC'=>'Operational','SC'=>'Staff costs')			
+			,'default'=>'DC'
+			, 'disabled'=>!$this->flagUpdate
+		);
+		
 		$this->Columns[] = $this->getResponsibleEF();
 		
 	}
@@ -191,6 +200,7 @@ class Interco_sales extends Document{
 			$this->product_folder = isset($_POST[self::Prefix.'ProductFolderID'])?$_POST[self::Prefix.'ProductFolderID']:$this->product_folder;			
 			$this->customer = isset($_POST[self::Prefix.'CustomerID'])?$_POST[self::Prefix.'CustomerID']:$this->customer;
 			$this->sales = isset($_POST[$this->prefix.'UserID'])?$_POST[$this->prefix.'UserID']:$this->sales;						
+			$this->type = isset($_POST[$this->prefix.'Type'])?$_POST[$this->prefix.'Type']:$this->type;						
 		}
 		
 		//-------------------Updating grid records---------------------------------
@@ -267,30 +277,21 @@ class Interco_sales extends Document{
 					$master_row->customer = $record->customer;	
 					$master_row->sales = $this->getSales($master_row->customer);					
 					$activity = $Activities->getByCode($record->activity);
-					$account = 'J00400';			
-					$master_row->account = $account;
-					$master_row->item = Items::INTERCOMPANY_REVENUE;
+					switch ($this->type) {
+						case 'DC':
+							$master_row->account = 'J00400';
+							$master_row->item = Items::INTERCOMPANY_REVENUE;
+							break;
+						case 'SC':
+							$master_row->account = 'J00801';
+							$master_row->item = Items::OUTSOURCING;
+							break;
+					}
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}				
-					
-					//-------------------------------------- Cost for supplier --------------------------------------------------
-					$master_row = $oMaster->add_master();
-					$master_row->profit = $this->profit;
-					$master_row->activity = $record->activity;
-					$master_row->customer = $record->customer;				
-					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $Activities->getByCode($record->activity);
-					$account = 'J00802';
-					
-					$master_row->account = $account;
-					$master_row->item = $activity->item_cost;
-					for($m=1;$m<=15;$m++){
-						$month = $this->budget->arrPeriod[$m];
-						$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
-					}
-					
+
 					//-------------------------------------- Intercompany cost for department --------------------------------------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->customer;
@@ -298,14 +299,38 @@ class Interco_sales extends Document{
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
 					$activity = $Activities->getByCode($record->activity);
-					$account = 'J00802';
-					
-					$master_row->account = $account;
-					$master_row->item = Items::INTERCOMPANY_COSTS;
+					switch ($this->type) {
+						case 'DC':			
+							$master_row->account = 'J00802';
+							$master_row->item = Items::INTERCOMPANY_COSTS;
+							break;
+						case 'SC':
+							$master_row->account = 'J00801';
+							$master_row->item = Items::OUTSOURCING;
+							break;
+					}
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
+					
+					if ($this->type=='DC'){					
+					//-------------------------------------- Cost for supplier --------------------------------------------------
+					$master_row = $oMaster->add_master();
+					$master_row->profit = $this->profit;
+					$master_row->activity = $record->activity;
+					$master_row->customer = $record->customer;				
+					$master_row->sales = $this->getSales($master_row->customer);
+					$activity = $Activities->getByCode($record->activity);
+					$master_row->account = 'J00802';
+					$master_row->item = $activity->item_cost;
+
+					for($m=1;$m<=15;$m++){
+						$month = $this->budget->arrPeriod[$m];
+						$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
+					}
+					
+
 					
 					//-------------------------------------- Elimination of revenue --------------------------------------------------
 					$master_row = $oMaster->add_master();
@@ -340,19 +365,21 @@ class Interco_sales extends Document{
 					}
 					
 					//-------------------------------------- Replacement of direct costs in customer department--------------------------
-					$master_row = $oMaster->add_master();
-					$master_row->profit = $this->customer;
-					$master_row->activity = $record->activity;
-					$master_row->customer = $record->customer;				
-					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $Activities->getByCode($record->activity);
-					$account = 'J00802';
 					
-					$master_row->account = $account;
-					$master_row->item = $activity->item_cost;
-					for($m=1;$m<=15;$m++){
-						$month = $this->budget->arrPeriod[$m];
-						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
+						$master_row = $oMaster->add_master();
+						$master_row->profit = $this->customer;
+						$master_row->activity = $record->activity;
+						$master_row->customer = $record->customer;				
+						$master_row->sales = $this->getSales($master_row->customer);
+						$activity = $Activities->getByCode($record->activity);
+						$account = 'J00802';
+						
+						$master_row->account = $account;
+						$master_row->item = $activity->item_cost;
+						for($m=1;$m<=15;$m++){
+							$month = $this->budget->arrPeriod[$m];
+							$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
+						}
 					}
 				}
 				$oMaster->save();

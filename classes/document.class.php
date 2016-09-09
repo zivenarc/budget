@@ -83,6 +83,7 @@ class Document extends easyForm{
 		$this->comment = $this->data[$this->prefix.'Comment'];
 		$this->amount = $this->data[$this->prefix.'Amount'];
 		$this->classified = $this->data[$this->prefix.'ClassifiedBy'];
+		$this->type = $this->data[$this->prefix.'Type'];
 		
 		$this->budget = new Budget($this->scenario);
 		

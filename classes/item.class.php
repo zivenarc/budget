@@ -23,6 +23,8 @@ class Items extends Reference{
 	const DIRECT_COSTS = '094e839a-095d-405f-af6a-77441bf66246';
 	const HIRING_COSTS = 'f0b14b45-f52b-11de-95b2-00188bc729d2';
 	
+	const OUTSOURCING = '602b628b-f52f-11de-95b2-00188bc729d2';
+	
 	const IT_EQUIPMENT = '602b626b-f52f-11de-95b2-00188bc729d2';
 	const INTERNET = '602b627c-f52f-11de-95b2-00188bc729d2';
 	const IT_COSTS = '602b626a-f52f-11de-95b2-00188bc729d2';
