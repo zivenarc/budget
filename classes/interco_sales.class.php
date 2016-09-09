@@ -41,6 +41,8 @@ class Interco_sales extends Document{
 		
 		parent::refresh($sql);
 		
+		$this->type = $this->data[$this->prefix.'Type'];
+		
 		if($this->GUID){
 			$sql = "SELECT * FROM `".self::Register."` WHERE `source`='".$this->GUID."';";
 			$rs = $this->oSQL->q($sql);			
