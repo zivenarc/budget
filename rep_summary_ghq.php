@@ -183,9 +183,7 @@ if(!isset($_GET['prtGHQ'])){
 	
 	$sql = "SELECT customer_group_code as optValue, 
 						customer_group_title as optText,  
-						{$sqlActual} as Actual, 
-						0 as Budget, 
-						{$sqlActual} as Diff
+						{$sqlActual} as Actual, IF(account='J00400',{$sqlActual},0) as Revenue
 				FROM vw_master 				
 				{$sqlWhere}
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
@@ -199,6 +197,7 @@ if(!isset($_GET['prtGHQ'])){
 		<caption>Top 10 customers, <?php echo urldecode($_GET['prtGHQ']);?></caption>
 		<tr>
 			<th>Customer</th>
+			<th>Revenue</th>
 			<th>GP</th>
 			<th>% of total</th>
 		</tr>
@@ -207,6 +206,7 @@ if(!isset($_GET['prtGHQ'])){
 		?>
 		<tr>
 			<td><?php echo $rw['optText'];?></td>
+			<td><?php echo number_format($rw['Revenue'],0,'.',',');?></td>
 			<td><?php echo number_format($rw['Actual'],0,'.',',');?></td>
 			<td><?php echo number_format($rw['Actual']/$arrReport['total']['fye']*100,0,'.',',');?>%</td>
 		</tr>
