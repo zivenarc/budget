@@ -327,13 +327,13 @@ class Budget{
 			<ul>
 			<?php
 			if (!$register){
-				$sql = "SELECT DISTINCT pccGUID, pccTitle$strLocal as pccTitle FROM vw_profit $sqlWhere";
+				$sql = "SELECT DISTINCT pccGUID, pccTitle$strLocal as pccTitle FROM vw_profit $sqlWhere ORDER BY pccParentID";
 			} else {
 				$sql = "SELECT DISTINCT pccGUID, pccTitle$strLocal as pccTitle 
 						FROM `$register` 
 						JOIN vw_profit ON pccID=pc
 						 $sqlWhere
-						";
+						ORDER BY pccParentID";
 				
 			}
 			
