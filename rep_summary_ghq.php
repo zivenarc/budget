@@ -183,7 +183,7 @@ if(!isset($_GET['prtGHQ'])){
 	
 	$sql = "SELECT customer_group_code as optValue, 
 						customer_group_title as optText,  
-						{$sqlActual} as Actual, IF(account='J00400',{$sqlActual},0) as Revenue
+						{$sqlActual} as Actual, SUM(IF(account='J00400',`Total_AM`,0)) as Revenue
 				FROM vw_master 				
 				{$sqlWhere}
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
