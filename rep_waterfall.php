@@ -19,13 +19,7 @@ $arrBudgetRates = $oBudget->getMonthlyRates($currency);
 $limit = 8;
 //$denominator = 1000;
 
-if (isset($_GET['period_type'])) {
-	$period_type = $_GET['period_type'];
-} elseif (isset($_COOKIE['period_type'])) {
-	$period_type = $_COOKIE['period_type'];
-} else {
-	$period_type = 'ytd';
-}
+
 SetCookie('period_type',$period_type,0,'/budget/');
 
 $arrPeriodType['ytd'] = 'YTD';

@@ -2692,6 +2692,8 @@ class Reports{
 				$strHeader = $this->oBudget->getTableHeader('roy');
 				$arrUnion = Array('YTD_A','YTD_B','ROY_A','ROY_B','FYE_A','FYE_B');				
 				break;
+			case 'ytd':
+			case 'cm':
 			default:
 				$strHeader = $this->oBudget->getTableHeader('mr');
 				$arrUnion = Array('CM_A','CM_B','YTD_A','YTD_B','NM_A','NM_B');	

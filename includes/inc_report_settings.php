@@ -78,6 +78,14 @@ if (isset($_GET['denominator'])) {
 }
 SetCookie('report_denominator',$denominator,0,'/budget/');
 
+if (isset($_GET['period_type'])) {
+	$period_type = $_GET['period_type'];
+} elseif (isset($_COOKIE['period_type'])) {
+	$period_type = $_COOKIE['period_type'];
+} else {
+	$period_type = 'ytd';
+}
+
 
 //------------------------------------ Title for report ------------------------------------------//
 if($currency!=643){
@@ -94,5 +102,7 @@ $arrUsrData["pagTitle$strLocal"] .= ': '.$curTitle;
 if ($denominator!=1) {
 	$arrUsrData["pagTitle$strLocal"] .= ' x'.$denominator;
 }
+
+
 
 ?>
