@@ -60,7 +60,7 @@ if(!isset($_GET['pccGUID'])){
 	}
 	
 	
-	$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>643, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
+	$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
 	$oReport->shortMonthlyReport($period_type);	
 	
 	?>
