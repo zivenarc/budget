@@ -1916,3 +1916,7 @@ background-image:url(/common/images/sprites/sprites.png);
 background-repeat:no-repeat;
 background-position:left -7597px;
 }
+
+td.budget-current{
+	border-right: 2px solid black;
+}

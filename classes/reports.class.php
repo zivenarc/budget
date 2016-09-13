@@ -822,7 +822,7 @@ class Reports{
 		for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class="budget-decimal budget-<?php echo $month;?>" data-meta='<?php echo json_encode($meta);?>'><?php self::render($data[$month],1);?></td>
+					<td class="budget-decimal budget-<?php echo $month;?> <?php echo ($m==$this->oBudget->cm?'budget-current':'';?>" data-meta='<?php echo json_encode($meta);?>'><?php self::render($data[$month],1);?></td>
 					<?php
 				
 				}
