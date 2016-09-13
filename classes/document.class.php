@@ -459,7 +459,7 @@ class Document extends easyForm{
 			,'field'=>$field
 			,'type'=>'combobox'
 			,'width'=>'40px'
-			,'arrValues'=>Array('monthly'=>'per month','annual'=>'per annum')
+			,'source'=>Array('monthly'=>'per month','annual'=>'per annum')
 			,'sql'=>Array('monthly'=>'per month','annual'=>'per annum')
 			,'mandatory'=>true
 			, 'disabled'=>!$this->flagUpdate
@@ -474,7 +474,7 @@ class Document extends easyForm{
 			,'field'=>$field
 			,'type'=>'combobox'
 			,'width'=>'100px'
-			,'arrValues'=>Activities::getStructuredRef()
+			,'source'=>Activities::getStructuredRef()
 			// ,'sql'=>"SELECT prtID as optValue, prtTitle as optText FROM vw_product_type ORDER BY prtRHQ, prtTitle"
 			, 'disabled'=>!$this->flagUpdate
 		);
@@ -491,8 +491,8 @@ class Document extends easyForm{
 			,'field'=>'product'
 			,'type'=>'combobox'
 			,'width'=>'100px'
-			,'arrValues'=>$Products->getStructuredRef($this->data["prdIdxLeft"],$this->data["prdIdxRight"])
-			,'source'=>"vw_product_select"      							
+			,'source'=>$Products->getStructuredRef($this->data["prdIdxLeft"],$this->data["prdIdxRight"])
+			// ,'source'=>"vw_product_select"      							
 			, 'mandatory' => true
 			, 'disabled'=>!$this->flagUpdate
 		);
