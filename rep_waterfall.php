@@ -125,6 +125,24 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 			'tolerance'=>0.05
 			);
 
+$settings['scbu'] = Array('title'=>"Staff cost by business unit",
+'sqlBase' => "SELECT pc as optValue, 
+					Profit as optText, 
+					{$sqlActual} as Actual, 
+					0 as Budget, 
+					{$sqlActual} as Diff
+			FROM vw_master 			
+			WHERE scenario='{$actual}' ".Reports::SC_FILTER."
+			GROUP BY pc
+			UNION ALL
+			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+			FROM vw_master 			
+			WHERE
+			scenario='{$budget}' AND source<>'Estimate' ".Reports::SC_FILTER."
+			GROUP BY pc",
+			'tolerance'=>0.05
+			);			
+			
 $settings['gpact'] = Array('title'=>"GP by activity",
 'sqlBase' => "SELECT activity as optValue, 
 					Activity_title as optText, 

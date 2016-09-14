@@ -12,6 +12,7 @@ class Reports{
 	const GP_CODE = 94;
 	const CNT_GROUP_EXEMPTION = 723;
 	const OP_FILTER = "AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%') ";	
+	const GP_FILTER = "AND group_code=95";
 	const GP_FILTER = "AND account IN ('J00400', 'J00802') ";
 	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';
 	const SALARY_THRESHOLD = 10000;
