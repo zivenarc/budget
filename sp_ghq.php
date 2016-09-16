@@ -292,7 +292,7 @@ foreach ($arrReport as $ghq=>$arrItems){
 			for ($m=$startMonth;$m<=$endMonth;$m++){
 				$month = $oBudget->arrPeriod[$m];
 				?>
-				<td class="budget-decimal"><?php Reports::render($values[$month],0);?></td>
+				<td class="budget-decimal <?php echo ($m==$oBudget->cm?'budget-current':'');?>"><?php Reports::render($values[$month],0);?></td>
 				<?php
 			}
 		?>
