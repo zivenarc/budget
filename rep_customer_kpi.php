@@ -8,6 +8,9 @@ $oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$c
 
 if (isset($_POST['activity'])){
 	$sqlWhere = " AND activity=".$oSQL->e($_POST['activity']);
+	if ($_POST['freehand']){
+		$sqlWhere.= " AND salBO=714";
+	}	
 	$sql = "SELECT * FROM vw_product_type WHERE prtID=".$oSQL->e($_POST['activity']);
 	$rs = $oSQL->q($sql);
 	$rwAct = $oSQL->f($rs);
@@ -24,6 +27,9 @@ include ('includes/inc-frame_top.php');
 <div id='output'>
 <h2><?php echo $rwAct["prtTitle$strLocal"];?></h2>
 <?php
+if ($_POST['freehand']){
+	?><h3>Freehand</h3><?php
+}
 $oReport->salesByCustomer($strPCFilter.' '.$sqlWhere);
 ?>
 </div>

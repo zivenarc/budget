@@ -149,7 +149,7 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
-					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
+					echo "<td class='budget-decimal budget-monthly budget-$month ".($m==$this->oBudget->cm?'budget-current':'')."'>",self::render($rw[$month]),'</td>';
 				}
 				$arrQuarter = $this->_getQuarterTotals($rw);
 				
@@ -189,15 +189,22 @@ class Reports{
 	
 	function offByRoute($sqlWhere){
 		
-		$sql = "SELECT prtTitle, ".$this->oBudget->getMonthlySumSQL(1,15).", 
-				SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total, 
-				SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
-				FROM vw_sales 
-				JOIN tbl_sales ON salGUID=source
-				{$sqlWhere} 
-					AND salBO=714
-					AND activity IN (48,63) AND scenario='{$this->oBudget->id}'
-				GROUP BY activity";
+		$sql = "SELECT activity, prtTitle, ".$this->oBudget->getMonthlySumSQL(1,15).", 
+				SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total
+				FROM 
+					(SELECT activity, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
+							FROM `reg_sales` 
+							JOIN tbl_sales ON salGUID=source							
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND salBO=714 AND activity IN (48,63)
+							GROUP BY activity, unit, source
+							UNION ALL
+							SELECT activity, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
+							FROM `reg_sales` 			
+							JOIN tbl_sales ON salGUID=source
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND salBO=714 AND activity IN (48,63)
+					GROUP BY activity, unit) U 		
+				LEFT JOIN vw_product_type ON prtID=activity
+				GROUP BY U.activity";
 		$rs = $this->oSQL->q($sql); 
 		$tableID = "kpi_".md5($sql);
 			?>
@@ -207,15 +214,10 @@ class Reports{
 				<tr>
 					<th>Activity</th>
 					<?php 
-					echo $this->oBudget->getTableHeader(); 
+					echo $this->oBudget->getTableHeader('monhtly',1+$this->oBudget->offset, 12+$this->oBudget->offset); 
 					echo $this->oBudget->getTableHeader('quarterly'); 
 					?>
 					<th class='budget-ytd'>Total</th>
-					<th class='budget-monthly'>Jan+</th>
-					<th class='budget-monthly'>Feb+</th>
-					<th class='budget-monthly'>Mar+</th>
-					<th>Q5</th>
-					<th class='budget-ytd'>Apr-Mar</th>
 				</tr>
 			</thead>			
 			<tbody>
@@ -229,36 +231,24 @@ class Reports{
 					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
 					<?php
 				};
-				echo "<td>",$rw['prtTitle'],'</td>';				
-				for ($m=1;$m<=12;$m++){
+				echo "<td><a href='javascript:getCustomerKPI({activity:{$rw['activity']},freehand:true});'>",$rw['prtTitle'],'</a></td>';				
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
-					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
+					echo "<td class='budget-decimal budget-monthly budget-$month ".($m==$this->oBudget->cm?'budget-current':'')."'>",self::render($rw[$month]),'</td>';
 					$arrTotal[$month]+=$rw[$month];
 				};
-				$arrTotal['Total']+=$rw['Total'];
-				$arrTotal['Total_AM']+=$rw['Total_AM'];
+				$arrTotal['Total']+=$rw['Total'];				
 				
 				$arrQuarter = $this->_getQuarterTotals($rw);
 				
-				for ($q=1;$q<5;$q++){		
+				for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 					$quarter = 'Q'.$q;
 					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
 					$arrTotal[$quarter]+=$arrQuarter[$quarter];
 				}				
 									
-				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';
-				for ($m=13;$m<=15;$m++){
-					// $month = $this->oBudget->arrPeriod[$m];
-					$month = $this->oBudget->arrPeriod[$m];
-					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
-				}
-				echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
-				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total_AM'],0,'.',','),'</td>';
-				for ($m=13;$m<=15;$m++){
-					$month = $this->oBudget->arrPeriod[$m];
-					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
-				}
+				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';								
 				echo "</tr>\r\n";				
 			}
 			?>
@@ -267,20 +257,18 @@ class Reports{
 				<tr class='budget-subtotal'>
 					<td>Total freehand volume</td>
 					<?php
-					for ($m=1;$m<=12;$m++){
+					for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($arrTotal[$month]),'</td>';
 	
 					}
-					for ($q=1;$q<5;$q++){		
+					for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 					$quarter = 'Q'.$q;
 					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($arrTotal[$quarter]),'</td>';
 
 					}	
-					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']),'</td>';
-					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render($arrTotal['Q5']),'</td>';
-					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total_AM']),'</td>';
+					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']),'</td>';					
 					?>
 				</tr>
 			</tfoot>
@@ -445,10 +433,11 @@ class Reports{
 					LEFT JOIN vw_customer ON customer=cntID					
 					LEFT JOIN vw_profit ON pc=pccID	
 					LEFT JOIN stbl_user ON sales=usrID
+					LEFT JOIN tbl_sales ON salGUID=source
 					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 {$sqlWhere} 
 					GROUP BY sales, `reg_sales`.`customer`, unit
 					ORDER BY sales, Total DESC"; 
-			//echo $sql;
+			// echo '<pre>',$sql,'</pre>';
 			$rs = $this->oSQL->q($sql);
 			if (!$this->oSQL->num_rows($rs)){
 				echo "<div class='warning'>No data found</div>";
@@ -485,7 +474,7 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
 					$arrTotal[$rw['unit']][$month] += $rw[$month];
-					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
+					echo "<td class='budget-decimal budget-monthly budget-$month ".($m==$this->oBudget->cm?'budget-current':'')."'>",self::render($rw[$month]),'</td>';
 				}
 				$arrQuarter = $this->_getQuarterTotals($rw);
 				
