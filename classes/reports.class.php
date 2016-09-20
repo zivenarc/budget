@@ -1172,7 +1172,7 @@ class Reports{
 									,Array('name'=>'Export, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Export']['Budget'],0,12))))									
 									,Array('name'=>'Import, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Import']['Budget'],0,12))))									
 								);		
-		$arrHighChartsOFF['series'] = Array(
+		$arrHighChartsRFF['series'] = Array(
 							Array('name'=>'Domestic, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Domestic']['Actual'],0,12))))									
 							,Array('name'=>'Intl, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Intl']['Actual'],0,12))))									
 							,Array('name'=>'Domestic, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Domestic']['Budget'],0,12))))									
@@ -1341,6 +1341,26 @@ class Reports{
 			}
 		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']),'</td>';
 		echo '<td class="budget-decimal budget-ytd">',self::render($arrKPI['OFF']['Import']['Actual']['Total_AM']),'</td>';
+		?>
+		</tr>
+		<tr><td rowspan="2">RFF volume</td><td>Domestic</td>
+		<?php
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
+				echo '<td class="budget-decimal">',self::render($arrKPI['RFF']['Domestic']['Actual'][$period]),'</td>';
+			}
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($arrKPI['RFF']['Domestic']['Actual']['Total_AM']),'</td>';
+		?>
+		</tr>
+		<tr><td>Intl</td>
+		<?php
+			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+				$period = $this->oBudget->arrPeriod[$m];
+				echo '<td class="budget-decimal">',self::render($arrKPI['RFF']['Intl']['Actual'][$period]),'</td>';
+			}
+		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($arrKPI['RFF']['Intl']['Actual']['Total_AM']),'</td>';
 		?>
 		</tr>
 		</table>
