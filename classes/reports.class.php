@@ -1359,14 +1359,14 @@ class Reports{
 			
 			
 			$sql = "SELECT {$sqlSelect}
-					FROM `vw_sales` 			
-					{$sqlWhere} AND scenario='{$this->oReference->id}' AND activity={$activity} AND source='Actual'";
+					FROM `reg_sales` 			
+					{$sqlWhere} AND scenario='{$this->oReference->id}' AND activity={$activity} AND source='Actual'";			
 			$rs = $this->oSQL->q($sql);
 			$res['Budget'] = $this->oSQL->f($rs);
 			
 			$sql = "SELECT {$sqlSelect}
-					FROM `vw_sales` 			
-					{$sqlWhere} AND scenario='{$this->oReference->id}' AND activity={$activity} AND source<>'Actual'";
+					FROM `reg_sales` 			
+					{$sqlWhere} AND scenario='{$this->oReference->id}' AND activity={$activity} AND source<>'Actual'";			
 			$rs = $this->oSQL->q($sql);
 			$rw = $this->oSQL->f($rs); 
 			for ($m=(integer)date('n',$this->oReference->date_start);$m<=12+$this->oBudget->offset;$m++){
@@ -1376,14 +1376,15 @@ class Reports{
 			}
 			
 			$sql = "SELECT {$sqlSelect}
-					FROM `vw_sales` 			
+					FROM `reg_sales` 			
 					{$sqlWhere} AND scenario='{$this->oBudget->id}' AND activity={$activity} AND source='Actual'";
 			$rs = $this->oSQL->q($sql);			
 			$res['Actual'] = $this->oSQL->f($rs);
 			
 			$sql = "SELECT {$sqlSelect}
-					FROM `vw_sales` 			
+					FROM `reg_sales` 			
 					{$sqlWhere} AND scenario='{$this->oBudget->id}' AND activity={$activity} AND source<>'Actual'";
+			// echo '<pre>',$sql,'</pre>';
 			$rs = $this->oSQL->q($sql);
 			$rw = $this->oSQL->f($rs); 
 			for ($m=(integer)date('n',$this->oBudget->date_start);$m<=12+$this->oBudget->offset;$m++){
