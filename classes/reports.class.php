@@ -1090,6 +1090,10 @@ class Reports{
 					'OFF'=>Array(
 							'Export'=>Array('activity'=>63),
 							'Import'=>Array('activity'=>48)
+					),
+					'RFF'=>Array(
+							'Domestic'=>Array('activity'=>3),
+							'Intl'=>Array('activity'=>13)
 					)
 				);
 		
@@ -1117,6 +1121,14 @@ class Reports{
 				'plotOptions'=>Array('column'=>Array('stacking'=>'normal'))
 		);
 		
+		$arrHighChartsRFF = Array(
+				'title'=>Array('text'=>'RFF volumes','x'=>-20),				
+				'subtitle'=>Array('text'=>$this->oBudget->title." vs ".$this->oReference->title,'x'=>-20),						
+				'chart'=>Array('type'=>'column'),
+				'yAxis'=>Array('min'=>0,'title'=>Array('text'=>'Ttips')),
+				'plotOptions'=>Array('column'=>Array('stacking'=>'normal'))
+		);
+		
 		//-------------------------------------------------------------------------
 		$arrHighCharts = Array(
 						'title'=>Array('text'=>'Performance by month','x'=>-20),
@@ -1129,6 +1141,7 @@ class Reports{
 			$arrHighCharts['xAxis']['categories'][] = $period;
 			$arrHighChartsAFF['xAxis']['categories'][] = $period;
 			$arrHighChartsOFF['xAxis']['categories'][] = $period;
+			$arrHighChartsRFF['xAxis']['categories'][] = $period;
 			$arrHSSeries[0][] = (integer)$rwGR[$period];
 			$arrHSSeries[1][] = (integer)$rwGP[$period];
 			$arrHSSeries[2][] = (integer)$rwBGP[$period];
@@ -1159,6 +1172,12 @@ class Reports{
 									,Array('name'=>'Export, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Export']['Budget'],0,12))))									
 									,Array('name'=>'Import, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Import']['Budget'],0,12))))									
 								);		
+		$arrHighChartsOFF['series'] = Array(
+							Array('name'=>'Domestic, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Domestic']['Actual'],0,12))))									
+							,Array('name'=>'Intl, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Intl']['Actual'],0,12))))									
+							,Array('name'=>'Domestic, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Domestic']['Budget'],0,12))))									
+							,Array('name'=>'Intl, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Intl']['Budget'],0,12))))									
+						);
 		// echo '<pre>';print_r($arrGraph);echo '</pre>';
 		?>
 		<table class='budget' id='<?php echo $this->ID;?>'>
@@ -1331,21 +1350,25 @@ class Reports{
 		<div id='graph_<?php echo $this->ID;?>'>Line chart loading...</div>
 		<div id='aff_<?php echo $this->ID;?>'>AFF chart loading...</div>
 		<div id='off_<?php echo $this->ID;?>'>OFF chart loading...</div>
+		<div id='rff_<?php echo $this->ID;?>'>RFF chart loading...</div>
 		<script type='text/javascript'>
 			console.log('Here should be a chart!');
 			var target = '#graph_<?php echo $this->ID;?>';
 			var targetAFF = '#aff_<?php echo $this->ID;?>';
 			var targetOFF = '#off_<?php echo $this->ID;?>';
+			var targetRFF = '#rff_<?php echo $this->ID;?>';
 			$(target).ready(function(){				
 				var options = <?php echo json_encode($arrHighCharts);?>;		
 				var optionsAFF = <?php echo json_encode($arrHighChartsAFF);?>;		
 				var optionsOFF = <?php echo json_encode($arrHighChartsOFF);?>;		
+				var optionsRFF = <?php echo json_encode($arrHighChartsRFF);?>;		
 				console.log(optionsAFF);
 				// target = document.getElementById(target);	
 				// drawGraph(arrData, target, options);
 				$(target).highcharts(options);
 				$(targetAFF).highcharts(optionsAFF);
 				$(targetOFF).highcharts(optionsOFF);
+				$(targetRFF).highcharts(optionsRFF);
 			});
 		</script>
 		<?php			
