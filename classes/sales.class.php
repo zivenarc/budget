@@ -351,6 +351,7 @@ class Sales extends Document{
 						$row->kpi = $_POST['kpi'][$id];				
 						$row->hbl = $_POST['hbl'][$id];				
 						$row->sales = $this->sales;				
+						$row->bo = $this->business_owner;				
 						$row->route = $this->route;				
 						for ($m=1;$m<=15;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));

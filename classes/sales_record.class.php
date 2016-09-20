@@ -61,6 +61,7 @@ class sales_record extends table_record{
 			$arrRes[] = "`route`=".($this->route?(integer)$this->route:'NULL');
 			$arrRes[] = "`kpi`=".(integer)$this->kpi;
 			$arrRes[] = "`hbl`=".(integer)$this->hbl;
+			$arrRes[] = "`bo`=".(integer)$this->bo;
 			if ($this->id){
 				$res = "UPDATE `reg_sales` SET ". implode(',',$arrRes)." WHERE id=".$this->id;
 			} else {
