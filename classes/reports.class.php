@@ -193,15 +193,13 @@ class Reports{
 				SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total
 				FROM 
 					(SELECT activity, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
-							FROM `reg_sales` 
-							JOIN tbl_sales ON salGUID=source							
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND salBO=714 AND activity IN (48,63)
+							FROM `reg_sales` 							
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND bo=714 AND activity IN (48,63)
 							GROUP BY activity, unit, source
 							UNION ALL
 							SELECT activity, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
-							FROM `reg_sales` 			
-							JOIN tbl_sales ON salGUID=source
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND salBO=714 AND activity IN (48,63)
+							FROM `reg_sales` 										
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND bo=714 AND activity IN (48,63)
 					GROUP BY activity, unit) U 		
 				LEFT JOIN vw_product_type ON prtID=activity
 				GROUP BY U.activity";
@@ -428,12 +426,15 @@ class Reports{
 	public function salesByCustomer($sqlWhere=''){
 		
 		ob_start();
-			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL(1,15).", SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total, usrTitle as responsible, sales
+			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL(1,15).", 
+							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total, 
+							usrTitle as responsible, 
+							sales
 					FROM `reg_sales`
 					LEFT JOIN vw_customer ON customer=cntID					
 					LEFT JOIN vw_profit ON pc=pccID	
 					LEFT JOIN stbl_user ON sales=usrID
-					LEFT JOIN tbl_sales ON salGUID=source
+					## LEFT JOIN tbl_sales ON salGUID=source
 					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 {$sqlWhere} 
 					GROUP BY sales, `reg_sales`.`customer`, unit
 					ORDER BY sales, Total DESC"; 
