@@ -507,7 +507,7 @@ class Depreciation extends Document{
 			}
 	}
 	
-	private function fill(){
+	public function fill(){
 		
 		if (is_array($this->records[$this->gridName])){
 			foreach($this->records[$this->gridName] as $id=>$record){
