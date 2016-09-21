@@ -57,27 +57,27 @@ switch ($oNewBudget->type){
 // if ($oNewBudget->type=='FYE'){
 	case 'FYE':
 	case 'FYE_AM':
-		$sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item, source, estimate, ytd, roy, scenario, active)
-				SELECT company, pc, activity, customer, account, item, 'Estimate', 
-						SUM(".$oBudget->getYTDSQL(1+$oNewBudget->offset,12+$oNewBudget->offset).") as FYE,
-						SUM(".$oBudget->getYTDSQL(1+$oNewBudget->offset,date('n',$oNewBudget->date_start)-1).") as YTD, 
-						SUM(".$oBudget->getYTDSQL(date('n',$oNewBudget->date_start),12+$oNewBudget->offset).") as ROY, 
-						'{$new_budget}', active
-					FROM reg_master WHERE scenario=@refID AND active=1 AND estimate=0
-					GROUP BY company, pc, activity, customer, account, item
-					HAVING FYE<>0;";
+		// $sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item, source, estimate, ytd, roy, scenario, active)
+				// SELECT company, pc, activity, customer, account, item, 'Estimate', 
+						// SUM(".$oBudget->getYTDSQL(1+$oNewBudget->offset,12+$oNewBudget->offset).") as FYE,
+						// SUM(".$oBudget->getYTDSQL(1+$oNewBudget->offset,date('n',$oNewBudget->date_start)-1).") as YTD, 
+						// SUM(".$oBudget->getYTDSQL(date('n',$oNewBudget->date_start),12+$oNewBudget->offset).") as ROY, 
+						// '{$new_budget}', active
+					// FROM reg_master WHERE scenario=@refID AND active=1 AND estimate=0
+					// GROUP BY company, pc, activity, customer, account, item
+					// HAVING FYE<>0;";
 		break;
 	case 'Actual':
 
 		break;
 	default:
-		$sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item, source, estimate, scenario, active)
-					SELECT company, pc, activity, customer, account, item, 'Estimate', 
-							SUM(".$oBudget->getYTDSQL(1+$oNewBudget->offset,12+$oNewBudget->offset).") as FYE,						
-							'{$new_budget}', active
-						FROM reg_master WHERE scenario=@refID AND active=1 AND estimate=0
-						GROUP BY company, pc, activity, customer, account, item
-						HAVING FYE<>0;";	
+		// $sql[] = "INSERT INTO reg_master (company, pc, activity, customer, account, item, source, estimate, scenario, active)
+					// SELECT company, pc, activity, customer, account, item, 'Estimate', 
+							// SUM(".$oBudget->getYTDSQL(1+$oNewBudget->offset,12+$oNewBudget->offset).") as FYE,						
+							// '{$new_budget}', active
+						// FROM reg_master WHERE scenario=@refID AND active=1 AND estimate=0
+						// GROUP BY company, pc, activity, customer, account, item
+						// HAVING FYE<>0;";	
 		break;
 }
 				
