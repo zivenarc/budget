@@ -1172,7 +1172,7 @@ class Reports{
 									,Array('name'=>'Export, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Export']['Budget'],0,12))))									
 									,Array('name'=>'Import, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Import']['Budget'],0,12))))									
 								);		
-		$arrHighChartsRFF['series'] = Array(
+		$arrHighChartsR	FF['series'] = Array(
 							Array('name'=>'Domestic, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Domestic']['Actual'],0,12))))									
 							,Array('name'=>'Intl, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Intl']['Actual'],0,12))))									
 							,Array('name'=>'Domestic, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Domestic']['Budget'],0,12))))									
@@ -2606,7 +2606,7 @@ class Reports{
 					<td class="td-posted <?php echo ($data[$i]['posted']?'budget-icon-posted':'');?>">&nbsp;</td>
 					<td class="td-deleted <?php echo ($data[$i]['deleted']?'budget-icon-deleted':'');?>">&nbsp;</td>
 					<td id="amount_<?php echo $data[$i]['guid'];?>" class="journal-current budget-decimal"><?php self::render($data[$i]['amount']);?></td>
-					<td><?php echo $data[$i]['pccTitle']?$data[$i]['pccTitle']:$data[$i]['locTitle'];?></td>
+					<td><?php echo $data[$i]['PL'];?></td>
 					<td><?php echo $data[$i]['comment'];?></td>
 					<td id="usrTitle_<?php echo $data[$i]['guid'];?>"><?php echo $data[$i]['usrTitle'];?></td>
 					<td id="timestamp_<?php echo $data[$i]['guid'];?>"><?php echo date('d.m.Y H:i',strtotime($data[$i]['timestamp']));?></td>

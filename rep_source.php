@@ -21,9 +21,8 @@ if ($_POST['pccGUID']=='all' || $_POST['pccGUID']=='undefined' || !isset($_POST[
 	$strPCFilter = " AND pccGUID=".$oSQL->e($_POST['pccGUID']);
 }
 
-$sql = "SELECT *,SUM(`Jan`+`Feb`+`Mar`+`Apr`+`May`+`Jun`+`Jul`+`Aug`+`Sep`+`Oct`+`Nov`+`Dec`) as amount FROM reg_master
-		JOIN vw_journal ON guid=source
-		LEFT JOIN vw_profit ON pccID=reg_master.pc
+$sql = "SELECT *,SUM(`Jan`+`Feb`+`Mar`+`Apr`+`May`+`Jun`+`Jul`+`Aug`+`Sep`+`Oct`+`Nov`+`Dec`+`Jan_1`+`Feb_1`+`Mar_1`) as amount FROM reg_master
+		JOIN vw_journal ON guid=source		
 		LEFT JOIN stbl_user ON usrID=edit_by
 		WHERE item=".$oSQL->e($_POST['item'])." $strPCFilter $sqlWhere  AND vw_journal.scenario='$budget_scenario'
 		GROUP BY guid

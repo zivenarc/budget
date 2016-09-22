@@ -7,9 +7,7 @@ if ($_GET['tab']){
 	require ('classes/reports.class.php');
 	$sql = "SELECT *, edit_date as timestamp FROM vw_master 		
 		LEFT JOIN vw_journal ON source=guid
-		LEFT JOIN stbl_user ON usrID=edit_by
-		LEFT JOIN vw_profit ON pccID=vw_master.pc
-		##LEFT JOIN vw_location ON locID=vw_journal.pc	
+		LEFT JOIN stbl_user ON usrID=edit_by		
 		WHERE posted=1 AND vw_master.scenario='{$_GET['tab']}' AND IFNULL(account,'') = ''
 		GROUP BY guid
 		ORDER BY vw_master.timestamp DESC";	
@@ -32,9 +30,7 @@ if ($_GET['tab']){
 		
 		$sql = "SELECT *, edit_date as timestamp FROM vw_master 		
 		LEFT JOIN vw_journal ON source=guid
-		LEFT JOIN stbl_user ON usrID=edit_by
-		LEFT JOIN vw_profit ON pccID=vw_master.pc
-		##LEFT JOIN vw_location ON locID=vw_journal.pc	
+		LEFT JOIN stbl_user ON usrID=edit_by		
 		WHERE posted=1 AND vw_master.scenario='{$_GET['tab']}' AND IFNULL(vw_master.pc,0) = 0
 		GROUP BY guid
 		ORDER BY vw_master.timestamp DESC";	

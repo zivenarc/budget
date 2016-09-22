@@ -10,12 +10,10 @@ if ($_GET['tab']){
 
 	<?php
 	require ('classes/reports.class.php');
-	$sql = "SELECT vw_journal.*, stbl_user.*, vw_profit.*, vw_location.*,  edit_date as timestamp FROM vw_journal 				
-		LEFT JOIN stbl_user ON usrID=vw_journal.edit_by		
-		LEFT JOIN vw_profit ON pccID=vw_journal.pc
-		LEFT JOIN vw_location ON locID=vw_journal.pc
+	$sql = "SELECT *,  edit_date as timestamp FROM vw_journal 				
+		LEFT JOIN stbl_user ON usrID=vw_journal.edit_by				
 		WHERE vw_journal.posted=1 AND vw_journal.scenario='{$_GET['tab']}' 
-		AND prefix IN ('sal')
+		AND prefix IN ('sal', 'ics')
 		GROUP BY vw_journal.guid
 		ORDER BY vw_journal.edit_date ASC";	
 

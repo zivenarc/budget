@@ -6,9 +6,7 @@ if ($_GET['tab']){
 
 	require ('classes/reports.class.php');
 	$sql = "SELECT *, edit_date as timestamp FROM vw_journal 		
-		LEFT JOIN stbl_user ON usrID=edit_by
-		LEFT JOIN vw_profit ON pccID=pc
-		LEFT JOIN vw_location ON locID=pc
+		LEFT JOIN stbl_user ON usrID=edit_by		
 		WHERE posted=0 AND scenario='{$_GET['tab']}' 
 		GROUP BY guid
 		ORDER BY timestamp DESC";	
