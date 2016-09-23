@@ -64,8 +64,9 @@ if ($_GET['tab']){
 	}
 	
 	$data = Array();
-	$sql = "SELECT source FROM reg_sales WHERE scenario='{$_GET['tab']}' 
-			WHERE activity IN (48,63) AND bo=714
+	$sql = "SELECT source FROM reg_sales 
+			WHERE scenario='{$_GET['tab']}' 
+				AND activity IN (48,63) AND bo=714
 			GROUP BY source";
 	$rs =$oSQL->q($sql);
 	if ($oSQL->n($rs)){
