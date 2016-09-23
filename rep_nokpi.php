@@ -62,6 +62,34 @@ if ($_GET['tab']){
 			Reports::getJournalEntries($data);
 
 	}
+	
+	$data = Array();
+	$sql = "SELECT source FROM reg_sales WHERE scenario='{$_GET['tab']}' 
+			WHERE activity IN (48,63) AND bo=714
+			GROUP BY source";
+	$rs =$oSQL->q($sql);
+	if ($oSQL->n($rs)){
+	$arrSource = Array();
+		while ($rw=$oSQL->f($rs)){
+			$arrSource[] = "'".$rw['source']."'";
+		}	
+		$sql = "SELECT *, edit_date as timestamp FROM vw_journal 				
+			WHERE scenario='{$_GET['tab']}' 
+				AND guid IN (".implode(",",$arrSource).")
+			GROUP BY guid
+			ORDER BY responsible, timestamp DESC";	
+
+			$rs =$oSQL->q($sql);
+			while ($rw=$oSQL->f($rs)){
+				$data[] = $rw;
+			}
+			?>
+			<!--<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>-->			
+			<h3>Freehand OFF - check!</h3>
+			<?php
+			Reports::getJournalEntries($data);
+
+	}
 	?>
 	</div>
 	<?php
