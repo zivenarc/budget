@@ -799,8 +799,6 @@ class Headcount extends Document{
 				from vw_employee WHERE empProfitID='{$this->pc->code}'
 				group by empProfitID"; 
 		
-		$this->Documentlog .= $sql;
-		
 		$rs = $this->oSQL->q($sql);
 		if ($rw=$this->oSQL->f($rs)){
 			$turnover = ceil(100*$rw['hc_dismissed']/(($rw['hc_opening']+$rw['hc_closing'])/2));
@@ -828,7 +826,12 @@ class Headcount extends Document{
 					WHERE empProfitID={$this->pc->code}
 						AND empFlagDeleted=0 AND (empEndDate IS NULL OR DATEDIFF(empEndDate,'".date('Y-m-d',$this->budget->date_start)."')>=0)
 					ORDER BY empSalary DESC, empFunctionGUID, empTitleLocal";//die($sql);
-					
+		
+				
+		$this->Documentlog[] = $this->budget->id;
+		$this->Documentlog[] = $this->budget->date_start;
+		$this->Documentlog[] = $this->budget->date_end;
+		$this->Documentlog[] = $sql;
 		// echo $sql;
 		// echo '<pre>';print_r($oBudget);echo '</pre>';
 		
