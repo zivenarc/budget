@@ -781,11 +781,11 @@ class Headcount extends Document{
 		
 		
 		
-		$dateBudgetStart = date('Y-m-d',$oBudget->date_start);
-		$dateBudgetEnd = date('Y-m-d h:i:s',$oBudget->date_end);
+		$dateBudgetStart = date('Y-m-d',$this->budget->date_start);
+		$dateBudgetEnd = date('Y-m-d h:i:s',$this->budget->date_end);
 		
-		$dateEstStart = date('Y-m-d',$oBudget->date_start-365*24*60*60);
-		$dateEstEnd = date('Y-m-d h:i:s',$oBudget->date_end-365*24*60*60);
+		$dateEstStart = date('Y-m-d',$this->budget->date_start-365*24*60*60);
+		$dateEstEnd = date('Y-m-d h:i:s',$this->budget->date_end-365*24*60*60);
 		
 		// if ($oBudget->length ==15){
 			// $dateBudgetEnd = ($oBudget->year+1).'-03-31 23:59:59';
@@ -823,10 +823,10 @@ class Headcount extends Document{
 						IF(empID IN ({$strMaternity}),0,empSalary) as empSalary
 						,empMonthly
 						,(SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
-					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090 AND DATEDIFF(rsgDateEnd,'".date('Y-m-d',$oBudget->date_start)."')>0) as empEndDate
+					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090 AND DATEDIFF(rsgDateEnd,'".date('Y-m-d',$this->budget->date_start)."')>0) as empEndDate
 					FROM vw_employee_select 
 					WHERE empProfitID={$this->pc->code}
-						AND empFlagDeleted=0 AND (empEndDate IS NULL OR DATEDIFF(empEndDate,'".date('Y-m-d',$oBudget->date_start)."')>=0)
+						AND empFlagDeleted=0 AND (empEndDate IS NULL OR DATEDIFF(empEndDate,'".date('Y-m-d',$this->budget->date_start)."')>=0)
 					ORDER BY empSalary DESC, empFunctionGUID, empTitleLocal";//die($sql);
 					
 		// echo $sql;
