@@ -367,14 +367,14 @@ class Headcount extends Document{
 								
 						for ($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
-							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-							$current_month_end = mktime(0,0,0,$m+1,0,$oBudget->year);
+							$current_month_start = mktime(0,0,0,$m,1,$this->budget->year);
+							$current_month_end = mktime(0,0,0,$m+1,0,$this->budget->year);
 							// echo date('d.m.Y',$row->start_date),';',date('d.m.Y',$current_month_start),"\r\n";
 							if ($this->type=='current'){
 								
 								$row->{$month} = (integer)$_POST[strtolower($month)][$id];
 								
-								$row->{$month} = $row->getFTE($m, $oBudget->year);
+								$row->{$month} = $row->getFTE($m, $this->budget->year);
 								
 								
 								
@@ -446,8 +446,8 @@ class Headcount extends Document{
 					for($m=1;$m<=15;$m++){ 
 						$month = $this->budget->arrPeriod[$m];
 						
-						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-						$current_month_end = mktime(23,59,59,$m+1,0,$oBudget->year);
+						$current_month_start = mktime(0,0,0,$m,1,$this->budget->year);
+						$current_month_end = mktime(23,59,59,$m+1,0,$this->budget->year);
 						
 						$sqlV = Array();
 						$sqlV[]="SET @dateStart:='".date('Y-m-d',$current_month_start)."',@dateEnd:='".date('Y-m-d',$current_month_end)."', @daysMonth = nlogjc.fn_daycount(@dateStart, @dateEnd, 'workdays');";
@@ -471,10 +471,10 @@ class Headcount extends Document{
 			
 				foreach($this->records[$this->gridName] as $id=>$record){
 				
-					$eligible_date = time(0,0,0,10,1,$oMaster->budget->year-1);
+					$eligible_date = time(0,0,0,10,1,$this->budget->year-1);
 					$start_date = strtotime($record->start_date);
 					$probation = $start_date + 91*24*60*60;
-					$eligible = ($start_date < $eligible_date) && ($this->settings['salary_review_month']>date('m',$oMaster->budget->date_start));
+					$eligible = ($start_date < $eligible_date) && ($this->settings['salary_review_month']>date('m',$this->budget->date_start));
 						
 					$oEmployee = $Employees->getById($record->employee);
 					// echo '<pre>';print_r($oEmployee);echo '</pre>';
