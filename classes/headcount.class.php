@@ -474,7 +474,7 @@ class Headcount extends Document{
 					$eligible_date = time(0,0,0,10,1,$this->budget->year-1);
 					$start_date = strtotime($record->start_date);
 					$probation = $start_date + 91*24*60*60;
-					$eligible = ($start_date < $eligible_date) && ($this->settings['salary_review_month']>date('m',$this->budget->date_start));
+					$eligible = ($start_date < $eligible_date) && ($this->settings['salary_review_month']>=date('m',$this->budget->date_start));
 						
 					$oEmployee = $Employees->getById($record->employee);
 					// echo '<pre>';print_r($oEmployee);echo '</pre>';
