@@ -799,6 +799,8 @@ class Headcount extends Document{
 				from vw_employee WHERE empProfitID='{$this->pc->code}'
 				group by empProfitID"; 
 		
+		$this->Documentlog .= $sql;
+		
 		$rs = $this->oSQL->q($sql);
 		if ($rw=$this->oSQL->f($rs)){
 			$turnover = ceil(100*$rw['hc_dismissed']/(($rw['hc_opening']+$rw['hc_closing'])/2));
