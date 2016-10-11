@@ -32,7 +32,7 @@ if(isset($_GET['pc'])){
 
 if ($_COOKIE['pc']){
 	$pcfilter = $_COOKIE['pc'];
-	$sqlWhere = " AND guid IN (SELECT source FROM reg_master WHERE pc=".$oSQL->e($pcfilter).")";
+	$sqlWhere = " AND (guid IN (SELECT source FROM reg_master WHERE pc=".$oSQL->e($pcfilter).") OR pc=".$oSQL->e($pcfilter).")";
 }
 
 if ($_GET['tab']){
