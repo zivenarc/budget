@@ -5,7 +5,7 @@
 require ('common/auth.php');
 
 
-$bdv = isset($_GET['bdv'])?$_GET['bdv']:($_COOKIE['bdv']?$_COOKIE['bdv']:$arrUsrData['usrID']);
+$bdv = isset($_GET['bdv'])?$_GET['bdv']:($_COOKIE['bdv']?$_COOKIE['bdv']:$arrUsrData['usrProfitID']);
 if ($_GET['bdv']=='MYSELF'){
 	$bdv = $arrUsrData['usrProfitID'];
 }
