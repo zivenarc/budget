@@ -56,7 +56,7 @@ class Sales extends Document{
 			$sql = "SELECT * FROM `".self::Register."` WHERE `source`='".$this->GUID."';";
 			$rs = $this->oSQL->q($sql);			
 			while($rw = $this->oSQL->f($rs)){
-				$this->records[$this->gridName][$rw['id']] = new sales_record($this->GUID, $this->scenario, $rw['id'], $rw);
+				$this->records[$this->gridName][$rw['id']] = new sales_record($this->GUID, $this->scenario, $this->company, $rw['id'], $rw);
 				if ($rw['unit']=='TEU'&& $rw['kpi']){
 					$this->arrTEU = $rw;
 				}
@@ -419,7 +419,7 @@ class Sales extends Document{
 				
 		
 		$this->refresh($this->ID);		
-		$oMaster = new Master($this->scenario, $this->GUID);
+		$oMaster = new Master($this->scenario, $this->GUID, $this->company);
 			
 			if(is_array($this->records[$this->gridName])){
 				foreach($this->records[$this->gridName] as $id=>$record){

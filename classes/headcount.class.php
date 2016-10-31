@@ -68,7 +68,7 @@ class Headcount extends Document{
 			$sql = "SELECT * FROM `".self::Register."` WHERE `source`='".$this->GUID."';";
 			$rs = $this->oSQL->q($sql);			
 			while($rw = $this->oSQL->f($rs)){
-				$this->records[$this->gridName][$rw['id']] = new headcount_record($this->GUID, $this->scenario, $rw['id'], $rw);
+				$this->records[$this->gridName][$rw['id']] = new headcount_record($this->GUID, $this->scenario,  $this->company, $rw['id'], $rw);
 			}		
 		}
 	}

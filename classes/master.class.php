@@ -5,22 +5,23 @@ class Master {
 	public $records;
 	protected $oSQL;
 	
-	function __construct($scenario, $source){
+	function __construct($scenario, $source, $company){
 		GLOBAL $oSQL;
 		$this->oSQL = $oSQL;
 		$this->id = $source;
 		$this->scenario = $scenario;		
+		$this->company = $company;		
 		$this->budget = new Budget($scenario);
 	}
 	
 	public function add_master(){
-		$oBR = new master_record($this->id,$this->scenario);
+		$oBR = new master_record($this->id,$this->scenario, $this->company);
 		$this->records['master'][] = $oBR;
 		return ($oBR);	
 	}
 	
 	public function add_headcount(){
-		$oBR = new headcount_record($this->id,$this->scenario);
+		$oBR = new headcount_record($this->id,$this->scenario, $this->company);
 		$this->records['headcount'][] = $oBR;
 		return ($oBR);	
 	}
@@ -49,7 +50,9 @@ class Master {
 		// }
 		
 		$sql[] = "UPDATE tbl_scenario 
-					SET scnTotal = (SELECT SUM(`jan`)+SUM(`feb`)+SUM(`mar`)+SUM(`apr`)+SUM(`may`)+SUM(`jun`)+SUM(`jul`)+SUM(`aug`)+SUM(`sep`)+SUM(`oct`)+SUM(`nov`)+SUM(`dec`) FROM reg_master WHERE scenario='".$this->scenario."') 
+					SET 
+						scnTotal = (SELECT SUM(`jan`)+SUM(`feb`)+SUM(`mar`)+SUM(`apr`)+SUM(`may`)+SUM(`jun`)+SUM(`jul`)+SUM(`aug`)+SUM(`sep`)+SUM(`oct`)+SUM(`nov`)+SUM(`dec`) FROM reg_master WHERE scenario='".$this->scenario."') 
+						,scnTotalAM = (SELECT SUM(`jan_1`)+SUM(`feb_1`)+SUM(`mar_1`)+SUM(`apr`)+SUM(`may`)+SUM(`jun`)+SUM(`jul`)+SUM(`aug`)+SUM(`sep`)+SUM(`oct`)+SUM(`nov`)+SUM(`dec`) FROM reg_master WHERE scenario='".$this->scenario."') 
 					,scnLastSource='".$this->id."'
 					,scnEditBy='".$arrUsrData['usrID']."'
 					,scnEditDate=NOW()

@@ -3,9 +3,9 @@ require_once('table_record.class.php');
 
 class sales_record extends table_record{
 	
-	function __construct($session, $scenario, $id='', $data=Array()){
+	function __construct($session, $scenario, $company, $id='', $data=Array()){
 
-		parent::__construct($session, $scenario, $id, $data);
+		parent::__construct($session, $scenario, $company, $id, $data);
 		
 		if (count($data)){			
 			$this->product = $data['product'];						
@@ -41,7 +41,7 @@ class sales_record extends table_record{
 			
 			$oProduct = $Products->getByCode($this->product);
 			
-			$arrRes[] = "`company`='OOO'";
+			$arrRes[] = "`company`='{$this->company}'";
 			$arrRes[] = "`pc`=".$this->profit;
 			$arrRes[] = "`source`='".$this->source."'";
 			$arrRes[] = "`scenario`='".$this->scenario."'";

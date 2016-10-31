@@ -9,7 +9,7 @@ class master_record{
 	public $particulars;
 	//private $session_id;
 	
-	function __construct($session, $scenario){
+	function __construct($session, $scenario, $company){
 		
 		$this->arrPeriod = Array(1=>'jan',2=>'feb',3=>'mar',4=>'apr',5=>'may',6=>'jun',7=>'jul',8=>'aug',9=>'sep',10=>'oct',11=>'nov',12=>'dec',13=>'jan_1',14=>'feb_1',15=>'mar_1');
 	
@@ -21,6 +21,7 @@ class master_record{
 		
 		$this->source = $session;
 		$this->scenario = $scenario;
+		$this->company = $company;
 		
 		return (true);
 	}	
@@ -50,7 +51,7 @@ class master_record{
 			$arrRes[] = "`$month`=".$this->{$month};
 		}
 				
-		$arrRes[] = "`company`='OOO'"; //========= Быдлокод
+		$arrRes[] = "`company`='{$this->company}'"; 
 		$arrRes[] = "`account`='".$this->account."'";		
 		$arrRes[] = "`item`='".$this->item."'";		
 		$arrRes[] = "`pc`=".$this->profit;

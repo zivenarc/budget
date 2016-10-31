@@ -17,12 +17,14 @@ class table_record {
 	
 	protected $oSQL;
 	
-	function __construct($session, $scenario, $id='', $data=Array()){
+	function __construct($session, $scenario, $company, $id='', $data=Array()){
 		GLOBAL $oSQL;
 		
 		$this->oSQL = $oSQL;
 		$this->source = $session;
 		$this->scenario = $scenario;		
+		$this->company = $company;		
+	
 		$this->id=$id;
 		$this->arrPeriod = Array(1=>'jan',2=>'feb',3=>'mar',4=>'apr',5=>'may',6=>'jun',7=>'jul',8=>'aug',9=>'sep',10=>'oct',11=>'nov',12=>'dec',13=>'jan_1',14=>'feb_1',15=>'mar_1');
 		
@@ -32,7 +34,7 @@ class table_record {
 				$month = $this->arrPeriod[$m];
 				$this->{$month} = $data[strtolower($month)];			
 			}
-			$this->company = $data['company'];
+			//$this->company = $data['company'];
 			$this->profit = $data['pc'];
 		}
 	}

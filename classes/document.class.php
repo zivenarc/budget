@@ -7,6 +7,7 @@ class Document extends easyForm{
 	public  $profit;
 	public  $location;
 	public  $scenario;
+	public  $company;
 	public  $flagPosted;
 	public  $flagDeleted;
 	public  $data;
@@ -96,7 +97,7 @@ class Document extends easyForm{
 	
 	public function add_record(){		
 		$reflector = new ReflectionClass($this->gridClass);
-		$oBR = $reflector->newInstance ($this->GUID,$this->scenario);
+		$oBR = $reflector->newInstance ($this->GUID,$this->scenario, $this->company);
 		$this->records[$this->gridName][] = $oBR;
 		return ($oBR);	
 	}
@@ -157,6 +158,20 @@ class Document extends easyForm{
 			'field'=>$this->prefix.'GUID'
 			,'type'=>'guid'
 		);
+		
+		$sql = "SHOW COLUMNS FROM `{$this->table}` LIKE '{$this->prefix}CompanyID'";
+		$rs = $this->oSQL->q($sql);
+		$rw = $this->oSQL->f($rs);
+		$this->Columns[] = Array(
+			'title'=>'Company'
+			,'field'=>$this->prefix.'CompanyID'
+			,'mandatory'=>true
+			,'type'=>'combobox'
+			,'sql'=>'SELECT comID as optValue, comTitle as optText FROM vw_company'
+			,'default'=>$rw['Default']	
+			,'disabled'=>!$this->flagUpdate
+		);
+		
 		$this->Columns[] = Array(
 			'title'=>'Scenario'
 			,'field'=>$this->prefix.'Scenario'

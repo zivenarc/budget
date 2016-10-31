@@ -47,7 +47,7 @@ class Location_costs extends Document{
 			$sql = "SELECT * FROM `".$this->register."` WHERE `source`='".$this->GUID."';";
 			$rs = $this->oSQL->q($sql);			
 			while($rw = $this->oSQL->f($rs)){
-				$this->records[$this->gridName][$rw['id']] = new costs_record($this->GUID, $this->scenario, $rw['id'], $rw);
+				$this->records[$this->gridName][$rw['id']] = new costs_record($this->GUID, $this->scenario,  $this->company, $rw['id'], $rw);
 			}		
 		}
 	}

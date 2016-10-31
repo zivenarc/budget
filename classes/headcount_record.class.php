@@ -11,9 +11,9 @@ class headcount_record extends table_record{
 	public $job;
 	public $salary;
 	
-	public function __construct($session, $scenario, $id='', $data=Array()){
+	public function __construct($session, $scenario, $company, $id='', $data=Array()){
 
-		parent::__construct($session, $scenario, $id, $data);
+		parent::__construct($session, $scenario, $company, $id, $data);
 		
 		if (count($data)){			
 			$this->product = $data['product'];			
@@ -55,7 +55,7 @@ class headcount_record extends table_record{
 			$arrRes = $this->getMonthlySQL();	
 		
 		if($this->salary+$this->insurance){
-			$arrRes[] = "`company`='OOO'";
+			$arrRes[] = "`company`='{$this->company}'";
 			$arrRes[] = "`account`='".$this->account->code."'";
 			$arrRes[] = "`item`='".Items::SALARY."'";
 			$arrRes[] = "`pc`=".(integer)$this->profit;

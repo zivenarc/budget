@@ -63,7 +63,7 @@ class Depreciation extends Document{
 			$sql = "SELECT * FROM `".$this->register."` WHERE `source`='".$this->GUID."';";
 			$rs = $this->oSQL->q($sql);			
 			while($rw = $this->oSQL->f($rs)){
-				$this->records[$this->gridName][$rw['id']] = new depreciation_record($this->GUID, $this->scenario, $rw['id'], $rw);
+				$this->records[$this->gridName][$rw['id']] = new depreciation_record($this->GUID, $this->scenario,  $this->company, $rw['id'], $rw);
 			}		
 		}
 	}
@@ -414,7 +414,7 @@ class Depreciation extends Document{
 		GLOBAL $Items;
 		
 		$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
-			$oMaster = new Master($this->scenario, $this->GUID);
+			$oMaster = new Master($this->scenario, $this->GUID, $this->company);
 					
 			if(is_array($this->records[$this->gridName])){
 				

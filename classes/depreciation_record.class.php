@@ -5,9 +5,9 @@ class depreciation_record extends table_record{
 
 	const TABLE='reg_depreciation';
 	
-	function __construct($session, $scenario, $id='', $data=Array()){
+	function __construct($session, $scenario, $company, $id='', $data=Array()){
 		
-		parent::__construct($session, $scenario, $id, $data);
+		parent::__construct($session, $scenario, $company, $id, $data);
 		
 		if (count($data)){
 			$this->particulars = $data['particulars'];
@@ -43,7 +43,7 @@ class depreciation_record extends table_record{
 			
 			//$oProduct = $Products->getByCode($this->product);
 			
-			$arrRes[] = "`company`='OOO'";
+			$arrRes[] = "`company`='{$this->company}'";
 			$arrRes[] = "`pc`=".(integer)$this->profit;
 			$arrRes[] = "`source`='".$this->source."'";
 			$arrRes[] = "`scenario`='".$this->scenario."'";
