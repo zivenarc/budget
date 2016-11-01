@@ -27,7 +27,15 @@ while ($rwRLU = $oSQL->fetch_array($rs)) {
 
 <div id="header_wrapper">
 	<a href="index.php" target="_top"><div id="corner_logo"><?php echo $arrSetup['strCompanyName']; ?></div></a>
-	<div id="app_title"><?php echo $strPageTitle.($strSubTitle? " :: ".$strSubTitle : ""); ?></div>
+	<div id="app_title"><?php echo $strPageTitle.($strSubTitle? " :: ".$strSubTitle : ""); ?> ::
+		<select>
+			<?php 
+				foreach($arrCompanyConfig as $company=>$data){
+					echo "<option value='{$company}'>{$data["comTitle$strLocal"]}</option>";
+				}
+			?>
+		</select>
+	</div>
 	
 	<?php
     if ($usrID){

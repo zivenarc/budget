@@ -163,24 +163,7 @@ while ($rw=$oSQL->f($rs)){
 		$arrGrossRevenueEstimate += $rw['Estimate'];
 	}
 	
-	switch ($rw['Customer_group_code']){
-		case 33239:
-			switch ($rw['customer']){
-				case 33242:
-					$cusGroup = 'New customers';
-					break;
-				default:
-					$cusGroup = "New and landed";
-					break;
-			}
-			break;
-		case 31153:
-			$cusGroup = 'Brought in 2015';
-			break;
-		default:
-			$cusGroup = 'Old customers';
-			break;
-	}
+	$cusGroup = Reports::getCustomerGroup($rw);
 	
 	$arrGP[$cusGroup]['this'][$keyProfit] += $rw['Total'];
 	$arrGPTotal['this'][$keyProfit] += $rw['Total'];

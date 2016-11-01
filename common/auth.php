@@ -78,6 +78,14 @@ while ($rw = $oSQL->f($rs)){
 	$arrProfitConfig[$rw['pccID']] = $rw;
 }
 // echo '<pre>';print_r($arrProfitConfig);echo '</pre>';
+//===============Fill the company array=========================
+$sql = "SELECT * FROM vw_company";
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	$arrCompanyConfig[$rw['comID']] = $rw;
+}
+
+$company = '000000001';
 
 //require ("lang_en.php");
 $budget_scenario = $arrSetup['stpScenarioID'];

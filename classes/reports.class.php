@@ -9,6 +9,8 @@ class Reports{
 	public $Denominator;
 	private $oSQL;
 	
+	private $company;
+	
 	const GP_CODE = 94;
 	const CNT_GROUP_EXEMPTION = 723;
 	const OP_FILTER = "AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%') ";	
@@ -20,10 +22,13 @@ class Reports{
 	function __construct($params){
 		
 		GLOBAL $oSQL;
+		GLOBAL $company;
+		
 		$this->oSQL = $oSQL;
 		
 		$this->oBudget = new Budget($params['budget_scenario']);
 		$this->oReference = $params['reference']?new Budget($params['reference']):$this->oBudget->reference_scenario;
+		$this->company = $company;
 		
 		$this->Currency = $params['currency']?$params['currency']:643;
 		
@@ -58,9 +63,9 @@ class Reports{
 					}
 				}
 			}
-			$this->sqlWhere = "WHERE ".implode (" AND ",$arrWhere);		
+			$this->sqlWhere = "WHERE ".implode (" AND ",$arrWhere)." AND `company`='{$this->company}'";		
 		} else {
-			$this->sqlWhere = "WHERE TRUE ";
+			$this->sqlWhere = "WHERE company`='{$this->company}' ";
 		}
 	}
 	
@@ -75,7 +80,7 @@ class Reports{
 								SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM 
 							FROM `reg_sales`					
 							LEFT JOIN vw_product_type ON prtID=activity
-							{$sqlWhere} AND posted=1 AND kpi=1 AND scenario='{$this->oBudget->id}'
+							{$sqlWhere} AND posted=1 AND kpi=1 AND scenario='{$this->oBudget->id}' AND `company`='{$this->company}'
 							GROUP BY `reg_sales`.`activity`, `reg_sales`.`unit`
 							ORDER BY prtGHQ, prtRHQ";
 					break;
@@ -90,13 +95,13 @@ class Reports{
 							(SELECT pc, activity, unit,
 									".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 			
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual'
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND `company`='{$this->company}'
 							GROUP BY activity, unit
 							UNION ALL
 							SELECT pc, activity, unit,
 									".str_repeat("0, ",$mthStart-1).$this->oBudget->getMonthlySumSQL($mthStart,15)."
 							FROM `reg_sales` 			
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual'
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND `company`='{$this->company}'
 							GROUP BY activity, unit) U
 					LEFT JOIN vw_product_type ON prtID=activity
 					GROUP BY U.activity, unit
@@ -194,12 +199,12 @@ class Reports{
 				FROM 
 					(SELECT activity, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND bo=714 AND activity IN (48,63)
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND bo=714 AND activity IN (48,63) AND `company`='{$this->company}'
 							GROUP BY activity, unit, source
 							UNION ALL
 							SELECT activity, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
 							FROM `reg_sales` 										
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND bo=714 AND activity IN (48,63)
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND bo=714 AND activity IN (48,63) AND `company`='{$this->company}'
 					GROUP BY activity, unit) U 		
 				LEFT JOIN vw_product_type ON prtID=activity
 				GROUP BY U.activity";
@@ -288,7 +293,7 @@ class Reports{
 						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates).") as Total,
 						SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as Total_AM 
 		FROM reg_master 
-		{$sqlWhere} AND item='".Items::REVENUE."' AND scenario='{$this->oBudget->id}'
+		{$sqlWhere} AND item='".Items::REVENUE."' AND scenario='{$this->oBudget->id}' AND `company`='{$this->company}'
 		GROUP BY customer";
 		$rs = $this->oSQL->q($sql); 
 		while ($rw = $this->oSQL->f($rs)){
@@ -300,7 +305,7 @@ class Reports{
 					SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
 				FROM reg_rent 
 				LEFT JOIN vw_customer ON cntID=customer
-				{$sqlWhere} AND posted=1 AND item='".Items::WH_RENT."' AND scenario='{$this->oBudget->id}'
+				{$sqlWhere} AND posted=1 AND item='".Items::WH_RENT."' AND scenario='{$this->oBudget->id}' AND `company`='{$this->company}'
 				GROUP BY customer";
 		$rs = $this->oSQL->q($sql); 
 		$tableID = "kpi_".md5($sql);
@@ -435,7 +440,7 @@ class Reports{
 					LEFT JOIN vw_profit ON pc=pccID	
 					LEFT JOIN stbl_user ON sales=usrID
 					## LEFT JOIN tbl_sales ON salGUID=source
-					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 {$sqlWhere} 
+					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1  AND `company`='{$this->company}' {$sqlWhere} 
 					GROUP BY sales, `reg_sales`.`customer`, unit
 					ORDER BY sales, Total DESC"; 
 			// echo '<pre>',$sql,'</pre>';
@@ -535,7 +540,7 @@ class Reports{
 			$sql = "SELECT cntTitle as 'Supplier', unit as 'Unit', ".Budget::getMonthlySumSQL().", SUM(".Budget::getYTDSQL().") as Total FROM `reg_costs`
 					LEFT JOIN vw_supplier ON cntID=supplier
 					LEFT JOIN vw_item ON itmGUID=item
-					$sqlWhere AND posted=1
+					{$sqlWhere} AND posted=1 AND `company`='{$this->company}'
 					GROUP BY `reg_costs`.`supplier`, `reg_costs`.`item`
 					ORDER BY supplier";
 			$rs = $oSQL->q($sql);
@@ -588,8 +593,7 @@ class Reports{
 				".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
 				SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(Q1) as Q1, SUM(Q2) as Q2, SUM(Q3) as Q3, SUM(Q4) as Q4, SUM(Q5) as Q5
 			FROM `vw_headcount`			
-			{$sqlWhere} 
-				AND salary>10000";
+			{$sqlWhere} AND `company`='{$this->company}' AND salary>10000";
 			
 			$sql = $sqlSelect." GROUP BY `prtGHQ`,wc
 					ORDER BY prtRHQ,wc";
@@ -686,7 +690,7 @@ class Reports{
 						FROM `reg_master`
 						$sqlWhere
 						".self::GP_FILTER."
-						AND active=1
+						AND active=1 AND `company`='{$this->company}'
 						GROUP BY account";
 				$rs = $oSQL->q($sql);	
 				if ($oSQL->num_rows($rs)){
@@ -753,7 +757,7 @@ class Reports{
 							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
 						FROM `vw_master`
 						$sqlWhere
-							AND Group_code IN (95)
+							AND Group_code IN (95) AND `company`='{$this->company}'
 						";
 				$rs = $oSQL->q($sql);	
 				if ($oSQL->num_rows($rs)){
@@ -2602,6 +2606,7 @@ class Reports{
 				$total += $data[$i]['amount'];	
 				?>
 				<tr id="tr_<?php echo $data[$i]['guid'];?>" class="<?php echo ($data[$i]['posted']?'journal-posted':'')?> <?php echo ($data[$i]['deleted']?'journal-deleted':'')?>">					
+					<td><input class='journal-cb' type='checkbox'/></td>
 					<td><a class="budget-document-link" target="_blank" href="<?php echo $data[$i]['script'].'?'.$data[$i]['prefix'].'ID='.$data[$i]['id'];?>"><?php echo $data[$i]['title'],' #',$data[$i]['id'];?></a></td>
 					<td class="td-posted <?php echo ($data[$i]['posted']?'budget-icon-posted':'');?>">&nbsp;</td>
 					<td class="td-deleted <?php echo ($data[$i]['deleted']?'budget-icon-deleted':'');?>">&nbsp;</td>
@@ -2623,6 +2628,7 @@ class Reports{
 			<table id='sources' class='log'>
 				<thead>
 					<tr>
+						<th><input class='journal-cb-all' type='checkbox'/></th>
 						<th>Document</th>
 						<!--<th>ID</th>
 						<th>GUID</th>-->
@@ -2917,6 +2923,28 @@ class Reports{
 		</ul>
 		<?php
 		
+	}
+	
+	function getCustomerGroup($rw){
+		switch ($rw['customer_group_code']){
+			case 33239:
+				switch ($rw['customer']){
+					case 33242:
+						$cusGroup = 'New customers';
+						break;
+					default:
+						$cusGroup = "New and landed in 2016";
+						break;
+				}
+				break;
+			case 31153:
+				$cusGroup = 'Brought in 2015';
+				break;
+			default:
+				$cusGroup = 'Old customers';
+				break;
+		}
+		return($cusGroup);
 	}
 	
 }
