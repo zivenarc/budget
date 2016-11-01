@@ -34,7 +34,7 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 	$sql[] = "SET @repDateStart:='{$repDateStart}', @repDateEnd:='{$repDateEnd}';";
 	$sql[] = "UPDATE reg_headcount SET `{$month}`=0 WHERE scenario=@scnID AND source<>'Actual';";
 	$sql[] = "INSERT INTO reg_headcount (company, pc, location, activity, `{$month}` ,source, scenario, particulars, account, item, `function`,salary, wc, active, posted)
-				SELECT 'OOO'
+				SELECT '{$company}'
 					, IFNULL((SELECT ephProfitID FROM common_db.tbl_employee_profit WHERE ephEmployeeGUID1C=empGUID1C AND DATEDIFF(@repDateEnd, ephDate)>=0 ORDER BY ephDate DESC LIMIT 1),1)
 					, empLocationID
 					, IFNULL(empProductTypeID,(SELECT pccProductTypeID FROM common_db.tbl_profit WHERE pccID=empProfitID))
