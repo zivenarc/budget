@@ -65,7 +65,7 @@ class Reports{
 			}
 			$this->sqlWhere = "WHERE ".implode (" AND ",$arrWhere)." AND `company`='{$this->company}'";		
 		} else {
-			$this->sqlWhere = "WHERE company`='{$this->company}' ";
+			$this->sqlWhere = "WHERE `company`='{$this->company}' ";
 		}
 	}
 	
