@@ -243,6 +243,7 @@ class Entity {
 	}
 	
 	public function getProfitTabs($sqlWhere){/*------------------- Tabsheets for Profit selection ----------------------*/
+		GLOBAL $company;
 		
 		$this->tabKey = $this->prefix.'ProfitID';
 		
@@ -258,7 +259,7 @@ class Entity {
 		$sqlTabs = "SELECT `pccID` as optValue, CONCAT(`pccTitle".$this->strLocal."`,' (', count(`".$this->prefix."ID`),')') as optText, count(`".$this->prefix."ID`) as nCount
 				FROM `".$this->table."`
 				INNER JOIN `vw_profit` on `pccID`=`".$this->prefix."ProfitID`
-				WHERE $sqlWhere
+				WHERE {$sqlWhere} AND `".$this->prefix."CompanyID`='{$company}'
 				GROUP BY pccID
 				ORDER BY pccID";
 		$rs = $this->oSQL->q($sqlTabs);
