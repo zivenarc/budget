@@ -28,13 +28,21 @@ while ($rwRLU = $oSQL->fetch_array($rs)) {
 <div id="header_wrapper">
 	<a href="index.php" target="_top"><div id="corner_logo"><?php echo $arrSetup['strCompanyName']; ?></div></a>
 	<div id="app_title"><?php echo $strPageTitle.($strSubTitle? " :: ".$strSubTitle : ""); ?> ::
-		<select>
+		<select id='company_select'>
 			<?php 
-				foreach($arrCompanyConfig as $company=>$data){
-					echo "<option value='{$company}'>{$data["comTitle$strLocal"]}</option>";
+				foreach($arrCompanyConfig as $id=>$data){
+					echo "<option ".($id==$company?" selected ":"")." value='{$id}'>{$data["comTitle$strLocal"]}</option>";
 				}
 			?>
 		</select>
+		<script>
+			var sel = document.getElementById("company_select");
+			sel.onchange = function(){
+				document.cookie = "company="+sel.options[sel.selectedIndex].value+"; expires=Thu, 31 Dec 2099 12:00:00 UTC; path=/budget/";
+				top.pane.body.innerHTML = "<h1 class='ajax-loading'>Loading...</h1>";
+				top.pane.location.reload();
+			};
+		</script>
 	</div>
 	
 	<?php

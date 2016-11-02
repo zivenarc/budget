@@ -147,6 +147,7 @@ class Document extends easyForm{
 	public function defineEF(){
 		
 		GLOBAL $arrUsrData;
+		GLOBAL $company;
 		global $budget_scenario;
 		
 		$this->Columns = Array();
@@ -159,16 +160,16 @@ class Document extends easyForm{
 			,'type'=>'guid'
 		);
 		
-		$sql = "SHOW COLUMNS FROM `{$this->table}` LIKE '{$this->prefix}CompanyID'";
-		$rs = $this->oSQL->q($sql);
-		$rw = $this->oSQL->f($rs);
+		// $sql = "SHOW COLUMNS FROM `{$this->table}` LIKE '{$this->prefix}CompanyID'";
+		// $rs = $this->oSQL->q($sql);
+		// $rw = $this->oSQL->f($rs);
 		$this->Columns[] = Array(
 			'title'=>'Company'
 			,'field'=>$this->prefix.'CompanyID'
 			,'mandatory'=>true
 			,'type'=>'combobox'
 			,'sql'=>'SELECT comID as optValue, comTitle as optText FROM vw_company'
-			,'default'=>$rw['Default']	
+			,'default'=>$company	
 			,'disabled'=>!$this->flagUpdate
 		);
 		

@@ -85,7 +85,7 @@ while ($rw = $oSQL->f($rs)){
 	$arrCompanyConfig[$rw['comID']] = $rw;
 }
 
-$company = '000000001';
+$company = isset($_COOKIE['company'])?$_COOKIE['company']:'000000001';
 
 //require ("lang_en.php");
 $budget_scenario = $arrSetup['stpScenarioID'];
