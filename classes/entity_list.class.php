@@ -290,6 +290,7 @@ class Entity {
 	}
 	
 	public function getLocationTabs($sqlWhere){/*------------------- Tabsheets for Location selection ----------------------*/
+		GLOBAL $company;
 		
 		$this->tabKey = $this->prefix.'LocationID';
 		
@@ -305,7 +306,7 @@ class Entity {
 		$sqlTabs = "SELECT `locID` as optValue, CONCAT(`locTitle".$this->strLocal."`,' (', count(`".$this->prefix."ID`),')') as optText, count(`".$this->prefix."ID`) as nCount
 				FROM `".$this->table."`
 				INNER JOIN `vw_location` on `locID`=`".$this->prefix."LocationID`
-				WHERE $sqlWhere
+				WHERE $sqlWhere AND `".$this->prefix."CompanyID`='{$company}'
 				GROUP BY locID
 				ORDER BY locID";
 		$rs = $this->oSQL->q($sqlTabs);
