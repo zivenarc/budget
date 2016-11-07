@@ -437,7 +437,7 @@ class Headcount extends Document{
 				
 		if($mode=='post'){
 			$this->refresh($this->ID);
-			$oMaster = new Master($this->scenario, $this->GUID);
+			$oMaster = new Master($this->scenario, $this->GUID,$this->company);
 			
 			if(is_array($this->records[$this->gridName])){
 			
