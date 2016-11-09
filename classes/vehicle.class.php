@@ -322,7 +322,7 @@ class Vehicle extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item_guid;						
 						
-						for($m=1;$m<13;$m++){
+						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = -$record->{$month}*$this->fuelprice*$this->consumption/100;							
 							
@@ -338,7 +338,7 @@ class Vehicle extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item_guid;						
 						
-						for($m=1;$m<13;$m++){
+						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];							
 							$master_row->{$month} = -($record->{$month}?1:0)*
 								($this->maintenance/12 + $this->consumables + $this->wash);							
@@ -356,7 +356,7 @@ class Vehicle extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item_guid;						
 						
-						for($m=1;$m<13;$m++){
+						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = - ($record->value_primo*$this->casco/100 + $this->osago)/12;							
 							
@@ -372,7 +372,7 @@ class Vehicle extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item_guid;						
 						
-						for($m=1;$m<13;$m++){
+						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} =	- $this->power*$this->rate/12;															
 						}
