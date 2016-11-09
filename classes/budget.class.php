@@ -133,7 +133,7 @@ class Budget{
 				return($this->getYTDSQL($nCurrent+1,$nCurrent+1,$arrRates));
 				break;
 			case 'roy':
-				return($this->getYTDSQL($nCurrent+1+$this->offset,12+$this->offset,$arrRates));
+				return($this->getYTDSQL($nCurrent+1,12+$this->offset,$arrRates));
 				break;
 			case 'q1':
 				return($this->getYTDSQL(1,3,$arrRates));
