@@ -78,7 +78,7 @@ if(!isset($_GET['prtGHQ'])){
 	<div>
 	<?php
 	// die();
-	$period_type = 'fye';
+	$period_type = 'roy';
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	
