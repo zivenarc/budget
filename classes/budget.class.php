@@ -414,7 +414,7 @@ class Budget{
 			$sql = "SELECT * FROM tbl_scenario WHERE scnFlagDeleted=0 AND scnFlagArchive=0 ".($flagWrite?" AND scnFlagReadOnly=0":"");			
 			$rs = $oSQL->q($sql);
 			while ($rw=$oSQL->f($rs)){
-				echo "<li><a href='",$_SERVER['PHP_SELF'],"?tab=",$rw['scnID'],"'>",$rw['scnTitle'],"</a></li>\r\n";
+				echo "<li><a href='",$_SERVER['PHP_SELF'],"?tab=",$rw['scnID'],"'>",($rw['scnFlagReadOnly']?'<img src="../common/images/icons/lock.png"/>':''),$rw['scnTitle'],"</a></li>\r\n";
 			}
 			// echo "<li><a href='",$_SERVER['PHP_SELF'],"?tab=all'>All</a></li>\r\n";
 			?>
