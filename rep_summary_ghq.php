@@ -82,6 +82,8 @@ if(!isset($_GET['prtGHQ'])){
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	
+	echo '<pre>',$sqlActual,'</pre>';
+	
 	$settings['gpcus'] = Array('title'=>"GP by customer",
 						'sqlBase' => "SELECT customer_group_code as optValue, 
 											customer_group_title as optText,  
