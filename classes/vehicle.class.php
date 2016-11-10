@@ -67,7 +67,7 @@ class Vehicle extends Document{
 		parent::defineEF();
 		
 		$this->Columns[] = Array(
-			'title'=>'CASCO rate, %'
+			'title'=>'CASCO rate, RUB'
 			,'field'=>$this->prefix.'CASCO'
 			,'type'=>'decimal'
 			,'disabled'=>!$this->flagUpdate
@@ -358,7 +358,8 @@ class Vehicle extends Document{
 						
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];	
-							$master_row->{$month} = - ($record->value_primo*$this->casco/100 + $this->osago)/12;							
+							// $master_row->{$month} = - ($record->value_primo*$this->casco/100 + $this->osago)/12;							
+							$master_row->{$month} = - ($this->casco + $this->osago)/12;							
 							
 						}
 						
