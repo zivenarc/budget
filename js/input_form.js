@@ -287,12 +287,12 @@ function parse_textarea(){
 	}
 		var inputs = new Array();
 	if (doc!=undefined){
-		for (m=0;m<months.length;m++){
+		for (m=0+doc.offset;m<12+doc.offset;m++){
 			$("input[name='"+months[m]+"[]']").each(function(index, element){
 				if(index!=0 && index<arrLines.length){
 					//$(this).val(arrLines[index-1][m]);
 					var hDom = $(this).get(0); console.log(hDom);
-					hDom.value = arrLines[index-1][m];
+					hDom.value = arrLines[index-1][m-doc.offset];
 					var $inpUpdated = $(this).parents('tr').find("input[name='inp_"+doc.gridName+"_updated[]']").val(1);
 				}
 			});

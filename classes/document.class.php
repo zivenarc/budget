@@ -25,8 +25,7 @@ class Document extends easyForm{
 				$this->ID=$id;
 				$this->refresh($id);
 				
-				$this->settings = $this->budget->getSettings();
-				$this->offset = $this->budget->offset;
+				$this->settings = $this->budget->getSettings();				
 				
 				if ($this->flagDeleted || $this->flagPosted){
 					$this->flagUpdate = false;
@@ -85,9 +84,9 @@ class Document extends easyForm{
 		$this->comment = $this->data[$this->prefix.'Comment'];
 		$this->amount = $this->data[$this->prefix.'Amount'];
 		$this->classified = $this->data[$this->prefix.'ClassifiedBy'];
-
-		
+				
 		$this->budget = new Budget($this->scenario);
+		$this->offset = $this->budget->offset;
 		
 		if ($this->data[$this->prefix.'EditDate']){
 			$this->timestamp = "Last edited by ".$this->data['usrTitle']." on ".date('d.m.Y H:i',strtotime($this->data[$this->prefix.'EditDate']));
