@@ -26,6 +26,7 @@ class Document extends easyForm{
 				$this->refresh($id);
 				
 				$this->settings = $this->budget->getSettings();
+				$this->offset = $this->budget->offset;
 				
 				if ($this->flagDeleted || $this->flagPosted){
 					$this->flagUpdate = false;
@@ -192,8 +193,9 @@ class Document extends easyForm{
 			$sqlFields = implode(', ',$arrFields);
 			$sqlFrom = $sqlFrom?$sqlFrom:"`".$this->register."`";
 			
-			$sql = "SELECT *, ".$this->budget->getYTDSQL(1,$this->budget->length)." as YTD, (".$this->budget->getYTDSQL(1,$this->budget->length).")/".$this->budget->length." as 'AVG'".($sqlFields?",".$sqlFields:"")."
-						FROM $sqlFrom 
+			$sql = "SELECT *, ".$this->budget->getYTDSQL(1+$this->offset,max($this->budget->length,12+$this->offset))." as YTD, 
+						(".$this->budget->getYTDSQL(1+$this->offset,max($this->budget->length,12+$this->offset)).")/".$this->budget->length." as 'AVG'".($sqlFields?",".$sqlFields:"")."
+						FROM {$sqlFrom}
 						WHERE source='{$this->GUID}'";//to add where
 			$rs = $this->oSQL->q($sql);
 			while ($rw = $this->oSQL->f($rs)){

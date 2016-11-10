@@ -16,6 +16,7 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 							$(this).tabs('option','active',2);
 						} else {
 							$('#tabs-input').find('.eiseGrid').eiseGrid();
+							rowTotalsInitialize();
 						}
 
 					}
@@ -61,7 +62,7 @@ function rowTotalsInitialize(){
 			styles.push('.'+doc.gridName+'_'+months[m]);	
 		};
 		$(styles.join()).each(function(){
-			$(this).change(function(){
+			$(this).find('input').change(function(){
 				recalcYTD($(this));
 			})
 		});
@@ -134,13 +135,16 @@ function unhookListeners($o){
 }
 
 function recalcYTD($o){
-	var $row = $o.parent('tr');
+	var $row = $o.parents('tr');
 	if(doc!=undefined){
 		var $ytd = $row.find('td.'+doc.gridName+'_YTD div');
 		
 		var res = 0;
 		for (m=0;m<months.length;m++){
-			res += parseFloat($row.find('td.'+doc.gridName+'_'+months[m]+' input').val());
+			cell = $row.find('td.'+doc.gridName+'_'+months[m]+' input');
+			if (cell.length){
+				res += parseFloat(cell.val());
+			}
 		}
 		$ytd.text(res);
 	}
