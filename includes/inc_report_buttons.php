@@ -19,6 +19,7 @@
 	<label for='detail_totals_<?php echo $_GET['pccGUID'];?>'>Totals</label>
 </div>
 </td>
+<td><input id='refresh' type='button' value='Refresh'/></td>
 </tr>
 </table>
 </div>

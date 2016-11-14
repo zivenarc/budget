@@ -112,6 +112,11 @@ function init_panel(o){
 			$('.budget-monthly',o).hide();
 		};
 		
+		$('#refresh',o).button().click(function(){
+			$('table.budget',o).load(request_uri+' table.budget');
+		});
+		
+		
 	if (typeof(report_id)!='undefined'){
 		$('#'+report_id).find('td').each(function(){		
 					$(this).click(function(){					
