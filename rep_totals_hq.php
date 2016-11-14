@@ -15,7 +15,11 @@ $oBudget = new Budget($budget_scenario);
 $oReference = new Budget($reference);
 $mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1+$oBudget->offset;
 $mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12+$oBudget->offset;
-$denominator = isset($_GET['denominator'])?(double)$_GET['denominator']:1;
+// $strLastTitle = $oBudget->type=='FYE'?'Budget':$reference;
+$strLastTitle = $reference;
+
+$arrRates_this = $oBudget->getMonthlyRates($currency);
+$arrRates_last = $oReference->getMonthlyRates($currency);
 
 $arrJS[] = 'js/rep_totals.js';
 include ('includes/inc-frame_top.php');
@@ -32,7 +36,7 @@ if ($mthStart!=1 || $mthEnd!=12){
 }
 
 
-$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
+$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM vw_master
 		WHERE scenario='$budget_scenario' AND pccFlagProd=0
 		GROUP BY Profit, `Budget item`,`item`
