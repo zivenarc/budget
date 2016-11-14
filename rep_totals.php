@@ -80,12 +80,12 @@ echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
 $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM vw_master
-		WHERE scenario='{$oBudget->id}' AND account NOT LIKE 'SZ%' {$sqlWherePC}
+		WHERE scenario='{$oBudget->id}' AND company='{$company}' AND account NOT LIKE 'SZ%' {$sqlWherePC}
 		GROUP BY Profit, `Budget item`,`item`
 		UNION ALL
 		SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM vw_master
-		WHERE scenario='{$reference}' AND account NOT LIKE 'SZ%' {$sqlWherePC}
+		WHERE scenario='{$reference}' AND company='{$company}'  AND account NOT LIKE 'SZ%' {$sqlWherePC}
 		GROUP BY Profit, `Budget item`,`item`
 		ORDER BY `Group`,pccFlagProd,Profit,itmOrder";
 
@@ -117,13 +117,13 @@ while ($rw=$oSQL->f($rs)){
 $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd).")/".($mthEnd-$mthStart+1)." as Total, 0 as Estimate
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='{$oBudget->id}' and posted=1 and salary>10000 {$sqlWherePC}
+		WHERE scenario='{$oBudget->id}'  AND company='{$company}' and posted=1 and salary>10000 {$sqlWherePC}
 		GROUP BY Profit
 		UNION ALL
 		SELECT pccTitle as Profit, pccFlagProd, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd).")/".($mthEnd-$mthStart+1)." as Estimate
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='{$reference}' and posted=1 and salary>10000 {$sqlWherePC}
+		WHERE scenario='{$reference}'  AND company='{$company}' and posted=1 and salary>10000 {$sqlWherePC}
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
@@ -140,13 +140,13 @@ while ($rw=$oSQL->f($rs)){
 //------------------------------ GROSS PROFIT ---------------------------
 $sql = "SELECT account,Customer_group_code, customer, Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM vw_master		
-		WHERE scenario='{$oBudget->id}' {$sqlWherePC}
+		WHERE scenario='{$oBudget->id}'  AND company='{$company}' {$sqlWherePC}
 			AND account IN('J00400','J00802')
 		GROUP BY account, Customer_group_code, customer, Profit
 		UNION ALL
 		SELECT account,Customer_group_code, customer,  Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM vw_master		
-		WHERE scenario='{$reference}' {$sqlWherePC}
+		WHERE scenario='{$reference}'  AND company='{$company}' {$sqlWherePC}
 			AND account IN('J00400','J00802')
 		GROUP BY account,Customer_group_code, customer, Profit
 		ORDER BY pccFlagProd,Profit";
@@ -174,14 +174,14 @@ while ($rw=$oSQL->f($rs)){
 $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='{$oBudget->id}' {$sqlWherePC}
+		WHERE scenario='{$oBudget->id}'  AND company='{$company}' {$sqlWherePC}
 			AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')
 		GROUP BY Profit
 		UNION ALL
 		SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='{$reference}' {$sqlWherePC}
+		WHERE scenario='{$reference}'  AND company='{$company}' {$sqlWherePC}
 			AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
