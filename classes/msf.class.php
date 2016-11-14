@@ -280,7 +280,7 @@ class MSF extends Document{
 							foreach($arrAccounts as $item_code=>$item_values){									
 									$master_row = $oMaster->add_master();
 									$master_row->profit = $record->pc;									
-									$oProfit = $ProfitCenters->getById($record->pc,);
+									$oProfit = $ProfitCenters->getById($record->pc);
 									$master_row->activity = $oProfit->activity;									
 									$item = $Items->getById($item_code);									
 									$master_row->account = $item->getYACT($record->pc);									
