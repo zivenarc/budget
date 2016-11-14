@@ -366,7 +366,7 @@ class Document extends easyForm{
 			if (!$this->flagPosted){
 				return (true);
 			}			
-			$oMaster = new Master($this->scenario, $this->GUID);
+			$oMaster = new Master($this->scenario, $this->GUID, $this->company);
 			$oMaster->clear();
 			$oMaster->save();
 			$res = $this->unmarkPosted();
