@@ -13,9 +13,8 @@ include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
 $oReference = new Budget($reference);
-
-$mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1;
-$mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12;
+$mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1+$oBudget->offset;
+$mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12+$oBudget->offset;
 $denominator = isset($_GET['denominator'])?(double)$_GET['denominator']:1;
 
 $arrJS[] = 'js/rep_totals.js';
