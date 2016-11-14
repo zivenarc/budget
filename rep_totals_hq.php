@@ -22,6 +22,15 @@ include ('includes/inc-frame_top.php');
 
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 include ('includes/inc_report_selectors.php');
+if ($mthStart!=1 || $mthEnd!=12){
+	if ($mthStart==$mthEnd){
+		$periodTitle = date('F',mktime(0,0,0,$mthStart)).' only';
+	} else {
+		$periodTitle = 'Period: '.date('M',mktime(0,0,0,$mthStart))." &ndash; ". date('M',mktime(0,0,0,$mthEnd));
+	}
+	echo '<h2>',$periodTitle,'</h2>';
+}
+
 
 $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM vw_master
