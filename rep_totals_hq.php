@@ -74,7 +74,7 @@ $sql = "SELECT account,Customer_group_code, vw_profit.pccTitle as Profit, SUM(".
 		FROM vw_master
 		LEFT JOIN stbl_user ON sales=usrID
 		LEFT JOIN vw_profit ON usrProfitID=pccID		
-		WHERE scenario='{$oBudget->reference_scenario->id}'
+		WHERE scenario='{$oReference->id}'
 			AND account IN('J00400','J00802')
 		GROUP BY sales, account,Customer_group_code, Profit
 		ORDER BY Profit";
