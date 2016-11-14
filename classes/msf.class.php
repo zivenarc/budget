@@ -287,15 +287,11 @@ class MSF extends Document{
 									$master_row->item = $item_code;
 									for($m=1;$m<=15;$m++){										
 										$month = $this->budget->arrPeriod[$m];										
-										if ($record->{$month}){
-											if ($arrPCSubtotal[$record->pc][$month]) {
+										if ($record->{$month}){											
 											$master_row->{$month} = round(
 																		$record->{$month}/$this->subtotal[strtolower($month)]
 																		*$item_values[$month]
-																	,2);
-											} else {
-												$master_row->{$month} = 0;
-											}
+																	,2);											
 										}									
 									}				
 								}	
