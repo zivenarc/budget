@@ -2928,9 +2928,11 @@ class Reports{
 	function getCustomerGroup($rw){
 		switch ($rw['customer_group_code']){
 			case 33239:
+			case 40933:
 				switch ($rw['customer']){
 					case 33242:
-						$cusGroup = 'New customers';
+					case 40934:
+						$cusGroup = 'New customers, unknown';
 						break;
 					default:
 						$cusGroup = "New and landed in 2016";
