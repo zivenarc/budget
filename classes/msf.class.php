@@ -127,6 +127,8 @@ class MSF extends Document{
 		GLOBAL $YACT;
 		GLOBAL $Items;
 		
+		$ProfitCenters = new ProfitCenters();
+		
 		parent::save($mode);			
 		
 		//echo '<pre>';print_r($_POST);die('</pre>');
@@ -277,8 +279,8 @@ class MSF extends Document{
 						} else {
 							foreach($arrAccounts as $item_code=>$item_values){									
 									$master_row = $oMaster->add_master();
-									$master_row->profit = $record->pc;
-									$oProfit = new ProfitCenter($record->pc);
+									$master_row->profit = $record->pc;									
+									$oProfit = $ProfitCenters->getById($record->pc,);
 									$master_row->activity = $oProfit->activity;									
 									$item = $Items->getById($item_code);									
 									$master_row->account = $item->getYACT($record->pc);									
