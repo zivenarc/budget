@@ -15,7 +15,7 @@ if($_GET['DataAction']=='update'){
 	$sql = Array();
 	$sql[] = "DELETE FROM reg_profit_ghq WHERE scenario = '$budget_scenario'";
 	$sql[] = "INSERT INTO reg_profit_ghq
-				SELECT company, scenario, pc, prtGHQ, ".$oBudget->getMonthlySumSQL(1,15).", SUM(`estimate`) as estimate
+				SELECT scenario, pc, company, prtGHQ, ".$oBudget->getMonthlySumSQL(1,15).", SUM(`estimate`) as estimate
 				FROM reg_master
 				LEFT JOIN vw_product_type ON prtID = activity
 				##WHERE item =  '".Items::REVENUE."'
