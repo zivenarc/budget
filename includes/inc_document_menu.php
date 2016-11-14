@@ -7,7 +7,9 @@ if($oDocument->budget->flagUpdate){
 			$arrActions[] = Array ('title'=>($strLocal?"Сохранить":'Update'),'class'=>'save', 'action'=>'javascript:budget_save();');
 			$arrActions[] = Array ('title'=>($strLocal?"Провести":'Post'),'class'=>'accept', 'action'=>'javascript:budget_save(\'post\');');
 			$arrActions[] = Array ('title'=>($strLocal?"Удалить":'Delete'),'class'=>'delete', 'action'=>'javascript:budget_save(\'delete\');');			
-		}		
+		} else {
+			$arrActions[] = Array ('title'=>($strLocal?"Восстановить":'Restore'),'class'=>'undo', 'action'=>'javascript:budget_save(\'restore\');');			
+		}
 	} else {
 		$arrActions[] = Array('title'=>'Save','class'=>'save', 'action'=>'javascript:budget_save(\'new\');');
 	}
