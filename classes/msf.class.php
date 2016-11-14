@@ -3,6 +3,7 @@ include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
 include_once ('classes/msf_record.class.php');
 include_once ('classes/item.class.php');
+include_once ('classes/profit.class.php');
 
 $Items = new Items();
 
@@ -247,42 +248,57 @@ class MSF extends Document{
 					// echo '<pre>';print_r($arrAccounts);echo '</pre>';
 					// echo '<pre>';print_r($arrDistribution);echo '</pre>';die();
 					
-					foreach($this->records[$this->gridName] as $id=>$record){						
-						foreach ($arrDistribution[$record->pc] as $activity=>$values){							
-							foreach($arrAccounts as $item_code=>$item_values){
-								// echo '<pre>',$item_code,"\r\n";print_r($item_values);echo '</pre>';
-								$master_row = $oMaster->add_master();
-								$master_row->profit = $record->pc;
-								$master_row->activity = $activity;
-								// $master_row->customer = $record->customer;					
-								//$item = $Items->getById($this->item);
-								$item = $Items->getById($item_code);
-								// echo '<pre>';print_r($item);echo '<pre>';
-								$master_row->account = $item->getYACT($record->pc);
-								// $master_row->item = $this->item;
-								$master_row->item = $item_code;
-								for($m=1;$m<=15;$m++){
-									// $month = date('M',mktime(0,0,0,$m,15));
-									$month = $this->budget->arrPeriod[$m];
-									// $master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]
-															// *$total[$month]															
-															// *($values[$month]/$arrPCSubtotal[$record->pc][$month]);	
-									if ($record->{$month}){
-										if ($arrPCSubtotal[$record->pc][$month]) {
-										$master_row->{$month} = round(
-																	$record->{$month}/$this->subtotal[strtolower($month)]
-																	*$item_values[$month]															
-																	*($values[$month]/$arrPCSubtotal[$record->pc][$month])
-																,2);
-										} else {
-											$master_row->{$month} = 0;
-										}
-									}									
-								}				
-														
-								// echo '<pre>';print_r($master_row);echo '</pre>';
-							}																					
-						}						
+					foreach($this->records[$this->gridName] as $id=>$record){
+						if(is_array($arrDistribution[$record->pc])){
+							foreach ($arrDistribution[$record->pc] as $activity=>$values){							
+								foreach($arrAccounts as $item_code=>$item_values){									
+									$master_row = $oMaster->add_master();
+									$master_row->profit = $record->pc;
+									$master_row->activity = $activity;									
+									$item = $Items->getById($item_code);									
+									$master_row->account = $item->getYACT($record->pc);									
+									$master_row->item = $item_code;
+									for($m=1;$m<=15;$m++){										
+										$month = $this->budget->arrPeriod[$m];										
+										if ($record->{$month}){
+											if ($arrPCSubtotal[$record->pc][$month]) {
+											$master_row->{$month} = round(
+																		$record->{$month}/$this->subtotal[strtolower($month)]
+																		*$item_values[$month]															
+																		*($values[$month]/$arrPCSubtotal[$record->pc][$month])
+																	,2);
+											} else {
+												$master_row->{$month} = 0;
+											}
+										}									
+									}				
+								}																					
+							}	
+						} else {
+							foreach($arrAccounts as $item_code=>$item_values){									
+									$master_row = $oMaster->add_master();
+									$master_row->profit = $record->pc;
+									$oProfit = new ProfitCenter($record->pc);
+									$master_row->activity = $oProfit->activity;									
+									$item = $Items->getById($item_code);									
+									$master_row->account = $item->getYACT($record->pc);									
+									$master_row->item = $item_code;
+									for($m=1;$m<=15;$m++){										
+										$month = $this->budget->arrPeriod[$m];										
+										if ($record->{$month}){
+											if ($arrPCSubtotal[$record->pc][$month]) {
+											$master_row->{$month} = round(
+																		$record->{$month}/$this->subtotal[strtolower($month)]
+																		*$item_values[$month]															
+																		*($values[$month]/$arrPCSubtotal[$record->pc][$month])
+																	,2);
+											} else {
+												$master_row->{$month} = 0;
+											}
+										}									
+									}				
+								}	
+						}
 						//echo $id,"\r\n";
 					}
 					
