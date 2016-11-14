@@ -74,9 +74,7 @@ if(!isset($_GET['pccGUID'])){
 		}
 	}
 	
-	?>
-	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
-	<?php
+	include ('includes/inc_report_selectors.php');
 	Budget::getProfitTabs('reg_sales', false, Array('customer'=>$arrCounterparty['codes']));	
 	include ('includes/inc-frame_bottom.php');
 } else {
