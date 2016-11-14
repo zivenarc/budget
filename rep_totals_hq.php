@@ -1,27 +1,28 @@
 <?php
 // $flagNoAuth = true;
+define ('STAFF_COSTS', '02.Staff costs');
+define ('GROSS_PROFIT', '01.Gross Margin');
+
+
 require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 require ('classes/item.class.php');
 
-$budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
+include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
+$oReference = new Budget($reference);
+
 $mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1;
 $mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12;
 $denominator = isset($_GET['denominator'])?(double)$_GET['denominator']:1;
 
 $arrJS[] = 'js/rep_totals.js';
 include ('includes/inc-frame_top.php');
+
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
-if ($denominator!=1) {
-	echo '<h2>RUB x',$denominator,'</h2>';
-}
-echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
-?>
-<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
-<?php
+include ('includes/inc_report_selectors.php');
 
 $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM vw_master
@@ -68,17 +69,7 @@ $sql = "SELECT account,Customer_group_code, vw_profit.pccTitle as Profit, SUM(".
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){	
 	
-	switch ($rw['Customer_group_code']){
-		case 33239:
-			$cusGroup = 'New customers';
-			break;
-		case 31153:
-			$cusGroup = 'Brought in 2015';
-			break;
-		default:
-			$cusGroup = 'Old customers';
-			break;
-	}
+	$cusGroup = Reports::getCustomerGroup($rw);
 	
 	$arrGP[$cusGroup]['this'][$rw['Profit']] += $rw['Total'];
 	$arrGPTotal['this'][$rw['Profit']] += $rw['Total'];
@@ -206,7 +197,7 @@ foreach($arrProfit as $pc=>$flag){
 foreach ($arrGP as $customer=>$data){
 	renderDataByPC($data, $arrProfit, $customer);	
 }
-renderDataByPC($arrGPTotal, $arrProfit, "Total GP", "budget-subtotal");	
+renderDataByPC($arrGPTotal, $arrProfit, "Total GP sold by...", "budget-subtotal");	
 ?>
 </tfoot>
 </table>
