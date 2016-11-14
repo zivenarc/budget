@@ -6,6 +6,8 @@ require ('classes/reports.class.php');
 require ('classes/reference.class.php');
 require ('classes/item.class.php');
 
+include ('includes/inc_report_settings.php');
+
 $oBudget = new Budget($budget_scenario);
 $arrJS[]='js/rep_pnl.js';
 
