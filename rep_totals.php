@@ -221,6 +221,7 @@ foreach($arrReport as $group=>$arrItem){
 			<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($values));?></td>		
 			<td class='budget-decimal'><?php Reports::render($arrEstimate[$group][$item]);?></td>
 			<td class='budget-decimal'><?php Reports::render(array_sum($values) - $arrEstimate[$group][$item]);?></td>
+			<td class='budget-decimal budget-ratio'><?php Reports::render_ratio(array_sum($values) , $arrEstimate[$group][$item]);?></td>
 		</tr>
 		<?php
 	}
@@ -239,6 +240,7 @@ foreach($arrReport as $group=>$arrItem){
 		<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrTotal['this'][$group]));?></td>
 		<td class='budget-decimal'><?php Reports::render(array_sum($arrTotal['last'][$group]));?></td>
 		<td class='budget-decimal'><?php Reports::render(array_sum($arrTotal['this'][$group]) - array_sum($arrTotal['last'][$group]));?></td>
+		<td class='budget-decimal budget-ratio'><?php Reports::render_ratio(array_sum($arrTotal['this'][$group]) , array_sum($arrTotal['last'][$group]));?></td>
 	</tr>
 	<?php
 	//------ Ratios for gross margin
@@ -360,6 +362,7 @@ foreach($arrProfit as $pc=>$flag){
 	<td class='budget-decimal'><?php Reports::render(array_sum($arrHeadcount['FTE']),1);?></td>
 	<td class='budget-decimal'><?php Reports::render(array_sum($arrHeadcountBudget['FTE']),1);?></td>
 	<td class='budget-decimal'><?php Reports::render(array_sum($arrHeadcount['FTE'])-array_sum($arrHeadcountBudget['FTE']),1);?></td>
+	<td class='budget-decimal'><?php Reports::render_ratio(array_sum($arrHeadcount['FTE']),array_sum($arrHeadcountBudget['FTE']),1);?></td>
 </tr>
 <tr>
 	<td>Headcount, <?php echo $strLastTitle;?></td>
@@ -395,6 +398,7 @@ foreach($arrProfit as $pc=>$flag){
 	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrossRevenue));?></td>
 	<td class='budget-decimal'><?php Reports::render($arrGrossRevenueEstimate);?></td>
 	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrossRevenue)-$arrGrossRevenueEstimate);?></td>
+	<td class='budget-decimal budget-ratio'><?php Reports::render_ratio(array_sum($arrGrossRevenue),$arrGrossRevenueEstimate);?></td>
 </tr>
 <tr class="budget-ratio">
 	<td>%of total</td>
@@ -527,6 +531,7 @@ function renderDataByPC($data, $arrProfit, $strTitle, $strClass=""){
 		<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($data['this']));?></td>
 		<td class='budget-decimal '><?php Reports::render(array_sum($data['last']));?></td>
 		<td class='budget-decimal '><?php Reports::render(array_sum($data['this']) - array_sum($data['last']));?></td>
+		<td class='budget-decimal budget-ratio'><?php Reports::render_ratio(array_sum($data['this']) , array_sum($data['last']));?></td>
 	</tr>
 	<?php
 }
@@ -543,6 +548,7 @@ function getTableHeader(){
 		<th class='budget-ytd'><?php echo $oBudget->type=='FYE'?'FYE':'Total';?><br/><small><?php echo $periodTitle;?></small></th>
 		<th title="<?php echo $oReference->title;?>"><?php echo $oReference->id;?></th>
 		<th>Diff</th>
+		<th>%</th>
 	</tr>
 	<?php
 	$res = ob_get_clean();
