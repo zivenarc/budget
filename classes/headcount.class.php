@@ -856,7 +856,7 @@ class Headcount extends Document{
 			$row->location = $rw['empLocationID'];			
 			$row->activity = $rw['empProductTypeID'];//?$rw['empProductTypeID']:$this->pc->activity;			
 			$row->salary = $rw['empSalary'];
-			$row->review_date = $rw['empSalaryRevision'];
+			$row->review_date = strtotime($rw['empSalaryRevision']);
 			$row->monthly_bonus = $rw['empMonthly'];
 			$row->insurance = $rw['insurance'];
 			$row->mobile_limit = $rw['funMobile'];
