@@ -33,6 +33,7 @@ class headcount_record extends table_record{
 			$this->vks = $data['vks'];
 			$this->start_date = strtotime($data['start_date']);
 			$this->end_date = strtotime($data['end_date']);
+			$this->review_date = strtotime($data['review_date']);
 			$this->new_fte = $data['new_fte'];
 	
 		}		
@@ -75,6 +76,7 @@ class headcount_record extends table_record{
 			$arrRes[] = "`fuel`=".(double)$this->fuel;
 			$arrRes[] = "`start_date`=".($this->start_date ? $oSQL->e(date('Y-m-d',$this->start_date)) : 'NULL');
 			$arrRes[] = "`end_date`=".($this->end_date ? $oSQL->e(date('Y-m-d',$this->end_date)) : 'NULL');
+			$arrRes[] = "`review_date`=".($this->review_date ? $oSQL->e(date('Y-m-d',$this->review_date)) : 'NULL');
 			$arrRes[] = "`new_fte`=".(double)$this->new_fte;
 			$arrRes[] = "`particulars`=".($this->employee?$oSQL->e($this->employee):'NULL');
 			if ($this->id){
