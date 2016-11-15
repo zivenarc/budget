@@ -39,6 +39,7 @@ class Sales extends Document{
 		$this->job_owner = $this->data['salJO'];
 		$this->destination_agent = $this->data['salDA'];
 		$this->business_owner = $this->data['salBO'];
+		$this->gbr = $this->data['salGBR'];
 		
 	}
 	public function refresh($id){
@@ -167,6 +168,12 @@ class Sales extends Document{
 			,'disabled'=>!$this->flagUpdate			
 		);
 		
+		$this->Columns[] = Array(
+			'title'=>'SAP/GBR (USD per TEU)'
+			,'field'=>self::Prefix.'GBR'
+			,'type'=>'integer'		
+			,'disabled'=>!$this->flagUpdate			
+		);
 
 	}
 	
@@ -288,6 +295,7 @@ class Sales extends Document{
 			$this->job_owner = isset($_POST[$this->prefix.'JO'])?$_POST[$this->prefix.'JO']:$this->job_owner;
 			$this->destination_agent = isset($_POST[$this->prefix.'DA'])?$_POST[$this->prefix.'DA']:$this->destination_agent;
 			$this->business_owner = isset($_POST[$this->prefix.'BO'])?$_POST[$this->prefix.'BO']:$this->business_owner;
+			$this->gbr = isset($_POST[$this->prefix.'GBR'])?$_POST[$this->prefix.'GBR']:$this->gbr;
 			
 			if (isset($_POST[$this->prefix.'ProfitID']) && count($this->records[$this->gridName])){
 				foreach ($this->records[$this->gridName] as $id=>$row){
