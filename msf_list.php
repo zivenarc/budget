@@ -6,7 +6,7 @@ $entID=13;
 $entity = new Entity();
 $entity->getByID($entID);
 
-$arrTabs = $entity->getProfitTabs($sqlMyFilter);
+$arrTabs = $entity->getScenarioTabs($sqlMyFilter);
 
 if ($_GET['ownerID']) {
 	$sqlMyFilter = "depInsertBy=".$oSQL->e($_GET['ownerID']);
