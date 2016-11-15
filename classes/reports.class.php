@@ -1659,8 +1659,8 @@ class Reports{
 						echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset,12+$this->oBudget->offset);
 						echo $this->oBudget->getTableHeader('quarterly');
 					?>		
-					<th class='budget-ytd'><?php echo $this->oBudget->type=='Budget'?'Budget':'FYE';?></th>
-					<th><?php echo $this->oBudget->type=='Budget'?$this->oReference->id:'Budget';?></th>
+					<th class='budget-ytd'><?php echo strpos($this->oBudget->type,'Budget')!==false?'Budget':'FYE';?></th>
+					<th><?php echo strpos($this->oBudget->type,'Budget')!==false?$this->oReference->id:'Budget';?></th>
 					<th>Diff</th>
 					<th>%</th>
 					<?php 
