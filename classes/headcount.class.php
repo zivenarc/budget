@@ -222,6 +222,14 @@ class Headcount extends Document{
 			,'totals'=>true
 		);
 		
+		$this->grid->Columns[] = Array(
+			'title'=>'Review date'
+			,'field'=>'review_date'
+			,'type'=>'date'	
+			,'width'=>'60px'				
+			, 'disabled'=>true
+		);
+		
 		$this->grid->Columns[] =Array(
 			'title'=>'M.bonus'
 			,'field'=>'monthly_bonus'
