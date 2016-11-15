@@ -266,6 +266,31 @@ class Entity {
 		return ($this->fillTabs($rs));
 	}
 	
+	public function getScenarioTabs($sqlWhere){/*------------------- Tabsheets for Profit selection ----------------------*/
+		GLOBAL $company;
+		
+		$this->tabKey = $this->prefix.'Scenario';
+		
+		if(!$sqlWhere){
+			if ($this->type=='ENT'){
+				$sqlWhere = $this->prefix."StateID=".(integer)$_GET[$this->prefix."StateID"];
+			} else {
+				$sqlWhere = '1=1';
+			}
+			//$sqlWhere = $this->prefix."StateID=".(integer)$_GET["StateID"];
+		} 	
+		
+		$sqlTabs = "SELECT `scnID` as optValue, CONCAT(`scnTitle".$this->strLocal."`,' (', count(`".$this->prefix."ID`),')') as optText, count(`".$this->prefix."ID`) as nCount
+				FROM `".$this->table."`
+				INNER JOIN `tbl_scenario` on `scnID`=`".$this->prefix."Scenario`
+				WHERE {$sqlWhere} AND `".$this->prefix."CompanyID`='{$company}'
+					AND scnFlagReadOnly=0
+				GROUP BY scnID
+				ORDER BY scnID";
+		$rs = $this->oSQL->q($sqlTabs);
+		return ($this->fillTabs($rs));
+	}
+	
 	public function getItemTabs($sqlWhere){/*------------------- Tabsheets for Profit selection ----------------------*/
 		
 		$this->tabKey = $this->prefix.'ItemGUID';

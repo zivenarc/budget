@@ -6,7 +6,7 @@ $entID=4;
 $entity = new Entity();
 $entity->getByID($entID);
 
-$arrTabs = $entity->getProfitTabs($sqlMyFilter);
+$arrTabs = $entity->getScenarioTabs($sqlMyFilter);
 
 if ($_GET['ownerID']) {
 	$sqlMyFilter = "cemInsertBy=".$oSQL->e($_GET['ownerID']);
