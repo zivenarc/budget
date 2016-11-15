@@ -481,8 +481,9 @@ class Headcount extends Document{
 				
 					$eligible_date = time(0,0,0,10,1,$this->budget->year-1);
 					$start_date = strtotime($record->start_date);
+					$review_date = strtotime($record->review_date);
 					$probation = $start_date + 91*24*60*60;
-					$eligible = ($start_date < $eligible_date) && ($this->settings['salary_review_month']>=date('m',$this->budget->date_start));
+					$eligible = (max($start_date,$review_date) < $eligible_date) && ($this->settings['salary_review_month']>=date('m',$this->budget->date_start));
 						
 					$oEmployee = $Employees->getById($record->employee);
 					// echo '<pre>';print_r($oEmployee);echo '</pre>';
@@ -827,6 +828,7 @@ class Headcount extends Document{
 		
 		$sql = "SELECT empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,funMobile,funFuel,
 						IF(empID IN ({$strMaternity}),0,empSalary) as empSalary
+						,empSalaryRevision
 						,empMonthly
 						,(SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
 					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090 AND DATEDIFF(rsgDateEnd,'".date('Y-m-d',$this->budget->date_start)."')>0) as empEndDate
@@ -854,6 +856,7 @@ class Headcount extends Document{
 			$row->location = $rw['empLocationID'];			
 			$row->activity = $rw['empProductTypeID'];//?$rw['empProductTypeID']:$this->pc->activity;			
 			$row->salary = $rw['empSalary'];
+			$row->review_date = $rw['empSalaryRevision'];
 			$row->monthly_bonus = $rw['empMonthly'];
 			$row->insurance = $rw['insurance'];
 			$row->mobile_limit = $rw['funMobile'];
