@@ -2927,6 +2927,9 @@ class Reports{
 	
 	function getCustomerGroup($rw){
 		switch ($rw['customer_group_code']){
+			case 31158:
+				$cusGroup = "TOYOTA";
+				break;
 			case 33239:
 			case 40933:
 				switch ($rw['customer']){
