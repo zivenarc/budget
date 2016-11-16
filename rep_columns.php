@@ -7,8 +7,8 @@ require ('classes/reports.class.php');
 
 include ('includes/inc_report_settings.php');
 
-$oThis = new Budget($budget_scenario);
-$oThat = new Budget($reference);
+$oBudget = new Budget($budget_scenario);
+$oReference = new Budget($reference);
 
 if ($bu_group){
 	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
@@ -67,8 +67,8 @@ if(!isset($_GET['pccGUID'])){
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 	}
 	
-	$arrActualRates = $oThis->getMonthlyRates($currency);
-	$arrBudgetRates = $oThat->getMonthlyRates($currency);
+	$arrActualRates = $oBudget->getMonthlyRates($currency);
+	$arrBudgetRates = $oReference->getMonthlyRates($currency);
 
 	SetCookie('period_type',$period_type,0,'/budget/');
 
@@ -91,8 +91,8 @@ if(!isset($_GET['pccGUID'])){
 		$arrActions[] = Array ('title'=>$title,'action'=>$url);
 	}
 
-	$sqlActual = "SUM(".$oThis->getThisYTDSQL($period_type,$arrActualRates).")";
-	$sqlBudget = "SUM(".$oThis->getThisYTDSQL($period_type,$arrBudgetRates).")";
+	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
+	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 
 	
 	$sql="SELECT 	sales as optValue, 
@@ -103,7 +103,7 @@ if(!isset($_GET['pccGUID'])){
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM vw_master 								
-								{$sqlWhere} AND scenario='{$oThis->id}' ".Reports::GP_FILTER." 
+								{$sqlWhere} AND scenario='{$oBudget->id}' ".Reports::GP_FILTER." 
 								GROUP BY customer_group_code, sales
 								UNION ALL
 								SELECT sales as optValue, 
@@ -113,10 +113,10 @@ if(!isset($_GET['pccGUID'])){
 											0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 								
-								{$sqlWhere} AND	scenario='{$oThat->id}' AND source<>'Estimate' ".Reports::GP_FILTER." 
+								{$sqlWhere} AND	scenario='{$oReference->id}' AND source<>'Estimate' ".Reports::GP_FILTER." 
 								GROUP BY customer_group_code, sales";
 	
-	$oReport = new Columns(Array('sqlBase'=>$sql, 'actual_title'=>$oThis->title,'budget_title'=>$oThat->title,'xTitle'=>'Gross profit'));
+	$oReport = new Columns(Array('sqlBase'=>$sql, 'actual_title'=>$oBudget->title,'budget_title'=>$oReference->title,'xTitle'=>'Gross profit'));
 		
 	$oReport->draw();
 	
