@@ -17,13 +17,6 @@ if ($bu_group){
 
 if(!isset($_GET['pccGUID'])){
 	$oBudget = new Budget($budget_scenario);
-	if ($reference!=$oBudget->reference_scenario->id){
-		$oReference = new Budget($reference);
-		$strVsTitle = ' vs '.$oReference->title;
-	} else {
-		$reference = $oBudget->reference_scenario->id;
-	}
-	
 	
 	$arrJS[]='js/rep_pnl.js';
 	// $arrJS[]='js/input_form.js';	
@@ -36,7 +29,7 @@ if(!isset($_GET['pccGUID'])){
 	// $arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");
 		
 	include ('includes/inc-frame_top.php');
-	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
+	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 	include ('includes/inc_report_selectors.php');
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	
