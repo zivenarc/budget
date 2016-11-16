@@ -32,6 +32,9 @@ $sql = "SELECT * FROM common_db.tbl_profit WHERE pccID=".$oSQL->e($bdv);
 $rs = $oSQL->q($sql);
 $rw = $oSQL->f($rs);
 $arrUsrData["pagTitle$strLocal"] = 'Sales by '.($rw['pccTitle']?$rw['pccTitle']:'<Unknown>');
+
+$arrActions[] = Array('title'=>'NSD','action'=>'?bdv=9');
+$arrActions[] = Array('title'=>'JSD','action'=>'?bdv=130');
 	
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';

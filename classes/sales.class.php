@@ -462,14 +462,14 @@ class Sales extends Document{
 									$freight_r_row = $oMaster->add_master();
 								}
 															
-								$freight_r_row->item = null;
-								$freight_r_row->account = 'SZ0001';
+								$freight_r_row->item = $activity->item_cost;
+								$freight_r_row->account = 'J00802';
 								$freight_r_row->profit = $this->profit;
-								$freight_r_row->activity = $record->activity;
+								$freight_r_row->activity = $Activities::OFIGB;
 								$freight_r_row->customer = $record->customer;				
 								$freight_r_row->sales = $record->sales;	
-								$freight_r_row->{$month} += ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
-								$master_row->{$month} = 0;
+								$freight_r_row->{$month} -= ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
+								//$master_row->{$month} = 0;
 								
 							} else{
 								// leave it alone
@@ -505,14 +505,14 @@ class Sales extends Document{
 										$freight_c_row = $oMaster->add_master();
 									}
 																
-									$freight_c_row->item = null;
-									$freight_c_row->account = 'SZ0011';
+									$freight_c_row->item = $activity->item_cost;
+									$freight_c_row->account = 'J00400';
 									$freight_c_row->profit = $this->profit;
-									$freight_c_row->activity = $record->activity;
+									$freight_c_row->activity = $Activities::OFIGB;
 									$freight_c_row->customer = $record->customer;				
 									$freight_c_row->sales = $record->sales;	
-									$freight_c_row->{$month} += -($record->{$month})*$record->buying_rate*$this->settings[strtolower($record->buying_curr)];
-									$master_row->{$month} = 0;
+									$freight_c_row->{$month} += ($record->{$month})*$record->buying_rate*$this->settings[strtolower($record->buying_curr)];
+									//$master_row->{$month} = 0;
 									} else {
 									// leave it alone
 								}
@@ -557,19 +557,24 @@ class Sales extends Document{
 					
 					if ($flagProjectBridge){
 						
-						$sql = "SELECT * FROM tbl_route WHERE rteID=".(integer)$this->route;
-						$rs = $this->oSQL->q($sql);
-						$arrRoute = $this->oSQL->f($rs);
+						if($this->gbr){
+							$SCC = $this->gbr;
+						} else {
+							$sql = "SELECT * FROM tbl_route WHERE rteID=".(integer)$this->route;
+							$rs = $this->oSQL->q($sql);
+							$arrRoute = $this->oSQL->f($rs);
+							$SCC = $arrRoute['rteSC_OFF'];
+						}
 						
-						//------- Sales commission ----------
+						//------- Sales commission receivable ----------
 						if ($this->job_owner!=PB_Ourselves && $this->business_owner==PB_Ourselves){
 							$master_row = $oMaster->add_master();
 							$master_row->profit = $this->profit;
-							$master_row->activity = $record->activity;
+							$master_row->activity = $Activities::OFICOM;
 							$master_row->customer = $record->customer;				
 							$master_row->sales = $record->sales;
 							
-							$activity = $Activities->getByCode($record->activity);
+							$activity = $Activities->getByCode($Activities::OFICOM);
 							$account = $activity->YACT;
 							
 							//$master_row->item = Items::PROFIT_SHARE;
@@ -583,7 +588,7 @@ class Sales extends Document{
 								//------Update for Project bridge since 1st April 2016-----------
 								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 								if ($current_month_start>=$dateProjectBridge){										
-									$master_row->{$month} = ($this->arrTEU[$month])*$arrRoute['rteSC_OFF']*$this->settings['usd'];
+									$master_row->{$month} = ($this->arrTEU[$month])*$SCC*$this->settings['usd'];
 								} else {
 									$master_row->{$month} = 0;	// do not calculate Profit share						
 								}
@@ -618,14 +623,14 @@ class Sales extends Document{
 							// no SSC in our books
 						}
 						//------- Destination handling charge
-						if ($this->job_owner!=PB_Ourselves && $this->destination_agent==PB_Ourselves){
+						if ($this->job_owner!=PB_Ourselves && $this->destination_agent==PB_Ourselves && !$this->gbr){
 							$master_row = $oMaster->add_master();
 							$master_row->profit = $this->profit;
-							$master_row->activity = $record->activity;
+							$master_row->activity = $Activities::OFICOM;
 							$master_row->customer = $record->customer;				
 							$master_row->sales = $record->sales;
 							
-							$activity = $Activities->getByCode($record->activity);
+							$activity = $Activities->getByCode($Activities::OFICOM);
 							$account = $activity->YACT;
 							
 							//$master_row->item = Items::PROFIT_SHARE;
