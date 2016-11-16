@@ -44,5 +44,14 @@
 		$('input[name="denominator"]').change(function(){
 			location.search = 'denominator='+$(this).val();
 		});
+		$('#budget_scenario').change(function(){		
+		location.search = 'budget_scenario='+$(this).val();
+		});
+		$('#reference').change(function(){		
+			location.search = 'reference='+$(this).val();
+		});	
+		$('#bu_group').change(function(){		
+			location.search = 'bu_group='+$(this).val();
+		});	
 	});
 </script>

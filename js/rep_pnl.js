@@ -62,16 +62,7 @@ function spinner_div(){
 var header = document.title;
 
 $(document).ready(function(){
-	$('#tabs').tabs(tabs_options);
-	$('#budget_scenario').change(function(){		
-		location.search = 'budget_scenario='+$(this).val();
-	});
-	$('#reference').change(function(){		
-		location.search = 'reference='+$(this).val();
-	});	
-	$('#bu_group').change(function(){		
-		location.search = 'bu_group='+$(this).val();
-	});	
+	$('#tabs').tabs(tabs_options);	
 });
 
 function init_panel(o){
