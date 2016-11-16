@@ -7,6 +7,9 @@ require ('classes/reports.class.php');
 
 include ('includes/inc_report_settings.php');
 
+$oActual = new Budget($budget_scenario);
+$oBudget = new Budget($reference);
+
 if ($bu_group){
 	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
 	$rs = $oSQL->q($sql);
@@ -15,8 +18,7 @@ if ($bu_group){
 	}
 }
 
-if(!isset($_GET['pccGUID'])){
-	$oBudget = new Budget($budget_scenario);
+if(!isset($_GET['pccGUID'])){	
 	
 	$arrJS[]='js/rep_pnl.js';
 	// $arrJS[]='js/input_form.js';	
@@ -29,9 +31,8 @@ if(!isset($_GET['pccGUID'])){
 	// $arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");
 		
 	include ('includes/inc-frame_top.php');
-	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
-	include ('includes/inc_report_selectors.php');
-	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
+	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
+	include ('includes/inc_report_selectors.php');	
 	
 	Budget::getProfitTabs('reg_master', !$flagNoAuth, Array('pccID'=>$arrBus));
 	
@@ -66,9 +67,6 @@ if(!isset($_GET['pccGUID'])){
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 	}
 	
-	$oActual = new Budget($budget_scenario);
-	$oBudget = new Budget($reference);
-
 	$actual = $oActual->id;
 	$budget = $oBudget->id;
 
