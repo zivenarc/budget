@@ -67,15 +67,8 @@ if(!isset($_GET['pccGUID'])){
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 	}
 	
-	$actual = $oActual->id;
-	$budget = $oBudget->id;
-
 	$arrActualRates = $oActual->getMonthlyRates($currency);
 	$arrBudgetRates = $oBudget->getMonthlyRates($currency);
-
-	$limit = 8;
-	//$denominator = 1000;
-
 
 	SetCookie('period_type',$period_type,0,'/budget/');
 
@@ -110,7 +103,7 @@ if(!isset($_GET['pccGUID'])){
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM vw_master 								
-								{$sqlWhere} AND scenario='{$actual}' ".Reports::GP_FILTER." 
+								{$sqlWhere} AND scenario='{$oActual->id}' ".Reports::GP_FILTER." 
 								GROUP BY customer_group_code, sales
 								UNION ALL
 								SELECT sales as optValue, 
@@ -120,7 +113,7 @@ if(!isset($_GET['pccGUID'])){
 											0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 								
-								{$sqlWhere} AND	scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." 
+								{$sqlWhere} AND	scenario='{$oBudget->id}' AND source<>'Estimate' ".Reports::GP_FILTER." 
 								GROUP BY customer_group_code, sales";
 	
 	$oReport = new Columns(Array('sqlBase'=>$sql, 'actual_title'=>$oActual->title,'budget_title'=>$oBudget->title,'xTitle'=>'Gross profit'));
