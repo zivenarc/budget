@@ -100,7 +100,7 @@ if ($_GET['tab']){
 			if ($oDocument->ps_profit){
 				$oReport->masterByProfit($sqlWhere);
 			} else {
-				$oReport->masterByCustomer($sqlWhere);
+				$oReport->masterByActivity($sqlWhere);
 			}			
 			$oReport->masterByYACT($sqlWhere);
 			die();
