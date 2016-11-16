@@ -21,17 +21,43 @@ if ($bu_group){
 if(!isset($_GET['pccGUID'])){	
 	
 	$arrJS[]='js/rep_pnl.js';
-	// $arrJS[]='js/input_form.js';	
 	
-	// $arrActions[] = Array ('title'=>'By customer group','action'=>"?type=customer_group");
-	// $arrActions[] = Array ('title'=>'By customer','action'=>"?type=customer");
-	// $arrActions[] = Array ('title'=>'By activity','action'=>"?type=activity");
-	// $arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
-	// $arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");
-	// $arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");
+	SetCookie('period_type',$period_type,0,'/budget/');
+
+	if(strpos($oBudget->type,'budget')===false){
+		$arrPeriodType['ytd'] = 'YTD';
+		$arrPeriodType['cm'] = 'Current month';
+		$arrPeriodType['nm'] = 'Next month';
+		$arrPeriodType['roy'] = 'Rest-of-year';
+	}
+	
+	if(!$oBudget->offset || $oBudget->length==15){
+		$arrPeriodType['fye'] = 'FYE';
+		$arrPeriodType['q1'] = '1<sup>st</sup> quarter';
+	};
+	
+	$arrPeriodType['q2'] = '2<sup>nd</sup> quarter';
+	$arrPeriodType['q3'] = '3<sup>rd</sup> quarter';
+	$arrPeriodType['q4'] = '4<sup>th</sup> quarter';
+	
+	if($oBudget->offset || $oBudget->length==15){
+		$arrPeriodType['q5'] = '5<sup>th</sup> quarter';
+		$arrPeriodType['am'] = 'Apr-Mar';
+	}
+
+
+	
+		
+	foreach($arrPeriodType as $id=>$title){
+		$temp = $_GET;
+		$temp['period_type'] = $id;
+		$url = $_SERVER['PHP_SELF'].'?'.http_build_query($temp);
+		$arrActions[] = Array ('title'=>$title,'action'=>$url);
+	}
 		
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
+	echo '<h2>',$arrPeriodType[$period_type],'</h2>';
 	include ('includes/inc_report_selectors.php');	
 	
 	Budget::getProfitTabs('reg_master', !$flagNoAuth, Array('pccID'=>$arrBus));
@@ -70,26 +96,7 @@ if(!isset($_GET['pccGUID'])){
 	$arrActualRates = $oBudget->getMonthlyRates($currency);
 	$arrBudgetRates = $oReference->getMonthlyRates($currency);
 
-	SetCookie('period_type',$period_type,0,'/budget/');
-
-	$arrPeriodType['ytd'] = 'YTD';
-	$arrPeriodType['cm'] = 'Current month';
-	$arrPeriodType['nm'] = 'Next month';
-	$arrPeriodType['q1'] = '1<sup>st</sup> quarter';
-	$arrPeriodType['q2'] = '2<sup>nd</sup> quarter';
-	$arrPeriodType['q3'] = '3<sup>rd</sup> quarter';
-	$arrPeriodType['q4'] = '4<sup>th</sup> quarter';
-	$arrPeriodType['q5'] = '5<sup>th</sup> quarter';
-	$arrPeriodType['roy'] = 'Rest-of-year';
-	$arrPeriodType['fye'] = 'FYE';
-	$arrPeriodType['am'] = 'Apr-Mar';
-		
-	foreach($arrPeriodType as $id=>$title){
-		$temp = $_GET;
-		$temp['period_type'] = $id;
-		$url = $_SERVER['PHP_SELF'].'?'.http_build_query($temp);
-		$arrActions[] = Array ('title'=>$title,'action'=>$url);
-	}
+	
 
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
@@ -116,7 +123,7 @@ if(!isset($_GET['pccGUID'])){
 								{$sqlWhere} AND	scenario='{$oReference->id}' AND source<>'Estimate' ".Reports::GP_FILTER." 
 								GROUP BY customer_group_code, sales";
 	
-	$oReport = new Columns(Array('sqlBase'=>$sql, 'actual_title'=>$oBudget->title,'budget_title'=>$oReference->title,'xTitle'=>'Gross profit'));
+	$oReport = new Columns(Array('sqlBase'=>$sql, 'actual_title'=>$oBudget->title,'budget_title'=>$oReference->title,'xTitle'=>'Gross profit', 'title'=>'Gross profit'));
 		
 	$oReport->draw();
 	

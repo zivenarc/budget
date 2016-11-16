@@ -32,6 +32,9 @@
 <td>
 <div><label for='bu_group'>Group</label><?php echo $oBudget->getBUGroupSelect(); ?></div>
 </td>
+<td>
+<input type="submit" value="Request"/>
+</td>
 </tr>
 </table>
 </form>
