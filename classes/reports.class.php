@@ -198,33 +198,34 @@ class Reports{
 		switch($this->oBudget->type){
 			case 'Budget':
 			case 'Budget_AM':
-				$sqlFrom = "SELECT activity, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
+				$sqlFrom = "SELECT activity, route, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
 							{$sqlWhere} AND scenario='{$this->oBudget->id}' 
 							AND kpi=1 AND bo=714 AND activity IN (48,63) 
 							AND `company`='{$this->company}'
-							GROUP BY activity, unit
+							GROUP BY activity, route, unit
 							";
 				break;
 			default:
-				$sqlFrom = "SELECT activity, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
+				$sqlFrom = "SELECT activity, route,  source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
 							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND bo=714 AND activity IN (48,63) AND `company`='{$this->company}'
-							GROUP BY activity, unit, source
+							GROUP BY activity, route, unit, source
 							UNION ALL
-						SELECT activity, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
+						SELECT activity, route, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
 						FROM `reg_sales` 										
 						{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND bo=714 AND activity IN (48,63) AND `company`='{$this->company}'
-					GROUP BY activity, unit";
+					GROUP BY activity, route, unit";
 				break;
 		}
 		
-		$sql = "SELECT activity, prtTitle, ".$this->oBudget->getMonthlySumSQL(1,15).", 
+		$sql = "SELECT activity, route, rteTitle, prtTitle, ".$this->oBudget->getMonthlySumSQL(1,15).", 
 				SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total
 				FROM 
 					({$sqlFrom}) U 		
 				LEFT JOIN vw_product_type ON prtID=activity
-				GROUP BY U.activity";
+				LEFT JOIN tbl_route ON rteID=route
+				GROUP BY U.activity, U.route";
 		try {
 			$rs = $this->oSQL->q($sql); 
 		} catch (Exception $e) {
@@ -239,7 +240,7 @@ class Reports{
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr>
-					<th>Activity</th>
+					<th>Activity/route</th>
 					<?php 
 					echo $this->oBudget->getTableHeader('monhtly',1+$this->oBudget->offset, 12+$this->oBudget->offset); 
 					echo $this->oBudget->getTableHeader('quarterly'); 
@@ -258,7 +259,8 @@ class Reports{
 					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
 					<?php
 				};
-				echo "<td><a href='javascript:getCustomerKPI({activity:{$rw['activity']},freehand:true});'>",$rw['prtTitle'],'</a></td>';				
+				echo "<td><a href='javascript:getCustomerKPI({activity:{$rw['activity']},route:{$rw['route']} ,freehand:true});'>",$rw['prtTitle']," | ",$rw['rteTitle'],'</a></td>';								
+				
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];

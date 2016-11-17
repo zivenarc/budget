@@ -10,10 +10,17 @@ if (isset($_POST['activity'])){
 	$sqlWhere = " AND activity=".$oSQL->e($_POST['activity']);
 	if ($_POST['freehand']){
 		$sqlWhere.= " AND bo=714";
-	}	
+	}
 	$sql = "SELECT * FROM vw_product_type WHERE prtID=".$oSQL->e($_POST['activity']);
 	$rs = $oSQL->q($sql);
 	$rwAct = $oSQL->f($rs);
+}
+
+if (isset($_POST['route'])){
+	$sqlWhere .= " AND route=".$oSQL->e($_POST['route']);
+	$sql = "SELECT * FROM tbl_route WHERE rteID=".$oSQL->e($_POST['route']);
+	$rs = $oSQL->q($sql);
+	$rwRte = $oSQL->f($rs);
 }
 
 if ($_POST['pccGUID']=='all'){
@@ -25,7 +32,7 @@ if ($_POST['pccGUID']=='all'){
 include ('includes/inc-frame_top.php');
 ?>
 <div id='output'>
-<h2><?php echo $rwAct["prtTitle$strLocal"];?></h2>
+<h2><?php echo $rwAct["prtTitle$strLocal"]," | ",$rwRte['rteTitle'];?></h2>
 <?php
 if ($_POST['freehand']){
 	?><h3>Freehand</h3><?php

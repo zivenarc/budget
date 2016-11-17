@@ -509,7 +509,7 @@ class Document extends easyForm{
 			,'type'=>'combobox'
 			,'width'=>'100px'
 			,'source'=>$Products->getStructuredRef($this->data["prdIdxLeft"],$this->data["prdIdxRight"])
-			// ,'source'=>"vw_product_select"      							
+			,'sql'=>"vw_product_select"      							
 			, 'mandatory' => true
 			, 'disabled'=>!$this->flagUpdate
 		);
