@@ -203,13 +203,20 @@ class Reports{
 							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND bo=714 AND activity IN (48,63) AND `company`='{$this->company}'
 							GROUP BY activity, unit, source
 							UNION ALL
-							SELECT activity, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
-							FROM `reg_sales` 										
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND bo=714 AND activity IN (48,63) AND `company`='{$this->company}'
+						SELECT activity, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
+						FROM `reg_sales` 										
+						{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND bo=714 AND activity IN (48,63) AND `company`='{$this->company}'
 					GROUP BY activity, unit) U 		
 				LEFT JOIN vw_product_type ON prtID=activity
 				GROUP BY U.activity";
-		$rs = $this->oSQL->q($sql); 
+		try {
+			$rs = $this->oSQL->q($sql); 
+		} catch (Exception $e) {
+			echo '<pre>Caught exception: ',  $e->getMessage(), "</pre>";
+			echo '<pre>',$sql,'</pre>';
+			echo '<pre>',print_r($this->oBudget),'</pre>';
+		};
+		
 		$tableID = "kpi_".md5($sql);
 			?>
 			<h2>Freehand OFF</h2>
