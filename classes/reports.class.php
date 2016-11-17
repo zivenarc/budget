@@ -195,10 +195,19 @@ class Reports{
 	
 	function offByRoute($sqlWhere){
 		
-		$sql = "SELECT activity, prtTitle, ".$this->oBudget->getMonthlySumSQL(1,15).", 
-				SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total
-				FROM 
-					(SELECT activity, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
+		switch($this->oBudget->type){
+			case 'Budget':
+			case 'Budget_AM':
+				$sqlFrom = "SELECT activity, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
+							FROM `reg_sales` 							
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' 
+							AND kpi=1 AND bo=714 AND activity IN (48,63) 
+							AND `company`='{$this->company}'
+							GROUP BY activity, unit
+							";
+				break;
+			default:
+				$sqlFrom = "SELECT activity, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
 							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND bo=714 AND activity IN (48,63) AND `company`='{$this->company}'
 							GROUP BY activity, unit, source
@@ -206,7 +215,14 @@ class Reports{
 						SELECT activity, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
 						FROM `reg_sales` 										
 						{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND bo=714 AND activity IN (48,63) AND `company`='{$this->company}'
-					GROUP BY activity, unit) U 		
+					GROUP BY activity, unit";
+				break;
+		}
+		
+		$sql = "SELECT activity, prtTitle, ".$this->oBudget->getMonthlySumSQL(1,15).", 
+				SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total
+				FROM 
+					({$sqlFrom}) U 		
 				LEFT JOIN vw_product_type ON prtID=activity
 				GROUP BY U.activity";
 		try {
