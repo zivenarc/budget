@@ -75,6 +75,7 @@ class Reports{
 			
 			switch ($this->oBudget->type){
 				case 'Budget':
+				case 'Budget_AM':
 					$sql = "SELECT prtGHQ, prtRHQ, pc, prtID, prtTitle as 'Activity', prtUnit as 'Unit', ".$this->oBudget->getMonthlySumSQL(1,15).", 
 								SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total, 
 								SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM 
