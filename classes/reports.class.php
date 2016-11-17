@@ -1084,13 +1084,13 @@ class Reports{
 				(SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
 						{$strFields_this}
 				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND {$strGPFilter} ## Gross margin only
+				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oBudget->id}' AND {$strGPFilter} ## Gross margin only
 				GROUP BY Level1_code, Level1_title, `{$strAccountCode}` , `{$strAccountTitle}`
 				UNION ALL
 				SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
 						{$strFields_last}
 				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oReference->id}' AND {$strGPFilter}
+				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oReference->id}' AND {$strGPFilter}
 				GROUP BY Level1_code, Level1_title,  `{$strAccountCode}` , `{$strAccountTitle}`) Q
 			GROUP BY Level1_code, Level1_title, `item` , `Budget item`
 			ORDER BY Level1_title, `Group` ASC			
@@ -2018,13 +2018,13 @@ class Reports{
 				(SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
 						{$strFields_this}
 				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND `{$strAccountCode}` IS NOT NULL
+				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oBudget->id}' AND `{$strAccountCode}` IS NOT NULL
 				{$sqlGroup}
 				UNION ALL
 				SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
 						{$strFields_last}
 				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oReference->id}' AND `{$strAccountCode}` IS NOT NULL 
+				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oReference->id}' AND `{$strAccountCode}` IS NOT NULL 
 				{$sqlGroup}) Q
 			{$sqlGroup}
 			ORDER BY `Group` ASC			
