@@ -428,6 +428,72 @@ class Reports{
 		
 	}
 	
+	public function masterDocument($source){
+		
+		$sql = "SELECT * FROM vw_master WHERE `source`='{$source}' ORDER BY pc, customer, activity, account, item";
+		$rs = $this->oSQL->q($sql);
+		$i = 1;
+		?>
+		<div id='report'>
+		<table class='budget' id='<?php echo $source;?>'>
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>PC</th>
+				<th>Customer</th>
+				<th>Activity</th>
+				<th colspan="2">YACT</th>
+				<th>Item</th>
+				<th>Sales</th>
+				<th>Sal.dept</th>
+				<?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset,max(12+$this->oBudget->offset,$this->oBudget->length)); ?>
+			</tr>
+		</thead>
+		<?php
+		while ($rw = $this->oSQL->f($rs)){
+			?>
+			<tr>
+				<td><?php echo $i;?></td>
+				<td><?php echo $rw['Profit'];?></td>
+				<td><?php echo $rw['Customer_name'];?></td>
+				<td><?php echo $rw['Activity_title'];?></td>
+				<td><?php echo $rw['account'];?></td>
+				<td><?php echo $rw['Title'];?></td>
+				<td><?php echo $rw['Budget item'];?></td>
+				<td><?php echo $rw['usrTitle'];?></td>
+				<td><?php echo $rw['bdvTitle'];?></td>
+				<?php
+					for($m=1+$this->oBudget->offset;$m<=max(12+$this->oBudget->offset,$this->oBudget->length);$m++){
+						$month = $this->oBudget->arrPeriod[$m];
+						$arrTotal[$month] += $rw[$month];
+						?>
+						<td class='budget-decimal'><?php self::render($rw[$month]);?></td>
+						<?php
+					}
+				?>
+			</tr>
+			<?php
+			$i++;
+		}
+		?>
+		<tfoot>
+			<tr class='budget-subtotal'>
+				<td colspan="9">Total:</td>
+				<?php
+					for($m=1+$this->oBudget->offset;$m<=max(12+$this->oBudget->offset,$this->oBudget->length);$m++){
+						$month = $this->oBudget->arrPeriod[$m];
+						?>
+						<td class='budget-decimal'><?php self::render($arrTotal[$month]);?></td>
+						<?php
+					}
+				?>
+			</tr>
+		</tfoot>
+		</table>
+		</div>
+		<?php
+	}
+	
 	public function salesByCustomer($sqlWhere=''){
 		
 		ob_start();

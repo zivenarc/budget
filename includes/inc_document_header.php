@@ -1,4 +1,11 @@
 <?php
+if($_GET['DataAction']=='master'){
+	require_once ('classes/reports.class.php');
+	$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id));
+	$oReport->masterDocument($oDocument->GUID);
+	die();
+}
+
 echo '<h1>';
 if ($oDocument->ID){
 	echo $oDocument->budget->title,' :: ';
