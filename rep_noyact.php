@@ -39,7 +39,36 @@ if ($_GET['tab']){
 		while ($rw=$oSQL->f($rs)){
 			$data[] = $rw;
 		}
-		echo '<h3>Missing PC</h3>';
+		?>
+		<h3>Missing PC</h3>
+		<?php
+		Reports::getJournalEntries($data);
+		
+		$data = Array();
+		
+		$sql = "SELECT yctID,yctTitle FROM vw_yact WHERE yctID LIKE 'J%'";
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){
+			$arrYact['code'][] = $rw['yctID'];			
+			$arrYact['title'][] = $rw['yctTitle'];			
+		}
+		$strAccounts = "'".implode("','",$arrYact)."'";
+		
+		$sql = "SELECT *, edit_date as timestamp FROM vw_master 		
+		LEFT JOIN vw_journal ON source=guid
+		LEFT JOIN stbl_user ON usrID=edit_by		
+		WHERE posted=1 AND vw_master.scenario='{$_GET['tab']}' AND IFNULL(vw_master.activity,0) = 0 AND account IN ({$strAccounts})
+		GROUP BY guid
+		ORDER BY vw_master.timestamp DESC";	
+
+		$rs =$oSQL->q($sql);
+		while ($rw=$oSQL->f($rs)){
+			$data[] = $rw;
+		}
+		?>
+		<h3>Missing Activity</h3>
+		<p><?php echo implode(", ",$arrYact['title']);?></p>
+		<?php
 		Reports::getJournalEntries($data);
 		
 	
