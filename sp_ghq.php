@@ -32,7 +32,9 @@ $endMonth = isset($_GET['mthEnd'])?$_GET['mthEnd']:12+$oBudget->offset;
 $colspan = $endMonth - $startMonth + 3;
 
 
-$sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
+$sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)." 
+		FROM reg_profit_ghq 
+		WHERE scenario='$budget_scenario' AND company='{$company}'
 		GROUP BY prtGHQ, pc";
 $rs = $oSQL->q($sql);
 if(!$oSQL->n($rs)){
@@ -73,7 +75,7 @@ $arrFilter = Array(
 );
 $reportKey = 'Revenue';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') 
 		GROUP by prtGHQ"; 
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -93,7 +95,7 @@ $arrFilter = Array(
 );
 $reportKey = 'Direct costs';
 $sql = "SELECT {$sqlFields} FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND item IN ('".implode("','",$arrFilter)."')
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND item IN ('".implode("','",$arrFilter)."')
 		GROUP BY {$sqlGroupBy}";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -107,7 +109,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'Reclassified fixed costs';
 $sql = "SELECT {$sqlFields} FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('J00801', 'J00803','J00804','J00805','J00806','J00808','J0080W')
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account IN ('J00801', 'J00803','J00804','J00805','J00806','J00808','J0080W')
 		GROUP by {$sqlGroupBy}
 		ORDER by account";
 
@@ -117,7 +119,7 @@ distribute($reportKey, $sql);
 
 $reportKey = 'General costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000' AND (pccFLagProd = 1 OR IFNULL(prtGHQ,'')<>'')
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000' AND (pccFLagProd = 1 OR IFNULL(prtGHQ,'')<>'')
 		GROUP by {$sqlGroupBy}
 		ORDER BY account";
 
@@ -125,21 +127,21 @@ distribute($reportKey, $sql);
 
 $reportKey = 'Corporate costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000'  AND (pccFLagProd = 0 AND IFNULL(prtGHQ,'')='')
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000'  AND (pccFLagProd = 0 AND IFNULL(prtGHQ,'')='')
 		GROUP by {$sqlGroupBy}
 		ORDER BY account";
 distribute ($reportKey, $sql);
 
 $reportKey = 'Distributed corporate costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account ='607000' 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account ='607000' 
 		GROUP by {$sqlGroupBy}
 		ORDER BY account";
 distribute ($reportKey, $sql);
 
 $reportKey = 'MSF';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account='527000' 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account='527000' 
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -158,7 +160,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'N/O income';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account like '60%') AND account<>'607000'
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account like '60%') AND account<>'607000'
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -178,7 +180,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'N/O costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account like '65%' or account like '66%') 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account like '65%' or account like '66%') 
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -197,7 +199,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'Extraordinary income';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account like '70%')
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account like '70%')
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -217,7 +219,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'Extraordinary costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account like '75%' or account like '76%') 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account like '75%' or account like '76%') 
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -236,7 +238,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'NO YACT';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND IFNULL(account,'') LIKE '' 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND IFNULL(account,'') LIKE '' 
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -256,7 +258,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'Control PBT';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account NOT LIKE 'SZ%'";
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account NOT LIKE 'SZ%'";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
