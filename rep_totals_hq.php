@@ -63,20 +63,18 @@ while ($rw=$oSQL->f($rs)){
 
 //------------------------------ GROSS PROFIT ---------------------------
 $sql = "SELECT account,Customer_group_code, vw_profit.pccTitle as Profit, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
-		FROM vw_master
-		LEFT JOIN stbl_user ON sales=usrID
-		LEFT JOIN vw_profit ON usrProfitID=pccID
+		FROM vw_master		
+		LEFT JOIN vw_profit ON bdv=pccID
 		WHERE scenario='{$oBudget->id}'
 			AND account IN('J00400','J00802')
-		GROUP BY sales, account, Customer_group_code, Profit
+		GROUP BY bdv, account, Customer_group_code, Profit
 		UNION ALL
 		SELECT account,Customer_group_code, vw_profit.pccTitle as Profit,  0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
-		FROM vw_master
-		LEFT JOIN stbl_user ON sales=usrID
-		LEFT JOIN vw_profit ON usrProfitID=pccID		
+		FROM vw_master		
+		LEFT JOIN vw_profit ON bdv=pccID		
 		WHERE scenario='{$oReference->id}'
 			AND account IN('J00400','J00802')
-		GROUP BY sales, account,Customer_group_code, Profit
+		GROUP BY bdv, account,Customer_group_code, Profit
 		ORDER BY Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){	
