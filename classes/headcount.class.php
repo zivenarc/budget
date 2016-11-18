@@ -509,12 +509,13 @@ class Headcount extends Document{
 						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 						$current_month_end = mktime(23,59,59,$m+1,0,$oBudget->year);
 											
-						if ($eligible) {						
+						if ($eligible && $this->type=='current') {						
 							$salary[$month] = ($record->{$month})*($record->salary+$record->monthly_bonus)*($m<$this->settings['salary_review_month']?1:1+$this->settings['salary_increase_ratio']);
 						} else {
 							if (true || $this->type=='current'){
 								$salary[$month] = ($record->{$month})*($record->salary+$record->monthly_bonus);
 							} else {
+								//------------disabled--------------------------------------
 								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 								$current_month_end = mktime(0,0,0,$m+1,0,$oBudget->year);
 								if(date('YM',$start_date)==date('YM',$current_month_start)){
