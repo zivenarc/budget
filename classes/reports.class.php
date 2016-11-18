@@ -1250,31 +1250,31 @@ class Reports{
 		}
 		$arrHighCharts['series']=Array(
 									Array('name'=>'Gross revenue','data'=>$arrHSSeries[0])
-									,Array('name'=>'Gross profit, actual','data'=>$arrHSSeries[1])
-									,Array('name'=>'Gross profit, budget','data'=>$arrHSSeries[2])
+									,Array('name'=>"Gross profit, {$this->oBudget->title}",'data'=>$arrHSSeries[1])
+									,Array('name'=>"Gross profit, {$this->oReference->title}",'data'=>$arrHSSeries[2])
 									,Array('name'=>'Staff costs','data'=>$arrHSSeries[3])
-									,Array('name'=>'OP, actual','data'=>$arrHSSeries[4])
-									,Array('name'=>'OP, budget','data'=>$arrHSSeries[5])
+									,Array('name'=>"OP, {$this->oBudget->title}",'data'=>$arrHSSeries[4])
+									,Array('name'=>"OP, {$this->oReference->title}",'data'=>$arrHSSeries[5])
 								);
 								
 		$arrHighChartsAFF['series'] = Array(
-									Array('name'=>'Export, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Export']['Actual'],0,12))))									
-									,Array('name'=>'Import, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Import']['Actual'],0,12))))									
-									,Array('name'=>'Export, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Export']['Budget'],0,12))))									
-									,Array('name'=>'Import, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Import']['Budget'],0,12))))									
+									Array('name'=>"Export, {$this->oBudget->title}",'stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Export']['Actual'],0,12))))									
+									,Array('name'=>"Import, {$this->oBudget->title}",'stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Import']['Actual'],0,12))))									
+									,Array('name'=>"Export, {$this->oReference->title}",'stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Export']['Budget'],0,12))))									
+									,Array('name'=>"Import, {$this->oReference->title}",'stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Import']['Budget'],0,12))))									
 								);
 								
 		$arrHighChartsOFF['series'] = Array(
-									Array('name'=>'Export, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Export']['Actual'],0,12))))									
-									,Array('name'=>'Import, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Import']['Actual'],0,12))))									
-									,Array('name'=>'Export, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Export']['Budget'],0,12))))									
-									,Array('name'=>'Import, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Import']['Budget'],0,12))))									
+									Array('name'=>"Export, {$this->oBudget->title}",'stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Export']['Actual'],0,12))))									
+									,Array('name'=>"Import, {$this->oBudget->title}",'stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Import']['Actual'],0,12))))									
+									,Array('name'=>"Export, {$this->oReference->title}",'stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Export']['Budget'],0,12))))									
+									,Array('name'=>"Import, {$this->oReference->title}",'stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['OFF']['Import']['Budget'],0,12))))									
 								);		
 		$arrHighChartsRFF['series'] = Array(
-							Array('name'=>'Domestic, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Domestic']['Actual'],0,12))))									
-							,Array('name'=>'Intl, act','stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Intl']['Actual'],0,12))))									
-							,Array('name'=>'Domestic, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Domestic']['Budget'],0,12))))									
-							,Array('name'=>'Intl, bud','stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Intl']['Budget'],0,12))))									
+							Array('name'=>"Domestic, {$this->oBudget->title}",'stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Domestic']['Actual'],0,12))))									
+							,Array('name'=>"Intl, {$this->oBudget->title}",'stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Intl']['Actual'],0,12))))									
+							,Array('name'=>"Domestic, {$this->oReference->title}",'stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Domestic']['Budget'],0,12))))									
+							,Array('name'=>"Intl, {$this->oReference->title}",'stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Intl']['Budget'],0,12))))									
 						);
 		// echo '<pre>';print_r($arrGraph);echo '</pre>';
 		?>
