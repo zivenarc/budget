@@ -364,7 +364,7 @@ class MSF extends Document{
 				$sql = "SELECT pc, wc, 'user' as unit, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_headcount
 					LEFT JOIN vw_profit ON pccID=pc				
 					WHERE scenario='".$oBudget->id."' 
-						AND posted=1 AND wc=1 
+						AND posted=1 AND wc=1 AND salary>10000
 						AND pccFlagProd=1 AND pc<>99
 						GROUP BY pc";
 				break;
