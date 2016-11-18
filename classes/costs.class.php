@@ -334,39 +334,40 @@ class Indirect_costs extends Document{
 		
 		switch ($type) {
 			case 'all':
-				$sql = "SELECT pc, wc, activity, 'fte' as unit, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_headcount WHERE scenario='".$this->budget->id."' AND active=1 GROUP BY pc, activity";
+				$sql = "SELECT pc, wc, activity, 'fte' as unit, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_headcount 
+						WHERE scenario='".$this->budget->id."' AND company='{$this->company}' AND active=1 GROUP BY pc, activity";
 				break;
 			case 'users':
 				$sql = "SELECT pc, wc, activity, 'user' as unit, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_headcount 
-					WHERE scenario='".$oBudget->id."' AND posted=1 AND wc=1 GROUP BY pc, activity";
+					WHERE scenario='".$oBudget->id."' AND company='{$this->company}' AND posted=1 AND wc=1 GROUP BY pc, activity";
 				break;
 			case 'bc':
 				$sql = "SELECT pc, wc, activity, funTitleLocal as comment, 'fte' as unit, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_headcount 
 					LEFT JOIN vw_function ON funGUID=function
-					WHERE scenario='".$oBudget->id."' AND posted=1 AND wc=0 GROUP BY pc, function, activity";
+					WHERE scenario='".$oBudget->id."' AND company='{$this->company}' AND posted=1 AND wc=0 GROUP BY pc, function, activity";
 				break;				
 			case 'teu':
 				$sql =  "SELECT pc, activity, customer, cntTitle as comment, unit, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_sales 
 					JOIN vw_product ON product=prdID
 					LEFT JOIN vw_customer ON customer=cntID
-					WHERE scenario='".$oBudget->id."' AND posted=1 AND prdGDS='OFT' GROUP BY pc, activity, customer";
+					WHERE scenario='".$oBudget->id."' AND company='{$this->company}' AND posted=1 AND prdGDS='OFT' GROUP BY pc, activity, customer";
 				break;
 			case 'revenue':
 				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_master 
 					LEFT JOIN vw_customer ON customer=cntID
-					WHERE scenario='".$oBudget->id."' AND item='".Items::REVENUE."' AND source<>'estimate' 
+					WHERE scenario='".$oBudget->id."' AND company='{$this->company}' AND item='".Items::REVENUE."' AND source<>'estimate' 
 					GROUP BY pc, activity";
 				break;
 			case 'kaizen':
 				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_master
 					JOIN vw_product_type ON prtID=activity AND prtGHQ='{$params['prtGHQ']}'
-					WHERE scenario='".$this->budget->id."' AND item='".Items::DIRECT_COSTS."' AND source NOT IN ('estimate','Actual')
+					WHERE scenario='".$this->budget->id."' AND company='{$this->company}' AND item='".Items::DIRECT_COSTS."' AND source NOT IN ('estimate','Actual')
 					GROUP BY pc, activity";
 				break;
 			case 'kaizen_revenue':
 				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_master
 					JOIN vw_product_type ON prtID=activity AND prtGHQ='{$params['prtGHQ']}'
-					WHERE scenario='".$oBudget->id."' AND item IN('".Items::REVENUE."','".Items::INTERCOMPANY_REVENUE."') AND source<>'estimate'
+					WHERE scenario='".$oBudget->id."' AND company='{$this->company}' AND item IN('".Items::REVENUE."','".Items::INTERCOMPANY_REVENUE."') AND source<>'estimate'
 					GROUP BY pc, activity";
 				break;
 		}
