@@ -344,7 +344,7 @@ class Vehicle extends Document{
 						
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];							
-							$master_row->{$month} = -($record->{$month}?1:0)*$maintenance_charge;							
+							$master_row->{$month} = -($record->{$month}!=0?1:0)*$maintenance_charge;							
 						}
 						
 							
