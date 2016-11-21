@@ -76,6 +76,27 @@ if(!isset($_GET['pccGUID'])){
 	
 	include ('includes/inc_report_selectors.php');
 	Budget::getProfitTabs('reg_sales', false, Array('customer'=>$arrCounterparty['codes']));	
+	
+	$sql = "SELECT vw_journal.*, stbl_user.*, edit_date as timestamp FROM vw_journal 				
+	LEFT JOIN stbl_user ON usrID=vw_journal.edit_by				
+	WHERE vw_journal.scenario='{$budget_scenario}' 
+		AND vw_journal.guid IN (SELECT source FROM reg_master 
+									WHERE											
+										customer IN (".implode(',',$arrCounterparty['codes']).")
+									)		
+	GROUP BY vw_journal.guid
+	ORDER BY vw_journal.edit_date ASC";	
+
+	$rs =$oSQL->q($sql);
+	while ($rw=$oSQL->f($rs)){
+		$data[] = $rw;
+	}
+	
+	?>
+	<h2>Documents related to this customer</h2>
+	<?php
+	Reports::getJournalEntries($data);
+	
 	include ('includes/inc-frame_bottom.php');
 } else {
 	
@@ -101,26 +122,6 @@ if(!isset($_GET['pccGUID'])){
 		
 		$oReport->periodicPnL($sqlWhere,$type);
 		$oReport->salesByActivity($sqlWhere);
-		
-		$sql = "SELECT vw_journal.*, stbl_user.*, edit_date as timestamp FROM vw_journal 				
-		LEFT JOIN stbl_user ON usrID=vw_journal.edit_by				
-		WHERE vw_journal.scenario='{$budget_scenario}' 
-			AND vw_journal.source IN (SELECT source FROM reg_master 
-										WHERE											
-											customer IN (".implode(',',$arrCounterparty['codes']).")
-										)		
-		GROUP BY vw_journal.guid
-		ORDER BY vw_journal.edit_date ASC";	
-
-		$rs =$oSQL->q($sql);
-		while ($rw=$oSQL->f($rs)){
-			$data[] = $rw;
-		}
-		
-		?>
-		<h2>Documents related to this customer</h2>
-		<?php
-		Reports::getJournalEntries($data);
 		
 		
 	}
