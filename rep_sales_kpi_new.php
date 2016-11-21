@@ -102,6 +102,25 @@ if(!isset($_GET['pccGUID'])){
 		$oReport->periodicPnL($sqlWhere,$type);
 		$oReport->salesByActivity($sqlWhere);
 		
+		$sql = "SELECT vw_journal.*, stbl_user.*, edit_date as timestamp FROM vw_journal 				
+		LEFT JOIN stbl_user ON usrID=vw_journal.edit_by				
+		WHERE vw_journal.scenario='{$budget_scenario}' 
+			AND vw_journal.customer IN (".implode(',',$arrCounterparty['codes']).")
+		{$sqlWhere}
+		GROUP BY vw_journal.guid
+		ORDER BY vw_journal.edit_date ASC";	
+
+		$rs =$oSQL->q($sql);
+		while ($rw=$oSQL->f($rs)){
+			$data[] = $rw;
+		}
+		
+		?>
+		<h2>Documents related to this customer</h2>
+		<?php
+		Reports::getJournalEntries($data);
+		
+		
 	}
 	// $oReport->periodicPnL($sqlWhere,Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity'));	
 	
