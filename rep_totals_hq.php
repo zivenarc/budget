@@ -10,6 +10,7 @@ require ('classes/reports.class.php');
 require ('classes/item.class.php');
 
 include ('includes/inc_report_settings.php');
+include ('includes/inc_total_functions.php');
 
 $oBudget = new Budget($budget_scenario);
 $oReference = new Budget($reference);
@@ -54,8 +55,8 @@ while ($rw=$oSQL->f($rs)){
 
 	$arrReport[$rw['Group']][$rw['Budget item']][$keyProfit] += $rw['Total'];
 	$arrTotal[$rw['Group']][$keyProfit] += $rw['Total'];
-	$arrGrandTotal[$keyProfit] += $rw['Total'];
-	$arrGrandTotalEstimate[$keyProfit] += $rw['Estimate'];
+	$arrGrandTotal['this'][$keyProfit] += $rw['Total'];
+	$arrGrandTotal['last'][$keyProfit] += $rw['Estimate'];
 	$arrEstimate[$rw['Group']][$rw['Budget item']] += $rw['Estimate'];
 	$arrProfit[$keyProfit] = $rw['pccFlagProd'];
 }
@@ -167,72 +168,36 @@ foreach($arrReport as $group=>$arrItem){
 		<th class='budget-ytd'>Total</th>
 		<th>Last</th>
 		<th>Diff</th>
-	</tr>
-	<tr class="budget-total">
-		<td>Total result</td>
+	</tr>	
 <?php
-foreach($arrProfit as $pc=>$flag){
-	?>
-	<td class='budget-decimal'><?php Reports::render($arrGrandTotal[$pc]);?></td>
-	<?php
-}
+renderDataByPC($arrGrandTotal, $arrProfit, 'Grand total','budget-total');
 ?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrandTotal));?></td>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotalEstimate));?></td>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotal)-array_sum($arrGrandTotalEstimate));?></td>
-</tr>
 <tr>
 		<td>Last</td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
-	<td class='budget-decimal'><?php Reports::render($arrGrandTotalEstimate[$pc]);?></td>
+	<td class='budget-decimal'><?php Reports::render($arrGrandTotal['last'][$pc]);?></td>
 	<?php
 }
 ?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrandTotalEstimate));?></td>
+	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrandTotal['last']));?></td>
 </tr>
 <tr>
 		<td>Diff</td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
-	<td class='budget-decimal'><?php Reports::render($arrGrandTotal[$pc]-$arrGrandTotalEstimate[$pc]);?></td>
+	<td class='budget-decimal'><?php Reports::render($arrGrandTotal['this'][$pc]-$arrGrandTotal['last'][$pc]);?></td>
 	<?php
 }
 ?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrandTotal)-array_sum($arrGrandTotalEstimate));?></td>
+	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrandTotal['this'])-array_sum($arrGrandTotal['last']));?></td>
 </tr>
 <?php
 foreach ($arrGP as $customer=>$data){
 	renderDataByPC($data, $arrProfit, $customer);	
 }
-renderDataByPC($arrGPTotal, $arrProfit, "Total GP sold by...", "budget-subtotal");	
-?>
-</tfoot>
-</table>
-	<ul class='link-footer'>
-		<li><a href='javascript:SelectContent("report");'>Select table</a></li>
-	</ul>
-<?php
-include ('includes/inc-frame_bottom.php');
 
-function renderDataByPC($data, $arrProfit, $strTitle, $strClass=""){
-	?>
-	<tr class="<?echo $strClass;?>">
-		<td><?php echo $strTitle;?></td>
-		<?php
-		foreach($arrProfit as $pc=>$flag){
-			?>
-			<td class='budget-decimal'><?php Reports::render($data['this'][$pc]);?></td>
-			<?php
-		}
-		?>
-		<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($data['this']));?></td>
-		<td class='budget-decimal '><?php Reports::render(array_sum($data['last']));?></td>
-		<td class='budget-decimal '><?php Reports::render(array_sum($data['this']) - array_sum($data['last']));?></td>
-	</tr>
-	<?php
-}
 
 ?>

@@ -10,6 +10,7 @@ require ('classes/reports.class.php');
 require ('classes/item.class.php');
 
 include ('includes/inc_report_settings.php');
+include ('includes/inc_total_functions.php');
 
 if ($bu_group){
 	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
@@ -517,42 +518,6 @@ renderDataByPC($arrGPTotal, $arrProfit, "Total GP", "budget-subtotal");
 <?php
 include ('includes/inc-frame_bottom.php');
 
-function renderDataByPC($data, $arrProfit, $strTitle, $strClass=""){
-	?>
-	<tr class="<?echo $strClass;?>">
-		<td><?php echo $strTitle;?></td>
-		<?php
-		foreach($arrProfit as $pc=>$flag){
-			?>
-			<td class='budget-decimal'><?php Reports::render($data['this'][$pc]);?></td>
-			<?php
-		}
-		?>
-		<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($data['this']));?></td>
-		<td class='budget-decimal '><?php Reports::render(array_sum($data['last']));?></td>
-		<td class='budget-decimal '><?php Reports::render(array_sum($data['this']) - array_sum($data['last']));?></td>
-		<td class='budget-decimal budget-ratio'><?php Reports::render_ratio(array_sum($data['this']) , array_sum($data['last']));?></td>
-	</tr>
-	<?php
-}
 
-function getTableHeader(){
-	GLOBAL $oBudget, $oReference, $arrProfit, $periodTitle;
-	ob_start();
-	?>
-		<tr>
-		<th>Account</th>
-		<?php foreach($arrProfit as $pc=>$flag){
-					echo '<th>',$pc,'</th>';
-		};?>
-		<th class='budget-ytd'><?php echo $oBudget->type=='FYE'?'FYE':'Total';?><br/><small><?php echo $periodTitle;?></small></th>
-		<th title="<?php echo $oReference->title;?>"><?php echo $oReference->id;?></th>
-		<th>Diff</th>
-		<th>%</th>
-	</tr>
-	<?php
-	$res = ob_get_clean();
-	return($res);
-}
 
 ?>

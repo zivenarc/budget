@@ -39,7 +39,8 @@ if ($_GET['tab']){
 		case 'kpi':
 			require_once ('classes/reports.class.php');
 			$sqlWhere = "WHERE source='".$oDocument->GUID."'";
-			Reports::headcountByJob($sqlWhere);
+			$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id));
+			$oReport->headcountByJob($sqlWhere);
 			die();
 			break;
 		case 'financials':

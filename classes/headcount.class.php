@@ -476,15 +476,26 @@ class Headcount extends Document{
 						
 					}
 			
-			
-				foreach($this->records[$this->gridName] as $id=>$record){
+				$eligible_date = mktime(0,0,0,10,1,$this->budget->year-1);
 				
-					$eligible_date = time(0,0,0,10,1,$this->budget->year-1);
-					$start_date = strtotime($record->start_date);
-					$review_date = strtotime($record->review_date);
+				foreach($this->records[$this->gridName] as $id=>$record){
+								
+					// $start_date = strtotime($record->start_date);
+					$start_date = ($record->start_date);
+					// $review_date = strtotime($record->review_date);
+					$review_date = ($record->review_date);
 					$probation = $start_date + 91*24*60*60;
 					$eligible = (max($start_date,$review_date) < $eligible_date) && ($this->settings['salary_review_month']>=date('m',$this->budget->date_start));
-						
+					
+					// echo "\r\n-----------";
+					// echo "Employee: ",$record->employee->name,"\r\n";
+					// echo "Eligible date:",date('Y-m-d',$eligible_date),"\r\n";
+					// echo "Start date:",date('Y-m-d',$start_date),"\r\n";
+					// echo "Review date:",date('Y-m-d',$review_date),"\r\n";
+					// echo "Eligible:",$eligible,"\r\n";
+					// print_r($record);
+					
+					
 					$oEmployee = $Employees->getById($record->employee);
 					// echo '<pre>';print_r($oEmployee);echo '</pre>';
 						
@@ -827,7 +838,7 @@ class Headcount extends Document{
 			$strMaternity = 'NULL';
 		}
 		
-		$sql = "SELECT empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,funMobile,funFuel,
+		$sql = "SELECT empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,funMobile,funFuel,empStartDate,empEndDate,
 						IF(empID IN ({$strMaternity}),0,empSalary) as empSalary
 						,empSalaryRevision
 						,empMonthly
