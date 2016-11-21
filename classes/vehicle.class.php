@@ -208,7 +208,7 @@ class Vehicle extends Document{
 		GLOBAL $Items;
 		GLOBAL $oBudget;
 		
-		$budget_year_start = time(0,0,0,1,1,$oBudget->year);
+		$budget_year_start = mktime(0,0,0,1,1,$oBudget->year);
 		
 		parent::save($mode);
 		
@@ -322,9 +322,11 @@ class Vehicle extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item_guid;						
 						
+						$fuel = $this->fuelprice*$this->consumption/100;
+						
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];	
-							$master_row->{$month} = -$record->{$month}*$this->fuelprice*$this->consumption/100;							
+							$master_row->{$month} = -$record->{$month}*$fuel;							
 							
 						}				
 															
