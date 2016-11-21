@@ -105,8 +105,7 @@ if(!isset($_GET['pccGUID'])){
 		$sql = "SELECT vw_journal.*, stbl_user.*, edit_date as timestamp FROM vw_journal 				
 		LEFT JOIN stbl_user ON usrID=vw_journal.edit_by				
 		WHERE vw_journal.scenario='{$budget_scenario}' 
-			AND vw_journal.customer IN (".implode(',',$arrCounterparty['codes']).")
-		{$sqlWhere}
+			AND vw_journal.customer IN (".implode(',',$arrCounterparty['codes']).")		
 		GROUP BY vw_journal.guid
 		ORDER BY vw_journal.edit_date ASC";	
 
