@@ -18,9 +18,9 @@ echo '<p>',$oBudget->timestamp,'</p>';
 	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
 <?php
 
-$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, SUM(".$oBudget->getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
+$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, SUM(".$oBudget->getYTDSQL(1+$oBudget->offset,12+$this->oBudget->offset).")/{$denominator} as Total, SUM(estimate)/$denominator as Estimate
 		FROM vw_master
-		WHERE scenario='$budget_scenario' AND source IN (select `nemGUID` FROM `tbl_new_employee`)
+		WHERE scenario='{$budget_scenario}' AND company='{$company}' AND source IN (select `nemGUID` FROM `tbl_new_employee`)
 		GROUP BY Profit, `Budget item`
 		ORDER BY `Group`,pccFlagProd,Profit,itmOrder";
 $rs = $oSQL->q($sql);
@@ -36,10 +36,10 @@ while ($rw=$oSQL->f($rs)){
 	$arrProfit[$keyProfit] = $rw['pccFlagProd'];
 }
 
-$sql = "SELECT pccFLagProd, pccTitle as Profit, pc, SUM(".$oBudget->getYTDSQL().")/12 as FTE
+$sql = "SELECT pccFLagProd, pccTitle as Profit, pc, SUM(".$oBudget->getYTDSQL(1+$oBudget->offset,12+$this->oBudget->offset).")/12 as FTE
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='$budget_scenario' AND new_fte<>0 AND posted=1
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND new_fte<>0 AND posted=1
 		GROUP BY pc";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
@@ -113,9 +113,9 @@ $arrTotal = Array();
 $arrGrandTotal = Array();
 $arrHeadcount = Array();
 
-$sql = "SELECT prtGHQ, pccFlagProd, `Budget item`, `Group`, SUM(".$oBudget->getYTDSQL().")/$denominator as Total, SUM(estimate)/$denominator as Estimate
+$sql = "SELECT prtGHQ, pccFlagProd, `Budget item`, `Group`, SUM(".$oBudget->getYTDSQL(1+$oBudget->offset,12+$this->oBudget->offset).")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM vw_master
-		WHERE scenario='$budget_scenario' AND source IN (select `nemGUID` FROM `tbl_new_employee`)
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source IN (select `nemGUID` FROM `tbl_new_employee`)
 		GROUP BY Profit, `Budget item`
 		ORDER BY `Group`,prtGHQ,itmOrder";
 $rs = $oSQL->q($sql);
@@ -131,10 +131,10 @@ while ($rw=$oSQL->f($rs)){
 	$arrProfit[$keyProfit] = $rw['pccFlagProd'];
 }
 
-$sql = "SELECT prtGHQ, pc, SUM(".$oBudget->getYTDSQL().")/12 as FTE
+$sql = "SELECT prtGHQ, pc, SUM(".$oBudget->getYTDSQL(1+$oBudget->offset,12+$this->oBudget->offset).")/12 as FTE
 		FROM reg_headcount
 		LEFT JOIN vw_product_type ON prtID=activity
-		WHERE scenario='$budget_scenario' AND new_fte<>0 AND posted=1
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND new_fte<>0 AND posted=1
 		GROUP BY pc";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
