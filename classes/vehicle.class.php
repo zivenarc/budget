@@ -338,11 +338,11 @@ class Vehicle extends Document{
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item_guid;						
 						
+						$maintenance_charge = $this->maintenance/12 + $this->consumables + $this->wash;
+						
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];							
-							$master_row->{$month} = -($record->{$month}?1:0)*
-								($this->maintenance/12 + $this->consumables + $this->wash);							
-							
+							$master_row->{$month} = -($record->{$month}?1:0)*$maintenance_charge;							
 						}
 						
 							
