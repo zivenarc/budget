@@ -375,12 +375,15 @@ class Interco_sales extends Document{
 						$master_row->sales = $this->getSales($master_row->customer);
 						$activity = $Activities->getByCode($record->activity);
 						$account = 'J00802';
-						
+									
 						$master_row->account = $account;
 						$master_row->item = $activity->item_cost;
+						
+						$rate = ($record->buying_rate==0?$record->selling_rate*$settings[strtolower($record->selling_curr)]:$record->buying_rate*$settings[strtolower($record->buying_curr)]);
+						
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
-							$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
+							$master_row->{$month} = ($record->{$month})*$rate;
 						}
 					}
 				}
