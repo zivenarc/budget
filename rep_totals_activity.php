@@ -40,7 +40,7 @@ if(true || !isset($_GET['ghq'])){
 
 $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM vw_master
-		WHERE scenario='{$budget_scenario}'
+		WHERE scenario='{$budget_scenario}' AND company='{$company}'
 		{$sqlActivityFilter}
 		GROUP BY Profit, `Budget item`,`item`
 		ORDER BY `Group`,pccFlagProd,Profit,itmOrder";
@@ -65,7 +65,7 @@ while ($rw=$oSQL->f($rs)){
 $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/12 as Total
 		FROM reg_headcount
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='$budget_scenario' and posted=1
+		WHERE scenario='$budget_scenario' and posted=1 AND company='{$company}' and salary>10000
 		{$sqlActivityFilter}
 		GROUP BY Profit
 		ORDER BY pccFlagProd,Profit";
@@ -78,7 +78,7 @@ while ($rw=$oSQL->f($rs)){
 $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='$budget_scenario' and active=1
+		WHERE scenario='$budget_scenario' and active=1 AND company='{$company}'
 			AND account='J00400'
 			{$sqlActivityFilter}
 		GROUP BY Profit
@@ -93,7 +93,7 @@ while ($rw=$oSQL->f($rs)){
 $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total, SUM(estimate)/$denominator as Estimate
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
-		WHERE scenario='$budget_scenario' and active=1
+		WHERE scenario='$budget_scenario' and active=1 AND company='{$company}'
 			AND (account NOT LIKE '6%' AND account NOT LIKE '7%')
 		{$sqlActivityFilter}
 		GROUP BY Profit
@@ -110,7 +110,7 @@ $sql = "SELECT prtTitle, unit, pccTitle as Profit, pccFlagProd, SUM(".$oBudget->
 		FROM reg_sales
 		LEFT JOIN vw_profit ON pccID=pc
 		LEFT JOIN vw_product_type ON prtID=activity
-		WHERE scenario='$budget_scenario' and posted=1 and kpi=1			
+		WHERE scenario='$budget_scenario' and posted=1 and kpi=1 AND company='{$company}'		
 		{$sqlActivityFilter}
 		GROUP BY activity, Profit
 		ORDER BY activity, pccFlagProd,Profit";
