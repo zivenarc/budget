@@ -143,7 +143,7 @@ $sql = "SELECT account,Customer_group_code, customer, Profit, pccFlagProd, bdv, 
 		FROM vw_master		
 		WHERE scenario='{$oBudget->id}'  AND company='{$company}' {$sqlWherePC}
 			AND account IN('J00400','J00802')
-		GROUP BY account, Customer_group_code, customer, Profit
+		GROUP BY account, Customer_group_code, customer, Profit, bdvTitle
 		UNION ALL
 		SELECT account,Customer_group_code, customer,  Profit, pccFlagProd, bdv, bdvTitle, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM vw_master		
