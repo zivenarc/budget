@@ -139,17 +139,17 @@ while ($rw=$oSQL->f($rs)){
 }
 
 //------------------------------ GROSS PROFIT ---------------------------
-$sql = "SELECT account,Customer_group_code, customer, Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
+$sql = "SELECT account,Customer_group_code, customer, Profit, pccFlagProd, bdv, bdvTitle, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM vw_master		
 		WHERE scenario='{$oBudget->id}'  AND company='{$company}' {$sqlWherePC}
 			AND account IN('J00400','J00802')
 		GROUP BY account, Customer_group_code, customer, Profit
 		UNION ALL
-		SELECT account,Customer_group_code, customer,  Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
+		SELECT account,Customer_group_code, customer,  Profit, pccFlagProd, bdv, bdvTitle, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM vw_master		
 		WHERE scenario='{$reference}'  AND company='{$company}' {$sqlWherePC}
 			AND account IN('J00400','J00802')
-		GROUP BY account,Customer_group_code, customer, Profit
+		GROUP BY account,Customer_group_code, customer, Profit, bdvTitle
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
@@ -164,12 +164,24 @@ while ($rw=$oSQL->f($rs)){
 		$arrGrossRevenueEstimate += $rw['Estimate'];
 	}
 	
-	$cusGroup = Reports::getCustomerGroup($rw);
+	switch($rw['bdv']){
+		case 9:
+		case 130:
+			$bdvGroup = $rw['bdvTitle'];
+			$cusGroup = Reports::getCustomerGroup($rw);
+			break;
+		default:
+			$bdvGroup = 'Other';
+			$cusGroup = 'Customers handled by OPS';
+			break;
+	}
 	
-	$arrGP[$cusGroup]['this'][$keyProfit] += $rw['Total'];
-	$arrGPTotal['this'][$keyProfit] += $rw['Total'];
-	$arrGP[$cusGroup]['last'][$keyProfit] += $rw['Estimate'];
-	$arrGPTotal['last'][$keyProfit] += $rw['Estimate'];
+	
+	
+	$arrGP[$bdvGroup][$cusGroup]['this'][$keyProfit] += $rw['Total'];
+	$arrGPTotal[$bdvGroup]['this'][$keyProfit] += $rw['Total'];
+	$arrGP[$bdvGroup][$cusGroup]['last'][$keyProfit] += $rw['Estimate'];
+	$arrGPTotal[$bdvGroup]['last'][$keyProfit] += $rw['Estimate'];
 }
 
 $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
@@ -505,10 +517,15 @@ foreach($arrProfit as $pc=>$flag){
 	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio((array_sum($arrOpIncome['this'])-array_sum($arrTotal['this'][GROSS_PROFIT]))/100,array_sum($arrHeadcount['FTE']),0);?></td>
 </tr>
 <?php
-foreach ($arrGP as $customer=>$data){
-	renderDataByPC($data, $arrProfit, $customer);	
+foreach ($arrGP as $bdv=>$arrCusGP){
+	?>
+	<tr><th colspan="<?php echo count($arrProfit)+5;?>">Gross Profit delivered by <?php echo $bdv;?></th></tr>
+	<?php
+	foreach ($arrCusGP as $customer=>$data){
+		renderDataByPC($data, $arrProfit, $customer);	
+	}
+	renderDataByPC($arrGPTotal[$bdv], $arrProfit, "Total GP", "budget-subtotal");	
 }
-renderDataByPC($arrGPTotal, $arrProfit, "Total GP", "budget-subtotal");	
 ?>
 </tfoot>
 </table>
