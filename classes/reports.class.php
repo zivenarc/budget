@@ -528,14 +528,15 @@ class Reports{
 			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL(1,15).", 
 							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total, 
 							usrTitle as responsible, 
-							sales
+							sales,
+							freehand
 					FROM `reg_sales`
 					LEFT JOIN vw_customer ON customer=cntID					
 					LEFT JOIN vw_profit ON pc=pccID	
 					LEFT JOIN stbl_user ON sales=usrID
 					## LEFT JOIN tbl_sales ON salGUID=source
 					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1  AND `company`='{$this->company}' {$sqlWhere} 
-					GROUP BY sales, `reg_sales`.`customer`, unit
+					GROUP BY sales, `reg_sales`.`customer`, unit, freehand
 					ORDER BY sales, Total DESC"; 
 			// echo '<pre>',$sql,'</pre>';
 			$rs = $this->oSQL->q($sql);
@@ -548,7 +549,7 @@ class Reports{
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
-				<tr><th>Customer</th><th>Unit</th>
+				<tr><th>Customer</th><th>Unit</th><th>FH</th>
 					<?php 
 					echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset,12+$this->oBudget->offset); 
 					echo $this->oBudget->getTableHeader('quarterly'); 
@@ -570,6 +571,7 @@ class Reports{
 				<tr>
 					<td><?php echo $rw['Customer'];?></td>
 					<td><?php echo $rw['unit'];?></td>
+					<td><?php echo $rw['freehand']?"&#x263A;":"";?></td>
 				<?php
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
@@ -599,7 +601,7 @@ class Reports{
 				foreach ($arrTotal as $unit=>$data){
 				?>
 				<tr class="budget-subtotal">
-					<td colspan="2">Total <?php echo $unit?$unit:"<...>";?></td>
+					<td colspan="3">Total <?php echo $unit?$unit:"<...>";?></td>
 					<?php
 					for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 						$month = $this->oBudget->arrPeriod[$m];
