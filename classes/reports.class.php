@@ -366,7 +366,7 @@ class Reports{
 				};
 				echo "<td class='code-".$rw['customer']."'>",$rw['cntTitle'],'</td>';				
 				echo "<td class='budget-decimal'>",$this->render_ratio($arrRevenue[$rw['customer']]['Total']/10,$rw['Total'],0),'</td>';				
-				for ($m=1;$m<=12;$m++){
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
@@ -393,7 +393,7 @@ class Reports{
 						$arrUtil['Q5']+=$arrQuarter['Q5'];
 				}
 				
-				for ($q=1;$q<5;$q++){		
+				for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 					$quarter = 'Q'.$q;
 					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
 					$arrTotal[$quarter]+=$arrQuarter[$quarter];
@@ -401,9 +401,7 @@ class Reports{
 							
 				$arrTotal['Q5']+=$arrQuarter['Q5'];
 				
-				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total']/12,0,'.',','),'</td>';
-				echo '<td class=\'budget-decimal budget-Q5\'>',number_format($arrQuarter['Q5'],0,'.',','),'</td>';
-				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total_AM']/12,0,'.',','),'</td>';
+				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total']/12,0,'.',','),'</td>';				
 				echo "</tr>\r\n";				
 			}
 			?>
@@ -418,14 +416,12 @@ class Reports{
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($arrTotal[$month]),'</td>';
 	
 					}
-					for ($q=1;$q<5;$q++){		
+					for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 					$quarter = 'Q'.$q;
 					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($arrTotal[$quarter]),'</td>';
 
 					}	
-					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']/12),'</td>';
-					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render($arrTotal['Q5']),'</td>';
-					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render($arrTotal['Total_AM']/12),'</td>';
+					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']/12),'</td>';					
 					?>
 				</tr>
 				<tr class='budget-subtotal budget-ratio'>
@@ -437,14 +433,12 @@ class Reports{
 					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render_ratio($arrUtil[$month],$arrTotal[$month]),'</td>';
 	
 					}
-					for ($q=1;$q<5;$q++){		
+					for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){	
 					$quarter = 'Q'.$q;
 					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render_ratio($arrUtil[$quarter],$arrTotal[$quarter]),'</td>';
 
 					}	
-					echo '<td class=\'budget-decimal budget-ytd\'>',self::render_ratio($arrUtil['Total']/12,$arrTotal['Total']/12),'</td>';
-					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render_ratio($arrUtil['Q5'],$arrTotal['Q5']),'</td>';
-					echo '<td class=\'budget-decimal budget-quarterly budget-Q5\'>',self::render_ratio($arrUtil['Total_AM']/12,$arrTotal['Total_AM']/12),'</td>';
+					echo '<td class=\'budget-decimal budget-ytd\'>',self::render_ratio($arrUtil['Total']/12,$arrTotal['Total']/12),'</td>';					
 					?>
 				</tr>
 			</tfoot>
