@@ -477,12 +477,39 @@ function distribute($reportKey, $sql){
 			$key = $reportKey;
 		}
 	
+		switch($rw['account']){
+			case 'J00801':
+				$accKey = 'Labor costs';
+				break;
+			case 'J0080W':
+				$accKey = 'Warehouse costs';
+				break;
+			case 'J00806':
+			case '512000':
+				$accKey = 'Depreciation';
+				break;
+			case '502000':
+			case '505000':
+			case '506000':
+				$accKey = 'Personal expenses';
+				break;
+			case '514000':
+			case '515000':
+			case '519000':
+			case '525000':
+				$accKey = 'Office cost';
+				break;
+			default:
+				$accKey = 'Other costs';
+				break;			
+		}
+	
 		for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 			if ($rw[$month]!=0){
 				if ($rw['prtGHQ']){
 					$arrReport[$rw['prtGHQ']][$key][$month] += $rw[$month];
-					$arrBreakDown[$key][$rw['account'].$rw['title']][$rw['prtGHQ']] += $rw[$month];
+					$arrBreakDown[$key][$accKey ][$rw['prtGHQ']] += $rw[$month];
 				} else {
 					if (!is_array($arrRatio[$rw['pc']])) {
 						if ($rw['pccFlagProd']){
@@ -490,13 +517,13 @@ function distribute($reportKey, $sql){
 						} else {
 							foreach($arrGHQSubtotal as $ghq=>$revenue){
 								$arrReport[$ghq][$key][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
-								$arrBreakDown[$key][$rw['account'].$rw['title']][$ghq] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+								$arrBreakDown[$key][$accKey][$ghq] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
 							}
 						}
 					} else {
 						foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
 							$arrReport[$ghq][$key][$month] += $rw[$month]*$ratios[$month];
-							$arrBreakDown[$key][$rw['account'].$rw['title']][$ghq] += $rw[$month]*$ratios[$month];
+							$arrBreakDown[$key][$accKey][$ghq] += $rw[$month]*$ratios[$month];
 						}
 					}
 				}
