@@ -13,7 +13,9 @@ $YACT = new YACT_COA();
 $Items = new Items();
 
 class Sales extends Document{
-
+	
+	const PB_Ourselves=714;
+	
 	const Register='reg_sales';
 	const GridName = 'sales';
 	const Prefix = 'sal';
@@ -327,6 +329,18 @@ class Sales extends Document{
 						// die('row #'.$id." updated with route value (".$this->route.")");							
 						$row->route = $this->route;
 					}
+					
+					if ($row->bo!=$this->business_owner){
+						$row->flagUpdated = true;	
+						// die('row #'.$id." updated with route value (".$this->route.")");							
+						$row->bo = $this->business_owner;
+					}
+					
+					if ($row->jo!=$this->job_owner){
+						$row->flagUpdated = true;	
+						// die('row #'.$id." updated with route value (".$this->route.")");							
+						$row->jo = $this->job_owner;
+					}
 				}
 			}
 						
@@ -359,10 +373,11 @@ class Sales extends Document{
 						$row->kpi = $_POST['kpi'][$id];				
 						$row->hbl = $_POST['hbl'][$id];				
 						$row->sales = $this->sales;				
-						$row->bo = $this->business_owner;				
+						$row->bo = $this->business_owner;
+						$row->jo = $this->job_owner;						
 						$row->route = $this->route;				
-						for ($m=1;$m<=15;$m++){
-							// $month = date('M',mktime(0,0,0,$m,15));
+						$row->freehand = ($row->activity==48 && $this->business_owner==self::PB_Ourselves && $this->job_owner!=self::PB_Ourselves) || ($row->activity==63 && $this->business_owner==self::PB_Ourselves);				
+						for ($m=1;$m<=15;$m++){							
 							$month = $this->budget->arrPeriod[$m];	
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
 						}					
@@ -422,9 +437,7 @@ class Sales extends Document{
 		GLOBAL $Items;
 		GLOBAL $oBudget;
 		
-		$dateProjectBridge = strtotime('1 April 2016');
-		define ('PB_Ourselves',714);
-				
+		$dateProjectBridge = strtotime('1 April 2016');				
 		
 		$this->refresh($this->ID);		
 		$oMaster = new Master($this->scenario, $this->GUID, $this->company);
@@ -453,7 +466,7 @@ class Sales extends Document{
 						
 						//------Update for Project bridge since 1st April 2016-----------
 						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-						if ($current_month_start>=$dateProjectBridge && $this->job_owner!=PB_Ourselves){							
+						if ($current_month_start>=$dateProjectBridge && $this->job_owner!=self::PB_Ourselves){							
 							if ($record->hbl){
 							// if ($record->activity==48 || $record->activity==63){
 							// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
@@ -497,7 +510,7 @@ class Sales extends Document{
 							
 							//------Update for Project bridge since 1st April 2016-----------
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-							if ($current_month_start>=$dateProjectBridge && $this->job_owner!=PB_Ourselves){
+							if ($current_month_start>=$dateProjectBridge && $this->job_owner!=self::PB_Ourselves){
 								if ($record->hbl){
 								// if ($record->activity==48 || $record->activity==63){
 								// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
@@ -567,7 +580,7 @@ class Sales extends Document{
 						}
 						
 						//------- Sales commission receivable ----------
-						if ($this->job_owner!=PB_Ourselves && $this->business_owner==PB_Ourselves){
+						if ($this->job_owner!=self::PB_Ourselves && $this->business_owner==self::PB_Ourselves){
 							$master_row = $oMaster->add_master();
 							$master_row->profit = $this->profit;
 							$master_row->activity = $Activities::OFICOM;
@@ -593,7 +606,7 @@ class Sales extends Document{
 									$master_row->{$month} = 0;	// do not calculate Profit share						
 								}
 							}
-						} elseif ($this->job_owner==PB_Ourselves && $this->business_owner!=PB_Ourselves) {
+						} elseif ($this->job_owner==self::PB_Ourselves && $this->business_owner!=self::PB_Ourselves) {
 							$master_row = $oMaster->add_master();
 							$master_row->profit = $this->profit;
 							$master_row->activity = $record->activity;
@@ -623,7 +636,7 @@ class Sales extends Document{
 							// no SSC in our books
 						}
 						//------- Destination handling charge
-						if ($this->job_owner!=PB_Ourselves && $this->destination_agent==PB_Ourselves && !$this->gbr){
+						if ($this->job_owner!=self::PB_Ourselves && $this->destination_agent==self::PB_Ourselves && !$this->gbr){
 							$master_row = $oMaster->add_master();
 							$master_row->profit = $this->profit;
 							$master_row->activity = $Activities::OFICOM;
@@ -649,7 +662,7 @@ class Sales extends Document{
 									$master_row->{$month} = 0;	// do not calculate Profit share						
 								}
 							}
-						} elseif ($this->job_owner==PB_Ourselves && $this->destination_agent!=PB_Ourselves) {
+						} elseif ($this->job_owner==self::PB_Ourselves && $this->destination_agent!=self::PB_Ourselves) {
 							$master_row = $oMaster->add_master();
 							$master_row->profit = $this->profit;
 							$master_row->activity = $record->activity;

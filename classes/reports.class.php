@@ -201,7 +201,7 @@ class Reports{
 				$sqlFrom = "SELECT activity, route, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
 							{$sqlWhere} AND scenario='{$this->oBudget->id}' 
-							AND kpi=1 AND bo=714 AND activity IN (48,63) 
+							AND kpi=1 AND freehand=1 AND posted=1
 							AND `company`='{$this->company}'
 							GROUP BY activity, route, unit
 							";
@@ -209,12 +209,12 @@ class Reports{
 			default:
 				$sqlFrom = "SELECT activity, route,  source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND bo=714 AND activity IN (48,63) AND `company`='{$this->company}'
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND freehand=1 AND `company`='{$this->company}'
 							GROUP BY activity, route, unit, source
 							UNION ALL
 						SELECT activity, route, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
 						FROM `reg_sales` 										
-						{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND bo=714 AND activity IN (48,63) AND `company`='{$this->company}'
+						{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND freehand=1 AND `company`='{$this->company}'
 					GROUP BY activity, route, unit";
 				break;
 		}

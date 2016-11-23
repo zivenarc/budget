@@ -9,7 +9,7 @@ $oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$c
 if (isset($_POST['activity'])){
 	$sqlWhere = " AND activity=".$oSQL->e($_POST['activity']);
 	if ($_POST['freehand']){
-		$sqlWhere.= " AND bo=714";
+		$sqlWhere.= " AND freehand=1";
 	}
 	$sql = "SELECT * FROM vw_product_type WHERE prtID=".$oSQL->e($_POST['activity']);
 	$rs = $oSQL->q($sql);

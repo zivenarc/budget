@@ -35,7 +35,7 @@ if(!isset($_GET['tab'])){
 	<?php
 	}
 	// Budget::getGHQTabs('reg_master', true);
-	Budget::getActivityTabs('reg_master', true, "WHERE TRUE ".$sqlActivityFilter);
+	Budget::getActivityTabs('reg_master', true, "WHERE company='{$company}' ".$sqlActivityFilter);
 	include ('includes/inc-frame_bottom.php');
 } else {
 	require ('classes/reports.class.php');
