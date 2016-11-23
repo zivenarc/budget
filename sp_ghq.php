@@ -62,7 +62,7 @@ foreach($arrPC as $pc=>$arrGhq){
 
 // echo '<pre>';print_r($arrRatio);echo '</pre>';
 
-$sqlFields = "CONCAT(account,': ',title) as account, prtGHQ, pc, pccFlagProd, 
+$sqlFields = "account, title, prtGHQ, pc, pccFlagProd, 
 				SUM(".$oBudget->getYTDSQL($startMonth,$endMonth, $arrRates).") as Total, 				
 				".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates);
 $sqlGroupBy = "account, pc, prtGHQ";
@@ -509,7 +509,7 @@ function distribute($reportKey, $sql){
 			if ($rw[$month]!=0){
 				if ($rw['prtGHQ']){
 					$arrReport[$rw['prtGHQ']][$key][$month] += $rw[$month];
-					$arrBreakDown[$key][$accKey ][$rw['prtGHQ']] += $rw[$month];
+					$arrBreakDown[$key][$accKey][$rw['prtGHQ']] += $rw[$month];
 				} else {
 					if (!is_array($arrRatio[$rw['pc']])) {
 						if ($rw['pccFlagProd']){
