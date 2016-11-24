@@ -1038,8 +1038,13 @@ class Reports{
 					<?php
 				
 				}
+				if ($this->oBudget->offset==3){
+					$totalField = "Total_AM";
+				} else {
+					$totalField = "Total";
+				};
 				?>
-					<td class='budget-decimal budget-ytd'><?php echo self::render($data['Total'],1);?></td>
+					<td class='budget-decimal budget-ytd'><?php echo self::render($data[$totalField],1);?></td>
 				</tr>
 		<?php
 	}
