@@ -33,7 +33,9 @@ if(!isset($_GET['pccGUID'])){
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	?>
-	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
+	<form>
+		<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?><input type="submit" value="Change"/></div>
+	</form>
 	<?php
 	$oBudget->getProfitTabs('reg_headcount');
 	include ('includes/inc-frame_bottom.php');
