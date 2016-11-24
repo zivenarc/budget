@@ -562,7 +562,7 @@ class Budget{
 					$res['YTD'] = $ytd_rate/$i;
 					break;
 				case 'Actual_AM':
-					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate)/curDecRate as Rate
+					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month',YEAR(erhDate) as Year, AVG(erhRate)/curDecRate as Rate
 								FROM common_db.tbl_rate_history, common_db.tbl_currency
 								WHERE erhCurrencyID={$currency} AND erhCurrencyID=curID
 									AND erhDate BETWEEN '{$this->year}-04-01' AND '".($this->year+1)."-03-31'									
