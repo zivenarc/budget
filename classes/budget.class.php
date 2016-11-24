@@ -545,7 +545,7 @@ class Budget{
 		if ($this->oSQL->n($rs)){
 			switch($this->type){
 				case 'Actual':
-					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate)/curDecRate as Rate
+					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month',YEAR(erhDate) as Year, AVG(erhRate)/curDecRate as Rate
 					FROM common_db.tbl_rate_history, common_db.tbl_currency
 					WHERE erhCurrencyID={$currency} AND erhCurrencyID=curID
 						AND erhDate BETWEEN '{$this->year}-01-01' AND '".($this->year+1)."-03-31'									
@@ -554,7 +554,8 @@ class Budget{
 					$rs = $this->oSQL->q($sql);
 					$i=0;
 					while ($rw = $this->oSQL->f($rs)){
-						$res[strtolower($rw['month'])] = $rw['Rate'];
+						$month = strtolower($rw['month'].($rw['Year']>$this->year?"_1":""));
+						$res[$month] = $rw['Rate'];
 						$ytd_rate+=$rw['Rate'];
 						$i++;
 					}
@@ -570,7 +571,8 @@ class Budget{
 					$rs = $this->oSQL->q($sql);
 					$i=0;
 					while ($rw = $this->oSQL->f($rs)){
-						$res[strtolower($rw['month'])] = $rw['Rate'];
+						$month = strtolower($rw['month'].($rw['Year']>$this->year?"_1":""));
+						$res[$month] = $rw['Rate'];
 						$ytd_rate+=$rw['Rate'];
 						$i++;
 					}
