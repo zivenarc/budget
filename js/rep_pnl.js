@@ -62,7 +62,8 @@ function spinner_div(){
 var header = document.title;
 
 $(document).ready(function(){
-	$('#tabs').tabs(tabs_options);	
+	$('#tabs').tabs(tabs_options);
+	init_panel(this);
 });
 
 function init_panel(o){
