@@ -548,7 +548,7 @@ class Budget{
 					$sql = "SELECT DATE_FORMAT(erhDate,'%b') as 'month', AVG(erhRate)/curDecRate as Rate
 					FROM common_db.tbl_rate_history, common_db.tbl_currency
 					WHERE erhCurrencyID={$currency} AND erhCurrencyID=curID
-						AND erhDate BETWEEN '{$this->year}-01-01' AND '{$this->year}-12-31'									
+						AND erhDate BETWEEN '{$this->year}-01-01' AND '{$this->year+1}-03-31'									
 					GROUP BY DATE_FORMAT(erhDate,'%b')";
 					// echo $sql;
 					$rs = $this->oSQL->q($sql);
