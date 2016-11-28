@@ -4,7 +4,7 @@ require ('common/auth.php');
 require ('classes/reference.class.php');
 require ('classes/item.class.php');
 require ('classes/budget.class.php');
-
+//
 include ('includes/inc_report_settings.php');
 $oBudget = new Budget($budget_scenario);
 
