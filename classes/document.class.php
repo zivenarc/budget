@@ -492,7 +492,7 @@ class Document extends easyForm{
 			,'type'=>'combobox'
 			,'width'=>'100px'
 			,'source'=>Activities::getStructuredRef()
-			// ,'sql'=>"SELECT prtID as optValue, prtTitle as optText FROM vw_product_type ORDER BY prtRHQ, prtTitle"
+			,'sql'=>"vw_product_type_select"
 			, 'disabled'=>!$this->flagUpdate
 		);
 		

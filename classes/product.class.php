@@ -120,19 +120,15 @@ class Activities extends Reference{
 	}
 	
 	function getStructuredRef(){
-		GLOBAL $oSQL;
-		$sql = "SELECT * FROM vw_product_type WHERE prtFlagDeleted=0 ORDER BY prtRHQ";
+		GLOBAL $oSQL, $strLocal;
+		$sql = "SELECT * FROM vw_product_type WHERE prtFlagDeleted=0 ORDER BY prtGHQ";
 		$rs = $oSQL->q($sql);
-		$rhq='';
+		$arrRes['Undefined group'][0] = '[None]';
 		while ($rw=$oSQL->f($rs)){
-			if ($rw['prtRHQ']!=$rhq){
-				$arrRes['##optgroupopen##'.$rw['prtRHQ']] = $rw['prtRHQ'];
-			}
-			$arrRes[$rw['prtID']] = $rw['prtTitle'];
-			$rhq = $rw['prtRHQ'];
+			$group = strlen($rw['prtGHQ'])?$rw['prtGHQ']:'Undefined group';
+			$arrRes[$group][$rw['prtID']] = $rw["prtTitle$strLocal"];
 		}
-		$arrRes['##optgroupclose##'.$rhq] = '';
-		$arrRes[0] = '[None]';
+		
 		return($arrRes);
 	}
 }
