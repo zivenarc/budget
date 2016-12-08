@@ -518,7 +518,7 @@ class Headcount extends Document{
 					$master_row->item = Items::SALARY;
 					
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? (($oEmployee->activity || !$record->wc)?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? ($record->sga?$oItem->YACTCorp:$oItem->YACTProd) : $oItem->YACTCorp;
 								
 					$social_tax = Array();					
 					$salarySubtotal = 0;
@@ -581,7 +581,7 @@ class Headcount extends Document{
 					$master_row->customer = $record->customer;							
 					$master_row->item = Items::UNUSED_VACATION_ACCRUAL;
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? ($record->sga?$oItem->YACTCorp:$oItem->YACTProd) : $oItem->YACTCorp;
 						
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
@@ -597,7 +597,7 @@ class Headcount extends Document{
 					$master_row->part_type = 'EMP';	
 					$master_row->item = Items::SOCIAL_TAX;
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? ($record->sga?$oItem->YACTCorp:$oItem->YACTProd) : $oItem->YACTCorp;
 					
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
@@ -615,7 +615,7 @@ class Headcount extends Document{
 					$master_row->item = Items::MOBILE;
 					
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? ($record->sga?$oItem->YACTCorp:$oItem->YACTProd) : $oItem->YACTCorp;
 					
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
@@ -633,7 +633,7 @@ class Headcount extends Document{
 						$master_row->item = Items::IT_EQUIPMENT;
 						
 						$oItem = $Items->getById($master_row->item);
-						$master_row->account = $this->pc->prod ? ($record->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+						$master_row->account = $this->pc->prod ? ($record->sga?$oItem->YACTCorp:$oItem->YACTProd) : $oItem->YACTCorp;
 						
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
@@ -655,7 +655,7 @@ class Headcount extends Document{
 						$master_row->item = Items::FUEL;
 						
 						$oItem = $Items->getById($master_row->item);
-						$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+						$master_row->account = $this->pc->prod ? ($record->sga?$oItem->YACTCorp:$oItem->YACTProd) : $oItem->YACTCorp;
 						
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
@@ -672,7 +672,7 @@ class Headcount extends Document{
 					
 					$master_row->item = Items::BONUS;
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? ($record->sga?$oItem->YACTCorp:$oItem->YACTProd) : $oItem->YACTCorp;
 					
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
@@ -693,7 +693,7 @@ class Headcount extends Document{
 					
 					$master_row->item = Items::MEDICAL_INSURANCE;
 					$oItem = $Items->getById($master_row->item);
-					$master_row->account = $this->pc->prod ? ($oEmployee->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+					$master_row->account = $this->pc->prod ? ($record->sga?$oItem->YACTCorp:$oItem->YACTProd) : $oItem->YACTCorp;
 					
 					$insurance_base = $record->insurance/12;
 					$insurance_roy = $insurance_base*(1+$this->settings['medical_insurance_index']);
@@ -731,7 +731,7 @@ class Headcount extends Document{
 						
 						$master_row->item = Items::HIRING_COSTS;
 						$oItem = $Items->getById($master_row->item);
-						$master_row->account = $this->pc->prod ? ($record->activity||!$record->wc?$oItem->YACTProd:$oItem->YACTCorp) : $oItem->YACTCorp;
+						$master_row->account = $this->pc->prod ? ($record->sga?$oItem->YACTCorp:$oItem->YACTProd) : $oItem->YACTCorp;
 												
 						
 						for($m=1;$m<=15;$m++){
