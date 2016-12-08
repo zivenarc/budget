@@ -30,6 +30,7 @@ class headcount_record extends table_record{
 			$this->insurance = $data['insurance'];
 			$this->pc_profile = $data['pc_profile'];
 			$this->wc = $data['wc'];
+			$this->sga = $data['sga'];
 			$this->vks = $data['vks'];
 			$this->start_date = strtotime($data['start_date']);
 			$this->end_date = strtotime($data['end_date']);
@@ -72,6 +73,7 @@ class headcount_record extends table_record{
 			$arrRes[] = "`insurance`=".(double)$this->insurance;
 			$arrRes[] = "`mobile_limit`=".(double)$this->mobile_limit;
 			$arrRes[] = "`wc`=".($this->wc?1:0);
+			$arrRes[] = "`sga`=".($this->sga?1:0);
 			$arrRes[] = "`vks`=".($this->vks?1:0);
 			$arrRes[] = "`fuel`=".(double)$this->fuel;
 			$arrRes[] = "`start_date`=".($this->start_date ? $oSQL->e(date('Y-m-d',$this->start_date)) : 'NULL');

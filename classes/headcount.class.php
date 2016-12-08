@@ -182,6 +182,14 @@ class Headcount extends Document{
 		);
 		
 		$this->grid->Columns[] = Array(
+			'title'=>'SGA'
+			,'field'=>'sga'
+			,'type'=>'boolean'		
+			,'width'=>'30px'							
+			, 'disabled'=>($this->type=='current')
+		);
+		
+		$this->grid->Columns[] = Array(
 			'title'=>'VKS'
 			,'field'=>'vks'
 			,'type'=>'boolean'			
@@ -838,7 +846,7 @@ class Headcount extends Document{
 			$strMaternity = 'NULL';
 		}
 		
-		$sql = "SELECT empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,funMobile,funFuel,empStartDate,empEndDate,
+		$sql = "SELECT empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,funMobile,funFuel,funFlagSGA, empStartDate,empEndDate,
 						IF(empID IN ({$strMaternity}),0,empSalary) as empSalary
 						,empSalaryRevision
 						,empMonthly
@@ -865,6 +873,7 @@ class Headcount extends Document{
 			$row->employee = $rw['empGUID1C'];				
 			$row->job = $rw['empFunctionGUID'];
 			$row->wc = $rw['funFlagWC'];				
+			$row->sga = $rw['funFlagSGA'];				
 			$row->location = $rw['empLocationID'];			
 			$row->activity = $rw['empProductTypeID'];//?$rw['empProductTypeID']:$this->pc->activity;			
 			$row->salary = $rw['empSalary'];
