@@ -28,6 +28,9 @@ $(document).ready(function(){
 });
 
 function repost(tab, event){
+		
+		var t0 = performance.now();
+
 		var total = 0;
 		$(event.srcElement).addClass('spinner');
 		
@@ -102,4 +105,6 @@ function repost(tab, event){
 		
 		$(event.srcElement).removeClass('spinner');
 		// $('#journal_total',$('#div_'+tab)).text(number_format(total,0,'.',','));
+		var t1 = performance.now();
+		console.log("Reposting took " + (t1 - t0) + " milliseconds.")
 }
