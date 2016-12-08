@@ -2403,9 +2403,6 @@ class Reports{
 	private function _getMRHeadcount($sqlWhere, $type='collars'){
 		
 		$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
-		?>
-		<tr><th colspan="14">Headcount</th></tr>
-		<?php
 		
 		switch($type){
 			case 'funRHQ':
@@ -2453,18 +2450,25 @@ class Reports{
 		
 		$rs = $this->oSQL->q($sql);
 		if (!$this->oSQL->n($rs)){
-			echo '<pre>',$sql,'</pre>';
-		}
-		while ($rw = $this->oSQL->f($rs)){			
-			// $rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
-			
-			$rw['YTD_A'] = $rw['YTD_A']/($cm-$this->oBudget->offset);
-			$rw['YTD_B'] = $rw['YTD_B']/($cm-$this->oBudget->offset);
-			
-			$rw['ROY_A'] = $rw['ROY_A']/(12-($cm-$this->oBudget->offset));
-			$rw['ROY_B'] = $rw['ROY_B']/(12-($cm-$this->oBudget->offset));
-			
-			$this->echoBudgetItemString($rw);
+			// echo '<pre>',$sql,'</pre>';
+			?>
+			<tr><td colspan="14">No headcount data</td></tr>
+			<?php
+		} else {
+			?>
+			<tr><th colspan="14">Headcount</th></tr>
+			<?php
+			while ($rw = $this->oSQL->f($rs)){			
+				// $rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
+				
+				$rw['YTD_A'] = $rw['YTD_A']/($cm-$this->oBudget->offset);
+				$rw['YTD_B'] = $rw['YTD_B']/($cm-$this->oBudget->offset);
+				
+				$rw['ROY_A'] = $rw['ROY_A']/(12-($cm-$this->oBudget->offset));
+				$rw['ROY_B'] = $rw['ROY_B']/(12-($cm-$this->oBudget->offset));
+				
+				$this->echoBudgetItemString($rw);
+			}
 		}
 	}
 	
