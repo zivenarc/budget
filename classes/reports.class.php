@@ -2149,13 +2149,13 @@ class Reports{
 						{$strFields_this}
 				FROM `vw_master` 			
 				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oBudget->id}' AND `{$strAccountCode}` IS NOT NULL
-				{$sqlGroup}
+				GROUP BY `{$strAccountCode}`
 				UNION ALL
 				SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
 						{$strFields_last}
 				FROM `vw_master` 			
 				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oReference->id}' AND `{$strAccountCode}` IS NOT NULL 
-				{$sqlGroup}) Q
+				GROUP BY `{$strAccountCode}`) Q
 			{$sqlGroup}
 			ORDER BY `Group` ASC			
 			";
