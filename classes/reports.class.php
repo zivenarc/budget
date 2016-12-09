@@ -2121,7 +2121,7 @@ class Reports{
 				
 		$strFields_this = $this->_getMonthlyFields();
 		$strFields_last = $this->_getMonthlyFields('last');
-		$sqlGroup = "GROUP BY item, `Budget item`";
+		
 		
 		if ($this->YACT){
 			$strAccountTitle = "title";
@@ -2129,12 +2129,14 @@ class Reports{
 			$strAccountCode = "account";
 			$strGroupCode = 'yact_group_code';
 			$strGPFilter = "yact_group_code IN ('449000','499000')"; 
+			$sqlGroup = "GROUP BY `account`";
 		} else {
 			$strAccountTitle = "Budget item";
 			$strAccountGroup = "Group";
 			$strAccountCode = "item";
 			$strGroupCode = 'Group_code';
 			$strGPFilter = "Group_code=".self::GP_CODE; 
+			$sqlGroup = "GROUP BY item, `Budget item`";
 		}
 		
 		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15).",\r\n".
