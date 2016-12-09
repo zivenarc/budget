@@ -2156,7 +2156,7 @@ class Reports{
 				FROM `vw_master` 			
 				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oReference->id}' AND `{$strAccountCode}` IS NOT NULL 
 				GROUP BY `{$strAccountCode}`) Q
-			{$sqlGroup}
+			GROUP BY item, `Budget item`
 			ORDER BY `Group` ASC			
 			";
 			
