@@ -202,7 +202,7 @@ echo '</tr>';
 	</ul>
 <?php
 
-$sql = "SELECT `Budget item`, `Group`, ".$oBudget->getMonthlySQL(1+$oBudget->offset,12+$oBudget->offset)."
+$sql = "SELECT `Budget item`, `Group`, ".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset)."
 		FROM vw_master
 		WHERE scenario='{$budget_scenario}' AND company='{$company}' AND source IN (select `nemGUID` FROM `tbl_new_employee`)
 		GROUP BY `Budget item`
