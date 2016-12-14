@@ -205,9 +205,9 @@ echo '</tr>';
 $sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, ".$oBudget->getMonthlySQL(1+$oBudget->offset,12+$oBudget->offset)."
 		FROM vw_master
 		WHERE scenario='{$budget_scenario}' AND company='{$company}' AND source IN (select `nemGUID` FROM `tbl_new_employee`)
-		GROUP BY Profit, `Budget item`
-		ORDER BY `Group`,pccFlagProd,Profit,itmOrder";
-echo '<pre>',$sql,'</pre>';
+		GROUP BY `Budget item`
+		ORDER BY `Group`,itmOrder";
+// echo '<pre>',$sql,'</pre>';
 
 $rs = $oSQL->q($sql);
 $arrReport = Array();
