@@ -210,7 +210,7 @@ if(!isset($_GET['prtGHQ'])){
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')";
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
-	//$arrReport['other']['GP'] = $rw['GP'];
+	$arrReportOther['GP'] = $rw['GP'];
 	$arrReportTotal['GP'] = $rw['GP'];
 	
 	$sql = "SELECT {$sqlActual} as Revenue 
@@ -218,11 +218,11 @@ if(!isset($_GET['prtGHQ'])){
 					{$sqlWhere}
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400')";
 					
-	echo '<pre>',$sql,'</pre>';
+	// echo '<pre>',$sql,'</pre>';
 	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
-	//$arrReport['other']['Revenue'] = $rw['Revenue'];
+	$arrReportOther['Revenue'] = $rw['Revenue'];
 	$arrReportTotal['Revenue'] = $rw['Revenue'];
 	
 	$tableID = "top_".md5(time());
@@ -232,7 +232,7 @@ if(!isset($_GET['prtGHQ'])){
 	<thead>	
 		<tr>
 			<th>Customer</th>
-			<th>Revenue</th>
+			<th>Gross Revenue</th>
 			<th>GP</th>
 			<th>Profitability</th>
 			<th>% of total</th>
@@ -250,10 +250,17 @@ if(!isset($_GET['prtGHQ'])){
 			<td><?php echo number_format($values['GP']/$arrReportTotal['GP']*100,0,'.',',');?>%</td>
 		</tr>
 		<?php
-		$arrReport['other']['Revenue'] -=  $values['Revenue'];
-		$arrReport['other']['GP'] -=  $values['GP'];
+		$arrReportOther['Revenue'] -=  $values['Revenue'];
+		$arrReportOther['GP'] -=  $values['GP'];
 	}
 	?>
+		<tr>
+			<td><?php echo $customer;?></td>
+			<td><?php echo number_format($arrReportOther['Revenue'],0,'.',',');?></td>
+			<td><?php echo number_format($arrReportOther['GP'],0,'.',',');?></td>
+			<td><?php echo number_format($arrReportOther['GP']/$arrReportOther['Revenue']*100,0,'.',',');?>%</td>
+			<td><?php echo number_format($arrReportOther['GP']/$arrReportTotal['GP']*100,0,'.',',');?>%</td>
+		</tr>
 	</tbody>
 	<tfoot>
 	<tr class="budget-subtotal">
