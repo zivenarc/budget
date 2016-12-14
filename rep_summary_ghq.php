@@ -194,8 +194,9 @@ if(!isset($_GET['prtGHQ'])){
 				LIMIT 10";
 				
 	$rs = $oSQL->q($sql);
+	$tableID = "top_".md5(time());
 	?>
-	<table class="budget">
+	<table class="budget" id="<?php echo $tableID;?>">
 		<caption>Top 10 customers, <?php echo urldecode($_GET['prtGHQ']);?></caption>
 		<tr>
 			<th>Customer</th>
@@ -213,15 +214,20 @@ if(!isset($_GET['prtGHQ'])){
 			<td><?php echo number_format($rw['Actual']/$arrReport['total']['fye']*100,0,'.',',');?>%</td>
 		</tr>
 		<?php
+		$arrReport['other']['Revenue'] -=  $rw['Revenue'];
 		$arrReport['other']['fye'] -=  $rw['Actual'];
 	}
 	?>
 	<tr>
 			<td>Others</td>
+			<td><?php echo number_format($arrReport['other']['Revenue'],0,'.',',');?></td>
 			<td><?php echo number_format($arrReport['other']['fye'],0,'.',',');?></td>
 			<td><?php echo number_format($arrReport['other']['fye']/$arrReport['total']['fye']*100,0,'.',',');?>%</td>
 		</tr>
-	</table>	
+	</table>
+	<ul class='link-footer'>
+		<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+	</ul>	
 	<?php
 	//==================== Staff ==========================/
 	$sql = "SELECT pccTitle, salary, monthly_bonus, empTitleLocal, funTitleLocal, prtTitleLocal,funFlagWC,funRHQ,".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset)." 
