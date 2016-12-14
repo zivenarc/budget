@@ -201,5 +201,55 @@ echo '</tr>';
 		<li><a href='javascript:SelectContent("report");'>Select table</a></li>
 	</ul>
 <?php
+
+$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, ".$oBudget->getMonthlySQL(1+$oBudget->offset,12+$oBudget->offset)."
+		FROM vw_master
+		WHERE scenario='{$budget_scenario}' AND company='{$company}' AND source IN (select `nemGUID` FROM `tbl_new_employee`)
+		GROUP BY Profit, `Budget item`
+		ORDER BY `Group`,pccFlagProd,Profit,itmOrder";
+echo '<pre>',$sql,'</pre>';
+
+$rs = $oSQL->q($sql);
+$arrReport = Array();
+while ($rw=$oSQL->f($rs)){
+	
+	for ($m=4;$m<=15;$m++){
+		$month = $oBudget->arrPeriod[$m];
+		$arrReport[$rw['Group']][$rw['Budget item']][$month] = $rw[$month];
+	}
+}
+?>
+<table class='budget' id='per_month'>
+<tbody>
+<?php
+foreach($arrReport as $group=>$arrItem){
+	foreach($arrItem as $item=>$values){
+		echo '<tr>';
+		echo '<td>',$item,'</td>';
+		for ($m=4;$m<=15;$m++){
+			$month = $oBudget->arrPeriod[$m];
+			echo "<td class='budget-decimal'>",number_format($values[$month],0,'.',','),'</td>';
+		}
+		echo '</tr>';
+	}
+	
+	echo '<tr class="budget-subtotal">';
+	echo '<td>',$group,'</td>';
+	for ($m=4;$m<=15;$m++){
+		$month = $oBudget->arrPeriod[$m];
+		echo "<td class='budget-decimal'>",number_format($arrTotal[$group][$month],0,'.',','),'</td>';
+	}
+	
+	echo '</tr>';	
+}
+
+
+?>
+</tbody>
+</table>
+	<ul class='link-footer'>
+		<li><a href='javascript:SelectContent("per_month");'>Select table</a></li>
+	</ul>
+<?php
 include ('includes/inc-frame_bottom.php');
 ?>
