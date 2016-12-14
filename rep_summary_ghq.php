@@ -199,7 +199,7 @@ if(!isset($_GET['prtGHQ'])){
 				{$sqlWhere}
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
 				GROUP BY customer_group_code
-				ORDER BY Actual DESC
+				ORDER BY GP DESC
 				LIMIT 10";
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
