@@ -78,7 +78,7 @@ if(!isset($_GET['prtGHQ'])){
 	<div>
 	<?php
 	// die();
-	$period_type = 'roy';
+	$period_type = 'fye';
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	
@@ -174,57 +174,92 @@ if(!isset($_GET['prtGHQ'])){
 	</div>
 	<?php
 	//==================== Top 10 customers ==========================/
-	$sql = "SELECT {$sqlActual} as Actual, SUM(IF(account='J00400',`Total_AM`,0)) as Revenue 
+	$sql = "SELECT {$sqlActual} as GP 
 					FROM vw_master 
 					{$sqlWhere}
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')";
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
+	$arrReport['other']['GP'] = $rw['GP'];
+	$arrReportTotal['GP'] = $rw['GP'];
+	
+	$sql = "SELECT {$sqlActual} as Revenue 
+					FROM vw_master 
+					{$sqlWhere}
+					AND  scenario='{$oBudget->id}' AND account IN ('J00400')";
+	$rs = $oSQL->q($sql);
+	$rw = $oSQL->f($rs);
 	$arrReport['other']['Revenue'] = $rw['Revenue'];
-	$arrReport['other']['fye'] = $rw['Actual'];
-	$arrReport['total']['fye'] = $rw['Actual'];
+	$arrReportTotal['Revenue'] = $rw['Revenue'];
 	
 	$sql = "SELECT customer_group_code as optValue, 
 						customer_group_title as optText,  
-						{$sqlActual} as Actual, SUM(IF(account='J00400',`Total_AM`,0)) as Revenue
+						{$sqlActual} as GP
 				FROM vw_master 				
 				{$sqlWhere}
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
 				GROUP BY customer_group_code
 				ORDER BY Actual DESC
 				LIMIT 10";
-				
 	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrReport[$rw['optText']]['GP'] = $rw['GP'];
+		$arrCGFilter[] = $rw['optValue'];
+	}
+	
+	$sql = "SELECT customer_group_code as optValue, 
+						customer_group_title as optText,  
+						{$sqlActual} as Revenue
+				FROM vw_master 				
+				{$sqlWhere}
+					AND  scenario='{$oBudget->id}' AND account IN ('J00400')
+					AND  customer_group_code IN (".implode(',',$arrCGFilter).")
+				GROUP BY customer_group_code
+				";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrReport[$rw['optText']]['Revenue'] = $rw['Revenue'];
+	}
+	
 	$tableID = "top_".md5(time());
 	?>
 	<table class="budget" id="<?php echo $tableID;?>">
 		<caption>Top 10 customers, <?php echo urldecode($_GET['prtGHQ']);?></caption>
+	<thead>	
 		<tr>
 			<th>Customer</th>
 			<th>Revenue</th>
 			<th>GP</th>
+			<th>Profitability</th>
 			<th>% of total</th>
 		</tr>
+	</thead>
+	<tbody>
 	<?php
-	while ($rw = $oSQL->f($rs)){
+	foreach ($arrReport as $customer=>$values){
 		?>
 		<tr>
-			<td><?php echo $rw['optText'];?></td>
-			<td><?php echo number_format($rw['Revenue'],0,'.',',');?></td>
-			<td><?php echo number_format($rw['Actual'],0,'.',',');?></td>
-			<td><?php echo number_format($rw['Actual']/$arrReport['total']['fye']*100,0,'.',',');?>%</td>
+			<td><?php echo $customer;?></td>
+			<td><?php echo number_format($values['Revenue'],0,'.',',');?></td>
+			<td><?php echo number_format($values['GP'],0,'.',',');?></td>
+			<td><?php echo number_format($values['GP']/$values['Revenue']*100,0,'.',',');?>%</td>
+			<td><?php echo number_format($values['GP']/$arrReportTotal['GP']*100,0,'.',',');?>%</td>
 		</tr>
 		<?php
-		$arrReport['other']['Revenue'] -=  $rw['Revenue'];
-		$arrReport['other']['fye'] -=  $rw['Actual'];
+		$arrReport['other']['Revenue'] -=  $values['Revenue'];
+		$arrReport['other']['GP'] -=  $values['GP'];
 	}
 	?>
-	<tr>
-			<td>Others</td>
-			<td><?php echo number_format($arrReport['other']['Revenue'],0,'.',',');?></td>
-			<td><?php echo number_format($arrReport['other']['fye'],0,'.',',');?></td>
-			<td><?php echo number_format($arrReport['other']['fye']/$arrReport['total']['fye']*100,0,'.',',');?>%</td>
-		</tr>
+	</tbody>
+	<tfoot>
+	<tr class="budget-subtotal">
+		<td>Total</td>
+		<td><?php echo number_format($arrReportTotal['Revenue'],0,'.',',');?></td>
+		<td><?php echo number_format($arrReportTotal['GP'],0,'.',',');?></td>
+		<td><?php echo number_format($arrReportTotal['GP']/$arrReportTotal['Revenue']*100,0,'.',',');?>%</td>
+		<td>100%</td>
+	</tr>
+	</tfoot>
 	</table>
 	<ul class='link-footer'>
 		<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
