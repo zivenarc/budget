@@ -174,23 +174,6 @@ if(!isset($_GET['prtGHQ'])){
 	</div>
 	<?php
 	//==================== Top 10 customers ==========================/
-	$sql = "SELECT {$sqlActual} as GP 
-					FROM vw_master 
-					{$sqlWhere}
-					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')";
-	$rs = $oSQL->q($sql);
-	$rw = $oSQL->f($rs);
-	$arrReport['other']['GP'] = $rw['GP'];
-	$arrReportTotal['GP'] = $rw['GP'];
-	
-	$sql = "SELECT {$sqlActual} as Revenue 
-					FROM vw_master 
-					{$sqlWhere}
-					AND  scenario='{$oBudget->id}' AND account IN ('J00400')";
-	$rs = $oSQL->q($sql);
-	$rw = $oSQL->f($rs);
-	$arrReport['other']['Revenue'] = $rw['Revenue'];
-	$arrReportTotal['Revenue'] = $rw['Revenue'];
 	
 	$sql = "SELECT customer_group_code as optValue, 
 						customer_group_title as optText,  
@@ -220,6 +203,24 @@ if(!isset($_GET['prtGHQ'])){
 	while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['optText']]['Revenue'] = $rw['Revenue'];
 	}
+	
+	$sql = "SELECT {$sqlActual} as GP 
+					FROM vw_master 
+					{$sqlWhere}
+					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')";
+	$rs = $oSQL->q($sql);
+	$rw = $oSQL->f($rs);
+	$arrReport['other']['GP'] = $rw['GP'];
+	$arrReportTotal['GP'] = $rw['GP'];
+	
+	$sql = "SELECT {$sqlActual} as Revenue 
+					FROM vw_master 
+					{$sqlWhere}
+					AND  scenario='{$oBudget->id}' AND account IN ('J00400')";
+	$rs = $oSQL->q($sql);
+	$rw = $oSQL->f($rs);
+	$arrReport['other']['Revenue'] = $rw['Revenue'];
+	$arrReportTotal['Revenue'] = $rw['Revenue'];
 	
 	$tableID = "top_".md5(time());
 	?>
