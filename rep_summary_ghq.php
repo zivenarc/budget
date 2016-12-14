@@ -255,7 +255,7 @@ if(!isset($_GET['prtGHQ'])){
 	}
 	?>
 		<tr>
-			<td><?php echo $customer;?></td>
+			<td>Others</td>
 			<td><?php echo number_format($arrReportOther['Revenue'],0,'.',',');?></td>
 			<td><?php echo number_format($arrReportOther['GP'],0,'.',',');?></td>
 			<td><?php echo number_format($arrReportOther['GP']/$arrReportOther['Revenue']*100,0,'.',',');?>%</td>
