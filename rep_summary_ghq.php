@@ -210,16 +210,19 @@ if(!isset($_GET['prtGHQ'])){
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')";
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
-	$arrReport['other']['GP'] = $rw['GP'];
+	//$arrReport['other']['GP'] = $rw['GP'];
 	$arrReportTotal['GP'] = $rw['GP'];
 	
 	$sql = "SELECT {$sqlActual} as Revenue 
 					FROM vw_master 
 					{$sqlWhere}
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400')";
+					
+	echo '<pre>',$sql,'</pre>';
+	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
-	$arrReport['other']['Revenue'] = $rw['Revenue'];
+	//$arrReport['other']['Revenue'] = $rw['Revenue'];
 	$arrReportTotal['Revenue'] = $rw['Revenue'];
 	
 	$tableID = "top_".md5(time());
