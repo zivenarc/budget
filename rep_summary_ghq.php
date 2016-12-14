@@ -38,15 +38,15 @@ if(!isset($_GET['prtGHQ'])){
 		// $filter = Array();
 	} else {
 		if ($_GET['prtGHQ']=='OFF') {
-		$sqlWhereP = " WHERE prtGHQ IN ('Ocean import','Ocean export') AND company='$company'";
+		$sqlWhereP = " WHERE prtGHQ IN ('Ocean import','Ocean export')";
 		$filter = Array('prtGHQ'=>Array('Ocean import','Ocean export'));
 		
 		} elseif ($_GET['prtGHQ']=='AFF') {
-			$sqlWhereP = " WHERE prtGHQ IN ('Air import','Air export')  AND company='$company'";
+			$sqlWhereP = " WHERE prtGHQ IN ('Air import','Air export')";
 			$filter = Array('prtGHQ'=>Array('Air import','Air export'));
 
 		} else {
-			$sqlWhereP = " WHERE prtGHQ=".$oSQL->e(urldecode($_GET['prtGHQ']))." AND company='$company'";
+			$sqlWhereP = " WHERE prtGHQ=".$oSQL->e(urldecode($_GET['prtGHQ']));
 			$filter = Array('prtGHQ'=>urldecode($_GET['prtGHQ']));
 			
 		}
@@ -58,7 +58,7 @@ if(!isset($_GET['prtGHQ'])){
 			$arrProducts['id'][] = $rw['prtID'];
 		}
 		
-		$sqlWhere = "WHERE activity IN (".implode(',',$arrProducts['id']).")";
+		$sqlWhere = "WHERE activity IN (".implode(',',$arrProducts['id']).") AND company='$company'";
 		$filter = Array('activity'=>$arrProducts['id']);
 		
 		?>
