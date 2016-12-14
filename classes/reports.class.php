@@ -2463,8 +2463,12 @@ class Reports{
 			while ($rw = $this->oSQL->f($rs)){			
 				// $rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
 				
-				$rw['YTD_A'] = $rw['YTD_A']/($cm-$this->oBudget->offset);
-				$rw['YTD_B'] = $rw['YTD_B']/($cm-$this->oBudget->offset);
+				$monthsYTD = $cm-$this->oBudget->offset;
+				
+				if($monthsYTD){
+					$rw['YTD_A'] = $rw['YTD_A']/($monthsYTD);
+					$rw['YTD_B'] = $rw['YTD_B']/($monthsYTD);
+				}
 				
 				$rw['ROY_A'] = $rw['ROY_A']/(12-($cm-$this->oBudget->offset));
 				$rw['ROY_B'] = $rw['ROY_B']/(12-($cm-$this->oBudget->offset));

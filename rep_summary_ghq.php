@@ -6,12 +6,12 @@ require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
 
-	//$denominator = 1000;	
-	// $budget_scenario = $_GET['budget_scenario']?$_GET['budget_scenario']:$arrSetup['stpFYEID'];
-	// $reference = $_GET['reference']?$_GET['reference']:$arrSetup['stpScenarioID'];
 	
 	$oBudget = new Budget($budget_scenario);
 	$oReference = new Budget($reference);
+	
+	$arrActualRates = $oBudget->getMonthlyRates($currency);
+	$arrBudgetRates = $oReference->getMonthlyRates($currency);
 	
 	if ($_GET['debug']){
 		echo '<pre>';print_r($oBudget);echo '</pre>';
@@ -174,12 +174,13 @@ if(!isset($_GET['prtGHQ'])){
 	</div>
 	<?php
 	//==================== Top 10 customers ==========================/
-	$sql = "SELECT {$sqlActual} as Actual 
+	$sql = "SELECT {$sqlActual} as Actual, SUM(IF(account='J00400',`Total_AM`,0)) as Revenue 
 					FROM vw_master 
 					{$sqlWhere}
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')";
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
+	$arrReport['other']['Revenue'] = $rw['Revenue'];
 	$arrReport['other']['fye'] = $rw['Actual'];
 	$arrReport['total']['fye'] = $rw['Actual'];
 	
