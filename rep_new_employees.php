@@ -50,6 +50,7 @@ while ($rw=$oSQL->f($rs)){
 }
 // echo '<pre>';print_r($arrReport);echo '</pre>';
 ?>
+<h2>Breakdown per business unit</h2>
 <table class='budget' id='report'>
 <thead>
 	<tr>
@@ -145,7 +146,8 @@ while ($rw=$oSQL->f($rs)){
 }
 // echo '<pre>';print_r($arrReport);echo '</pre>';
 ?>
-<table class='budget' id='report'>
+<h2>Breakdown per product</h2>
+<table class='budget' id='per_product'>
 <thead>
 	<tr>
 		<th>Account</th>
@@ -198,11 +200,11 @@ echo '</tr>';
 </tbody>
 </table>
 	<ul class='link-footer'>
-		<li><a href='javascript:SelectContent("report");'>Select table</a></li>
+		<li><a href='javascript:SelectContent("per_product");'>Select table</a></li>
 	</ul>
 <?php
 
-$sql = "SELECT `Budget item`, `Group`, ".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset)."
+$sql = "SELECT `Budget item`, `Group`, ".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset,$oBudget->arrRates,$denominator)."
 		FROM vw_master
 		WHERE scenario='{$budget_scenario}' AND company='{$company}' AND source IN (select `nemGUID` FROM `tbl_new_employee`)
 		GROUP BY `Budget item`
@@ -216,21 +218,29 @@ while ($rw=$oSQL->f($rs)){
 	for ($m=4;$m<=15;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		$arrReport[$rw['Group']][$rw['Budget item']][$month] += $rw[$month];
+		$arrTotal[$rw['Group']][$month] += $rw[$month];
 	}
 }
 ?>
+<h2>Breakdown per month</h2>
 <table class='budget' id='per_month'>
 <tbody>
 <?php
 foreach($arrReport as $group=>$arrItem){
 	foreach($arrItem as $item=>$values){
-		echo '<tr>';
-		echo '<td>',$item,'</td>';
+		?>
+		<tr>
+			<td><?php echo $item;?></td>
+		<?php
 		for ($m=4;$m<=15;$m++){
 			$month = $oBudget->arrPeriod[$m];
-			echo "<td class='budget-decimal'>",number_format($values[$month],0,'.',','),'</td>';
+			?>
+			<td class='budget-decimal'><?php echo number_format($values[$month],0,'.',',');?></td>
+			<?php
 		}
-		echo '</tr>';
+		?>
+		</tr>
+		<?php
 	}
 	
 	echo '<tr class="budget-subtotal">';

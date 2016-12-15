@@ -175,6 +175,20 @@ if(!isset($_GET['prtGHQ'])){
 	<?php
 	//==================== Top 10 customers ==========================/
 	
+	function _renderTopCustomerLine($data, $arrTotal, $strTitle, $strClass=""){
+		?>
+		<tr class="<?php echo $strClass;?>">
+			<td><?php echo $strTitle;?></td>
+			<td class="budget-decimal"><?php Reports::render($data['KPI'],0,'.',',');?></td>
+			<td class="budget-decimal"><?php Reports::render($data['Revenue'],0,'.',',');?></td>
+			<td class="budget-decimal"><?php Reports::render($data['GP'],0,'.',',');?></td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GP'],$data['Revenue'],0);?>%</td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GP'],$data['KPI']*100,2);?></td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GP'],$arrTotal['GP'],0);?>%</td>
+		</tr>
+		<?php
+	}
+	
 	$sql = "SELECT customer_group_code as optValue, 
 						customer_group_title as optText,  
 						{$sqlActual} as GP
@@ -204,6 +218,32 @@ if(!isset($_GET['prtGHQ'])){
 		$arrReport[$rw['optText']]['Revenue'] = $rw['Revenue'];
 	}
 	
+	$sql = "SELECT customer_group_code as optValue, 
+						customer_group_title as optText,  
+						SUM(".$oBudget->getThisYTDSQL($period_type).") as KPI,
+						unit
+				FROM vw_sales 				
+				{$sqlWhere}
+					AND  scenario='{$oBudget->id}' AND unit IN ('Kgs','TEU')
+					AND  customer_group_code IN (".implode(',',$arrCGFilter).")
+				GROUP BY customer_group_code
+				";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrReport[$rw['optText']]['KPI'] = $rw['KPI'];
+	}
+	
+	$sql = "SELECT 	SUM(".$oBudget->getThisYTDSQL($period_type).") as KPI,
+						unit
+				FROM vw_sales 				
+				{$sqlWhere}
+					AND  scenario='{$oBudget->id}' AND unit IN ('Kgs','TEU')									
+				";
+	$rs = $oSQL->q($sql);
+	$rw = $oSQL->f($rs);
+	$arrReportOther['KPI'] = $rw['KPI'];
+	$arrReportTotal['KPI'] = $rw['KPI'];
+	
 	$sql = "SELECT {$sqlActual} as GP 
 					FROM vw_master 
 					{$sqlWhere}
@@ -232,50 +272,38 @@ if(!isset($_GET['prtGHQ'])){
 	<thead>	
 		<tr>
 			<th>Customer</th>
+			<th>Volume</th>
 			<th>Gross Revenue</th>
 			<th>GP</th>
 			<th>Profitability</th>
+			<th>per unit</th>
 			<th>% of total</th>
 		</tr>
 	</thead>
 	<tbody>
 	<?php
 	foreach ($arrReport as $customer=>$values){
-		?>
-		<tr>
-			<td><?php echo $customer;?></td>
-			<td><?php echo number_format($values['Revenue'],0,'.',',');?></td>
-			<td><?php echo number_format($values['GP'],0,'.',',');?></td>
-			<td><?php echo number_format($values['GP']/$values['Revenue']*100,0,'.',',');?>%</td>
-			<td><?php echo number_format($values['GP']/$arrReportTotal['GP']*100,0,'.',',');?>%</td>
-		</tr>
-		<?php
+		_renderTopCustomerLine($values, $arrReportTotal, $customer);	
 		$arrReportOther['Revenue'] -=  $values['Revenue'];
 		$arrReportOther['GP'] -=  $values['GP'];
+		$arrReportOther['KPI'] -=  $values['KPI'];
 	}
+		_renderTopCustomerLine($arrReportOther, $arrReportTotal, "Others");
 	?>
-		<tr>
-			<td>Others</td>
-			<td><?php echo number_format($arrReportOther['Revenue'],0,'.',',');?></td>
-			<td><?php echo number_format($arrReportOther['GP'],0,'.',',');?></td>
-			<td><?php echo number_format($arrReportOther['GP']/$arrReportOther['Revenue']*100,0,'.',',');?>%</td>
-			<td><?php echo number_format($arrReportOther['GP']/$arrReportTotal['GP']*100,0,'.',',');?>%</td>
-		</tr>
 	</tbody>
 	<tfoot>
-	<tr class="budget-subtotal">
-		<td>Total</td>
-		<td><?php echo number_format($arrReportTotal['Revenue'],0,'.',',');?></td>
-		<td><?php echo number_format($arrReportTotal['GP'],0,'.',',');?></td>
-		<td><?php echo number_format($arrReportTotal['GP']/$arrReportTotal['Revenue']*100,0,'.',',');?>%</td>
-		<td>100%</td>
-	</tr>
+	<?php
+		_renderTopCustomerLine($arrReportTotal, $arrReportTotal, "Total", "budget-subtotal");
+	?>	
 	</tfoot>
 	</table>
 	<ul class='link-footer'>
 		<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
 	</ul>	
 	<?php
+	
+	
+	
 	//==================== Staff ==========================/
 	$sql = "SELECT pccTitle, salary, monthly_bonus, empTitleLocal, funTitleLocal, prtTitleLocal,funFlagWC,funRHQ,".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset)." 
 			FROM reg_headcount 
