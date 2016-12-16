@@ -2993,7 +2993,7 @@ class Reports{
 		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
 		
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = 'J00400')", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = 'J00400') AND pccFlagProd=1", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
@@ -3043,7 +3043,7 @@ class Reports{
 			$this->echoBudgetItemString($rw, 'budget-subtotal');
 		}
 		
-		if (!($this->filter['activity'])){
+		// if (!($this->filter['activity'])){
 			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '5%' AND account<>'5999CO' AND pccFlagProd=1)", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
@@ -3099,7 +3099,7 @@ class Reports{
 				$rw['Budget item'] = "Profit before tax";
 				$this->echoBudgetItemString($rw, 'budget-subtotal');
 			}
-		} else {
+		// } else {
 			//------- KPIs -----------------	
 			$strFields = self::_getMRFields(Array('denominator'=>1,'currency'=>643));
 			
@@ -3141,7 +3141,7 @@ class Reports{
 					$this->echoBudgetItemString($rw);
 				}
 			}
-		}
+		// }
 		
 		$this->_getMRHeadcount($sqlWhere);
 		$this->_getMRHeadcount($sqlWhere,'funRHQ');
