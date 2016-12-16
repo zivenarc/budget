@@ -3134,7 +3134,7 @@ class Reports{
 				
 			$sql = self::_unionMRQueries($sql,"`prtTitle`, `activity`, `unit`",'', $arrUnion);
 			
-			echo '<pre>',$sql,'</pre>';
+			// echo '<pre>',$sql,'</pre>';
 			$rs = $this->oSQL->q($sql);
 			
 			if ($this->oSQL->n($rs)){
