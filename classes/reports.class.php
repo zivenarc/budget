@@ -3103,15 +3103,7 @@ class Reports{
 			//------- KPIs -----------------	
 			$strFields = self::_getMRFields(Array('denominator'=>1,'currency'=>643));
 			
-			if (strpos($this->oBudget->type,'Budget')!==false){
-				$sql = "UNION ALL
-					SELECT activity, unit, prtTitle,
-					{$strFields['budget']}
-				FROM `vw_sales`				
-				{$sqlWhere} AND scenario='{$strFields['from_a']}' 
-				GROUP BY activity, unit";
-			} else {
-				$sql = "SELECT activity, unit, prtTitle,
+			$sql = "SELECT activity, unit, prtTitle,
 						{$strFields['actual']}
 				FROM `vw_sales`			
 				{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND source='Actual'
@@ -3121,9 +3113,8 @@ class Reports{
 						{$strFields['next']}
 				FROM `vw_sales`			
 				{$sqlWhere}  AND scenario='{$strFields['from_a']}'  
-				GROUP BY activity, unit";
-			}
-			$sql .= "UNION ALL
+				GROUP BY activity, unit
+				UNION ALL
 					SELECT activity, unit, prtTitle,
 					{$strFields['budget']}
 				FROM `vw_sales`				
