@@ -20,6 +20,11 @@ if ($bu_group){
 	$oBudget = new Budget($budget_scenario);
 	$oReference = new Budget($reference);
 	
+	if(strpos($oBudget->type,"Budget")!==false){	
+		$period_type = 'fye';
+	}
+	//$period_type = 'cm';
+	
 	if ($_GET['debug']){
 		echo '<pre>';print_r($oBudget);echo '</pre>';
 	}
@@ -66,9 +71,10 @@ if(!isset($_GET['pccGUID'])){
 	?>
 	<div>
 	<?php
-	//$period_type = 'cm';
+	
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
+	
 	$settings['gpcus'] = Array('title'=>"GP by customer",
 						'sqlBase' => "SELECT  customer_group_code as optValue, 
 											customer_group_title as optText,  
@@ -92,6 +98,8 @@ if(!isset($_GET['pccGUID'])){
 										AND account IN ('J00400', 'J00802')										
 									GROUP BY customer_group_code",
 							'denominator'=>$denominator,
+							'actual_title'=>$oBudget->title,
+							'budget_title'=>$oReference->title,
 							'tolerance'=>0.05,
 							'limit'=>10);	
 	
@@ -121,51 +129,55 @@ if(!isset($_GET['pccGUID'])){
 										AND account NOT LIKE 'SZ%'										
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)",
 							'denominator'=>$denominator,
+							'actual_title'=>$oBudget->title,
+							'budget_title'=>$oReference->title,
 							'tolerance'=>0.05,
 							'limit'=>10);
 	
 	$oWF = new Waterfall($settings['pbt']);
 	$oWF->draw();
 	
-	$sqlActual = "SUM(".$oBudget->getThisYTDSQL('nm',$arrActualRates).")";
-	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('cm',$arrActualRates).")";
-	$settings['nextGP'] = Array('title'=>"GP by customer, next month changes",
-						'sqlBase' => "SELECT  customer_group_code as optValue, 
-											customer_group_title as optText,  
-											{$sqlActual} as Actual, 
-											{$sqlBudget} as Budget, 
-											({$sqlActual}-{$sqlBudget}) as Diff
-									FROM vw_master 
-									{$sqlWhere}
-										AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
-									GROUP BY customer_group_code",
-							'denominator'=>$denominator,
-							'budget_title'=>'This month',
-							'actual_title'=>'Next month',
-							'tolerance'=>0.05,
-							'limit'=>10);	
-	
-	$oWF = new Waterfall($settings['nextGP']);
-	$oWF->draw();
-	
-	$settings['nextCosts'] = Array('title'=>"Costs, next month changes",
-						'sqlBase' => "SELECT  IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
-											IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
-											{$sqlActual} as Actual, 
-											{$sqlBudget} as Budget, 
-											({$sqlActual}-{$sqlBudget}) as Diff
-									FROM vw_master 
-									{$sqlWhere}
-										AND  scenario='{$oBudget->id}' AND account NOT IN ('J00400', 'J00802') AND item<>''
-									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
-							'denominator'=>$denominator,
-							'budget_title'=>'This month',
-							'actual_title'=>'Next month',
-							'tolerance'=>0.05,
-							'limit'=>10);	
-	
-	$oWF = new Waterfall($settings['nextCosts']);
-	$oWF->draw();
+	if (strpos($oBudget->type,'Budget')===false){
+		$sqlActual = "SUM(".$oBudget->getThisYTDSQL('nm',$arrActualRates).")";
+		$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('cm',$arrActualRates).")";
+		$settings['nextGP'] = Array('title'=>"GP by customer, next month changes",
+							'sqlBase' => "SELECT  customer_group_code as optValue, 
+												customer_group_title as optText,  
+												{$sqlActual} as Actual, 
+												{$sqlBudget} as Budget, 
+												({$sqlActual}-{$sqlBudget}) as Diff
+										FROM vw_master 
+										{$sqlWhere}
+											AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
+										GROUP BY customer_group_code",
+								'denominator'=>$denominator,
+								'budget_title'=>'This month',
+								'actual_title'=>'Next month',
+								'tolerance'=>0.05,
+								'limit'=>10);	
+		
+		$oWF = new Waterfall($settings['nextGP']);
+		$oWF->draw();
+		
+		$settings['nextCosts'] = Array('title'=>"Costs, next month changes",
+							'sqlBase' => "SELECT  IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
+												IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
+												{$sqlActual} as Actual, 
+												{$sqlBudget} as Budget, 
+												({$sqlActual}-{$sqlBudget}) as Diff
+										FROM vw_master 
+										{$sqlWhere}
+											AND  scenario='{$oBudget->id}' AND account NOT IN ('J00400', 'J00802') AND item<>''
+										GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
+								'denominator'=>$denominator,
+								'budget_title'=>'This month',
+								'actual_title'=>'Next month',
+								'tolerance'=>0.05,
+								'limit'=>10);	
+		
+		$oWF = new Waterfall($settings['nextCosts']);
+		$oWF->draw();
+	}
 	?>
 	</div>
 	<?php
