@@ -3068,7 +3068,7 @@ class Reports{
 				$this->echoBudgetItemString($rw, 'budget-subtotal');
 			}
 			
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '60%')", $sql);
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '60%' AND account<>'607000')", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
