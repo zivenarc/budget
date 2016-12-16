@@ -3104,8 +3104,7 @@ class Reports{
 			$strFields = self::_getMRFields(Array('denominator'=>1,'currency'=>643));
 			
 			if (strpos($this->oBudget->type,'Budget')!==false){
-				$sql = "UNION ALL
-					SELECT activity, unit, prtTitle,
+				$sql = "SELECT activity, unit, prtTitle,
 					{$strFields['actual']}
 				FROM `vw_sales`				
 				{$sqlWhere} AND scenario='{$strFields['from_a']}' 
