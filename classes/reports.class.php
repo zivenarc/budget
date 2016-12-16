@@ -2605,7 +2605,7 @@ class Reports{
 		$currency = $params['currency']?$params['currency']:$this->Currency;
 		$denominator = $params['denominator']?$params['denominator']:$this->Denominator;
 		
-		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
+		$arrRates = $this->oBudget->getMonthlyRates($currency);
 		
 		$cm = $this->oBudget->arrPeriod[$this->oBudget->cm];
 		$res['cm'] = $cm;
@@ -2944,8 +2944,8 @@ class Reports{
 		
 		$sqlWhere = $this->sqlWhere;
 
-		$strFields = self::_getMRFields();
-		$strFieldsKPI = self::_getMRFields(Array('denominator'=>1,'currency'=>643));
+		$strFields = $this->_getMRFields();
+		$strFieldsKPI = $this->_getMRFields(Array('denominator'=>1,'currency'=>643));
 		
 		//$sqlGroup = "GROUP BY `item`";
 		
@@ -3101,38 +3101,40 @@ class Reports{
 			}
 		// } else {
 			//------- KPIs -----------------	
-			$strFields = self::_getMRFields(Array('denominator'=>1,'currency'=>643));
+			// $strFields = self::_getMRFields(Array('denominator'=>1,'currency'=>643));
 			
 			if (strpos($this->oBudget->type,'Budget')!==false){
 				$sql = "SELECT activity, unit, prtTitle,
-					{$strFields['actual']}
+					{$strFieldsKPI['actual']}
 				FROM `vw_sales`				
-				{$sqlWhere} AND scenario='{$strFields['from_a']}' 
-				GROUP BY activity, unit";
+				{$sqlWhere} AND scenario='{$strFieldsKPI['from_a']}' 
+				GROUP BY activity, unit
+				";
 			} else {
 				$sql = "SELECT activity, unit, prtTitle,
-						{$strFields['actual']}
+						{$strFieldsKPI['actual']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND source='Actual'
+				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND source='Actual'
 				GROUP BY activity, unit
 				UNION ALL
 				SELECT activity, unit, prtTitle, 
-						{$strFields['next']}
+						{$strFieldsKPI['next']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFields['from_a']}'  
-				GROUP BY activity, unit";
+				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}'  
+				GROUP BY activity, unit
+				";
 			}
 			$sql .= "UNION ALL
 					SELECT activity, unit, prtTitle,
-					{$strFields['budget']}
+					{$strFieldsKPI['budget']}
 				FROM `vw_sales`				
-				{$sqlWhere} AND scenario='{$strFields['from_b']}' 
+				{$sqlWhere} AND scenario='{$strFieldsKPI['from_b']}' 
 				GROUP BY activity, unit
 				";
 				
 			$sql = self::_unionMRQueries($sql,"`prtTitle`, `activity`, `unit`",'', $arrUnion);
 			
-			// echo '<pre>',$sql,'</pre>';
+			echo '<pre>',$sql,'</pre>';
 			$rs = $this->oSQL->q($sql);
 			
 			if ($this->oSQL->n($rs)){
