@@ -3044,7 +3044,7 @@ class Reports{
 		}
 		
 		if (!($this->filter['activity'])){
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '5%' AND account<>'5999CO')", $sql);
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '5%' AND account<>'5999CO' AND pccFlagProd=1)", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
@@ -3060,7 +3060,7 @@ class Reports{
 				$this->echoBudgetItemString($rw);
 			}
 			
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND pccFlagProd=1)", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
