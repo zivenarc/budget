@@ -26,17 +26,16 @@ class ProfitCenters extends Reference{
 		}
 	}
 	
-	public function getStructuredRef(){		
-		$group = '';		
-		foreach ($this->data as $key=>$value){
-			if ($group!=$value[$this->prefix.'ParentID']){
-				$arrRes['##optgroupopen##'.$value[$this->prefix.'ParentID']] = $value[$this->prefix.'ParentTitle'];
+	public function getStructuredRef(){	
+		GLOBAL $oSQL, $strLocal;	
+		$sql = "SELECT P.pccTitle$strLocal as pccParentTitle, PCC.* FROM `".self::TABLE."` PCC 
+				LEFT JOIN `".self::TABLE."` P ON P.pccCode1C=PCC.pccParentCode1C
+				WHERE PCC.pccFlagDeleted=0";
+		$rs = $oSQL->q($sql);
+		while ($rw=$oSQL->f($rs)){		
+			if(!$rw['pccFlagFolder']){
+				$arrRes[$rw['pccParentTitle']][$rw['pccID']] = $rw["pccTitle$strLocal"];			
 			}
-			if ($value[$this->prefix.'ParentID']){
-				$arrRes[$key] = $value[$this->prefix.'Title'];
-				$group = $value[$this->prefix.'ParentID'];
-			}
-			
 		}
 		return ($arrRes);
 	}

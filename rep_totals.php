@@ -79,39 +79,56 @@ if ($mthStart!=1 || $mthEnd!=12){
 
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
-$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
+$repType = 'yact';
+
+switch($repType){
+	case 'yact':
+		$sqlAccountString = "CONCAT(`account`,':',`Title`) AS 'AccountTitle', `account` AS 'Account', `yact_group` AS 'GroupTitle', `yact_group_code` AS 'Group'";
+		$sqlGroupBy = "`account`";
+		break;
+	case 'budget':
+	default:
+		$sqlAccountString = "`Budget item` AS 'AccountTitle', `item` AS 'Account', `Group` AS 'GroupTitle', `Group_code` AS 'Group'";
+		$sqlGroupBy = "`item`";
+		break;
+}
+
+$sql = "SELECT Profit, pccFlagProd, {$sqlAccountString} , SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM vw_master
 		WHERE scenario='{$oBudget->id}' AND company='{$company}' AND account NOT LIKE 'SZ%' {$sqlWherePC}
-		GROUP BY Profit, `Budget item`,`item`
+		GROUP BY Profit, {$sqlGroupBy}
 		UNION ALL
-		SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, itmOrder, `Group_code`, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
+		SELECT Profit, pccFlagProd, {$sqlAccountString}, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM vw_master
 		WHERE scenario='{$reference}' AND company='{$company}'  AND account NOT LIKE 'SZ%' {$sqlWherePC}
-		GROUP BY Profit, `Budget item`,`item`
-		ORDER BY `Group`,pccFlagProd,Profit,itmOrder";
+		GROUP BY Profit, {$sqlGroupBy}
+		ORDER BY `Group`,pccFlagProd,Profit";
 
 // echo '<pre>',$sql,'</pre>';
 		
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-
+	
+	// echo '<pre>';print_r ($rw);echo '</pre>';
+	
 	if (!$bu_group) {
 		$keyProfit = $oBudget->getProfitAlias($rw);		
 	} else {
 		$keyProfit = $rw['Profit'];
 	}
 	
-	if ($rw['item']==Items::REVENUE || $rw['item']==Items::INTERCOMPANY_REVENUE){
+	if ($rw['Account']==Items::REVENUE || $rw['Account']==Items::INTERCOMPANY_REVENUE || $rw['Account']=='J00400'){
 		$arrRevenue[$keyProfit] += $rw['Total'];
 		$arrRevenueEst += $rw['Estimate'];
 	}
-
-	$arrReport[$rw['Group']][$rw['Budget item']][$keyProfit] += $rw['Total'];
-	$arrTotal['this'][$rw['Group']][$keyProfit] += $rw['Total'];
-	$arrTotal['last'][$rw['Group']][$keyProfit] += $rw['Estimate'];
+		
+	$arrReport['this'][$rw['GroupTitle']][$rw['AccountTitle']][$keyProfit] += $rw['Total'];
+	$arrReport['last'][$rw['GroupTitle']][$rw['AccountTitle']][$keyProfit] += $rw['Estimate'];
+	$arrTotal['this'][$rw['GroupTitle']][$keyProfit] += $rw['Total'];
+	$arrTotal['last'][$rw['GroupTitle']][$keyProfit] += $rw['Estimate'];
 	$arrGrandTotal[$keyProfit] += $rw['Total'];
 	$arrGrandTotalEstimate[$keyProfit] += $rw['Estimate'];
-	$arrEstimate[$rw['Group']][$rw['Budget item']] += $rw['Estimate'];
+	$arrEstimate[$rw['GroupTitle']][$rw['AccountTitle']] += $rw['Estimate'];
 	$arrProfit[$keyProfit] = $rw['pccFlagProd'];
 }
 

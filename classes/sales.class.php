@@ -6,6 +6,7 @@ include_once ('classes/reference.class.php');
 include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
 include_once ('classes/yact_coa.class.php');
+include_once ('classes/profit.class.php');
 
 $Products = new Products ();
 $Activities = new Activities ();
