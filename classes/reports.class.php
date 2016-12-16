@@ -3002,7 +3002,7 @@ class Reports{
 		}
 		
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (item = '".self::REVENUE_ITEM."')", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND pccFlagProd=1 AND (item = '".self::REVENUE_ITEM."')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
@@ -3010,7 +3010,7 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00802')) AND item<>'".self::REVENUE_ITEM."'", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00802')) AND pccFlagProd=1 AND item<>'".self::REVENUE_ITEM."'", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
@@ -3018,7 +3018,7 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00400','J00802'))", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00400','J00802') AND pccFlagProd=1)", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
@@ -3027,7 +3027,7 @@ class Reports{
 		}
 		
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W'))", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W') AND pccFlagProd=1)", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
@@ -3035,7 +3035,7 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00400','J00802','J00801','J00803','J00804','J00805','J00806','J00808','J0080W'))", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00400','J00802','J00801','J00803','J00804','J00805','J00806','J00808','J0080W') AND pccFlagProd=1)", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
