@@ -273,7 +273,13 @@ foreach ($arrReport as $ghq=>$arrItems){
 }
 ?>
 <h2>Grand total</h2>
-<table>
+<table class='budget'>
+<thead>
+	<th>Item</th>
+	<?php echo $oBudget->getTableHeader('monthly', $startMonth,$endMonth); ?>
+	<th>Total</th>	
+</thead>
+<tbody>
 <?php
 foreach ($arrAccounts as $item=>$settings){
 		?>
@@ -285,7 +291,7 @@ foreach ($arrAccounts as $item=>$settings){
 				?>
 				<td class="budget-decimal"><?php Reports::render($arrGrandTotal[$item]['monthly'][$month],0);?></td>
 				<?php
-				$arrNRBT[$month] += $arrGrandTotal[$item][$month];
+				$arrNRBT[$month] += $arrGrandTotal[$item]['monthly'][$month];
 			}
 		?>
 		<td class="budget-ytd budget-decimal"><?php Reports::render(array_sum($arrGrandTotal[$item]['monthly']),0);?></td>
@@ -309,7 +315,7 @@ for ($m=$startMonth;$m<=$endMonth;$m++){
 </table>
 </div>
 <ul class='link-footer'>
-	<li><a href='javascript:SelectContent("report");'>Select table</a></li>
+	<li><a href='javascript:SelectContent("report");'>Select all</a></li>
 </ul>
 
 <h2>Activity ratios</h2>
