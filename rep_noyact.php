@@ -52,15 +52,19 @@ if ($_GET['tab']){
 			$arrYact['code'][] = $rw['yctID'];			
 			$arrYact['title'][] = $rw['yctTitle'];			
 		}
-		$strAccounts = "'".implode("','",$arrYact)."'";
+		$strAccounts = "'".implode("','",$arrYact['code'])."'";
 		
 		$sql = "SELECT *, edit_date as timestamp FROM vw_master 		
 		LEFT JOIN vw_journal ON source=guid
 		LEFT JOIN stbl_user ON usrID=edit_by		
-		WHERE posted=1 AND vw_master.scenario='{$_GET['tab']}' AND IFNULL(vw_master.activity,0) = 0 AND account IN ({$strAccounts})
+		WHERE posted=1 AND vw_master.scenario='{$_GET['tab']}' 
+			##AND IFNULL(vw_master.activity,'') = '' 
+			AND IFNULL(prtGHQ,'')=''
+			AND account IN ({$strAccounts})
 		GROUP BY guid
 		ORDER BY vw_master.timestamp DESC";	
 
+		// echo '<pre>',$sql,'</pre>';
 		$rs =$oSQL->q($sql);
 		while ($rw=$oSQL->f($rs)){
 			$data[] = $rw;
