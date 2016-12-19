@@ -226,6 +226,7 @@ echo '<p>',$oBudget->timestamp,'</p>';
 foreach ($arrReport as $ghq=>$arrItems){
 	$arrPC[$ghq] = array_unique($arrPC[$ghq]);
 ?>
+<div id="<?php echo $ghq;?>">
 <h2><?php echo $ghq?$ghq:"No product";?></h2>
 <table id="<?php echo 'report_'.$qhq;?>" class="budget">
 <thead>
@@ -235,7 +236,7 @@ foreach ($arrReport as $ghq=>$arrItems){
 	<?php
 	foreach ($arrPC[$ghq] as $pc){
 		?>
-		<th><?php echo $pc;?></th>
+		<th class='budget-bypc'><?php echo $pc;?></th>
 		<?php
 	};
 	?>
@@ -269,6 +270,7 @@ foreach ($arrReport as $ghq=>$arrItems){
 	?>
 	</tbody>
 	</table>
+</div>
 	<?php
 }
 ?>
