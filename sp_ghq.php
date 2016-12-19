@@ -69,131 +69,95 @@ $sqlGroupBy = "account, pc, prtGHQ";
 
 // echo '<pre>',$sqlFields,'</pre>';
 
-$arrFilter = Array(
+$sqlWhere = "WHERE scenario='{$budget_scenario}' 
+			AND company='{$company}' 
+			AND source<>'Estimate'";
+			// AND pccFlagProd=1 ";
+
+			
+$arrRevenueFilter = Array(
 	Items::REVENUE,
 	Items::INTERCOMPANY_REVENUE
 );
-$reportKey = 'Revenue';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') 
-		GROUP by prtGHQ"; 
-// echo '<pre>',$sql,'</pre>';
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-		$month = $oBudget->arrPeriod[$m];
-		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-}
 
-
-$arrFilter = Array(
+$arrDCFilter = Array(
 	Items::DIRECT_COSTS,
 	Items::INTERCOMPANY_COSTS,
 	Items::KAIZEN
 );
-$reportKey = 'Direct costs';
-$sql = "SELECT {$sqlFields} FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND item IN ('".implode("','",$arrFilter)."')
-		GROUP BY {$sqlGroupBy}";
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-		$month = $oBudget->arrPeriod[$m];
-		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
+
+$arrAccounts = Array(
+		'Revenue'=>Array('sql'=>"SELECT $sqlFields FROM vw_master 
+							{$sqlWhere} 
+								AND item in ('".implode("','",$arrRevenueFilter)."') 			
+							GROUP by prtGHQ",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
+		'Direct costs'=>Array('negative'=>true, 'sql'=>"SELECT {$sqlFields} FROM vw_master 
+								{$sqlWhere}  
+									AND item IN ('".implode("','",$arrDCFilter)."')
+								GROUP BY {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
+		'Gross profit'=>Array('class'=>'budget-subtotal'),
+		'Reclassified fixed costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
+									{$sqlWhere} 
+										AND account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W')			
+									GROUP by {$sqlGroupBy}
+									ORDER by account",'subtotal'=>Array('Gross operating profit','Net operating profit','PBT')),
+		'Gross operating profit'=>Array('class'=>'budget-subtotal'),
+		'General costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT $sqlFields FROM vw_master 
+								{$sqlWhere}  
+									AND account LIKE '5%' AND account<>'5999CO'			
+								GROUP by {$sqlGroupBy}
+								ORDER BY account",'subtotal'=>Array('Net operating profit','PBT')),
+		'Corporate costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT $sqlFields FROM vw_master 
+								{$sqlWhere} 
+									AND account='5999CO'  			
+								GROUP by {$sqlGroupBy}
+								ORDER BY account",'subtotal'=>Array('Net operating profit','PBT')),
+		'Net operating profit'=>Array('class'=>'budget-subtotal'),
+		'Non-operating income'=>Array('sql'=>"SELECT $sqlFields FROM vw_master 
+								{$sqlWhere} 
+									AND (account like '60%') AND account<>'607000'			
+								GROUP by pc, prtGHQ",'subtotal'=>Array('PBT')),
+		'Non-operating costs'=>Array('negative'=>true,'sql'=>"SELECT $sqlFields FROM vw_master 
+								{$sqlWhere} 
+									AND (account like '65%' or account like '66%')			
+								GROUP by pc, prtGHQ",'subtotal'=>Array('PBT')),
+		'PBT'=>Array('class'=>'budget-total')
+	);
+
+// echo '<pre>';print_r($arrAccounts); echo '</pre>';
+
+foreach($arrReport as $key=>$values){
+	$arrReport[$key] = $arrAccounts;
 }
-	
-
-$reportKey = 'Reclassified fixed costs';
-$sql = "SELECT {$sqlFields} FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account IN ('J00801', 'J00803','J00804','J00805','J00806','J00808','J0080W')
-		GROUP by {$sqlGroupBy}
-		ORDER by account";
-
-distribute($reportKey, $sql);
-
-
-
-$reportKey = 'General costs';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000' AND (pccFLagProd = 1 OR IFNULL(prtGHQ,'')<>'')
-		GROUP by {$sqlGroupBy}
-		ORDER BY account";
-
-distribute($reportKey, $sql);
-
-$reportKey = 'Corporate costs';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account LIKE '5%' AND account<>'527000'  AND (pccFLagProd = 0 AND IFNULL(prtGHQ,'')='')
-		GROUP by {$sqlGroupBy}
-		ORDER BY account";
-distribute ($reportKey, $sql);
-
-$reportKey = 'Distributed corporate costs';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account ='607000' 
-		GROUP by {$sqlGroupBy}
-		ORDER BY account";
-distribute ($reportKey, $sql);
-
-$reportKey = 'MSF';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account='527000' 
-		GROUP by pc, prtGHQ";
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-		$month = $oBudget->arrPeriod[$m];
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		} else {
-			foreach($arrGHQSubtotal as $ghq=>$revenue){
-				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+			
+foreach ($arrAccounts as $reportKey=>$settings){
+	$sql = $settings['sql'];
+	// echo '<pre>',$sql,'</pre>';
+	if(strlen($sql)){
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){
+			if($rw['pccFlagProd']){
+				for($m=$startMonth;$m<=$endMonth;$m++){
+					$month = $oBudget->arrPeriod[$m];
+					$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month]*($settings['negative']?-1:1);
+					for($i=0;$i<count($settings['subtotal']);$i++){
+						$arrReport[$rw['prtGHQ']][$settings['subtotal'][$i]][$month] += $rw[$month];
+						$arrGrandTotal[$settings['subtotal'][$i]][$month] += $rw[$month];
+					};
+					$arrGrandTotal[$reportKey][$month] += $rw[$month];
+				}
+			} else {
+				$arrGrandTotal[$reportKey][$month] += $rw[$month];
+			}
+			
+			if($settings['breakdown']){
+				$accKey = getAccountAlias($rw['account']);
+				$arrBreakDown[$reportKey][$accKey][$rw['prtGHQ']] += $rw[$month];
 			}
 		}
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-}
+		
 
-$reportKey = 'N/O income';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account like '60%') AND account<>'607000'
-		GROUP by pc, prtGHQ";
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-		$month = $oBudget->arrPeriod[$m];
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		} else {
-			foreach($arrGHQSubtotal as $ghq=>$revenue){
-				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
-			}
-		}
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-}
-
-
-$reportKey = 'N/O costs';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account like '65%' or account like '66%') 
-		GROUP by pc, prtGHQ";
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-		$month = $oBudget->arrPeriod[$m];
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		} else {
-			foreach($arrGHQSubtotal as $ghq=>$revenue){
-				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
-			}
-		}
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+		
 	}
 }
 
@@ -205,13 +169,7 @@ $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		} else {
-			foreach($arrGHQSubtotal as $ghq=>$revenue){
-				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
-			}
-		}
+		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
@@ -222,16 +180,11 @@ $sql = "SELECT $sqlFields FROM vw_master
 		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account like '75%' or account like '76%') 
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
+$rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		} else {
-			foreach($arrGHQSubtotal as $ghq=>$revenue){
-				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
-			}
-		}
+		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
@@ -244,13 +197,7 @@ $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		} else {
-			foreach($arrGHQSubtotal as $ghq=>$revenue){
-				$arrReport[$ghq][$reportKey][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
-			}
-		}
+		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
@@ -286,19 +233,19 @@ foreach ($arrReport as $ghq=>$arrItems){
 	<th colspan="<?php echo $colspan;?>"><?php echo $ghq?$ghq:'[None]';?></th>
 	</tr>
 	<?php
-	foreach ($arrItems as $item=>$values){
+	foreach ($arrAccounts as $item=>$settings){
 		?>
-		<tr>
+		<tr class="<?php echo $settings['class'];?>">
 			<td><?php echo $item;?></td>
 			<?php
 			for ($m=$startMonth;$m<=$endMonth;$m++){
 				$month = $oBudget->arrPeriod[$m];
 				?>
-				<td class="budget-decimal <?php echo ($m==$oBudget->cm?'budget-current':'');?>"><?php Reports::render($values[$month],0);?></td>
+				<td class="budget-decimal <?php echo ($m==$oBudget->cm?'budget-current':'');?>"><?php Reports::render($arrReport[$ghq][$item][$month],0);?></td>
 				<?php
 			}
 		?>
-			<td class="budget-ytd budget-decimal"><?php Reports::render(array_sum($values),0);?></td>			
+			<td class="budget-ytd budget-decimal"><?php Reports::render(array_sum($arrReport[$ghq][$item]),0);?></td>			
 		</tr>
 		<?php
 	}
@@ -308,20 +255,20 @@ foreach ($arrReport as $ghq=>$arrItems){
 	<th colspan="<?php echo $colspan;?>">Grand total</th>
 </tr>
 <?php
-foreach ($arrGrandTotal as $item=>$values){
+foreach ($arrAccounts as $item=>$settings){
 		?>
-		<tr>
+		<tr class="<?php echo $settings['class'];?>">
 			<td><?php echo $item;?></td>
 			<?php
 			for ($m=$startMonth;$m<=$endMonth;$m++){
 				$month = $oBudget->arrPeriod[$m];
 				?>
-				<td class="budget-decimal"><?php Reports::render($values[$month],0);?></td>
+				<td class="budget-decimal"><?php Reports::render($arrGrandTotal[$item][$month],0);?></td>
 				<?php
 				$arrNRBT[$month] += $values[$month];
 			}
 		?>
-		<td class="budget-ytd budget-decimal"><?php Reports::render(array_sum($values),0);?></td>
+		<td class="budget-ytd budget-decimal"><?php Reports::render(array_sum($arrGrandTotal[$item]),0);?></td>
 		</tr>
 		<?php
 }
@@ -499,6 +446,7 @@ function distribute($reportKey, $sql){
 			case '525000':
 				$accKey = 'Office cost';
 				break;
+			
 			default:
 				$accKey = 'Other costs';
 				break;			
@@ -533,5 +481,39 @@ function distribute($reportKey, $sql){
 			} 
 		}
 	}
+}
+
+function getAccountAlias($account){
+	switch($account){
+			case 'J00801':
+				$accKey = 'Labor costs';
+				break;
+			case 'J0080W':
+				$accKey = 'Warehouse costs';
+				break;
+			case 'J00806':
+			case '512000':
+				$accKey = 'Depreciation';
+				break;
+			case '502000':
+			case '505000':
+			case '506000':
+				$accKey = 'Personal expenses';
+				break;
+			case '514000':
+			case '515000':
+			case '519000':
+			case '525000':
+				$accKey = 'Office cost';
+				break;
+			case '5999CO':
+			case '5999BD':
+				return (false);
+				break;
+			default:
+				$accKey = 'Other costs';
+				break;			
+		}
+	return ($accKey);
 }
 ?>
