@@ -221,6 +221,63 @@ echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 include ('includes/inc_report_selectors.php');
 echo '<p>',$oBudget->timestamp,'</p>';
 ?>
+<style>
+	.toggle{
+		color: blue;
+		border-bottom: 1px dashed blue;
+		margin-bottom: 5px;
+	}
+</style>
+<script>
+$(document).ready(function(){
+	
+	$('.budget-bypc').hide();
+	$('.toggle').click(function(){
+		var o = $(this).parent('div');
+		var res = toggleVisibility(o);
+		$(this).text(res);
+	});
+	
+});
+
+function toggleVisibility(o){
+	var cellsMonthly = $('.budget-monthly',o);
+	var cellsPC = $('.budget-bypc',o);
+	
+	var wrapperDivsMonthly = cellsMonthly.wrapInner('<div/>').children();
+	var wrapperDivsPC = cellsPC.wrapInner('<div style="display:block;"/>').children();
+	
+	if ($('.budget-monthly:visible',o).length>0){			
+		wrapperDivsMonthly.animate({'width':'hide'},1000,function(){
+			cellsMonthly.hide();
+			wrapperDivsMonthly.replaceWith(function(){
+              return $(this).contents();
+            });			
+		});
+		wrapperDivsPC.animate({'width':'show'},1000,function(){
+				cellsPC.show();
+				wrapperDivsPC.replaceWith(function(){
+					return $(this).contents();
+				});
+			});
+		return ('Show by month');
+	} else {
+		wrapperDivsMonthly.animate({'width':'show'},1000,function(){
+			cellsMonthly.show();
+			wrapperDivsMonthly.replaceWith(function(){
+              return $(this).contents();
+            });			
+		});
+		wrapperDivsPC.animate({'width':'hide'},1000,function(){
+				cellsPC.hide();
+				wrapperDivsPC.replaceWith(function(){
+					return $(this).contents();
+				});
+			});
+		return ('Show by unit');
+	}
+}
+</script>
 <div id="report">
 <?php 
 foreach ($arrReport as $ghq=>$arrItems){
@@ -228,6 +285,7 @@ foreach ($arrReport as $ghq=>$arrItems){
 ?>
 <div id="<?php echo $ghq;?>">
 <h2><?php echo $ghq?$ghq:"No product";?></h2>
+<span class='toggle'>Show by unit</span>
 <table id="<?php echo 'report_'.$qhq;?>" class="budget">
 <thead>
 	<th>Item</th>
