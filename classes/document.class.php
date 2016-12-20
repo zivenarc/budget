@@ -181,7 +181,7 @@ class Document extends easyForm{
 			,'default'=>$budget_scenario	
 			,'disabled'=>!$this->flagUpdate
 		);
-		$this->Columns[] = self::getProfitEG($this->prefix."ProfitID");
+		$this->Columns[] = self::getProfitEG();
 		
 		$this->Columns[] = Array('title'=>'Comments','field'=>$this->prefix.'Comment','type'=>'text', 'disabled'=>!$this->flagUpdate);
 	}
@@ -408,16 +408,14 @@ class Document extends easyForm{
 		return ($res);
 	}
 	
-	protected function getProfitEG($field='profit'){
+	protected function getProfitEG(){
 		GLOBAL $arrUsrData;
 		$res = Array(
 			'title'=>'Profit center'
-			,'field'=>$field
+			,'field'=>$this->prefix.'ProfitID'
 			,'type'=>'combobox'
 			,'width'=>'80px'
-			,'source'=>ProfitCenters::getStructuredRef()
-			,'sql'=>'SELECT pccID as optValue, pccTitle as optText, pccFlagDeleted as optFlagDeleted 
-					FROM vw_profit WHERE pccFlagFolder=0'
+			,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit WHERE pccFlagFolder=0'
 			,'default'=>$arrUsrData['empProfitID']
 			,'disabled'=>!$this->flagUpdate
 		);
