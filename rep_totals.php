@@ -1,9 +1,5 @@
 <?php
 // $flagNoAuth = true;
-define ('STAFF_COSTS', '02.Staff costs');
-define ('GROSS_PROFIT', '01.Gross Margin');
-
-
 require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
@@ -79,15 +75,23 @@ if ($mthStart!=1 || $mthEnd!=12){
 
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
-$repType = 'yact';
+$repType = 'budget';
 
 switch($repType){
 	case 'yact':
+	
+		define ('STAFF_COSTS', 'J00801:Labor cost');
+		define ('GROSS_PROFIT', 'Gross profit');
+	
 		$sqlAccountString = "CONCAT(`account`,':',`Title`) AS 'AccountTitle', `account` AS 'Account', `yact_group` AS 'GroupTitle', `yact_group_code` AS 'Group'";
 		$sqlGroupBy = "`account`";
 		break;
 	case 'budget':
 	default:
+		
+		define ('STAFF_COSTS', '02.Staff costs');
+		define ('GROSS_PROFIT', '01.Gross Margin');
+	
 		$sqlAccountString = "`Budget item` AS 'AccountTitle', `item` AS 'Account', `Group` AS 'GroupTitle', `Group_code` AS 'Group'";
 		$sqlGroupBy = "`item`";
 		break;
@@ -236,7 +240,7 @@ while ($rw=$oSQL->f($rs)){
 </thead>
 <tbody>
 <?php
-foreach($arrReport as $group=>$arrItem){
+foreach($arrReport['this'] as $group=>$arrItem){
 	foreach($arrItem as $item=>$values){
 		?>
 		<tr>
@@ -249,7 +253,7 @@ foreach($arrReport as $group=>$arrItem){
 		}				
 		?>
 			<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($values));?></td>		
-			<td class='budget-decimal'><?php Reports::render($arrEstimate[$group][$item]);?></td>
+			<td class='budget-decimal'><?php Reports::render(array_sum($arrReport['last'][$group][$item]));?></td>
 			<td class='budget-decimal'><?php Reports::render(array_sum($values) - $arrEstimate[$group][$item]);?></td>
 			<td class='budget-decimal budget-ratio'><?php Reports::render_ratio(array_sum($values) , $arrEstimate[$group][$item]);?></td>
 		</tr>
@@ -365,20 +369,20 @@ foreach($arrProfit as $pc=>$flag){
 	<td>% of revenue</td>
 <?php
 foreach($arrProfit as $pc=>$flag){
-	if ($arrReport[GROSS_PROFIT]['Revenue'][$pc]){
-		$arrCostRatio[$pc] = $arrGrandTotal[$pc]/$arrReport[GROSS_PROFIT]['Revenue'][$pc]*100;	
+	if ($arrReport['this'][GROSS_PROFIT]['Revenue'][$pc]){
+		$arrCostRatio[$pc] = $arrGrandTotal[$pc]/$arrReport['this'][GROSS_PROFIT]['Revenue'][$pc]*100;	
 	} else {
 		$arrCostRatio[$pc]=0;
 	}
 	if(!$flag){
-		$arrCostRatio[$pc] = - $arrGrandTotal[$pc]/array_sum($arrReport[GROSS_PROFIT]['Revenue'])*100;
+		$arrCostRatio[$pc] = - $arrGrandTotal[$pc]/array_sum($arrReport['this'][GROSS_PROFIT]['Revenue'])*100;
 	}
 	?>
 	<td class='budget-decimal'><?php Reports::render($arrCostRatio[$pc],1);?></td>
 	<?php
 }
 ?>
-	<td class='budget-decimal'><?php Reports::render_ratio(array_sum($arrGrandTotal),array_sum($arrReport[GROSS_PROFIT]['Revenue']));?></td>
+	<td class='budget-decimal'><?php Reports::render_ratio(array_sum($arrGrandTotal),array_sum($arrReport['this'][GROSS_PROFIT]['Revenue']));?></td>
 </tr>
 <tr class="budget-subtotal">
 	<td>Headcount</td>
