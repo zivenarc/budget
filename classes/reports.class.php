@@ -2326,17 +2326,7 @@ class Reports{
 		
 		?>
 			<tr><th colspan="14">Other financials</th></tr>
-		<?php			
-		//------ Operating income -------
-		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
-		$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
-		$rs = $oSQL->q($sqlOps);
-		while ($rw = $oSQL->f($rs)){
-			$rw['Budget item'] = "Operating income";
-			$this->echoBudgetItemString($rw,'budget-subtotal');
-		}
-		
+		<?php					
 		//------ Gross revenue -------
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = 'J00400')", $sql);
@@ -2345,6 +2335,28 @@ class Reports{
 		while ($rw = $oSQL->f($rs)){
 			$rw['Budget item'] = "Gross revenue";
 			$this->echoBudgetItemString($rw);
+		}
+		
+		if (!(isset($this->filter['customer']) || isset($this->filter['sales']))){
+		//------ Gross operating profit -------
+		
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE 'J%')", $sql);
+			$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
+			$rs = $oSQL->q($sqlOps);
+			while ($rw = $oSQL->f($rs)){
+				$rw['Budget item'] = "Gross operatng profit";
+				$this->echoBudgetItemString($rw);
+			}
+			
+			//------ Operating income -------
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
+			$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
+			$rs = $oSQL->q($sqlOps);
+			while ($rw = $oSQL->f($rs)){
+				$rw['Budget item'] = "Operating profit";
+				$this->echoBudgetItemString($rw);
+			}
+		
 		}
 		
 		//----- Sales costs ----------
