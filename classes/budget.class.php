@@ -44,10 +44,6 @@ class Budget{
 		$this->total = $rw['scnTotal'];
 		$this->id = $scenario;
 		$this->timestamp = "Updated by ".$rw['usrTitle']." on ".date('d.m.Y H:i',strtotime($rw['scnEditDate'])).", <a href='{$rw['script']}?{$rw['prefix']}ID={$rw['id']}'>".$rw['title']." #".$rw['id']."</a>";
-		
-				
-
-		
 		$this->length = $rw['scnLength'];
 		
 		$this->flagUpdate = !$rw['scnFlagReadOnly'];
@@ -211,6 +207,9 @@ class Budget{
 				ob_start();
 				?>
 					<th colspan="4">Current month (<?php echo date('M',$this->date_start-1);?>)</th>
+					<?php if (!($this->cm % 3)){ ?>
+					<th colspan="4">Current quarter</th>
+					<?php } ?>
 					<th colspan="4">YTD</th>				
 					<th colspan="4">Next month (<?php echo date('M',$this->date_start);?>)</th>
 				</tr>
@@ -219,6 +218,12 @@ class Budget{
 					<th>Budget</th>
 					<th>Diff</th>
 					<th>%</th>
+					<?php if (!($this->cm % 3)){ ?>
+					<th class='budget-ytd'>Actual</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+					<?php } ?>
 					<th class='budget-quarterly'>Actual</th>
 					<th>Budget</th>
 					<th>Diff</th>
@@ -232,6 +237,7 @@ class Budget{
 				$res = ob_get_clean();				
 				break;
 			case 'roy':
+			case 'fye':
 				ob_start();
 				?>
 					<th colspan="4">YTD</th>

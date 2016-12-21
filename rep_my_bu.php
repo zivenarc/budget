@@ -16,6 +16,9 @@ require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
+
+include ('includes/inc_report_pcfilter.php');
+
 $arrJS[]='js/rep_pnl.js';
 // $arrJS[]='js/input_form.js';	
 
@@ -36,26 +39,39 @@ $arrUsrData["pagTitle$strLocal"] = 'Sales by '.($rw['pccTitle']?$rw['pccTitle']:
 $arrActions[] = Array('title'=>'NSD','action'=>'?bdv=9');
 $arrActions[] = Array('title'=>'JSD','action'=>'?bdv=130');
 	
-include ('includes/inc-frame_top.php');
-echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
-echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
-include ('includes/inc_report_selectors.php');
+if(!isset($_GET['pccGUID'])){
+	
+	include ('includes/inc-frame_top.php');
+	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
+	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
+	include ('includes/inc_report_selectors.php');
 
-$sqlWhere .= "WHERE bdv = ".$oSQL->e($bdv);
+	Budget::getProfitTabs('reg_sales', false, Array('bdv'=>$bdv));
 
+	include ('includes/inc-frame_bottom.php');
 
-$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>Array('bdv'=>$bdv)));
-
-if (strpos($oBudget->type,'FYE')!==false){
-	$oReport->monthlyReport($type);
 } else {
-	$oReport->periodicPnL($sqlWhere,$type);
+	$sqlWhere = "WHERE bdv = ".$oSQL->e($bdv);
 
-	?>
-	<h2>KPI</h2>
-	<?php
-	$oReport->salesByCustomer(' and bdv='.$oSQL->e($bdv));
+	if ($_GET['pccGUID']=='all'){
+		
+	} else {
+		$sqlWhere .= " AND pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
+	}
+	
+	$filter['bdv'] = $bdv;
+	
+	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
+
+	if (strpos($oBudget->type,'FYE')!==false){
+		$oReport->monthlyReport($type);
+	} else {
+		$oReport->periodicPnL($sqlWhere,$type);
+
+		?>
+		<h2>KPI</h2>
+		<?php
+		$oReport->salesByCustomer(' and bdv='.$oSQL->e($bdv));
+	}
 }
-
-include ('includes/inc-frame_bottom.php');
 ?>

@@ -43,7 +43,7 @@ if(!isset($_GET['pccGUID'])){
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	include ('includes/inc_report_selectors.php');
 	
-	Budget::getProfitTabs('reg_sales', false, Array('customer'=>$arrCounterparty['codes']));
+	Budget::getProfitTabs('reg_sales', false, Array('sales'=>$ownerID));
 	
 	include ('includes/inc_subordinates.php');
 
@@ -60,7 +60,9 @@ if(!isset($_GET['pccGUID'])){
 		$sqlWhere .= " AND pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 	}
 	
-	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>Array('sales'=>$ownerID)));
+	$filter['sales'] = $ownerID;
+	
+	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
 
 	if (strpos($oBudget->type,'FYE')!==false){
 		$oReport->monthlyReport($type);

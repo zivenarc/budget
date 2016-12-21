@@ -1705,7 +1705,7 @@ class Reports{
 				break;
 		}
 		
-		$strFields = $this->_getMonthlyFields();
+		// $strFields = $this->_getMonthlyFields();
 		
 		$strFields = $this->_getMRFields();
 		
@@ -1731,6 +1731,8 @@ class Reports{
 					SUM(CM_B) as CM_B,
 					SUM(YTD_A) as YTD_A,
 					SUM(YTD_B) as YTD_B,
+					SUM(Q_A) as Q_A,
+					SUM(Q_B) as Q_B,
 					SUM(NM_A) as NM_A,
 					SUM(NM_B) as NM_B
 				FROM ({$sql}) U {$sqlGroup} 
@@ -1791,7 +1793,7 @@ class Reports{
 				break;
 		}
 		
-		$strFields = $this->_getMonthlyFields();
+		// $strFields = $this->_getMonthlyFields();
 		
 		$strFields = $this->_getMRFields();
 		
@@ -1815,6 +1817,8 @@ class Reports{
 		$sql = "SELECT `Level1_title`, `level1_code`, `Budget item`, `Group`, `item`,`itmOrder`,
 					SUM(CM_A) as CM_A,
 					SUM(CM_B) as CM_B,
+					SUM(Q_A) as Q_A,
+					SUM(Q_B) as Q_B,
 					SUM(YTD_A) as YTD_A,
 					SUM(YTD_B) as YTD_B,
 					SUM(NM_A) as NM_A,
@@ -2009,10 +2013,11 @@ class Reports{
 					$arrSubreport[$l1Code][$rw['item']]['CM_B'] += $rw['CM_B'];
 					$arrSubreport[$l1Code][$rw['item']]['YTD_A'] += $rw['YTD_A'];
 					$arrSubreport[$l1Code][$rw['item']]['YTD_B'] += $rw['YTD_B'];
+					$arrSubreport[$l1Code][$rw['item']]['Q_A'] += $rw['Q_A'];
+					$arrSubreport[$l1Code][$rw['item']]['Q_B'] += $rw['Q_B'];
 					$arrSubreport[$l1Code][$rw['item']]['NM_A'] += $rw['NM_A'];
 					$arrSubreport[$l1Code][$rw['item']]['NM_B'] += $rw['NM_B'];
 
-					
 					$arrSort[$l1Code]['value'] += $rw['YTD_A'];
 					
 					if (!$template) $template = $rw;
@@ -2292,6 +2297,8 @@ class Reports{
 					$subtotal[$rw['Group']]['CM_B'] += $rw['CM_B'];
 					$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
 					$subtotal[$rw['Group']]['YTD_B'] += $rw['YTD_B'];
+					$subtotal[$rw['Group']]['Q_A'] += $rw['Q_A'];
+					$subtotal[$rw['Group']]['Q_B'] += $rw['Q_B'];
 					$subtotal[$rw['Group']]['NM_A'] += $rw['NM_A'];
 					$subtotal[$rw['Group']]['NM_B'] += $rw['NM_B'];
 					
@@ -2299,6 +2306,8 @@ class Reports{
 					$grandTotal['CM_B'] += $rw['CM_B'];
 					$grandTotal['YTD_A'] += $rw['YTD_A'];
 					$grandTotal['YTD_B'] += $rw['YTD_B'];
+					$grandTotal['Q_A'] += $rw['Q_A'];
+					$grandTotal['Q_B'] += $rw['Q_B'];
 					$grandTotal['NM_A'] += $rw['NM_A'];
 					$grandTotal['NM_B'] += $rw['NM_B'];				
 				}
@@ -2374,6 +2383,8 @@ class Reports{
 					SUM(CM_B) as CM_B,
 					SUM(YTD_A) as YTD_A,
 					SUM(YTD_B) as YTD_B,
+					SUM(Q_A) as Q_A,
+					SUM(Q_B) as Q_B,
 					SUM(NM_A) as NM_A,
 					SUM(NM_B) as NM_B					
 				FROM ($sql) U
@@ -2441,6 +2452,8 @@ class Reports{
 					SUM(CM_B) as CM_B,
 					SUM(YTD_A) as YTD_A,
 					SUM(YTD_B) as YTD_B,
+					SUM(Q_A) as Q_A,
+					SUM(Q_B) as Q_B,
 					SUM(NM_A) as NM_A,
 					SUM(NM_B) as NM_B					
 				FROM ($sql) U	
@@ -2448,7 +2461,7 @@ class Reports{
 				ORDER BY `Budget item`";
 		// echo '<pre>',$sql,'</pre>';
 		
-		$cm = date('n',$this->oBudget->date_start - 1);
+		$cm = $this->oBudget->cm;
 		
 		$rs = $this->oSQL->q($sql);
 		if (!$this->oSQL->n($rs)){
@@ -2469,6 +2482,9 @@ class Reports{
 					$rw['YTD_A'] = $rw['YTD_A']/($monthsYTD);
 					$rw['YTD_B'] = $rw['YTD_B']/($monthsYTD);
 				}
+				
+				$rw['Q_A'] = $rw['Q_A']/3;
+				$rw['Q_B'] = $rw['Q_B']/3;
 				
 				$rw['ROY_A'] = $rw['ROY_A']/(12-($cm-$this->oBudget->offset));
 				$rw['ROY_B'] = $rw['ROY_B']/(12-($cm-$this->oBudget->offset));
@@ -2508,6 +2524,8 @@ class Reports{
 		$sql = "SELECT cntTitle, CASE WHEN customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN cntTitle ELSE CONCAT('&#x1F4C2;',customer_group_title) END as 'Customer_name',
 					SUM(CM_A) as CM_A,
 					SUM(CM_B) as CM_B,
+					SUM(Q_A) as Q_A,
+					SUM(Q_B) as Q_B,
 					SUM(YTD_A) as YTD_A,
 					SUM(YTD_B) as YTD_B,
 					SUM(NM_A) as NM_A,
@@ -2620,6 +2638,8 @@ class Reports{
 						0 as CM_B,								
 						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,$nCurrent,$arrRates).")/{$denominator} as YTD_A ,
 						0 as YTD_B, 
+						SUM(".$this->oBudget->getYTDSQL(max($nCurrent-2,1+$this->oBudget->offset),$nCurrent,$arrRates).")/{$denominator} as Q_A ,
+						0 as Q_B, 
 						{$sqlNM} as NM_A , 
 						0 as NM_B,
 						SUM(".$this->oBudget->getYTDSQL($nCurrent+1,12+$this->oBudget->offset,$arrRates).")/{$denominator} as ROY_A ,
@@ -2630,7 +2650,9 @@ class Reports{
 		$res['next']=	"0 as CM_A, 
 						0 as CM_B,								
 						0 as YTD_A ,
-						0 as YTD_B, 
+						0 as YTD_B,
+						0 as Q_A,
+						0 as Q_B,
 						{$sqlNM} as NM_A , 
 						0 as NM_B,
 						SUM(".$this->oBudget->getYTDSQL($nCurrent+1,12+$this->oBudget->offset,$arrRates).")/{$denominator} as ROY_A,
@@ -2641,6 +2663,8 @@ class Reports{
 						SUM(`{$cm}`)/{$arrRates[$cm]}/{$denominator} as CM_B,								
 						0 as YTD_A,
 						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,$nCurrent,$arrRates).")/{$denominator} as YTD_B, 
+						0 as Q_A,
+						SUM(".$this->oBudget->getYTDSQL(max($nCurrent-2,1+$this->oBudget->offset),$nCurrent,$arrRates).")/{$denominator} as Q_B, 
 						0 as NM_A , 
 						{$sqlNM} as NM_B,
 						0 as ROY_A ,
@@ -2666,6 +2690,17 @@ class Reports{
 			<td class='budget-decimal'><?php self::render($data['CM_B'],0);?></td>
 			<td class='budget-decimal'><?php self::render($data['CM_A']-$data['CM_B'],0);?></td>
 			<td class='budget-decimal'><em><?php self::render_ratio($data['CM_A'],$data['CM_B']);?></em></td>
+			
+			<?php
+			if (!($this->oBudget->cm % 3)){
+			?>
+			<td class='budget-decimal budget-ytd'><?php self::render($data['Q_A'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['Q_B'],0);?></td>
+			<td class='budget-decimal'><?php self::render($data['Q_A']-$data['Q_B'],0);?></td>
+			<td class='budget-decimal'><em><?php self::render_ratio($data['Q_A'],$data['Q_B']);?></em></td>
+			<?php
+			}
+			?>
 			
 			<td class='budget-decimal budget-quarterly'><?php self::render($data['YTD_A'],0);?></td>
 			<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
@@ -2969,7 +3004,7 @@ class Reports{
 			case 'cm':
 			default:
 				$strHeader = $this->oBudget->getTableHeader('mr');
-				$arrUnion = Array('CM_A','CM_B','YTD_A','YTD_B','NM_A','NM_B');	
+				$arrUnion = Array('CM_A','CM_B','Q_A','Q_B','YTD_A','YTD_B','NM_A','NM_B');	
 		}
 		$sql = self::_unionMRQueries($sql,'','', $arrUnion);
 		
