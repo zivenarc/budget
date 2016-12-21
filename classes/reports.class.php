@@ -2256,58 +2256,28 @@ class Reports{
 		
 		?>
 		<tr><th colspan="<?php echo $this->colspan;?>">Other financials</th></tr>
-		<?php					
-		//------ Gross revenue -------
-		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = 'J00400')", $sql);
-		$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);	
-		$rs = $oSQL->q($sqlOps);
-		while ($rw = $oSQL->f($rs)){
-			$rw['Budget item'] = "Gross revenue";
-			$this->echoBudgetItemString($rw);
-		}
-		
+		<?php							
+		$arrOther[] = Array('title'=>'Gross revenue','sqlWhere'=>" AND (account = 'J00400')");
+				
 		if (!(isset($this->filter['customer']) || isset($this->filter['sales']) || isset($this->filter['bdv']))){
-		//------ Gross operating profit -------
-		
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE 'J%')", $sql);
-			$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
-			$rs = $oSQL->q($sqlOps);
-			while ($rw = $oSQL->f($rs)){
-				$rw['Budget item'] = "Gross operatng profit";
-				$this->echoBudgetItemString($rw);
-			}
-			
-			//------ Operating income -------
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
-			$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
-			$rs = $oSQL->q($sqlOps);
-			while ($rw = $oSQL->f($rs)){
-				$rw['Budget item'] = "Operating profit";
-				$this->echoBudgetItemString($rw);
-			}
-		
+			$arrOther[] = Array('title'=>'Gross operatng profit','sqlWhere'=>" AND (account LIKE 'J%')");
+			$arrOther[] = Array('title'=>'Net operatng profit','sqlWhere'=>" AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')");	
 		}
 		
 		if (!(isset($this->filter['customer']) || isset($this->filter['sales']) )){
-			//----- Sales costs ----------
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = '5999BD')", $sql);
-			$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
-			$rs = $oSQL->q($sqlOps);
-			while ($rw = $oSQL->f($rs)){
-				$rw['Budget item'] = "BD costs";
-				$this->echoBudgetItemString($rw);
-			}
+			$arrOther[] = Array('title'=>'BD costs','sqlWhere'=>" AND (account = '5999BD')");				
 		}
-		//------ JO freight -------
 		
-		// $sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('SZ0001','SZ0011'))", $sql);
-		// $sqlOps = str_replace($sqlGroup, 'GROUP BY account', $sqlOps);
-		// $rs = $oSQL->q($sqlOps);
-		// while ($rw = $oSQL->f($rs)){
-			// $rw['Budget item'] = "Job owner's freight revenue";
-			// $this->echoBudgetItemString($rw);
-		// }
+		for($i=0;$i<count($arrOther);$i++){
+			$sqlOps = str_replace($sqlWhere, $sqlWhere.$arrOther[$i]['sqlWhere'], $sql);	
+			if (!$rs = $oSQL->q($sqlOps)){
+				echo '<pre>',$sqlOps,'</pre>';
+			}
+			while ($rw = $oSQL->f($rs)){
+				$rw['Budget item'] = $arrOther[$i]['title'];
+				$this->echoBudgetItemString($rw,$arrOther[$i]['class']);
+			}
+		}		
 		
 		//------- KPIs -----------------
 		

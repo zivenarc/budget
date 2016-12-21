@@ -570,4 +570,14 @@ function getUITabs($arrTabs){
 	</div>
 	<?php
 }
+
+function rstrpos ($haystack, $needle, $offset=0){
+    $size = strlen ($haystack);
+    $pos = strpos (strrev($haystack), $needle, $size - $offset);
+    
+    if ($pos === false)
+        return false;
+    
+    return $size - $pos;
+}
 ?>
