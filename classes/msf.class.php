@@ -256,6 +256,7 @@ class MSF extends Document{
 								foreach($arrAccounts as $item_code=>$item_values){									
 									$master_row = $oMaster->add_master();
 									$master_row->profit = $record->pc;
+									$master_row->bdv = $this->profit;
 									$master_row->activity = $activity;									
 									$item = $Items->getById($item_code);									
 									$master_row->account = $item->getYACT($record->pc);									
@@ -280,6 +281,7 @@ class MSF extends Document{
 							foreach($arrAccounts as $item_code=>$item_values){									
 									$master_row = $oMaster->add_master();
 									$master_row->profit = $record->pc;									
+									$master_row->bdv = $this->profit;									
 									$oProfit = $ProfitCenters->getById($record->pc);
 									$master_row->activity = $oProfit->activity;									
 									$item = $Items->getById($item_code);									
