@@ -1132,7 +1132,7 @@ class Reports{
 		
 	private function _documentPnL($sqlWhere, $params = Array('field_data','field_title','title')){
 
-		$strFields = $this->_getMonthlyFields();
+		$strFields = $this->_getPeriodicFields();
 		
 		ob_start();
 		$sql = "SELECT {$params['field_title']} as 'Level1_title', {$params['field_data']} as 'level1_code', `Budget item`, `Group`, `item`,
@@ -1189,8 +1189,8 @@ class Reports{
 				break;
 		};		
 		
-		$strFields_this = $this->_getMonthlyFields();
-		$strFields_last = $this->_getMonthlyFields('last');
+		$strFields_this = $this->_getPeriodicFields();
+		$strFields_last = $this->_getPeriodicFields('last');
 		
 		if ($this->YACT){
 			$strAccountTitle = "title";
@@ -1245,8 +1245,8 @@ class Reports{
 		
 
 		
-		$strFields_this = $this->_getMonthlyFields();
-		$strFields_last = $this->_getMonthlyFields('last');
+		$strFields_this = $this->_getPeriodicFields();
+		$strFields_last = $this->_getPeriodicFields('last');
 		
 		if ($this->YACT){
 			$strAccountTitle = "title";
@@ -1712,7 +1712,7 @@ class Reports{
 				break;
 		}
 		
-		// $strFields = $this->_getMonthlyFields();
+		// $strFields = $this->_getPeriodicFields();
 		
 		$strFields = $this->_getMRFields();
 		
@@ -1800,7 +1800,7 @@ class Reports{
 				break;
 		}
 		
-		// $strFields = $this->_getMonthlyFields();
+		// $strFields = $this->_getPeriodicFields();
 		
 		$strFields = $this->_getMRFields();
 		
@@ -1851,7 +1851,7 @@ class Reports{
 	public function masterYactbyActivityEst($sqlWhere){
 		global $oSQL;
 		
-		$strFields = self::_getMonthlyFields($currency);
+		$strFields = self::_getPeriodicFields($currency);
 		
 		ob_start();
 			$sql = "SELECT prtGHQ as 'Level1_title', activity as 'level1_code', CONCAT(`account`,': ',`Title`) as `Budget item`, Yact_group as `Group`, account as `item`,
@@ -1876,6 +1876,8 @@ class Reports{
 	private function _firstLevelPeriodic($sql, $firstLevelTitle){	
 		
 		$tableID = $this->ID?$this->ID:"FLR_".md5($sql);
+		
+		$this->colspan = $this->oBudget->length + 10;
 		
 		if (!$rs = $this->oSQL->q($sql)){
 				echo "<div class='error'>SQL error:</div>";
@@ -1907,6 +1909,7 @@ class Reports{
 						<th><?php echo $this->oBudget->type=='Budget'?$this->oReference->id:'Budget';?> Apr-Mar</th>
 						<th>Diff</th>
 					<?php
+						$this->colspan += 4;
 					}					
 					if (strpos($this->oBudget->type,'FYE')!== false) {
 					?>
@@ -1919,6 +1922,7 @@ class Reports{
 					<th class='FYE_analysis'>Diff</th>
 					<th>%</th>
 					<?php
+						$this->colspan += 8;
 					}
 					?>
 				</tr>
@@ -2051,7 +2055,7 @@ class Reports{
 				
 		global $oSQL;
 		
-		$strFields = self::_getMonthlyFields($currency);
+		$strFields = self::_getPeriodicFields($currency);
 		
 		$sql = "SELECT CONCAT(`account`,': ',`Title`) as `Budget item`, `item`, yact_group as `Group`, yact_group_code as `Group_code`, 
 			{$strFields}
@@ -2131,8 +2135,8 @@ class Reports{
 	
 	private function no_firstLevelPeriodic($sqlWhere){
 				
-		$strFields_this = $this->_getMonthlyFields();
-		$strFields_last = $this->_getMonthlyFields('last');
+		$strFields_this = $this->_getPeriodicFields();
+		$strFields_last = $this->_getPeriodicFields('last');
 		
 		
 		if ($this->YACT){
@@ -2589,7 +2593,7 @@ class Reports{
 			
 	}
 	
-	private function _getMonthlyFields($type='this'){
+	private function _getPeriodicFields($type='this'){
 		// GLOBAL $budget_scenario;
 		// $oBudget = new Budget($budget_scenario);
 		switch ($type){
