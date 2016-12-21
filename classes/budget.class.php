@@ -306,6 +306,7 @@ class Budget{
 		GLOBAL $oSQL;
 		GLOBAL $arrUsrData;
 		GLOBAL $budget_scenario;
+		GLOBAL $bu_group;
 		
 		if ($acl){
 			$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
@@ -327,17 +328,23 @@ class Budget{
 		<div id='tabs' class='tabs'>
 			<ul>
 			<?php
-			if (!$register){
-				$sql = "SELECT DISTINCT pccGUID, pccTitle$strLocal as pccTitle FROM vw_profit $sqlWhere ORDER BY pccParentCode1C";
+			if (!$bu_group){
+				$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle as optText 
+						FROM vw_profit 
+						WHERE pccFlagFolder=1 
+						ORDER BY pccTitle";
 			} else {
-				$sql = "SELECT DISTINCT pccGUID, pccTitle$strLocal as pccTitle 
-						FROM `$register` 
-						JOIN vw_profit ON pccID=pc
-						 $sqlWhere
-						ORDER BY pccParentCode1C";
-				
+				if (!$register){
+					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText FROM vw_profit $sqlWhere ORDER BY pccParentCode1C";
+				} else {
+					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText 
+							FROM `$register` 
+							JOIN vw_profit ON pccID=pc
+							 $sqlWhere
+							ORDER BY pccParentCode1C";
+					
+				}
 			}
-			
 			// echo '<pre>',$sql,'</pre>';
 			$rs = $oSQL->q($sql);
 			
@@ -348,8 +355,8 @@ class Budget{
 			}
 			
 			while ($rw=$oSQL->f($rs)){
-				$arrGET['pccGUID'] = $rw['pccGUID'];				
-				echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>",$rw['pccTitle'],"</a></li>\r\n";
+				$arrGET['pccGUID'] = $rw['optValue'];				
+				echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>",$rw['optText'],"</a></li>\r\n";
 				
 			}
 			$arrGET['pccGUID'] = 'all';	
@@ -687,7 +694,7 @@ class Budget{
 		while ($rw = $this->oSQL->f($rs)){
 			$arrSelect[$rw['pccCode1C']] = $rw['pccTitle'];
 		}
-		$arrSelect[] = "---None---";
+		$arrSelect[] = "--- All ---";
 		?>
 		<select name='bu_group' id='bu_group'>
 			<?php 

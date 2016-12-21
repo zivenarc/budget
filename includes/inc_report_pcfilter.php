@@ -29,7 +29,12 @@ if ($_GET['pccGUID']=='all'){
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
 		$arrPC[] = $rw['pccID'];
-	}			
+	}
+	$sql = "SELECT pccID FROM vw_profit WHERE pccParentCode1C IN (SELECT pccCode1C FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrPC[] = $rw['pccID'];
+	}	
 }
 	// $sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
 

@@ -16,6 +16,9 @@ require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
+
+include ('includes/inc_report_pcfilter.php');
+
 $arrJS[]='js/rep_pnl.js';
 // $arrJS[]='js/input_form.js';	
 
@@ -33,28 +36,42 @@ $rs = $oSQL->q($sql);
 $rw = $oSQL->f($rs);
 $arrUsrData["pagTitle$strLocal"] = 'Sales by '.($rw['usrTitle']?$rw['usrTitle']:'<Unknown>');
 	
-include ('includes/inc-frame_top.php');
-echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
-echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
-include ('includes/inc_report_selectors.php');
+	
+if(!isset($_GET['pccGUID'])){
+	include ('includes/inc-frame_top.php');
+	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
+	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
+	include ('includes/inc_report_selectors.php');
+	
+	Budget::getProfitTabs('reg_sales', false, Array('customer'=>$arrCounterparty['codes']));
+	
+	include ('includes/inc_subordinates.php');
 
-$sqlWhere .= "WHERE sales = ".$oSQL->e($ownerID);
-
-
-$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>Array('sales'=>$ownerID)));
-
-if (strpos($oBudget->type,'FYE')!==false){
-	$oReport->monthlyReport($type);
+	include ('includes/inc-frame_bottom.php');
 } else {
-	$oReport->periodicPnL($sqlWhere,$type);
+	
+	include ('includes/inc_report_buttons.php');
+	
+	$sqlWhere = "WHERE sales = ".$oSQL->e($ownerID);
+	
+	if ($_GET['pccGUID']=='all'){
+		
+	} else {
+		$sqlWhere .= " AND pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
+	}
+	
+	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>Array('sales'=>$ownerID)));
 
-	?>
-	<h2>KPI</h2>
-	<?php
-	$oReport->salesByCustomer(' and sales='.$oSQL->e($ownerID));
+	if (strpos($oBudget->type,'FYE')!==false){
+		$oReport->monthlyReport($type);
+	} else {
+		$oReport->periodicPnL($sqlWhere,$type);
+
+		?>
+		<h2>KPI</h2>
+		<?php
+		$oReport->salesByCustomer(' and sales='.$oSQL->e($ownerID));
+	}
+	
 }
-
-include ('includes/inc_subordinates.php');
-
-include ('includes/inc-frame_bottom.php');
 ?>
