@@ -67,7 +67,7 @@ if(!isset($_GET['pccGUID'])){
 	if (strpos($oBudget->type,'FYE')!==false){
 		$oReport->monthlyReport($type);
 	} else {
-		$oReport->periodicPnL($sqlWhere,$type);
+		$oReport->periodicPnL($type);
 
 		?>
 		<h2>KPI</h2>

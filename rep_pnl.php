@@ -76,7 +76,7 @@ if(!isset($_GET['pccGUID'])){
 	// $sqlWhere .= " AND scenario='$budget_scenario'";
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator,'reference'=>$reference));
 	
-	$oReport->periodicPnL($sqlWhere,$type);
+	$oReport->periodicPnL($type);
 }
 
 

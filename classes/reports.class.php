@@ -1160,7 +1160,9 @@ class Reports{
 		
 	}
 	
-	public function periodicPnL($sqlWhere, $type='ghq'){ //$params = Array('field_data','field_title','title','yact'=>false)){
+	public function periodicPnL($type='ghq'){ //$params = Array('field_data','field_title','title','yact'=>false)){
+		
+		$sqlWhere = $this->sqlWhere;
 		
 		switch ($type){
 			case 'activity':		
@@ -2337,7 +2339,7 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		if (!(isset($this->filter['customer']) || isset($this->filter['sales']))){
+		if (!(isset($this->filter['customer']) || isset($this->filter['sales']) || isset($this->filter['bdv']))){
 		//------ Gross operating profit -------
 		
 			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE 'J%')", $sql);
@@ -2359,15 +2361,16 @@ class Reports{
 		
 		}
 		
-		//----- Sales costs ----------
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = '5999BD')", $sql);
-		$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
-		$rs = $oSQL->q($sqlOps);
-		while ($rw = $oSQL->f($rs)){
-			$rw['Budget item'] = "BD costs";
-			$this->echoBudgetItemString($rw);
+		if (!(isset($this->filter['customer']) || isset($this->filter['sales']) )){
+			//----- Sales costs ----------
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = '5999BD')", $sql);
+			$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
+			$rs = $oSQL->q($sqlOps);
+			while ($rw = $oSQL->f($rs)){
+				$rw['Budget item'] = "BD costs";
+				$this->echoBudgetItemString($rw);
+			}
 		}
-		
 		//------ JO freight -------
 		
 		// $sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('SZ0001','SZ0011'))", $sql);
