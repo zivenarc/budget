@@ -83,8 +83,7 @@ if(!isset($_GET['pccGUID'])){
 	$sql = "SELECT vw_journal.*, stbl_user.*, edit_date as timestamp 
 	FROM vw_journal 				
 	LEFT JOIN stbl_user ON usrID=vw_journal.edit_by				
-	WHERE vw_journal.scenario='{$budget_scenario}' 
-		AND vw_journal.guid IN (SELECT source FROM reg_master 
+	WHERE vw_journal.guid IN (SELECT source FROM reg_master 
 									WHERE
 										scenario = '{$budget_scenario}'
 										AND customer IN (".implode(',',$arrCounterparty['codes']).")
@@ -93,6 +92,7 @@ if(!isset($_GET['pccGUID'])){
 	ORDER BY vw_journal.edit_date ASC";	
 
 	$rs =$oSQL->q($sql);
+	$data = Array();
 	while ($rw=$oSQL->f($rs)){
 		$data[] = $rw;
 	}
