@@ -2497,8 +2497,10 @@ class Reports{
 				$rw['Q_A'] = $rw['Q_A']/3;
 				$rw['Q_B'] = $rw['Q_B']/3;
 				
-				$rw['ROY_A'] = $rw['ROY_A']/(12-($cm-$this->oBudget->offset));
-				$rw['ROY_B'] = $rw['ROY_B']/(12-($cm-$this->oBudget->offset));
+				if($cm-$this->oBudget->offset){
+					$rw['ROY_A'] = $rw['ROY_A']/(12-($cm-$this->oBudget->offset));
+					$rw['ROY_B'] = $rw['ROY_B']/(12-($cm-$this->oBudget->offset));
+				}
 				
 				$this->echoBudgetItemString($rw);
 			}
