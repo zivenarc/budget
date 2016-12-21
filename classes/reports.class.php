@@ -2347,6 +2347,15 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
+		//----- Sales costs ----------
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = '5999BD')", $sql);
+		$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
+		$rs = $oSQL->q($sqlOps);
+		while ($rw = $oSQL->f($rs)){
+			$rw['Budget item'] = "BD costs";
+			$this->echoBudgetItemString($rw);
+		}
+		
 		//------ JO freight -------
 		
 		// $sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('SZ0001','SZ0011'))", $sql);
