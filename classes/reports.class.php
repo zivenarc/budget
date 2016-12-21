@@ -2168,6 +2168,7 @@ class Reports{
 				FROM `vw_master` 			
 				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oReference->id}' AND `{$strAccountCode}` IS NOT NULL 
 				GROUP BY `{$strAccountCode}`) Q
+			##GROUPING BY ITEM
 			GROUP BY item, `Budget item`
 			ORDER BY `Group` ASC			
 			";
@@ -2269,9 +2270,14 @@ class Reports{
 		}
 		
 		for($i=0;$i<count($arrOther);$i++){
-			$sqlOps = str_replace($sqlWhere, $sqlWhere.$arrOther[$i]['sqlWhere'], $sql);	
+			$sqlOps = str_replace($sqlWhere, $sqlWhere.$arrOther[$i]['sqlWhere'], $sql);
+			$nPos = strpos($sqlOps,"##GROUPING BY ITEM");
+			if ($nPos!==false){
+				$sqlOps = substr($sqlOps,0,$nPos);
+			}
+			
 			if (!$rs = $oSQL->q($sqlOps)){
-				echo '<pre>',$sqlOps,'</pre>';
+				echo 'Error: <pre>',$sqlOps,'</pre>';
 			}
 			while ($rw = $oSQL->f($rs)){
 				$rw['Budget item'] = $arrOther[$i]['title'];
