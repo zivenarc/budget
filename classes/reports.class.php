@@ -1671,6 +1671,11 @@ class Reports{
 		
 		// GLOBAL $budget_scenario;
 		// $oBudget = new Budget($budget_scenario);
+		if($this->oBudget->cm % 3){
+			$this->colspan = 14;
+		} else {
+			$this->colspan = 18;
+		}
 		
 		$sqlWhere = $this->sqlWhere;
 		
@@ -2237,102 +2242,25 @@ class Reports{
 			$data['Budget item']='Profit before tax';
 			$this->echoBudgetItemString($data,'budget-total');
 			
-		//------ Operating income -------
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')", $sql);
-		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
-		$rs = $this->oSQL->q($sqlOps);
-		while ($rw = $this->oSQL->f($rs)){
-			$rw['Budget item'] = "Operating income";
-			$this->echoBudgetItemString($rw,'budget-subtotal');
-		}
-			
+		$this->_getOtherFinancials($sql,$sqlGroup,$sqlOrder);
+		
 	}
 	
-	private function noFirstLevelReportMR($currency=643){
-				
-		global $oSQL;		
-		$sqlWhere = $this->sqlWhere;
+	private function _getOtherFinancials($sql,$sqlGroup,$sqlOrder){
 		
-		$strFields = self::_getMRFields($currency);
+		$sqlWhere = $this->sqlWhere;
+		$oSQL = $this->oSQL;
+		
 		$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
 		
-		$sqlGroup = "`Budget item`, `item`, `Group`, `Group_code`";
-		$sqlOrder = "`Group`, `itmOrder` ASC";
-		
-		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
-					{$strFields['actual']}
-			FROM `vw_master`			
-			{$sqlWhere}  AND scenario='{$strFields['from_a']}'
-			GROUP BY {$sqlGroup}	
-			UNION ALL
-				SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
-				{$strFields['budget']}
-			FROM `vw_master`				
-			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND `item` IS NOT NULL
-			GROUP BY {$sqlGroup}			
-			ORDER BY {$sqlOrder}";
-			
-		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
-		
-		$sql = self::_unionMRQueries($sql, $sqlGroup);
-			
-			$group = '';
-			$subtotal = Array();
-			$grandTotal = Array();
-			$rs = $oSQL->q($sql);
-			while ($rw=$oSQL->f($rs)){				
-				if ($rw['Group_code']==94){
-					$tr_class = "budget-total";
-				} else {
-					$tr_class = 'budget-item';
-				}
-				
-				if($group && $group!=$rw['Group']){
-					$data = $subtotal[$group];
-					$data['Budget item']=$group;
-					$this->echoBudgetItemString($data,'budget-subtotal');
-				}
-				
-				if ($rw['Budget item']){
-					$subtotal[$rw['Group']]['CM_A'] += $rw['CM_A'];
-					$subtotal[$rw['Group']]['CM_B'] += $rw['CM_B'];
-					$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
-					$subtotal[$rw['Group']]['YTD_B'] += $rw['YTD_B'];
-					$subtotal[$rw['Group']]['Q_A'] += $rw['Q_A'];
-					$subtotal[$rw['Group']]['Q_B'] += $rw['Q_B'];
-					$subtotal[$rw['Group']]['NM_A'] += $rw['NM_A'];
-					$subtotal[$rw['Group']]['NM_B'] += $rw['NM_B'];
-					
-					$grandTotal['CM_A'] += $rw['CM_A'];
-					$grandTotal['CM_B'] += $rw['CM_B'];
-					$grandTotal['YTD_A'] += $rw['YTD_A'];
-					$grandTotal['YTD_B'] += $rw['YTD_B'];
-					$grandTotal['Q_A'] += $rw['Q_A'];
-					$grandTotal['Q_B'] += $rw['Q_B'];
-					$grandTotal['NM_A'] += $rw['NM_A'];
-					$grandTotal['NM_B'] += $rw['NM_B'];				
-				}
-				
-				$this->echoBudgetItemString($rw,$tr_class);				
-				$group = $rw['Group'];
-			}
-			//last group subtotal
-			$data = $subtotal[$group];
-			$data['Budget item']=$group;
-			$this->echoBudgetItemString($data,'budget-subtotal');
-			//Grand total
-			$data = $grandTotal;
-			$data['Budget item']='Profit before tax';
-			$this->echoBudgetItemString($data,'budget-total');
-		
 		?>
-			<tr><th colspan="14">Other financials</th></tr>
+		<tr><th colspan="<?php echo $this->colspan;?>">Other financials</th></tr>
 		<?php					
 		//------ Gross revenue -------
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = 'J00400')", $sql);
-		$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);
+		$sqlOps = str_replace(array("GROUP BY $sqlGroup",$sqlGroup.",","ORDER BY $sqlOrder"), '', $sqlOps);	
 		$rs = $oSQL->q($sqlOps);
 		while ($rw = $oSQL->f($rs)){
 			$rw['Budget item'] = "Gross revenue";
@@ -2420,7 +2348,7 @@ class Reports{
 		$rs = $oSQL->q($sql);
 		if ($oSQL->n($rs)){
 			?>
-			<tr><th colspan="14">Operational KPIs</th></tr>
+			<tr><th colspan="<?php echo $this->colspan;?>">Operational KPIs</th></tr>
 			<?php		
 			while ($rw = $oSQL->f($rs)){			
 				$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
@@ -2432,8 +2360,91 @@ class Reports{
 				$this->echoBudgetItemString($rw);
 			}
 		}
+		
+		
 		//------- Headcount -----------------
-		$this->_getMRHeadcount($sqlWhere);
+		if (!(isset($this->filter['customer']) || isset($this->filter['sales']) || isset($this->filter['bdv']))){
+			$this->_getMRHeadcount($sqlWhere);
+		}
+	}
+	
+	private function noFirstLevelReportMR($currency=643){
+				
+		global $oSQL;		
+		$sqlWhere = $this->sqlWhere;
+		
+		$strFields = self::_getMRFields($currency);
+				
+		$sqlGroup = "`Budget item`, `item`, `Group`, `Group_code`";
+		$sqlOrder = "`Group`, `itmOrder` ASC";
+		
+		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
+					{$strFields['actual']}
+			FROM `vw_master`			
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}'
+			GROUP BY {$sqlGroup}	
+			UNION ALL
+				SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
+				{$strFields['budget']}
+			FROM `vw_master`				
+			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND `item` IS NOT NULL
+			GROUP BY {$sqlGroup}			
+			ORDER BY {$sqlOrder}";
+			
+		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
+		
+		$sql = self::_unionMRQueries($sql, $sqlGroup);
+			
+			$group = '';
+			$subtotal = Array();
+			$grandTotal = Array();
+			$rs = $oSQL->q($sql);
+			while ($rw=$oSQL->f($rs)){				
+				if ($rw['Group_code']==94){
+					$tr_class = "budget-total";
+				} else {
+					$tr_class = 'budget-item';
+				}
+				
+				if($group && $group!=$rw['Group']){
+					$data = $subtotal[$group];
+					$data['Budget item']=$group;
+					$this->echoBudgetItemString($data,'budget-subtotal');
+				}
+				
+				if ($rw['Budget item']){
+					$subtotal[$rw['Group']]['CM_A'] += $rw['CM_A'];
+					$subtotal[$rw['Group']]['CM_B'] += $rw['CM_B'];
+					$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
+					$subtotal[$rw['Group']]['YTD_B'] += $rw['YTD_B'];
+					$subtotal[$rw['Group']]['Q_A'] += $rw['Q_A'];
+					$subtotal[$rw['Group']]['Q_B'] += $rw['Q_B'];
+					$subtotal[$rw['Group']]['NM_A'] += $rw['NM_A'];
+					$subtotal[$rw['Group']]['NM_B'] += $rw['NM_B'];
+					
+					$grandTotal['CM_A'] += $rw['CM_A'];
+					$grandTotal['CM_B'] += $rw['CM_B'];
+					$grandTotal['YTD_A'] += $rw['YTD_A'];
+					$grandTotal['YTD_B'] += $rw['YTD_B'];
+					$grandTotal['Q_A'] += $rw['Q_A'];
+					$grandTotal['Q_B'] += $rw['Q_B'];
+					$grandTotal['NM_A'] += $rw['NM_A'];
+					$grandTotal['NM_B'] += $rw['NM_B'];				
+				}
+				
+				$this->echoBudgetItemString($rw,$tr_class);				
+				$group = $rw['Group'];
+			}
+			//last group subtotal
+			$data = $subtotal[$group];
+			$data['Budget item']=$group;
+			$this->echoBudgetItemString($data,'budget-subtotal');
+			//Grand total
+			$data = $grandTotal;
+			$data['Budget item']='Profit before tax';
+			$this->echoBudgetItemString($data,'budget-total');
+		
+		$this->_getOtherFinancials($sql,$sqlGroup,$sqlOrder);
 		
 	}
 	
