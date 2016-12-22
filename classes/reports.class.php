@@ -1136,7 +1136,7 @@ class Reports{
 		
 		ob_start();
 		$sql = "SELECT {$params['field_title']} as 'Level1_title', {$params['field_data']} as 'level1_code', `Budget item`, `Group`, `item`,
-					{$strFields}
+					{$strFields['actual']}
 			FROM `vw_master` 			
 			{$sqlWhere}
 			GROUP BY `vw_master`.`{$params['field_data']}`, `vw_master`.item
@@ -1164,6 +1164,18 @@ class Reports{
 		
 		$sqlWhere = $this->sqlWhere;
 		
+		$this->columns = Array('Total','Total_AM','estimate','estimate_AM','YTD_A','YTD','ROY_A','ROY_B');
+		$this->sqlSelect = "";
+		for ($m = 1;$m<=15;$m++){
+			$this->columns[] = $this->oBudget->arrPeriod[$m];
+		}
+		for ($q = 1;$q<=5;$q++){
+			$this->columns[] = 'Q'.$q;
+		}
+		foreach($this->columns as $i=>$field){
+			$this->sqlSelect .= ($this->sqlSelect?",\r\n":"")."SUM(`{$field}`) as '{$field}'";
+		}
+		
 		switch ($type){
 			case 'activity':		
 				$params = Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity');	
@@ -1189,8 +1201,7 @@ class Reports{
 				break;
 		};		
 		
-		$strFields_this = $this->_getPeriodicFields();
-		$strFields_last = $this->_getPeriodicFields('last');
+		$strFields = $this->_getPeriodicFields();
 		
 		if ($this->YACT){
 			$strAccountTitle = "title";
@@ -1205,20 +1216,17 @@ class Reports{
 		}
 		
 		ob_start();
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15).",\r\n".
-				$this->oBudget->getQuarterlySumSQL().
-				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,SUM(estimate_AM) as estimate_AM, 
-				SUM(YTD_A) as YTD_A, SUM(YTD) as YTD, SUM(ROY_A) as ROY_A, SUM(ROY) as ROY,
+		$sql = "SELECT {$this->sqlSelect},
 				Level1_title,level1_code,`{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item'
 			FROM 
 				(SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
-						{$strFields_this}
+						{$strFields['actual']}
 				FROM `vw_master` 			
 				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oBudget->id}' AND {$strGPFilter} ## Gross margin only
 				GROUP BY Level1_code, Level1_title, `{$strAccountCode}` , `{$strAccountTitle}`
 				UNION ALL
 				SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
-						{$strFields_last}
+						{$strFields['budget']}
 				FROM `vw_master` 			
 				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oReference->id}' AND {$strGPFilter}
 				GROUP BY Level1_code, Level1_title,  `{$strAccountCode}` , `{$strAccountTitle}`) Q
@@ -1242,8 +1250,7 @@ class Reports{
 	
 	public function periodicGraph($sqlWhere){
 					
-		$strFields_this = $this->_getPeriodicFields();
-		$strFields_last = $this->_getPeriodicFields('last');
+		$strFields = $this->_getPeriodicFields();		
 		
 		if ($this->YACT){
 			$strAccountTitle = "title";
@@ -1676,6 +1683,12 @@ class Reports{
 		
 		$sqlWhere = $this->sqlWhere;
 		
+		$this->columns = Array('CM_A','CM_B','YTD_A','YTD_B','Q_A','Q_B','NM_A','NM_B');
+		$this->sqlSelect = "";
+		foreach($this->columns as $i=>$field){
+			$this->sqlSelect .= ($this->sqlSelect?",\r\n":"")."SUM(`{$field}`) as '{$field}'";
+		}
+		
 		switch($type){
 			case 'activity':
 				$sqlMeasure = "Activity_title as 'Level1_title', activity as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";
@@ -1732,14 +1745,7 @@ class Reports{
 			ORDER BY `Group`, `itmOrder` ASC";
 		
 		$sql = "SELECT `Level1_title`, `level1_code`, `Budget item`, `Group`, `item`,`itmOrder`,
-					SUM(CM_A) as CM_A,
-					SUM(CM_B) as CM_B,
-					SUM(YTD_A) as YTD_A,
-					SUM(YTD_B) as YTD_B,
-					SUM(Q_A) as Q_A,
-					SUM(Q_B) as Q_B,
-					SUM(NM_A) as NM_A,
-					SUM(NM_B) as NM_B
+					{$this->sqlSelect}
 				FROM ({$sql}) U {$sqlGroup} 
 				ORDER BY `level1_code`, `Group`, `itmOrder` ASC";
 			
@@ -1849,11 +1855,11 @@ class Reports{
 	public function masterYactbyActivityEst($sqlWhere){
 		global $oSQL;
 		
-		$strFields = self::_getPeriodicFields($currency);
+		$strFields = self::_getPeriodicFields();
 		
 		ob_start();
 			$sql = "SELECT prtGHQ as 'Level1_title', activity as 'level1_code', CONCAT(`account`,': ',`Title`) as `Budget item`, Yact_group as `Group`, account as `item`,
-					{$strFields}				
+					{$strFields['actual']}				
 			FROM `vw_master` 
 			{$sqlWhere} 
 			AND yact_group_code IN ('450000','400000') ## Gross margin only
@@ -1976,7 +1982,7 @@ class Reports{
 					};
 					
 					$arrSubreport[$l1Code][$rw['item']]['ROY_A']+=$rw['ROY_A'];
-					$arrSubreport[$l1Code][$rw['item']]['ROY']+=$rw['ROY'];
+					$arrSubreport[$l1Code][$rw['item']]['ROY_B']+=$rw['ROY_B'];
 					$arrSubreport[$l1Code][$rw['item']]['Total']+=$rw['Total'];
 					$arrSubreport[$l1Code][$rw['item']]['Total_AM']+=$rw['Total_AM'];
 					$arrSubreport[$l1Code][$rw['item']]['estimate']+=$rw['estimate'];
@@ -2024,10 +2030,10 @@ class Reports{
 				
 		global $oSQL;
 		
-		$strFields = self::_getPeriodicFields($currency);
+		$strFields = self::_getPeriodicFields();
 		
 		$sql = "SELECT CONCAT(`account`,': ',`Title`) as `Budget item`, `item`, yact_group as `Group`, yact_group_code as `Group_code`, 
-			{$strFields}
+			{$strFields['actual']}
 			FROM `vw_master`
 			##LEFT JOIN tbl_scenario ON scnID=scenario
 			$sqlWhere 
@@ -2069,14 +2075,14 @@ class Reports{
 				$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
 				$subtotal[$rw['Group']]['YTD'] += $rw['YTD'];
 				$subtotal[$rw['Group']]['ROY_A'] += $rw['ROY_A'];
-				$subtotal[$rw['Group']]['ROY'] += $rw['ROY'];
+				$subtotal[$rw['Group']]['ROY_B'] += $rw['ROY_B'];
 				
 				$grandTotal['Total'] += $local_subtotal;
 				$grandTotal['estimate'] += $rw['estimate'];
 				$grandTotal['YTD_A'] += $rw['YTD_A'];
 				$grandTotal['YTD'] += $rw['YTD'];
 				$grandTotal['ROY_A'] += $rw['ROY_A'];
-				$grandTotal['ROY'] += $rw['ROY'];
+				$grandTotal['ROY_B'] += $rw['ROY_B'];
 				
 				$this->echoBudgetItemString($rw,$tr_class);				
 				$group = $rw['Group'];
@@ -2104,9 +2110,7 @@ class Reports{
 	
 	private function _nofirstLevelPeriodic($sqlWhere){
 				
-		$strFields_this = $this->_getPeriodicFields();
-		$strFields_last = $this->_getPeriodicFields('last');
-		
+		$strFields = $this->_getPeriodicFields();	
 		
 		if ($this->YACT){
 			$strAccountTitle = "title";
@@ -2123,21 +2127,18 @@ class Reports{
 			$strGPFilter = "Group_code=".self::GP_CODE; 
 			$sqlGroup = "GROUP BY item, `Budget item`";
 		}
-		
-		$sql = "SELECT ".$this->oBudget->getMonthlySumSQL(1,15).",\r\n".
-				$this->oBudget->getQuarterlySumSQL().
-				",SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(estimate) as estimate,SUM(estimate_AM) as estimate_AM,
-				SUM(YTD_A) as YTD_A, SUM(YTD) as YTD, SUM(ROY_A) as ROY_A, SUM(ROY) as ROY,
+			
+		$sql = "SELECT {$this->sqlSelect},
 				`Budget item`,`Group`, `item`, `Group_code`
 			FROM 
 				(SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
-						{$strFields_this}
+						{$strFields['actual']}
 				FROM `vw_master` 			
 				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oBudget->id}' AND `{$strAccountCode}` IS NOT NULL
 				GROUP BY `{$strAccountCode}`
 				UNION ALL
 				SELECT `{$strAccountTitle}` as 'Budget item',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'item', {$strGroupCode} as Group_code,
-						{$strFields_last}
+						{$strFields['budget']}
 				FROM `vw_master` 			
 				{$sqlWhere} AND company='{$this->company}' AND scenario='{$this->oReference->id}' AND `{$strAccountCode}` IS NOT NULL 
 				GROUP BY `{$strAccountCode}`) Q
@@ -2170,38 +2171,12 @@ class Reports{
 				$local_subtotal = 0;
 
 				if($rw['item']){
-											
-					$subtotal[$rw['Group']]['Total'] += $rw['Total'];
-					$subtotal[$rw['Group']]['Total_AM'] += $rw['Total_AM'];
-					$subtotal[$rw['Group']]['estimate'] += $rw['estimate'];
-					$subtotal[$rw['Group']]['estimate_AM'] += $rw['estimate_AM'];
-					$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
-					$subtotal[$rw['Group']]['YTD'] += $rw['YTD'];
-					$subtotal[$rw['Group']]['ROY_A'] += $rw['ROY_A'];
-					$subtotal[$rw['Group']]['ROY'] += $rw['ROY'];
-					
-					for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-					// $month = $this->oBudget->arrPeriod[$m];
-						$month = $this->oBudget->arrPeriod[$m];
-						$subtotal[$rw['Group']][$month]+=$rw[$month];														
-						$local_subtotal += $rw[$month];
-						$grandTotal[$month] += $rw[$month];					
+						
+					foreach($this->columns as $i=>$field){
+						$subtotal[$rw['Group']][$field] += $rw[$field];
+						$grandTotal[$field] += $rw[$field];
 					}
-					
-					$grandTotal['Total'] += $rw['Total'];
-					$grandTotal['Total_AM'] += $rw['Total_AM'];
-					$grandTotal['estimate'] += $rw['estimate'];
-					$grandTotal['estimate_AM'] += $rw['estimate_AM'];
-					$grandTotal['YTD_A'] += $rw['YTD_A'];
-					$grandTotal['YTD'] += $rw['YTD'];
-					$grandTotal['ROY_A'] += $rw['ROY_A'];
-					$grandTotal['ROY'] += $rw['ROY'];
-					
-					for ($q = 1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){
-						$subtotal[$rw['Group']]['Q'.$q]+=$rw['Q'.$q];	
-						$grandTotal['Q'.$q] += $rw['Q'.$q];
-					}
-					
+									
 				}
 								
 				$this->echoBudgetItemString($rw,$tr_class);				
@@ -2225,8 +2200,6 @@ class Reports{
 		
 		$sqlWhere = $this->sqlWhere;
 		$oSQL = $this->oSQL;
-		
-		$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
 		
 		?>
 		<tr><th colspan="<?php echo $this->colspan;?>">Other financials</th></tr>
@@ -2259,6 +2232,17 @@ class Reports{
 		}		
 		
 		//------- KPIs -----------------
+				
+		switch ($this->structure){
+			case 'monthly':
+			case 'forecast':
+				$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
+				break;
+			case 'periodic':
+			default:
+				$strFieldsKPI = self::_getPeriodicFields(Array('currency'=>643,'denominator'=>1));
+				break;
+		}
 		
 		$sql = "SELECT activity, unit, 
 					{$strFieldsKPI['actual']}
@@ -2280,14 +2264,7 @@ class Reports{
 			ORDER BY activity, unit";
 			
 		$sql = "SELECT prtTitle, activity, unit, 
-					SUM(CM_A) as CM_A,
-					SUM(CM_B) as CM_B,
-					SUM(YTD_A) as YTD_A,
-					SUM(YTD_B) as YTD_B,
-					SUM(Q_A) as Q_A,
-					SUM(Q_B) as Q_B,
-					SUM(NM_A) as NM_A,
-					SUM(NM_B) as NM_B					
+					{$this->sqlSelect}					
 				FROM ($sql) U
 				LEFT JOIN vw_product_type ON activity=prtID
 				WHERE unit<>''
@@ -2362,23 +2339,10 @@ class Reports{
 				}
 				
 				if ($rw['Budget item']){
-					$subtotal[$rw['Group']]['CM_A'] += $rw['CM_A'];
-					$subtotal[$rw['Group']]['CM_B'] += $rw['CM_B'];
-					$subtotal[$rw['Group']]['YTD_A'] += $rw['YTD_A'];
-					$subtotal[$rw['Group']]['YTD_B'] += $rw['YTD_B'];
-					$subtotal[$rw['Group']]['Q_A'] += $rw['Q_A'];
-					$subtotal[$rw['Group']]['Q_B'] += $rw['Q_B'];
-					$subtotal[$rw['Group']]['NM_A'] += $rw['NM_A'];
-					$subtotal[$rw['Group']]['NM_B'] += $rw['NM_B'];
-					
-					$grandTotal['CM_A'] += $rw['CM_A'];
-					$grandTotal['CM_B'] += $rw['CM_B'];
-					$grandTotal['YTD_A'] += $rw['YTD_A'];
-					$grandTotal['YTD_B'] += $rw['YTD_B'];
-					$grandTotal['Q_A'] += $rw['Q_A'];
-					$grandTotal['Q_B'] += $rw['Q_B'];
-					$grandTotal['NM_A'] += $rw['NM_A'];
-					$grandTotal['NM_B'] += $rw['NM_B'];				
+					foreach($this->columns as $i=>$field){
+						$subtotal[$rw['Group']][$field] += $rw[$field];
+						$grandTotal[$field] += $rw[$field];
+					}		
 				}
 				
 				$this->echoBudgetItemString($rw,$tr_class);				
@@ -2399,7 +2363,16 @@ class Reports{
 	
 	private function _getMRHeadcount($sqlWhere, $type='collars'){
 		
-		$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
+		switch ($this->structure){
+			case 'monthly':
+			case 'forecast':
+				$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
+				break;
+			case 'periodic':
+			default:
+				$strFieldsKPI = self::_getPeriodicFields(Array('currency'=>643,'denominator'=>1));
+				break;
+		}
 		
 		switch($type){
 			case 'funRHQ':
@@ -2432,14 +2405,7 @@ class Reports{
 			";
 			
 		$sql = "SELECT  `Budget item`, 
-					SUM(CM_A) as CM_A,
-					SUM(CM_B) as CM_B,
-					SUM(YTD_A) as YTD_A,
-					SUM(YTD_B) as YTD_B,
-					SUM(Q_A) as Q_A,
-					SUM(Q_B) as Q_B,
-					SUM(NM_A) as NM_A,
-					SUM(NM_B) as NM_B					
+					{$this->sqlSelect}					
 				FROM ($sql) U	
 				GROUP BY `Budget item`
 				ORDER BY `Budget item`";
@@ -2562,44 +2528,53 @@ class Reports{
 			
 	}
 	
-	private function _getPeriodicFields($type='this'){
-		// GLOBAL $budget_scenario;
-		// $oBudget = new Budget($budget_scenario);
-		switch ($type){
-		case 'this':
-			$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
-			// echo '<pre>';print_r($arrRates);echo '</pre>';
-			$res=	$this->oBudget->getMonthlySumSQL(1,15,$arrRates, $this->Denominator).", \r\n".
-					$this->oBudget->getQuarterlySumSQL($arrRates, $this->Denominator).", \r\n 
-					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates, $this->Denominator).") as Total,\r\n
-					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $this->Denominator).") as Total_JD ,\r\n
-					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $this->Denominator).") as Total_AM ,\r\n
+	private function _getPeriodicFields($params=Array()){
+		
+		$currency = $params['currency']?$params['currency']:$this->Currency;
+		$denominator = $params['denominator']?$params['denominator']:$this->Denominator;
+		
+		$arrRates = $this->oBudget->getMonthlyRates($currency);
+		
+		$cm = $this->oBudget->cm;
+		$nm = $this->oBudget->nm;
+		
+		$arrRates = $this->oBudget->getMonthlyRates($currency);
+		
+		$res['actual']=	$this->oBudget->getMonthlySumSQL(1,15,$arrRates, $denominator).", \r\n".
+					$this->oBudget->getQuarterlySumSQL($arrRates, $denominator).", \r\n 
+					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates, $denominator).") as Total,\r\n
+					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $denominator).") as Total_JD ,\r\n
+					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $denominator).") as Total_AM ,\r\n
 					0 as estimate, 
 					0 as estimate_JD, 
 					0 as estimate_AM, 
-					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, (integer)date('n',$this->oBudget->date_start)-1,$arrRates, $this->Denominator).") as YTD_A, 
+					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, $cm ,$arrRates, $denominator).") as YTD_A, 
 					0 as YTD, 
-					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12+$this->oBudget->offset,$arrRates, $this->Denominator).") as ROY_A, 
-					0 as ROY";
-			break;
-		case 'last':
-			$arrRates = $this->oReference->getMonthlyRates($this->Currency);
-			$res=	str_repeat('0,',15)." \r\n".
+					SUM(".$this->oBudget->getYTDSQL($nm, 12+$this->oBudget->offset,$arrRates, $denominator).") as ROY_A, 
+					0 as ROY_B";
+		
+		$res['next'] = $res['actual'];
+		
+		$arrRates = $this->oReference->getMonthlyRates($currency);
+		
+		$res['budget']=	str_repeat('0,',15)." \r\n".
 					str_repeat('0,',5)." \r\n
 					0 as Total, \r\n
 					0 as Total_JD, \r\n
 					0 as Total_AM, \r\n
-					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates, $this->Denominator).") as estimate ,
-					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $this->Denominator).") as estimate_JD ,
-					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $this->Denominator).") as estimate_AM ,
+					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates, $denominator).") as estimate ,
+					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $denominator).") as estimate_JD ,
+					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $denominator).") as estimate_AM ,
 					0 as YTD_A,
-					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, (integer)date('n',$this->oBudget->date_start)-1,$arrRates, $this->Denominator).") as YTD, 
+					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, $cm ,$arrRates, $denominator).") as YTD, 
 					0 as ROY_A,
-					SUM(".$this->oBudget->getYTDSQL((integer)date('n',$this->oBudget->date_start),12+$this->oBudget->offset,$arrRates, $this->Denominator).") as ROY";
-					
-			break;
-		}
+					SUM(".$this->oBudget->getYTDSQL($nm,12+$this->oBudget->offset,$arrRates, $denominator).") as ROY_B";
+		
 		// echo '<pre>';print_r($arrRates);echo '</pre>';
+		
+		$res['from_a'] = $this->oBudget->id;
+		$res['from_b'] = $this->oReference->id;
+		
 		return ($res);
 		
 	}
@@ -2770,9 +2745,9 @@ class Reports{
 						<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD']);?></em></td>
 						<!--Data for rest-of-year-->
 						<td class='budget-decimal budget-ytd'><?php self::render($data['ROY_A'],0);?></td>
-						<td class='budget-decimal'><?php self::render($data['ROY'],0);?></td>
-						<td class='budget-decimal'><?php self::render($data['ROY_A']-$data['ROY'],0);?></td>
-						<td class='budget-decimal'><em><?php self::render_ratio($data['ROY_A'],$data['ROY']);?></em></td>
+						<td class='budget-decimal'><?php self::render($data['ROY_B'],0);?></td>
+						<td class='budget-decimal'><?php self::render($data['ROY_A']-$data['ROY_B'],0);?></td>
+						<td class='budget-decimal'><em><?php self::render_ratio($data['ROY_A'],$data['ROY_B']);?></em></td>
 					<?php
 					}
 				}
@@ -2940,7 +2915,9 @@ class Reports{
 	private function _unionMRQueries($sql, 
 			$sqlGroup="`Budget item`, `item`, `Group`, `Group_code`,`itmOrder`", 
 			$sqlOrder="`Group`, `itmOrder` ASC", 
-			$fields = Array('CM_A','CM_B','Q_A','Q_B','YTD_A','YTD_B','NM_A','NM_B')){
+			$fields = Array()){
+		
+		if(!count($fields)) $fields = $this->columns;
 		
 		for($i = 0;$i<count($fields);$i++){
 			$arrUnion[] = "SUM({$fields[$i]}) as {$fields[$i]}";
