@@ -2436,6 +2436,15 @@ class Reports{
 				$rw['Q_A'] = $rw['Q_A']/3;
 				$rw['Q_B'] = $rw['Q_B']/3;
 				
+				for($q=1;$q<=5;$q++){
+					$rw["Q$q"] = $rw["Q$q"]/3;
+				}
+				
+				$rw['Total_AM'] = $rw['Total_AM']/12;
+				$rw['estimate_AM'] = $rw['estimate_AM']/12;
+				$rw['Total'] = $rw['Total']/12;
+				$rw['estimate'] = $rw['estimate']/12;
+				
 				if(12-($cm-$this->oBudget->offset)){
 					$rw['ROY_A'] = $rw['ROY_A']/(12-($cm-$this->oBudget->offset));
 					$rw['ROY_B'] = $rw['ROY_B']/(12-($cm-$this->oBudget->offset));
