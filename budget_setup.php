@@ -79,6 +79,8 @@ Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> 
 		<?php
 		echo $oBudget->getTableHeader('monthly', 1+$oBudget->offset, 12+$oBudget->offset);
 		?>
+		<th>YTD</th>
+		<th>FYE</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -94,6 +96,8 @@ Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> 
 			echo '<td class="budget-decimal">',number_format($data[$month],4,'.',','),'</td>';
 		}
 		?>
+			<td class="budget-decimal budget-ytd"><?php echo number_format($data['YTD'],4,'.',',');?></td>
+			<td class="budget-decimal budget-quarterly"><?php echo number_format($data['Total'],4,'.',',');?></td>
 		</tr>
 		<?php
 		}
