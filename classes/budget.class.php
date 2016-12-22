@@ -634,7 +634,7 @@ class Budget{
 					$res['Q4'] = ($res['oct']*31+$res['nov']*30+$res['dec']*31)/92;
 					$res['Q5'] = ($res['jan_1']*31+$res['feb_1']*28+$res['mar_1']*31)/90;
 					
-					$res['Total'] = ($res['Q1']+$res['Q2']+$res['Q3']+$res['Q4'])/4;
+					$res['Total'] = ($res['Q2']+$res['Q3']+$res['Q4']+$res['Q5'])/4;
 					
 					break;
 				case 'Budget':
