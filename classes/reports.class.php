@@ -2971,6 +2971,12 @@ class Reports{
 		
 		$sqlWhere = $this->sqlWhere;
 
+		if($this->oBudget->cm % 3){
+			$this->colspan = 14;
+		} else {
+			$this->colspan = 18;
+		}
+		
 		$strFields = $this->_getMRFields();
 		$strFieldsKPI = $this->_getMRFields(Array('denominator'=>1,'currency'=>643));
 		
@@ -2989,18 +2995,25 @@ class Reports{
 		
 		switch ($type){
 			case 'fye':
+				$this->columns = Array('YTD_A','YTD_B','ROY_A','ROY_B','FYE_A','FYE_B');
 				$this->structure = 'forecast';
-				$strHeader = $this->oBudget->getTableHeader('roy');
-				$arrUnion = Array('YTD_A','YTD_B','ROY_A','ROY_B','FYE_A','FYE_B');				
+				$strHeader = $this->oBudget->getTableHeader('roy');				
 				break;
 			case 'ytd':
 			case 'cm':
 			default:
+				$this->columns = Array('CM_A','CM_B','YTD_A','YTD_B','Q_A','Q_B','NM_A','NM_B');
 				$this->structure = 'monthly';
-				$strHeader = $this->oBudget->getTableHeader('mr');
-				$arrUnion = Array('CM_A','CM_B','Q_A','Q_B','YTD_A','YTD_B','NM_A','NM_B');	
+				$strHeader = $this->oBudget->getTableHeader('mr');				
 		}
-		$sql = self::_unionMRQueries($sql,'','', $arrUnion);
+		
+		
+		$this->sqlSelect = "";
+		foreach($this->columns as $i=>$field){
+			$this->sqlSelect .= ($this->sqlSelect?",\r\n":"")."SUM(`{$field}`) as '{$field}'";
+		}
+		
+		$sql = self::_unionMRQueries($sql,'','', $this->columns);
 		
 		//$tableID = "SUMMARY_".md5($sql);
 		
@@ -3168,7 +3181,7 @@ class Reports{
 			
 			if ($this->oSQL->n($rs)){
 				?>
-				<tr><th colspan="14">Operational KPIs</th></tr>				
+				<tr><th colspan="<?php echo $this->colspan;?>">Operational KPIs</th></tr>				
 				<?php		
 				while ($rw = $this->oSQL->f($rs)){			
 					$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
