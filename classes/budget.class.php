@@ -555,7 +555,7 @@ class Budget{
 			return ($res);
 		}
 		
-		$start_month = date('n',$this->date_start);
+		$start_month = $this->nm;
 		
 		$sql = "SELECT * FROM common_db.tbl_currency WHERE curID={$currency}";
 		$rs = $this->oSQL->q($sql);
@@ -603,7 +603,7 @@ class Budget{
 								WHERE erhCurrencyID={$currency} AND erhCurrencyID=curID
 									AND erhDate BETWEEN '{$this->year}-04-01' AND '".date('Y-m-d',$this->date_start)."'
 								GROUP BY DATE_FORMAT(erhDate,'%b')";
-					
+					// echo '<pre>',$sql,'</pre>';
 					$rs = $this->oSQL->q($sql);
 					$i=0;
 					while ($rw = $this->oSQL->f($rs)){
