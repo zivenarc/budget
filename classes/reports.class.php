@@ -1229,7 +1229,7 @@ class Reports{
 		$this->_firstLevelPeriodic($sql, $params['title'], $this->oBudget);
 				
 		//==========================================================================================================================Non-customer-related data
-		$this->no_firstLevelPeriodic($sqlWhere);
+		$this->_nofirstLevelPeriodic($sqlWhere);
 		?>
 		</tbody>
 		</table>
@@ -1241,10 +1241,7 @@ class Reports{
 	}
 	
 	public function periodicGraph($sqlWhere){
-				
-		
-
-		
+					
 		$strFields_this = $this->_getPeriodicFields();
 		$strFields_last = $this->_getPeriodicFields('last');
 		
@@ -1712,6 +1709,7 @@ class Reports{
 				break;
 		}
 		
+		$this->structure = 'monthly';
 		// $strFields = $this->_getPeriodicFields();
 		
 		$strFields = $this->_getMRFields();
@@ -1995,7 +1993,7 @@ class Reports{
 					$arrSubreport[$l1Code][$rw['item']]['NM_A'] += $rw['NM_A'];
 					$arrSubreport[$l1Code][$rw['item']]['NM_B'] += $rw['NM_B'];
 
-					$arrSort[$l1Code]['value'] += $rw['YTD_A'];
+					$arrSort[$l1Code]['value'] += $rw['YTD_A']+$rw['YTD_B']+$rw['Total_AM']+$rw['estimate_AM'];
 					
 					if (!$template) $template = $rw;
 					
@@ -2008,6 +2006,12 @@ class Reports{
 				
 				// echo '<pre>';print_r($arrReport);echo '</pre>';die();
 				foreach ($arrReport as $key=>$data){
+									
+					// if(!$printed){
+						// echo '<pre>';print_r($data);echo '</pre>';
+						// $printed = true;
+					// }
+					
 					$this->echoBudgetItemString($data, 'budget-item');
 				}
 				
@@ -2098,7 +2102,7 @@ class Reports{
 		
 	}
 	
-	private function no_firstLevelPeriodic($sqlWhere){
+	private function _nofirstLevelPeriodic($sqlWhere){
 				
 		$strFields_this = $this->_getPeriodicFields();
 		$strFields_last = $this->_getPeriodicFields('last');
@@ -2199,7 +2203,7 @@ class Reports{
 					}
 					
 				}
-				
+								
 				$this->echoBudgetItemString($rw,$tr_class);				
 				$group = $rw['Group'];
 			}
@@ -2664,110 +2668,116 @@ class Reports{
 	}
 	
 	private function _echoNumericTDs($data){
+		
+		// echo '<pre>';print_r($data);echo '</pre>';
+	
 		$local_subtotal = 0;
 		$ytd = 0;
 		$roy = 0;
-		if (isset($data['CM_A'])){ ?>
-			<td class='budget-decimal budget-ytd'><?php self::render($data['CM_A'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['CM_B'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['CM_A']-$data['CM_B'],0);?></td>
-			<td class='budget-decimal'><em><?php self::render_ratio($data['CM_A'],$data['CM_B']);?></em></td>
-			
-			<?php
-			if (!($this->oBudget->cm % 3)){
+		
+		switch($this->structure){
+			case 'monthly':
 			?>
-			<td class='budget-decimal budget-ytd'><?php self::render($data['Q_A'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['Q_B'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['Q_A']-$data['Q_B'],0);?></td>
-			<td class='budget-decimal'><em><?php self::render_ratio($data['Q_A'],$data['Q_B']);?></em></td>
-			<?php
-			}
-			?>
-			
-			<td class='budget-decimal budget-quarterly'><?php self::render($data['YTD_A'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
-			<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B']);?></em></td>
-			
-			<td class='budget-decimal budget-ytd'><?php self::render($data['NM_A'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['NM_B'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['NM_A']-$data['NM_B'],0);?></td>
-			<td class='budget-decimal'><em><?php self::render_ratio($data['NM_A'],$data['NM_B']);?></em></td>
-		<?php		
-		} elseif (isset($data['apr'])) {
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				// $month = $this->oBudget->arrPeriod[$m];
-				$month = $this->oBudget->arrPeriod[$m];
-				?>
-				<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
+				<td class='budget-decimal budget-ytd'><?php self::render($data['CM_A'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['CM_B'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['CM_A']-$data['CM_B'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['CM_A'],$data['CM_B']);?></em></td>
 				<?php
-			}
-			
-			//--------------------- quarterly data -----------------------
-			if(isset($data['Q1']) || isset($data['Q2']) || isset($data['Q3']) || isset($data['Q4']) || isset($data['Q5'])){
-				for ($q=1+$this->oBudget->offset/3;$q<5+$this->oBudget->offset/3;$q++){
+				if (!($this->oBudget->cm % 3)){
+				?>
+				<td class='budget-decimal budget-ytd'><?php self::render($data['Q_A'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['Q_B'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['Q_A']-$data['Q_B'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['Q_A'],$data['Q_B']);?></em></td>
+				<?php
+				}
+				?>	
+				<td class='budget-decimal budget-quarterly'><?php self::render($data['YTD_A'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B']);?></em></td>
+				
+				<td class='budget-decimal budget-ytd'><?php self::render($data['NM_A'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['NM_B'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['NM_A']-$data['NM_B'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['NM_A'],$data['NM_B']);?></em></td>
+				<?php		
+				break;
+			case 'forecast':
+				?>		
+				<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B']);?></em></td>
+				
+				<td class='budget-decimal budget-ytd'><?php self::render($data['ROY_A'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['ROY_B'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['ROY_A']-$data['ROY_B'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['ROY_A'],$data['ROY_B']);?></em></td>
+				
+				<td class='budget-decimal budget-quarterly'><?php self::render($data['FYE_A'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['FYE_B'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['FYE_A']-$data['FYE_B'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['FYE_A'],$data['FYE_B']);?></em></td>
+				<?php
+			case 'periodic':
+			default:
+					
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+					// $month = $this->oBudget->arrPeriod[$m];
+					$month = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class='budget-decimal budget-quarterly budget-<?php echo 'q'.$q;?>'><?php self::render($data['Q'.$q],0);?></td>
+					<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
 					<?php
 				}
-			}
-			?>
-			<td class='budget-decimal budget-ytd'><?php self::render($data['Total'],0);?></td>			
-			<?php 
-			if (isset($data['estimate'])){
-				?>
-				<td class='budget-decimal'><?php self::render($data['estimate'],0);?></td>
-				<td class='budget-decimal'><?php self::render($data['Total']-$data['estimate'],0);?></td>
-				<td class='budget-decimal'><em><?php self::render_ratio($data['Total'],$data['estimate']);?></em></td>
-				<?php 
-				if ($this->oBudget->length>12){ 
 					
-					for ($m=13;$m<=15;$m++){
-						// $month = $this->oBudget->arrPeriod[$m];
-						$month = $this->oBudget->arrPeriod[$m];
+				for ($q=1+$this->oBudget->offset/3;$q<5+$this->oBudget->offset/3;$q++){
 						?>
-						<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
+						<td class='budget-decimal budget-quarterly budget-<?php echo 'q'.$q;?>'><?php self::render($data['Q'.$q],0);?></td>
 						<?php
-						}
+					}
+				
+				?>
+				<td class='budget-decimal budget-ytd'><?php self::render($data['Total'],0);?></td>			
+				<?php 
+				if (isset($data['estimate'])){
 					?>
-					<td class='budget-decimal budget-quarterly '><?php self::render($data['Q5'],0);?></td>				
-					<td class='budget-decimal budget-ytd'><?php self::render($data['Total_AM'],0);?></td>				
-					<td class='budget-decimal'><?php self::render($data['estimate_AM'],0);?></td>				
-					<td class='budget-decimal'><?php self::render($data['Total_AM'] - $data['estimate_AM'],0);?></td>				
-				<?php };
-				if (strpos($this->oBudget->type,'FYE')!== false || strpos($this->oBudget->type,'Actual')!==false){ 
-				?>					
-					<!--Data for YTD actual-->
-					<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
-					<td class='budget-decimal'><?php self::render($data['YTD'],0);?></td>
-					<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD'],0);?></td>
-					<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD']);?></em></td>
-					<!--Data for rest-of-year-->
-					<td class='budget-decimal budget-ytd'><?php self::render($data['ROY_A'],0);?></td>
-					<td class='budget-decimal'><?php self::render($data['ROY'],0);?></td>
-					<td class='budget-decimal'><?php self::render($data['ROY_A']-$data['ROY'],0);?></td>
-					<td class='budget-decimal'><em><?php self::render_ratio($data['ROY_A'],$data['ROY']);?></em></td>
-				<?php
+					<td class='budget-decimal'><?php self::render($data['estimate'],0);?></td>
+					<td class='budget-decimal'><?php self::render($data['Total']-$data['estimate'],0);?></td>
+					<td class='budget-decimal'><em><?php self::render_ratio($data['Total'],$data['estimate']);?></em></td>
+					<?php 
+					if ($this->oBudget->length>12){ 
+						
+						for ($m=13;$m<=15;$m++){
+							// $month = $this->oBudget->arrPeriod[$m];
+							$month = $this->oBudget->arrPeriod[$m];
+							?>
+							<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
+							<?php
+							}
+						?>
+						<td class='budget-decimal budget-quarterly '><?php self::render($data['Q5'],0);?></td>				
+						<td class='budget-decimal budget-ytd'><?php self::render($data['Total_AM'],0);?></td>				
+						<td class='budget-decimal'><?php self::render($data['estimate_AM'],0);?></td>				
+						<td class='budget-decimal'><?php self::render($data['Total_AM'] - $data['estimate_AM'],0);?></td>				
+					<?php };
+					if (strpos($this->oBudget->type,'FYE')!== false || strpos($this->oBudget->type,'Actual')!==false){ 
+					?>					
+						<!--Data for YTD actual-->
+						<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
+						<td class='budget-decimal'><?php self::render($data['YTD'],0);?></td>
+						<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD'],0);?></td>
+						<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD']);?></em></td>
+						<!--Data for rest-of-year-->
+						<td class='budget-decimal budget-ytd'><?php self::render($data['ROY_A'],0);?></td>
+						<td class='budget-decimal'><?php self::render($data['ROY'],0);?></td>
+						<td class='budget-decimal'><?php self::render($data['ROY_A']-$data['ROY'],0);?></td>
+						<td class='budget-decimal'><em><?php self::render_ratio($data['ROY_A'],$data['ROY']);?></em></td>
+					<?php
+					}
 				}
+				break;	
 			}
-		} else {
-			?>		
-			<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
-			<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B']);?></em></td>
-			
-			<td class='budget-decimal budget-ytd'><?php self::render($data['ROY_A'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['ROY_B'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['ROY_A']-$data['ROY_B'],0);?></td>
-			<td class='budget-decimal'><em><?php self::render_ratio($data['ROY_A'],$data['ROY_B']);?></em></td>
-			
-			<td class='budget-decimal budget-quarterly'><?php self::render($data['FYE_A'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['FYE_B'],0);?></td>
-			<td class='budget-decimal'><?php self::render($data['FYE_A']-$data['FYE_B'],0);?></td>
-			<td class='budget-decimal'><em><?php self::render_ratio($data['FYE_A'],$data['FYE_B']);?></em></td>
-			<?php
-		}
 	}
 	
 	private function echoBudgetItemString($data, $strClass=''){							
@@ -2983,12 +2993,14 @@ class Reports{
 		
 		switch ($type){
 			case 'fye':
+				$this->structure = 'forecast';
 				$strHeader = $this->oBudget->getTableHeader('roy');
 				$arrUnion = Array('YTD_A','YTD_B','ROY_A','ROY_B','FYE_A','FYE_B');				
 				break;
 			case 'ytd':
 			case 'cm':
 			default:
+				$this->structure = 'monthly';
 				$strHeader = $this->oBudget->getTableHeader('mr');
 				$arrUnion = Array('CM_A','CM_B','Q_A','Q_B','YTD_A','YTD_B','NM_A','NM_B');	
 		}

@@ -91,15 +91,17 @@ class Budget{
 		
 	}
 	
-	public function getYTDSQL($mStart=1, $mEnd=12, $arrRates = null){
+	public function getYTDSQL($mStart=1, $mEnd=12, $arrRates = null, $denominator=1){
 		for($m=$mStart;$m<=$mEnd;$m++){
 			// $month = date('M',mktime(0,0,0,$m,15));			
 			$month = $this->arrPeriod[$m];
 			
+			if($denominator>1) $strDenominator = "/{$denominator}";
+			
 			if (is_array($arrRates)){				
-				$arrRes[] = "`$month`/{$arrRates[$month]}";
+				$arrRes[] = "`$month`/{$arrRates[$month]}".$strDenominator;
 			} else {
-				$arrRes[] = "`$month`";
+				$arrRes[] = "`$month`".$strDenominator;
 			}
 		}
 		if(is_array($arrRes)){
@@ -111,9 +113,9 @@ class Budget{
 	}
 	
 	public function getThisYTDSQL($period_type = 'ytd',$arrRates = null){		
-		$cm = date('M',$this->date_start - 1);
-		$nm = date('M',$this->date_start);		
-		$nCurrent = (integer)date('m',$this->date_start - 1);	
+		$cm = $this->cm;
+		$nm = $this->nm;	
+		$nCurrent = $this->cm;	
 		
 		switch ($period_type){
 			case 'ytd':
@@ -168,9 +170,9 @@ class Budget{
 			// $month = date('M',mktime(0,0,0,$m,15));			
 			$month = $this->arrPeriod[$m];
 			if (is_array($arrRates)){				
-				$arrRes[] = "SUM(`$month`)/{$arrRates[$month]}".($denominator!=1?"/{$denominator}":"")." AS '$month'";
+				$arrRes[] = "SUM(`$month`)/{$arrRates[$month]}".($denominator>1?"/{$denominator}":"")." AS '$month'";
 			} else {
-				$arrRes[] = "SUM(`$month`)".($denominator!=1?"/{$denominator}":"")." AS '$month'";
+				$arrRes[] = "SUM(`$month`)".($denominator>1?"/{$denominator}":"")." AS '$month'";
 			}			
 			
 		}
@@ -178,16 +180,19 @@ class Budget{
 		return($res);
 	}
 	
-	public function getQuarterlySumSQL($arrRates = null){
+	public function getQuarterlySumSQL($arrRates = null, $denominator=1){
+	
+			$strDenominator = $denominator>1?"/$denominator":"";
+	
 			if(is_array($arrRates)){
-				$arrRes[] = "SUM(`jan`/{$arrRates['jan']}+`feb`/{$arrRates['feb']}+`mar`/{$arrRates['mar']}) as 'Q1'";
-				$arrRes[] = "SUM(`apr`/{$arrRates['apr']}+`may`/{$arrRates['may']}+`jun`/{$arrRates['jun']}) as 'Q2'";
-				$arrRes[] = "SUM(`jul`/{$arrRates['jul']}+`aug`/{$arrRates['aug']}+`sep`/{$arrRates['sep']}) as 'Q3'";
-				$arrRes[] = "SUM(`oct`/{$arrRates['oct']}+`nov`/{$arrRates['nov']}+`dec`/{$arrRates['dec']}) as 'Q4'";
-				$arrRes[] = "SUM(`jan_1`/{$arrRates['jan_1']}+`feb_1`/{$arrRates['feb_1']}+`mar_1`/{$arrRates['mar_1']}) as 'Q5'";
+				$arrRes[] = "SUM(`jan`/{$arrRates['jan']}+`feb`/{$arrRates['feb']}+`mar`/{$arrRates['mar']}){$strDenominator} as 'Q1'";
+				$arrRes[] = "SUM(`apr`/{$arrRates['apr']}+`may`/{$arrRates['may']}+`jun`/{$arrRates['jun']}){$strDenominator} as 'Q2'";
+				$arrRes[] = "SUM(`jul`/{$arrRates['jul']}+`aug`/{$arrRates['aug']}+`sep`/{$arrRates['sep']}){$strDenominator} as 'Q3'";
+				$arrRes[] = "SUM(`oct`/{$arrRates['oct']}+`nov`/{$arrRates['nov']}+`dec`/{$arrRates['dec']}){$strDenominator} as 'Q4'";
+				$arrRes[] = "SUM(`jan_1`/{$arrRates['jan_1']}+`feb_1`/{$arrRates['feb_1']}+`mar_1`/{$arrRates['mar_1']}){$strDenominator} as 'Q5'";
 			} else {
 				for($q=1;$q<=5;$q++){			
-					$arrRes[] = "SUM(`Q$q`) as 'Q$q'";
+					$arrRes[] = "SUM(`Q{$q}`){$strDenominator} as 'Q$q'";
 				}
 			}
 		$res = implode(',',$arrRes);
