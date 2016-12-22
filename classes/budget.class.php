@@ -36,7 +36,7 @@ class Budget{
 			$this->cm=15;
 			$this->nm = 99;
 		} else {
-			$this->cm = date('n',$this->date_start-1); 
+			$this->cm = date('n',$this->date_start-1)+12*(date('Y',$this->date_start-1)-$this->year); 
 			$this->nm = $this->cm+1;
 		};
 		
