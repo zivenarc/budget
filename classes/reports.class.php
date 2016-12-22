@@ -1749,7 +1749,7 @@ class Reports{
 			self::firstLevelReportMR($sql, $strGroupTitle, $this->oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
-			self::noFirstLevelReportMR($this->currency);
+			self::_noFirstLevelMonthly($this->currency);
 			?>
 			</tbody>
 			</table>
@@ -1837,7 +1837,7 @@ class Reports{
 			self::firstLevelReportMR($sql, $strGroupTitle, $oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
-			// self::noFirstLevelReportMR($this->currency);
+			// self::_noFirstLevelMonthly($this->currency);
 			?>
 			</tbody>
 			</table>
@@ -1929,62 +1929,7 @@ class Reports{
 			</thead>			
 			<tbody>
 			<?php
-			if ($this->oSQL->num_rows($rs)){
-				$Level1_title = '';		
-				
-				while ($rw=$this->oSQL->f($rs)){
-					
-					if ($rw['item']){
-						foreach ($rw as $key=>$value){						
-							 $arrGrandTotal[$key] += $value;
-						}
-					}
-					
-					$l1Code = (string)$rw['level1_code'];
-					$arrSubreport[$l1Code][$rw['item']] = Array('Level1_title'=>$rw['Level1_title'],'Budget item'=>$rw['Budget item'],'level1_code'=>$l1Code);
-			
-					for ($m=1;$m<=15;$m++){
-						// $month = $this->oBudget->arrPeriod[$m];
-						$month = $this->oBudget->arrPeriod[$m];
-						
-						$arrSubreport[$l1Code][$rw['item']][$month]+=$rw[$month];
-						if ($m<=5){
-							$arrSubreport[$l1Code][$rw['item']]['Q'.$m]+=$rw['Q'.$m];
-						};
-						// $local_subtotal += $rw[$month];
-						
-					};
-					
-					$arrSubreport[$l1Code][$rw['item']]['YTD_A']+=$rw['YTD_A'];
-					$arrSubreport[$l1Code][$rw['item']]['YTD']+=$rw['YTD'];
-					$arrSubreport[$l1Code][$rw['item']]['ROY_A']+=$rw['ROY_A'];
-					$arrSubreport[$l1Code][$rw['item']]['ROY']+=$rw['ROY'];
-					$arrSubreport[$l1Code][$rw['item']]['Total']+=$rw['Total'];
-					$arrSubreport[$l1Code][$rw['item']]['Total_AM']+=$rw['Total_AM'];
-					$arrSubreport[$l1Code][$rw['item']]['estimate']+=$rw['estimate'];
-					$arrSubreport[$l1Code][$rw['item']]['estimate_AM']+=$rw['estimate_AM'];
-					$arrSubreport[$l1Code][$rw['item']]['Total_AprMar']+=$rw['Total_AprMar'];
-					$arrSubreport[$l1Code][$rw['item']]['Total_15']+=$rw['Total_15'];
-										
-					$arrSort[$l1Code]['value'] += $rw['Total'];
-					
-					if (!$template) $template = $rw;
-					
-				}
-							
-				arsort($arrSort);
-				foreach ($arrSort as $key=>$value){
-					$arrReport[$key] = $arrSubreport[$key];
-				}
-				
-				// echo '<pre>';print_r($arrReport);echo '</pre>';die();
-				foreach ($arrReport as $key=>$data){
-					$this->echoBudgetItemString($data, 'budget-item');
-				}
-				
-					$arrGrandTotal['Budget item'] = 'Grand total';
-					return ($arrGrandTotal);
-			}
+			return ($this->_processFLData($rs));
 	}
 	
 	private function firstLevelReportMR($sql, $firstLevelTitle, $oBudget=null){
@@ -2008,7 +1953,11 @@ class Reports{
 			</thead>			
 			<tbody>
 			<?php
-			if ($this->oSQL->num_rows($rs)){
+			return ($this->_processFLData($rs));
+	}
+	
+	private function _processFLData($rs){
+		if ($this->oSQL->num_rows($rs)){
 				$Level1_title = '';		
 				
 				while ($rw=$this->oSQL->f($rs)){
@@ -2019,7 +1968,24 @@ class Reports{
 					
 					$l1Code = (string)$rw['level1_code'];
 					$arrSubreport[$l1Code][$rw['item']] = Array('Level1_title'=>$rw['Level1_title'],'Budget item'=>$rw['Budget item'],'level1_code'=>$l1Code);
-											
+					
+					for ($m=1;$m<=15;$m++){						
+						$month = $this->oBudget->arrPeriod[$m];
+						$arrSubreport[$l1Code][$rw['item']][$month]+=$rw[$month];
+						if ($m<=5){
+							$arrSubreport[$l1Code][$rw['item']]['Q'.$m]+=$rw['Q'.$m];
+						};						
+					};
+					
+					$arrSubreport[$l1Code][$rw['item']]['ROY_A']+=$rw['ROY_A'];
+					$arrSubreport[$l1Code][$rw['item']]['ROY']+=$rw['ROY'];
+					$arrSubreport[$l1Code][$rw['item']]['Total']+=$rw['Total'];
+					$arrSubreport[$l1Code][$rw['item']]['Total_AM']+=$rw['Total_AM'];
+					$arrSubreport[$l1Code][$rw['item']]['estimate']+=$rw['estimate'];
+					$arrSubreport[$l1Code][$rw['item']]['estimate_AM']+=$rw['estimate_AM'];
+					$arrSubreport[$l1Code][$rw['item']]['Total_AprMar']+=$rw['Total_AprMar'];
+					$arrSubreport[$l1Code][$rw['item']]['Total_15']+=$rw['Total_15'];
+					
 					$arrSubreport[$l1Code][$rw['item']]['CM_A'] += $rw['CM_A'];
 					$arrSubreport[$l1Code][$rw['item']]['CM_B'] += $rw['CM_B'];
 					$arrSubreport[$l1Code][$rw['item']]['YTD_A'] += $rw['YTD_A'];
@@ -2042,14 +2008,13 @@ class Reports{
 				
 				// echo '<pre>';print_r($arrReport);echo '</pre>';die();
 				foreach ($arrReport as $key=>$data){
-					$this->echoBudgetItemString($data, 'budget-item', $oBudget);
+					$this->echoBudgetItemString($data, 'budget-item');
 				}
 				
 					$arrGrandTotal['Budget item'] = 'Grand total';
 					return ($arrGrandTotal);
 			}
 	}
-	
 	
 	private function noFirstLevelReport_YACT($sqlWhere){
 				
@@ -2348,7 +2313,7 @@ class Reports{
 		}
 	}
 	
-	private function noFirstLevelReportMR($currency=643){
+	private function _noFirstLevelMonthly($currency=643){
 				
 		global $oSQL;		
 		$sqlWhere = $this->sqlWhere;
@@ -2359,17 +2324,17 @@ class Reports{
 		$sqlOrder = "`Group`, `itmOrder` ASC";
 		
 		$sql = "SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
-					{$strFields['actual']}
-			FROM `vw_master`			
-			{$sqlWhere}  AND scenario='{$strFields['from_a']}'
-			GROUP BY {$sqlGroup}	
-			UNION ALL
-				SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
-				{$strFields['budget']}
-			FROM `vw_master`				
-			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND `item` IS NOT NULL
-			GROUP BY {$sqlGroup}			
-			ORDER BY {$sqlOrder}";
+							{$strFields['actual']}
+					FROM `vw_master`			
+					{$sqlWhere}  AND scenario='{$strFields['from_a']}'
+					GROUP BY {$sqlGroup}	
+					UNION ALL
+						SELECT `Budget item`, `item`, `Group`, `Group_code`,`itmOrder`, 
+						{$strFields['budget']}
+					FROM `vw_master`				
+					{$sqlWhere} AND scenario='{$strFields['from_b']}' AND `item` IS NOT NULL
+					GROUP BY {$sqlGroup}			
+					ORDER BY {$sqlOrder}";
 			
 		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
 		
@@ -2482,11 +2447,11 @@ class Reports{
 		if (!$this->oSQL->n($rs)){
 			// echo '<pre>',$sql,'</pre>';
 			?>
-			<tr><td colspan="14">No headcount data</td></tr>
+			<tr><td colspan="<?php echo $this->colspan;?>">No headcount data</td></tr>
 			<?php
 		} else {
 			?>
-			<tr><th colspan="14">Headcount</th></tr>
+			<tr><th colspan="<?php echo $this->colspan;?>">Headcount</th></tr>
 			<?php
 			while ($rw = $this->oSQL->f($rs)){			
 				// $rw['Budget item'] = $rw['wc']?"White collars":"Blue collars";
@@ -2962,7 +2927,10 @@ class Reports{
 		}
 	}
 		
-	private function _unionMRQueries($sql, $sqlGroup="`Budget item`, `item`, `Group`, `Group_code`,`itmOrder`", $sqlOrder="`Group`, `itmOrder` ASC", $fields = Array('CM_A','CM_B','YTD_A','YTD_B','NM_A','NM_B')){
+	private function _unionMRQueries($sql, 
+			$sqlGroup="`Budget item`, `item`, `Group`, `Group_code`,`itmOrder`", 
+			$sqlOrder="`Group`, `itmOrder` ASC", 
+			$fields = Array('CM_A','CM_B','Q_A','Q_B','YTD_A','YTD_B','NM_A','NM_B')){
 		
 		for($i = 0;$i<count($fields);$i++){
 			$arrUnion[] = "SUM({$fields[$i]}) as {$fields[$i]}";
@@ -2970,6 +2938,7 @@ class Reports{
 		$sql = "SELECT ".($sqlGroup?"{$sqlGroup},":'')."
 					".implode(',',$arrUnion)."
 				FROM ({$sql}) U 
+				##GROUPING BY ITEM
 				".($sqlGroup?"GROUP BY {$sqlGroup}":'')."
 				".($sqlOrder?"ORDER BY {$sqlOrder}":'');
 		return($sql);
