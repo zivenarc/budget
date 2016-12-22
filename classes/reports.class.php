@@ -2290,7 +2290,7 @@ class Reports{
 		
 		//------- Headcount -----------------
 		if (!(isset($this->filter['customer']) || isset($this->filter['sales']) || isset($this->filter['bdv']))){
-			$this->_getMRHeadcount($sqlWhere);
+			$this->_getMRHeadcount($sqlWhere,'funTitle');
 		}
 	}
 	
@@ -2379,6 +2379,10 @@ class Reports{
 				$field = "IF(funRHQ='',funTitleLocal, funRHQ)";
 				$groupBy = "IF(funRHQ='',funTitleLocal, funRHQ)";	
 				break;
+			case 'funTitle':
+				$field = "funTitle$strLocal";
+				$groupBy = "funTitle$strLocal";	
+				break;
 			default:
 				$field = "IF(`wc`=1,'White collars','Blue collars')";
 				$groupBy = 'wc';
@@ -2450,8 +2454,14 @@ class Reports{
 					$rw['ROY_B'] = $rw['ROY_B']/(12-($cm-$this->oBudget->offset));
 				}
 				
+				foreach($this->columns as $i=>$field){
+					$grandTotal[$field] +=$rw[$field];
+				}
+				
 				$this->echoBudgetItemString($rw);
 			}
+			$grandTotal['Budget item'] = 'Total headcount';
+			$this->echoBudgetItemString($grandTotal,'budget-subtotal');
 		}
 	}
 	
