@@ -41,7 +41,7 @@ class Master {
 		$sql[] = "DELETE FROM `reg_master` WHERE `source`='".$this->id."'";
 		
 		for ($i=0;$i<count($this->records['master']);$i++){
-			$sql[] = $this->records['master'][$i]->getSQLstring(date('n',$this->budget->date_start),15,$flagPostActualPeriods);
+			$sql[] = $this->records['master'][$i]->getSQLstring($this->budget->nm,15,$flagPostActualPeriods);
 		}
 		
 		// $sql[] = "DELETE FROM `tbl_headcount` WHERE `source`='".$this->id."'";
