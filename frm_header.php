@@ -57,12 +57,12 @@ while ($rwRLU = $oSQL->fetch_array($rs)) {
 		?></div><?php
     }
 	?>
-	<div id='search_form'>
+	<!--div id='search_form'>
 		<form target='pane' action='frm_search.php'>
 		<input class='i-text' placeholder='<?php echo $strLocal?"Поиск...":"Search...";?>' type='text' name='strSearch' id='strSearch'/>
 		<input class='ui-button' type='submit' id='search_submit' value='<?php echo $strLocal?"Найти":"Find";?>'/>
 		</form>
-	</div>	
+	</div-->	
 	<div id='languages'>
 		<ul>
 			<li><a target="_top" class="lang-en" href="index.php?lang=en">ENG</a></li>
