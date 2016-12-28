@@ -10,6 +10,7 @@ $Items = new Items();
 class MSF extends Document{
 	
 	const MSF_ITEM = '090d883b-5061-11e4-926a-00155d010e0b';
+	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';
 	
 	function __construct($id=''){
 		GLOBAL $strLocal;
@@ -360,6 +361,16 @@ class MSF extends Document{
 							AND pc<>'{$this->profit}'
 							AND pccFlagProd=1 AND pc<>99
 							AND account='J00400'
+						GROUP BY pc"; 
+			break;
+			case 'net_sales':
+				$sql = "SELECT 'RUB' as unit, pc, ".$this->budget->getMonthlySumSQL(1,15, null, 1000)." FROM reg_master
+						LEFT JOIN vw_profit ON pccID=pc
+						WHERE scenario='".$oBudget->id."' 
+							AND active=1 
+							AND pc<>'{$this->profit}'
+							AND pccFlagProd=1 AND pc<>99
+							AND item='".self::REVENUE_ITEM."'
 						GROUP BY pc"; 
 			break;
 			case 'users':

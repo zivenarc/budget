@@ -22,6 +22,9 @@ if ($_POST['DataAction']){
 		case 'fill_sales':
 			$oDocument->fill_distribution($oBudget, 'sales');
 			break;	
+		case 'fill_net_sales':
+			$oDocument->fill_distribution($oBudget, 'net_sales');
+			break;	
 		case 'fill_users':
 			$oDocument->fill_distribution($oBudget, 'users');
 			break;			
@@ -68,7 +71,8 @@ include ('includes/inc_document_menu.php');
 if ($oDocument->GUID && !$oDocument->flagPosted){
 	$arrActions[] = Array ('title'=>'FTE','action'=>'javascript:fillGrid(\'_fte\');','class'=>'brick');	
 	$arrActions[] = Array ('title'=>'Users','action'=>'javascript:fillGrid(\'_users\');','class'=>'brick');	
-	$arrActions[] = Array ('title'=>'Sales','action'=>'javascript:fillGrid(\'_sales\');','class'=>'brick');	
+	$arrActions[] = Array ('title'=>'Gross revenue','action'=>'javascript:fillGrid(\'_sales\');','class'=>'brick');	
+	$arrActions[] = Array ('title'=>'Net revenue','action'=>'javascript:fillGrid(\'_net_sales\');','class'=>'brick');	
 }
 
 //============================== Main form definition ==============================
