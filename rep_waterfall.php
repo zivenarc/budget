@@ -122,7 +122,7 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
 			GROUP BY pc",
-			'tolerance'=>0.00
+			'tolerance'=>0.001
 			);
 
 $settings['scbu'] = Array('title'=>"Staff cost by business unit",
