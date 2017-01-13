@@ -7,7 +7,7 @@ require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
-$ytd = date('n',$oBudget->date_start-1);echo $ytd;
+$ytd = $oBudget->cm;echo $ytd;
 
 
 echo $oBudget->type;
