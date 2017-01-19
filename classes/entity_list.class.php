@@ -284,7 +284,7 @@ class Entity {
 				FROM `".$this->table."`
 				INNER JOIN `tbl_scenario` on `scnID`=`".$this->prefix."Scenario`
 				WHERE {$sqlWhere} AND `".$this->prefix."CompanyID`='{$company}'
-					AND scnFlagReadOnly=0
+					AND scnFlagArchive=0
 				GROUP BY scnID
 				ORDER BY scnID";
 		$rs = $this->oSQL->q($sqlTabs);
