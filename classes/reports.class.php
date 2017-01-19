@@ -577,13 +577,14 @@ class Reports{
 		
 	}
 	
-	public function masterDocument($source){
+	public function masterDocument($source, $docClass=''){
 		
 		$sql = "SELECT * FROM vw_master WHERE `source`='{$source}' ORDER BY pc, customer, activity, account, item";
 		$rs = $this->oSQL->q($sql);
 		$i = 1;
 		?>
 		<div id='report'>
+		<h2>Master registry {<?php echo $source;?>}</h2>
 		<table class='budget' id='<?php echo $source;?>'>
 		<thead>
 			<tr>
@@ -638,7 +639,60 @@ class Reports{
 				?>
 			</tr>
 		</tfoot>
-		</table>
+		</table>		
+		<?php
+		if ($docClass=='Interco_sales' || $docClass=='Sales'){
+			$sql = "SELECT reg_sales.*, tbl_profit.pccTitle as Profit, tbl_counterparty.cntTitle as Customer_name, tbl_product.prdTitle as Product_title, tbl_product_type.prtGHQ as Activity_title
+					FROM reg_sales 
+					LEFT JOIN common_db.tbl_profit ON pc=pccID
+					LEFT JOIN common_db.tbl_counterparty ON customer=cntID
+					LEFT JOIN common_db.tbl_product ON product=prdID
+					LEFT JOIN common_db.tbl_product_type ON activity=prtID
+					WHERE `source`='{$source}' ORDER BY pc, customer, activity";
+			$rs = $this->oSQL->q($sql);
+			$i = 1;
+			?>
+			<h2>Sales registry</h2>
+			<table class='budget' id='sales_<?php echo $source;?>'>
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>PC</th>
+					<th>Customer</th>
+					<th>Activity</th>					
+					<th>Product</th>
+					<?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset,max(12+$this->oBudget->offset,$this->oBudget->length)); ?>
+				</tr>
+			</thead>
+			<tbody>
+			<?php			
+			while ($rw = $this->oSQL->f($rs)){
+				?>
+				<tr>
+					<td><?php echo $i;?></td>
+					<td><?php echo $rw['Profit'];?></td>
+					<td><?php echo $rw['Customer_name'];?></td>
+					<td><?php echo $rw['Activity_title'];?></td>
+					<td><?php echo $rw['Product_title'];?></td>					
+					<?php
+						for($m=1+$this->oBudget->offset;$m<=max(12+$this->oBudget->offset,$this->oBudget->length);$m++){
+							$month = $this->oBudget->arrPeriod[$m];
+							$arrTotal[$month] += $rw[$month];
+							?>
+							<td class='budget-decimal'><?php self::render($rw[$month]);?></td>
+							<?php
+						}
+					?>
+				</tr>
+				<?php
+				$i++;
+			}
+			?>
+			</tbody>
+			</table>
+			<?php
+		}
+		?>
 		</div>
 		<?php
 	}

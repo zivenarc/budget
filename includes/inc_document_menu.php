@@ -18,6 +18,7 @@ if($oDocument->budget->flagUpdate){
 }
 
 if ($oDocument->GUID) {
+	$arrActions[] = Array ('title'=>($strLocal?"Данные":"Master data"), 'action'=>$_SERVER['REQUEST_URI']."&DataAction=master", 'class'=>'table');
 	$arrActions[] = Array ('title'=>($strLocal?"Поделиться...":"Share..."), 'action'=>"javascript:assign()", 'class'=>'send');
 	$arrActions[] = Array ('title'=>($strLocal?"Печать":"Print"), 'action'=>"javascript:print()", 'class'=>'print');
 }

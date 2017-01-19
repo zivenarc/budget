@@ -2,7 +2,7 @@
 if($_GET['DataAction']=='master'){
 	require_once ('classes/reports.class.php');
 	$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id));
-	$oReport->masterDocument($oDocument->GUID);
+	$oReport->masterDocument($oDocument->GUID, get_class($oDocument));
 	die();
 }
 
