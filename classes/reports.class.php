@@ -2452,7 +2452,7 @@ class Reports{
 			SELECT   {$field}, 
 					{$strFieldsKPI['next']}
 			FROM `vw_headcount`			
-			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}'  AND salary>".self::SALARY_THRESHOLD."
+			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND source<>'Actual' AND salary>".self::SALARY_THRESHOLD."
 			GROUP BY  {$groupBy}
 			UNION ALL
 				SELECT   {$field}, 
