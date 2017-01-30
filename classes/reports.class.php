@@ -2813,9 +2813,9 @@ class Reports{
 					?>					
 						<!--Data for YTD actual-->
 						<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
-						<td class='budget-decimal'><?php self::render($data['YTD'],0);?></td>
-						<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD'],0);?></td>
-						<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD']);?></em></td>
+						<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
+						<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
+						<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B']);?></em></td>
 						<!--Data for rest-of-year-->
 						<td class='budget-decimal budget-ytd'><?php self::render($data['ROY_A'],0);?></td>
 						<td class='budget-decimal'><?php self::render($data['ROY_B'],0);?></td>
