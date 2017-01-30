@@ -45,7 +45,7 @@ if ($oDocument->classified) {
 	?>
 	<div class='warning'>Classified by <?php echo strtoupper($oDocument->classified); ?></div>
 	<?php
-	if (strtoupper($oDocument->classified) != $arrUsrData['usrID']){		
+	if (strtoupper($oDocument->classified) != $arrUsrData['usrID'] && !in_array('FM', $arrUsrData['roleIDs'])){		
 		require ('includes/inc-frame_bottom.php');
 		die();
 	}
