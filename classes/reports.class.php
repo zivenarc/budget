@@ -2622,7 +2622,7 @@ class Reports{
 					0 as estimate_JD, 
 					0 as estimate_AM, 
 					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, $cm ,$arrRates, $denominator).") as YTD_A, 
-					0 as YTD, 
+					0 as YTD_B, 
 					SUM(".$this->oBudget->getYTDSQL($nm, 12+$this->oBudget->offset,$arrRates, $denominator).") as ROY_A, 
 					0 as ROY_B";
 		
@@ -2639,7 +2639,7 @@ class Reports{
 					SUM(".$this->oBudget->getYTDSQL(1,12,$arrRates, $denominator).") as estimate_JD ,
 					SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates, $denominator).") as estimate_AM ,
 					0 as YTD_A,
-					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, $cm ,$arrRates, $denominator).") as YTD, 
+					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, $cm ,$arrRates, $denominator).") as YTD_B, 
 					0 as ROY_A,
 					SUM(".$this->oBudget->getYTDSQL($nm,12+$this->oBudget->offset,$arrRates, $denominator).") as ROY_B";
 		
