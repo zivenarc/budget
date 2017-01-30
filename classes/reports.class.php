@@ -1218,7 +1218,7 @@ class Reports{
 		
 		$sqlWhere = $this->sqlWhere;
 		
-		$this->columns = Array('Total','Total_AM','estimate','estimate_AM','YTD_A','YTD','ROY_A','ROY_B');
+		$this->columns = Array('Total','Total_AM','estimate','estimate_AM','YTD_A','YTD_B','ROY_A','ROY_B');
 		$this->sqlSelect = "";
 		for ($m = 1;$m<=15;$m++){
 			$this->columns[] = $this->oBudget->arrPeriod[$m];
