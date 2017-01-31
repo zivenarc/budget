@@ -3,8 +3,11 @@ $flagNoAuth = true;
 define ("CRLF","\r\n");
 define ("TAB","\t");
 require ('common/auth.php');
+require ('classes/budget.class.php');
+
 $pccCode1C = $_GET['pccCode1C']?$_GET['pccCode1C']:"";
-$scenario = $_GET['scenario']?$_GET['scenario']:$budget_scenario;
+$scenario = $_GET['scenario']?$_GET['scenario']:$arrSetup['stpScenarioID'];
+$oBudget = new Budget($scenario);
 
 $sql = "select `pc`
 			,LPAD(`activity`,9,'0') AS 'КодНоменклатурнойГруппы'
@@ -15,18 +18,7 @@ $sql = "select `pc`
 			,`item`
 			,`itmTitle`
 			,LPAD(`itmID`,5,'0') AS 'КодБюджетногоСчета'
-			,SUM(`Jan`) as 'Jan'
-			,SUM(`Feb`) as 'Feb'
-			,SUM(`Mar`) as 'Mar'
-			,SUM(`Apr`) as 'Apr'
-			,SUM(`May`) as 'May'
-			,SUM(`Jun`) as 'Jun'
-			,SUM(`Jul`) as 'Jul'
-			,SUM(`Aug`) as 'Aug'
-			,SUM(`Sep`) as 'Sep'
-			,SUM(`Oct`) as 'Oct'
-			,SUM(`Nov`) as 'Nov'
-			,SUM(`Dec`) as 'Dec'
+			,".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset)."
 			,`scenario`
 			,`particulars`
 			,PART.`КодФизЛица`
