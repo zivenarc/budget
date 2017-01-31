@@ -80,13 +80,14 @@ if(!isset($_GET['prtGHQ'])){
 	<div>
 	<?php
 	// die();
-	$period_type = 'fye';
+	$period_type = 'roy'; $period_title = "rest of year";
+	
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	
 	// echo '<pre>',$sqlActual,'</pre>';
 	
-	$settings['gpcus'] = Array('title'=>"GP by customer",
+	$settings['gpcus'] = Array('title'=>"GP by customer, ".$period_title,
 						'sqlBase' => "SELECT customer_group_code as optValue, 
 											customer_group_title as optText,  
 											{$sqlActual} as Actual, 
@@ -115,7 +116,7 @@ if(!isset($_GET['prtGHQ'])){
 	$oWF = new Waterfall($settings['gpcus']);
 	$oWF->draw();
 	
-	$settings['rfc'] = Array('title'=>"RFC by elements",
+	$settings['rfc'] = Array('title'=>"RFC by elements, ".$period_title,
 						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
 											IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
 											{$sqlActual} as Actual, 
@@ -144,7 +145,7 @@ if(!isset($_GET['prtGHQ'])){
 	$oWF = new Waterfall($settings['rfc']);
 	$oWF->draw();
 	
-	$settings['sga'] = Array('title'=>"SG&A by elements",
+	$settings['sga'] = Array('title'=>"SG&A by elements, ".$period_title,
 						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
 											IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
 											{$sqlActual} as Actual, 
