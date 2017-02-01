@@ -39,7 +39,8 @@ switch ($_POST['DataAction']){
 			$arrJS[]='js/rep_pnl.js';
 			// $arrJS[]='js/input_form.js';	
 			
-			include('includes/inc_group_buttons.php');
+			include('includes/inc_group_buttons.php');			
+			include ('includes/inc-frame_top.php');
 			
 			?>
 				<script>
@@ -56,7 +57,6 @@ switch ($_POST['DataAction']){
 				</script>
 			<?php
 			
-			include ('includes/inc-frame_top.php');
 			echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
 			include ('includes/inc_report_selectors.php');
 			echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';	
