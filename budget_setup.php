@@ -23,6 +23,9 @@ switch ($_POST['DataAction']){
 	case 'unarchive':
 		$oBudget->archive(false);
 		break;	
+	case 'default':
+		$oBudget->setAsDefault(false);
+		break;	
 	default:
 		//do nothing
 		break;
@@ -39,17 +42,37 @@ while ($rw = $oSQL->f($rs)){
 
 ?>
 <div>
-<h2><?php echo $oBudget->title;?> :: 
-Read-only<input type='checkbox' <?php echo $oBudget->flagUpdate?"":"checked";?> name='scnFlagReadOnly' id='scnFlagReadOnly'>
-Archived<input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> name='scnFlagArchive' id='scnFlagArchive'>
-</h2>
-	<div class='f-row'>
-		<label for='scnLastID'>Reference period</label>
-		<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->reference_scenario->id)); ?>
-	</div>
+<h2><?php echo $oBudget->title;?></h2>
+<div id='controlPanel' style="display:inline-block;">
+<table><tr>
+<td>
+	<label for='scnLastID'>Reference period</label>
+	<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->reference_scenario->id)); ?>
+</td>
+<td>
+<label for="scnFlagReadOnly">Read-only</label><input type='checkbox' <?php echo $oBudget->flagUpdate?"":"checked";?> name='scnFlagReadOnly' id='scnFlagReadOnly'>
+<label for="scnFlagArchive">Archived</label><input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> name='scnFlagArchive' id='scnFlagArchive'>
+<?php
+if ($oBudget->id==$arrSetup['stpScenarioID']){
+?>
+<span class='info'>Default budget</span>
+<?php
+} elseif ($oBudget->id==$arrSetup['stpFYEID']){
+?>
+<span class='info'>Default actual scenario</span>
+<?php
+} else {
+?>
+<span><input type='button' value='Set as default' id='default'/></span>
+<?php
+}
+?>
+</td>
+</tr></table>
+</div>
 <nav>
-	<a href='sp_get_kpi.php?budget_scenario=<?php echo $_GET['tab'];?>'>Get KPIs from Nlogjc</a>|
-	<a href='rep_staff_costs.php?budget_scenario=<?php echo $_GET['tab'];?>'>Refresh headcount</a>|	
+	<a target='_blank' href='sp_get_kpi.php?budget_scenario=<?php echo $_GET['tab'];?>'>Get KPIs from Nlogjc</a>|
+	<a  target='_blank' href='rep_staff_costs.php?budget_scenario=<?php echo $_GET['tab'];?>'>Refresh headcount</a>|	
 </nav>
 </div>
 <h2>Budget variables</h2>

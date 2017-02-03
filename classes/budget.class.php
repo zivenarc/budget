@@ -725,6 +725,20 @@ class Budget{
 					AND customer ={$cntID}";
 	}
 	
+	function setAsDefault(){
+		GLOBAL $oSQL, $arrUsrData;
+		if (strpos($this->type,'Budget')!==false){
+			$oSQL->q("UPDATE tbl_setup SET stpCharValue='{$this->id}' 
+					,stpEditBy='{$arrUsrData['usrID']}', stpEditDate=NOW()
+				WHERE stpVarName='stpScenarioID'");
+		} else {
+			$oSQL->q("UPDATE tbl_setup SET stpCharValue='{$this->id}' 
+					,stpEditBy='{$arrUsrData['usrID']}', stpEditDate=NOW()
+				WHERE stpVarName='stpFYEID'");
+		}
+		return (true);
+	}
+	
 	function delete(){
 		GLOBAL $oSQL;
 		$sql = "SELECT entPrefix, entTable, entRegister FROM stbl_entity";

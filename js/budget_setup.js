@@ -22,6 +22,11 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 						$.post(url,{DataAction:'unarchive'});
 					}
 				});
+				$('#default', ui.panel).click(function(){
+					$.post(url,{DataAction:'default'}, function (data){
+						console.log(data);
+					});
+				});
 			},	
 		};
 			
