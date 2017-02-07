@@ -13,7 +13,7 @@ $oBudget = new Budget($budget_scenario);
 
 if (strpos($oBudget->type,'Budget')) die('Wrong budget type, cannot fill in the actuals');
 
-$ytd = $oBudget->cm - 1;
+$ytd = $oBudget->cm;
 $year = $oBudget->year;
 
 $arrKPI[] = Array('prtID'=>48,'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)');
