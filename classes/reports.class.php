@@ -2977,7 +2977,7 @@ class Reports{
 	}
 	
 	function render_ratio ($n1, $n2, $decimals=1){
-		if ((integer)$n2==0){
+		if ((integer)$n2==0 || ($n1*$n2<0)){
 			echo 'n/a';
 			return;			
 		} else {
