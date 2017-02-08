@@ -22,13 +22,13 @@ $sql[] = "SET @item:='453d8da7-963b-4c4f-85ca-99e26d9fc7a2', @yact:='J00801';";
 $sql[] = "DELETE FROM reg_headcount WHERE scenario=@scnID and source='Actual';";
 
 for($m=1+$oBudget->offset;$m<=$ytd;$m++){
-	$year = date('Y',$oBudget->date_start-1);
+	$year = $oBudget->year;
 	$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
 	$repDateEnd = date('Y-m-d H:i:s',mktime(23,59,59,$m+1,0,$year));
 	
 	// $month = date('M',mktime(0,0,0,$m,1,$year));
 	$month = $oBudget->arrPeriod[$m];
-	// echo '<pre>',$repDateStart,' - ',$repDateEnd,'</pre>';
+	echo '<pre>',$repDateStart,' - ',$repDateEnd,'</pre>';
 	// echo $month;
 
 	$sql[] = "SET @repDateStart:='{$repDateStart}', @repDateEnd:='{$repDateEnd}';";
