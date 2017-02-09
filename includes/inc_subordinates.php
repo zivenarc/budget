@@ -36,9 +36,11 @@ $id = 0;
 	<ul class='link-footer'>
 		<li><a href="?ownerID=<?php echo $arrUsrData['usrID'];?>">My documents</a>
 		<?php
-		foreach($subordinates as $id=>$data){
-			if($data['empUserID']){
-				?><li><a href="?ownerID=<?php echo $data['empUserID'];?>"><?php echo $data['empTitle'];?></a><?php
+		if (is_array($subordinates)){
+			foreach($subordinates as $id=>$data){
+				if($data['empUserID']){
+					?><li><a href="?ownerID=<?php echo $data['empUserID'];?>"><?php echo $data['empTitle'];?></a><?php
+				}
 			}
 		}
 		?>
