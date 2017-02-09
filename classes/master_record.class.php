@@ -63,7 +63,7 @@ class master_record{
 		$arrRes[] = "`part_type`=".($this->part_type?$oSQL->e($this->part_type):'NULL');
 		$arrRes[] = "`particulars`=".$oSQL->e($this->particulars);
 		$arrRes[] = "`sales`=".($this->sales?$oSQL->e($this->sales):'NULL');		
-		$arrRes[] = "`bdv`=IFNULL((SELECT usrProfitID FROM stbl_user WHERE usrID=".$oSQL->e($this->sales)."),0)";
+		$arrRes[] = "`bdv`=".($this->bdv?$this->bdv:"IFNULL((SELECT usrProfitID FROM stbl_user WHERE usrID=".$oSQL->e($this->sales)."),0)");
 		//$arrRes[] = "`part_type`=".(is_object($this->particulars['obj'])?"'".$this->particulars['obj']->TYPE."'":'NULL');
 		$res = "INSERT INTO `reg_master` SET ". implode(',',$arrRes).';';
 		return $res;
