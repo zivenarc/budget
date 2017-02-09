@@ -52,13 +52,12 @@ if(!isset($_GET['pccGUID'])){
 	
 	include ('includes/inc_report_buttons.php');
 	
-	$sqlWhere = "WHERE sales = ".$oSQL->e($ownerID);
-	
-	if ($_GET['pccGUID']=='all'){
-		
-	} else {
-		$sqlWhere .= " AND pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
-	}
+	// $sqlWhere = "WHERE sales = ".$oSQL->e($ownerID);
+	// if ($_GET['pccGUID']=='all'){
+
+	// } else {
+		// $sqlWhere .= " AND pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
+	// }
 	
 	$filter['sales'] = $ownerID;
 	

@@ -16,9 +16,11 @@ if ($_GET['pccGUID']=='all'){
 	
 	if ($bu_group){
 		$strBUs = implode(',',$arrBus);
-		$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1 AND pcrProfitID IN ({$strBUs})";
+		// $sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1 AND pcrProfitID IN ({$strBUs})";
+		$sql = "SELECT DISTINCT pccID FROM common.db.tbl_profit WHERE pccID IN ({$strBUs})";
 	} else {		
-		$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
+		// $sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
+		$sql = "SELECT DISTINCT pccID FROM common.db.tbl_profit";
 	}
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
