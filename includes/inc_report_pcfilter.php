@@ -20,11 +20,12 @@ if ($_GET['pccGUID']=='all'){
 		$sql = "SELECT DISTINCT pccID FROM common_db.tbl_profit WHERE pccID IN ({$strBUs})";
 	} else {		
 		// $sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
-		$sql = "SELECT DISTINCT pccID FROM common_db.tbl_profit";
+		$sql = "SELECT DISTINCT pccID FROM common_db.tbl_profit WHERE pccFlagFolder=0";
 	}
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
-		$arrPC[] = $rw['pcrProfitID'];
+		// $arrPC[] = $rw['pcrProfitID'];
+		$arrPC[] = $rw['pccID'];
 	}		
 } else {
 	$sql = "SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']);
