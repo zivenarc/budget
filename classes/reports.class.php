@@ -68,6 +68,8 @@ class Reports{
 		} else {
 			$this->sqlWhere = "WHERE `company`='{$this->company}' ";
 		}
+		
+		$this->caption = $this->oBudget->title.' vs '.$this->oReference->title.', '.$this->CurrencyTitle.($this->Denominator!=1?'x'.$this->Denominator:'');
 	}
 	
 	public function salesByActivity($sqlWhere=''){
@@ -1124,6 +1126,7 @@ class Reports{
 			}
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
+			<caption><?php echo $this->caption;?></caption>
 			<thead>
 				<tr>
 					<th>Activity</th>
@@ -1960,6 +1963,7 @@ class Reports{
 			};
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
+			<caption><?php echo $this->caption;?></caption>
 			<thead>
 				<tr>
 					<th><?php echo $firstLevelTitle; ?></th>
@@ -2018,6 +2022,7 @@ class Reports{
 			};
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
+			<caption><?php echo $this->caption;?></caption>
 			<thead>
 				<tr>
 					<th rowspan="2"><?php echo $firstLevelTitle; ?></th>
@@ -2891,7 +2896,7 @@ class Reports{
 				$this->echoBudgetItemString($arrSubtotal,'budget-subtotal budget-item');
 			} else {	
 			?>
-			<td colspan="2" data-code='<?php echo $data['metadata'];?>'>
+			<td colspan="2" title="<?php echo $data['title'];?>" data-code='<?php echo $data['metadata'];?>'>
 			<?php
 				if ($data['Group_code']==self::GP_CODE) {
 					echo 'Total '.strtolower($data['Budget item']); 
@@ -3093,8 +3098,8 @@ class Reports{
 				return (false);
 		};
 			?>
-			<table id='<?php echo $this->ID;?>' class='budget' style='font-size:1.3em;'>
-			<caption><?php echo $this->oBudget->title,' vs ',$this->oReference->title;?></caption>
+			<table id='<?php echo $this->ID;?>' class='budget' style='font-size:1.2em;'>
+			<caption><?php echo $this->caption;?></caption>
 			<thead>				
 				<tr>					
 					<th rowspan="2" colspan="2"><?php echo $this->CurrencyTitle, "&nbsp;", number_format($this->Denominator);?></th>
@@ -3119,6 +3124,7 @@ class Reports{
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Net revenue";
+			$rw['title'] = "Revenue less proceeds from import freight";
 			$this->echoBudgetItemString($rw);
 		}
 		
@@ -3127,6 +3133,7 @@ class Reports{
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Direct costs";
+			$rw['title'] = "Subcontractor costs, except import freight";
 			$this->echoBudgetItemString($rw);
 		}
 		
@@ -3144,6 +3151,7 @@ class Reports{
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Reclassified fixed costs";
+			$rw['title'] = "Direct production costs: labor, rent, fuel, depreciation";
 			$this->echoBudgetItemString($rw);
 		}
 		
@@ -3161,6 +3169,7 @@ class Reports{
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
 				$rw['Budget item'] = "Selling & general";
+				$rw['title'] = "Costs of sales and BU management";
 				$this->echoBudgetItemString($rw);
 			}
 			
@@ -3169,6 +3178,7 @@ class Reports{
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
 				$rw['Budget item'] = "Corporate costs";
+				$rw['title'] = "Costs of headquarters, except BDV";
 				$this->echoBudgetItemString($rw);
 			}
 			
@@ -3176,7 +3186,7 @@ class Reports{
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
-				$rw['Budget item'] = "Operating income";
+				$rw['Budget item'] = "Operating income";				
 				$this->echoBudgetItemString($rw, 'budget-subtotal');
 			}
 			
@@ -3185,6 +3195,7 @@ class Reports{
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
 				$rw['Budget item'] = "Non-operating income";
+				$rw['title'] = "Interest receivable, sublease, sale of assets";
 				$this->echoBudgetItemString($rw);
 			}
 			
@@ -3193,6 +3204,7 @@ class Reports{
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
 				$rw['Budget item'] = "Non-operating losses";
+				$rw['title'] = "Interest and FX losses";
 				$this->echoBudgetItemString($rw);
 			}
 			
