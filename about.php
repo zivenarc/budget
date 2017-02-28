@@ -36,8 +36,8 @@ require ('includes/inc-frame_top.php');
 $denominator = 1000;
 $oBudget = new Budget($arrSetup['stpFYEID']);
 $oReference = new Budget($arrSetup['stpScenarioID']);
-
-$arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>($arrUsrData['pccFlagProd']?$arrUsrData['pccParentCode1C']:''));
+// echo '<pre>';print_r($arrUsrData);echo '</pre>';
+$arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>($arrUsrData['PCC']['pccFlagProd']?$arrUsrData['PCC']['pccParentCode1C']:''));
 $strQuery = http_build_query($arrDefaultParams);
 
 ?>
