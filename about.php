@@ -37,7 +37,7 @@ $denominator = 1000;
 $oBudget = new Budget($arrSetup['stpFYEID']);
 $oReference = new Budget($arrSetup['stpScenarioID']);
 
-$arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>'');
+$arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>($arrUsrData['pccFlagProd']?$arrUsrData['pccParentCode1C']:''));
 $strQuery = http_build_query($arrDefaultParams);
 
 ?>
