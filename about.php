@@ -36,15 +36,29 @@ require ('includes/inc-frame_top.php');
 $denominator = 1000;
 $oBudget = new Budget($arrSetup['stpFYEID']);
 $oReference = new Budget($arrSetup['stpScenarioID']);
+
+$arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>'');
+$strQuery = http_build_query($arrDefaultParams);
+
 ?>
 <h1>Current scenario: <?php echo $oBudget->title; ?>, current budget - <?php echo $oReference->title; ?></h1>
-<nav>
-	<a href="rep_summary.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Summary</a>|
-	<a href="rep_monthly.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Monthly report</a>|
-	<a href="rep_pnl.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Full-year estimate</a>|
-	<a href="rep_totals.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Results per BU</a>|
-	<a href="rep_waterfall.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Waterfall</a>|
-	<a href="rep_graphs.php?budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Charts</a>
+
+<nav><span>vs default budget:</span>
+	<a href="rep_summary.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Summary</a>|
+	<a href="rep_monthly.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Monthly report</a>|
+	<a href="rep_pnl.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Full-year estimate</a>|
+	<a href="rep_totals.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Results per BU</a>|
+	<a href="rep_waterfall.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Waterfall</a>|
+	<a href="rep_graphs.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Charts</a>
+</nav>
+
+<nav><span>vs <?php echo $oBudget->reference_scenario->title;?>:</span>
+	<a href="rep_summary.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Summary</a>|
+	<a href="rep_monthly.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Monthly report</a>|
+	<a href="rep_pnl.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Full-year estimate</a>|
+	<a href="rep_totals.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Results per BU</a>|
+	<a href="rep_waterfall.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Waterfall</a>|
+	<a href="rep_graphs.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Charts</a>
 </nav>
 <br/>
 <?php

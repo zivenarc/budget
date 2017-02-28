@@ -125,6 +125,25 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 			'tolerance'=>0.001
 			);
 
+$settings['gopbu'] = Array('title'=>"GOP by business unit",
+'sqlBase' => "SELECT pc as optValue, 
+					Profit as optText, 
+					{$sqlActual} as Actual, 
+					0 as Budget, 
+					{$sqlActual} as Diff
+			FROM vw_master 			
+			WHERE scenario='{$actual}' ".Reports::GOP_FILTER."
+			GROUP BY pc
+			UNION ALL
+			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+			FROM vw_master 			
+			WHERE
+			scenario='{$budget}' AND source<>'Estimate' ".Reports::GOP_FILTER."
+			GROUP BY pc",
+			'tolerance'=>0.001
+			);
+			
+			
 $settings['scbu'] = Array('title'=>"Staff cost by business unit",
 'sqlBase' => "SELECT pc as optValue, 
 					Profit as optText, 
@@ -200,60 +219,6 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
 			'tolerance'=>0.07,
 			'limit'=>5);
-
-$settings['pbtwwh'] = Array('title'=>"PBT by factors w/o Warehouse",
-'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
-					IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
-					{$sqlActual} as Actual, 
-					0 as Budget, 
-					{$sqlActual} as Diff
-			FROM vw_master 			
-			WHERE scenario='{$actual}' AND pc NOT IN (5,15) AND Group_code<>121
-			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)
-			UNION ALL
-			SELECT IF(`Group_code` IN (108,110,96),item,Group_code), 
-				IF(`Group_code` IN (108,110,96),`Budget item`,`Group`), 
-				0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
-			FROM vw_master 			
-			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc NOT IN (5,15) AND Group_code<>121
-			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
-			'tolerance'=>0.07);
-
-$settings['whp'] = Array('title'=>"PBT Pokrov",
-'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
-					IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
-					{$sqlActual} as Actual, 
-					0 as Budget, 
-					{$sqlActual} as Diff
-			FROM vw_master 			
-			WHERE scenario='{$actual}' AND pc IN (5) AND Group_code<>121
-			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)
-			UNION ALL
-			SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code), 
-				IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`), 
-				0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
-			FROM vw_master 			
-			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc IN (5) AND Group_code<>121
-			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)",
-			'tolerance'=>0.05);
-			
-$settings['whs'] = Array('title'=>"PBT Shushary",
-'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
-					IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
-					{$sqlActual} as Actual, 
-					0 as Budget, 
-					{$sqlActual} as Diff
-			FROM vw_master 			
-			WHERE scenario='{$actual}' AND pc IN (15) AND Group_code<>121
-			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)
-			UNION ALL
-			SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code), 
-				IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`), 
-				0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
-			FROM vw_master 			
-			WHERE scenario='{$budget}' AND source<>'Estimate' AND pc IN (15) AND Group_code<>121
-			GROUP BY IF(`Group_code` IN (108,110,96,94),item, Group_code)",
-			'tolerance'=>0.05);
 			
 $type = $_GET['type']?$_GET['type']:'gpcus';
 			
