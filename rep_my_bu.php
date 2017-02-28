@@ -60,13 +60,6 @@ if(!isset($_GET['pccGUID'])){
 	
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
 	
-	if(isset($currency)){
-		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
-		$rs = $oSQL->q($sql);
-		$rw = $oSQL->f($rs);
-		echo '<h2>',$rw["curTitle$strLocal"],($denominator!=1?' x'.$denominator:''),'</h2>';
-	}
-	
 	if (strpos($oBudget->type,'FYE')!==false){
 		$oReport->monthlyReport($type);
 	} else {

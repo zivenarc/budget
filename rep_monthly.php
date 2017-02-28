@@ -12,13 +12,6 @@ if ($reference!=$oBudget->reference_scenario->id){
 	$reference = $oBudget->reference_scenario->id;
 }
 
-if(isset($_GET['currency'])){
-		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
-		$rs = $oSQL->q($sql);
-		$rw = $oSQL->f($rs);
-		echo '<h2>',$rw["curTitle$strLocal"],'</h2>';
-}
-
 include ('includes/inc_report_pcfilter.php'); /// filter and tabs for Business unit
 
 if (isset($_REQUEST['filter'])){
