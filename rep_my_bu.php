@@ -36,8 +36,11 @@ $rs = $oSQL->q($sql);
 $rw = $oSQL->f($rs);
 $arrUsrData["pagTitle$strLocal"] = 'Sales by '.($rw['pccTitle']?$rw['pccTitle']:'<Unknown>');
 
-$arrActions[] = Array('title'=>'NSD','action'=>'?bdv=9');
-$arrActions[] = Array('title'=>'JSD','action'=>'?bdv=130');
+$arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>'');
+$strQuery = http_build_query($arrDefaultParams);
+
+$arrActions[] = Array('title'=>'NSD','action'=>'?bdv=9&type=bu_group&'.$strQuery);
+$arrActions[] = Array('title'=>'JSD','action'=>'?bdv=130&type=bu_group&'.$strQuery);
 	
 if(!isset($_GET['pccGUID'])){
 	
