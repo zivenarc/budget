@@ -24,13 +24,6 @@ $arrJS[]='js/rep_pnl.js';
 
 include('includes/inc_group_buttons.php');
 
-if(isset($currency)){
-		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
-		$rs = $oSQL->q($sql);
-		$rw = $oSQL->f($rs);
-		echo '<h2>',$rw["curTitle$strLocal"],'</h2>';
-}
-
 $sql = "SELECT * FROM common_db.tbl_profit WHERE pccID=".$oSQL->e($bdv);
 $rs = $oSQL->q($sql);
 $rw = $oSQL->f($rs);
@@ -46,6 +39,7 @@ if(!isset($_GET['pccGUID'])){
 	
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
+
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	include ('includes/inc_report_selectors.php');
 
@@ -65,7 +59,14 @@ if(!isset($_GET['pccGUID'])){
 	$filter['bdv'] = $bdv;
 	
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
-
+	
+	if(isset($currency)){
+		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
+		$rs = $oSQL->q($sql);
+		$rw = $oSQL->f($rs);
+		echo '<h2>',$rw["curTitle$strLocal"],($denominator!=1?' x'.$denominator:''),'</h2>';
+	}
+	
 	if (strpos($oBudget->type,'FYE')!==false){
 		$oReport->monthlyReport($type);
 	} else {
