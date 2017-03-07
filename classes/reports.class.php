@@ -3199,7 +3199,7 @@ class Reports{
 				$this->echoBudgetItemString($rw);
 			}
 			
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '65%')", $sql);
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '65%' OR account LIKE '66%')", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
