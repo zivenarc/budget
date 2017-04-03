@@ -51,7 +51,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM vw_master 								
-								WHERE scenario='{$actual}' ".Reports::GP_FILTER."
+								WHERE scenario='{$actual}' ".Reports::GP_FILTER." AND company='{$company}'
 								GROUP BY customer_group_code
 								UNION ALL
 								SELECT customer_group_code as optValue, 
@@ -60,7 +60,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 								
 								WHERE
-								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
+								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 								GROUP BY customer_group_code",
 						'tolerance'=>0.05,
 						'limit'=>10);
@@ -72,14 +72,14 @@ $settings['gpsal'] = Array('title'=>"GP by sales",
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM vw_master 							
-								WHERE scenario='{$actual}' ".Reports::GP_FILTER."
+								WHERE scenario='{$actual}' ".Reports::GP_FILTER." AND company='{$company}'
 								GROUP BY sales
 								UNION ALL
 								SELECT sales, usrTitle as optText, 0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 								
 								WHERE
-								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
+								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 								GROUP BY sales",
 						'tolerance'=>0.05,
 						'limit'=>10);						
@@ -92,7 +92,7 @@ $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 										{$sqlActual} as Diff
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
-								WHERE scenario='{$actual}' ".Reports::GP_FILTER." 
+								WHERE scenario='{$actual}' ".Reports::GP_FILTER." AND company='{$company}'
 								AND pc NOT in (5,15)
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)
 								UNION ALL
@@ -101,7 +101,7 @@ $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 								FROM vw_master 
 								LEFT JOIN common_db.tbl_counterparty C ON C.cntID=customer
 								WHERE
-								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
+								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 								AND pc NOT in (5,15)
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
 						'tolerance'=>0.05,
@@ -114,13 +114,13 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}' ".Reports::GP_FILTER."
+			WHERE scenario='{$actual}' ".Reports::GP_FILTER." AND company='{$company}'
 			GROUP BY pc
 			UNION ALL
 			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE
-			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
+			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 			GROUP BY pc",
 			'tolerance'=>0.001
 			);
@@ -132,13 +132,13 @@ $settings['gopbu'] = Array('title'=>"GOP by business unit",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}' ".Reports::GOP_FILTER."
+			WHERE scenario='{$actual}' ".Reports::GOP_FILTER." AND company='{$company}'
 			GROUP BY pc
 			UNION ALL
 			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE
-			scenario='{$budget}' AND source<>'Estimate' ".Reports::GOP_FILTER."
+			scenario='{$budget}' AND source<>'Estimate' ".Reports::GOP_FILTER." AND company='{$company}'
 			GROUP BY pc",
 			'tolerance'=>0.001
 			);
@@ -151,13 +151,13 @@ $settings['scbu'] = Array('title'=>"Staff cost by business unit",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}' ".Reports::SC_FILTER."
+			WHERE scenario='{$actual}' ".Reports::SC_FILTER." AND company='{$company}'
 			GROUP BY pc
 			UNION ALL
 			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE
-			scenario='{$budget}' AND source<>'Estimate' ".Reports::SC_FILTER."
+			scenario='{$budget}' AND source<>'Estimate' ".Reports::SC_FILTER." AND company='{$company}'
 			GROUP BY pc",
 			'tolerance'=>0.05
 			);			
@@ -169,13 +169,13 @@ $settings['gpact'] = Array('title'=>"GP by activity",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}' ".Reports::GP_FILTER."
+			WHERE scenario='{$actual}' ".Reports::GP_FILTER." AND company='{$company}'
 			GROUP BY activity
 			UNION ALL
 			SELECT activity, Activity_title, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE
-			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER."
+			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 			GROUP BY activity",
 			'tolerance'=>0.1
 			);			
@@ -187,13 +187,13 @@ $settings['opbu'] = Array('title'=>"OP by business unit",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}'  ".Reports::OP_FILTER."
+			WHERE scenario='{$actual}'  ".Reports::OP_FILTER." AND company='{$company}'
 			GROUP BY pc
 			UNION ALL
 			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE
-			scenario='{$budget}' AND source<>'Estimate' ".Reports::OP_FILTER."
+			scenario='{$budget}' AND source<>'Estimate' ".Reports::OP_FILTER." AND company='{$company}'
 			GROUP BY pc",
 			'tolerance'=>0.05
 			);
@@ -207,7 +207,7 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 			
-			WHERE scenario='{$actual}' AND Group_code<>121
+			WHERE scenario='{$actual}' AND Group_code<>121 AND company='{$company}'
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)
 			UNION ALL
 			SELECT IF(`Group_code` IN (108,110,96),item,Group_code), 
@@ -215,7 +215,7 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 				0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 			FROM vw_master 			
 			WHERE
-			scenario='{$budget}' AND source<>'Estimate' AND Group_code<>121
+			scenario='{$budget}' AND source<>'Estimate' AND Group_code<>121 AND company='{$company}'
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
 			'tolerance'=>0.07,
 			'limit'=>5);
