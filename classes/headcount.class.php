@@ -522,21 +522,35 @@ class Headcount extends Document{
 								
 					$social_tax = Array();					
 					$salarySubtotal = 0;
+					
+					$sql = "SELECT IF(bnsStateID=2270,bnsApprovedSalary,bnsReviewedSalary) as bnsReviewedSalary
+							FROM treasury.tbl_bonus 
+							WHERE bnsEmployeeID=(SELECT empID FROM common_db.tbl_employee WHERE empGUID1C='{$record->employee}')
+								AND bnsStateID BETWEEN 2220 AND 2270
+								AND bnsPeriodID=(SELECT MAX(bpdID) FROM treasury.tbl_bonus_period WHERE bpdDateEnd<'".date('Y-m-d',$this->budget->date_start)."' AND bpdFlagSalaryReview=1)";
+					$rs = $this->oSQL->q($sql);
+					$bnsReviewedSalary = $this->oSQL->get_data($rs);
+					
+					// echo '<pre>',$sql,'</pre>';die();
+					
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
 						
-						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-						$current_month_end = mktime(23,59,59,$m+1,0,$oBudget->year);
-											
-						if ($eligible && $this->type=='current') {						
+						$current_month_start = mktime(0,0,0,$m,1,$this->budget->year);
+						$current_month_end = mktime(23,59,59,$m+1,0,$this->budget->year);
+						
+
+						if($bnsReviewedSalary){
+							$salary[$month] = ($record->{$month})*(($m<$this->settings['salary_review_month']?$record->salary:$bnsReviewedSalary)+$record->monthly_bonus);
+						} elseif ($eligible && $this->type=='current') {						
 							$salary[$month] = ($record->{$month})*($record->salary+$record->monthly_bonus)*($m<$this->settings['salary_review_month']?1:1+$this->settings['salary_increase_ratio']);
 						} else {
 							if (true || $this->type=='current'){
 								$salary[$month] = ($record->{$month})*($record->salary+$record->monthly_bonus);
 							} else {
 								//------------disabled--------------------------------------
-								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-								$current_month_end = mktime(0,0,0,$m+1,0,$oBudget->year);
+								$current_month_start = mktime(0,0,0,$m,1,$this->budget->year);
+								$current_month_end = mktime(0,0,0,$m+1,0,$this->budget->year);
 								if(date('YM',$start_date)==date('YM',$current_month_start)){
 									$record->hc = $record->new_fte*(date('t',$current_month_start)-date('j',$start_date))/date('t',$current_month_start);							 
 								} elseif($start_date<$current_month_start){
