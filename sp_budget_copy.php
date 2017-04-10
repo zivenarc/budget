@@ -218,7 +218,9 @@ $sql[] = "SET AUTOCOMMIT=1;";
 $sql[] = "SET FOREIGN_KEY_CHECKS=1;";
 for ($i=0;$i<count($sql);$i++){
 	echo '<pre>',$sql[$i],'</pre>';
-	$oSQL->q($sql[$i]);
+	if(!isset($_GET['debug'])){
+		$oSQL->q($sql[$i]);
+	}
 }
 
 ?>
