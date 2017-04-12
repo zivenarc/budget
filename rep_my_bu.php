@@ -60,7 +60,7 @@ if(!isset($_GET['pccGUID'])){
 	
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
 	
-	if (strpos($oBudget->type,'FYE')!==false){
+	if (strpos($oBudget->type,'Budget')===false){
 		$oReport->monthlyReport($type);
 	} else {
 		$oReport->periodicPnL($type);
