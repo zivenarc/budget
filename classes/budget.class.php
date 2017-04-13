@@ -765,13 +765,22 @@ class Budget{
 		
 		$sqlAction[] = "COMMIT;";
 		
-		for ($i=0;$i<count($sqlAction);$i++){
-			echo '<pre>',$sqlAction[$i],'</pre>';
-			$rs = $oSQL->q($sqlAction[$i]);
-			echo "<pre style='color:red;'>## Affected rows - ",$oSQL->affected_rows,'</pre>';
+		$success = true;
+		$res['id']=$this->id;
+		for ($i=0;$i<count($sqlAction);$i++){			
+			$res['log'][] = $sqlAction[$i];
+			try {
+				$success &= $oSQL->q($sqlAction[$i]);
+				$res['log'][] = "##Affected rows - ".$oSQL->affected_rows;
+			} catch (Exception $e){
+				$res['status'] = 'error';
+				$res['log'][] = $e->getMessage();
+				return ($res);
+			}
+			
 		}
-		
-		return (true);
+		if ($success) $res['status'] = 'success';
+		return ($res);
 	}
 	
 }
