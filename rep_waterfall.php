@@ -159,7 +159,7 @@ $settings['scbu'] = Array('title'=>"Staff cost by business unit",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::SC_FILTER." AND company='{$company}'
 			GROUP BY pc",
-			'tolerance'=>0.00
+			'tolerance'=>0.005
 			);			
 			
 $settings['gpact'] = Array('title'=>"GP by activity",
