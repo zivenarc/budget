@@ -111,6 +111,8 @@ if(!isset($_GET['prtGHQ'])){
 									GROUP BY customer_group_code",
 							'tolerance'=>0.05,
 							'denominator'=>$denominator,
+							'actual_title'=>$oBudget->title,
+							'budget_title'=>$oReference->title,
 							'limit'=>10);	
 	
 	$oWF = new Waterfall($settings['gpcus']);
@@ -140,6 +142,8 @@ if(!isset($_GET['prtGHQ'])){
 									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
 							'tolerance'=>0.05,
 							'denominator'=>$denominator,
+							'actual_title'=>$oBudget->title,
+							'budget_title'=>$oReference->title,
 							'limit'=>10);
 	
 	$oWF = new Waterfall($settings['rfc']);
@@ -169,6 +173,8 @@ if(!isset($_GET['prtGHQ'])){
 									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
 							'tolerance'=>0.05,
 							'denominator'=>$denominator,
+							'actual_title'=>$oBudget->title,
+							'budget_title'=>$oReference->title,
 							'limit'=>10);
 	
 	$oWF = new Waterfall($settings['sga']);
