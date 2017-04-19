@@ -227,6 +227,7 @@ if (is_array($settings[$type])){
 	$settings[$type]['actual_title'] = $oActual->title;
 	$settings[$type]['budget_title'] = $oBudget->title;
 	$settings[$type]['denominator'] = $denominator;
+	$settings[$type]['currency'] = $arrCurrencySelector[$currency];
 	
 	$oWF = new Waterfall($settings[$type]);
 } else {
