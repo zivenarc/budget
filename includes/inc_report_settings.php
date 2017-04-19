@@ -42,6 +42,8 @@ if (isset($_GET['currency'])) {
 }
 SetCookie('report_currency',$currency,0,'/budget/');
 
+$arrCurrencySelector = Array(978=>'EUR',840=>'USD',643=>'RUB');
+
 //------------------------------------- type of report details -------------------------------------------//
 if (isset($_GET['type'])){
 	$type = $_GET['type'];

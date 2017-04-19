@@ -3,8 +3,7 @@
 <tr>
 <td>
 <div id="currency_selector">
-	<?php 
-		$arrCurrencySelector = Array(978=>'EUR',840=>'USD',643=>'RUB');
+	<?php 		
 		foreach ($arrCurrencySelector as $key=>$title){
 			$label = "currency_".$key;
 		?>		
