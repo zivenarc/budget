@@ -32,9 +32,12 @@ class Budget{
 		if ($this->type=='Actual' || $this->type=='Budget'){
 			$this->cm=12;
 			$this->nm = 99;
-		} elseif ($this->type=='Actual_AM' || $this->type=='Budget_AM') {
+		} elseif ($this->type=='Actual_AM'){
 			$this->cm=15;
-			$this->nm = 3;
+			$this->nm = 4;
+		} elseif ($this->type=='Budget_AM'){
+			$this->cm=4;
+			$this->nm=5;
 		} else {
 			$this->cm = date('n',$this->date_start-1)+12*(date('Y',$this->date_start-1)-$this->year); 
 			$this->nm = $this->cm+1;
