@@ -183,8 +183,29 @@ if(!isset($_GET['prtGHQ'])){
 	// if (strpos($oBudget->type,'Budget')===false){
 		$sqlActual = "SUM(".$oBudget->getThisYTDSQL('nm',$arrActualRates).")";
 		$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('cm',$arrActualRates).")";
-		$settings['nextGP'] = Array('title'=>"GP by customer, next month changes",
-							'sqlBase' => "SELECT  customer_group_code as optValue, 
+		
+		if ($oBudget->nm < $oBudget->cm){
+			$sqlBase = "SELECT  customer_group_code as optValue, 
+												customer_group_title as optText,  
+												{$sqlActual} as Actual, 
+												0 as Budget, 
+												{$sqlActual} as Diff
+										FROM vw_master 
+										{$sqlWhere}
+											AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
+										GROUP BY customer_group_code
+						UNION ALL
+						SELECT  customer_group_code as optValue, 
+												customer_group_title as optText,  
+												0 as Actual, 
+												{$sqlBudget} as Budget, 
+												(-{$sqlBudget}) as Diff
+										FROM vw_master 
+										{$sqlWhere}
+											AND  scenario='{$oReference->id}' AND account IN ('J00400', 'J00802')
+										GROUP BY customer_group_code";
+		} else {
+			$sqlBase = "SELECT  customer_group_code as optValue, 
 												customer_group_title as optText,  
 												{$sqlActual} as Actual, 
 												{$sqlBudget} as Budget, 
@@ -192,7 +213,11 @@ if(!isset($_GET['prtGHQ'])){
 										FROM vw_master 
 										{$sqlWhere}
 											AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
-										GROUP BY customer_group_code",
+										GROUP BY customer_group_code";
+		}
+		
+		$settings['nextGP'] = Array('title'=>"GP by customer, next month changes",
+							'sqlBase' => $sqlBase,
 								'denominator'=>$denominator,
 								'budget_title'=>'This month',
 								'actual_title'=>'Next month',
