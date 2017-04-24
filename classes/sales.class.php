@@ -42,6 +42,8 @@ class Sales extends Document{
 		$this->destination_agent = $this->data['salDA'];
 		$this->business_owner = $this->data['salBO'];
 		$this->gbr = $this->data['salGBR'];
+		$this->pol = $this->data['salPOL'];
+		$this->pod = $this->data['salPOD'];
 		
 	}
 	public function refresh($id){
@@ -176,6 +178,26 @@ class Sales extends Document{
 			,'type'=>'integer'		
 			,'disabled'=>!$this->flagUpdate			
 		);
+		
+		$this->Columns[] = Array(
+			'title'=>'Port of loading'
+			,'field'=>self::Prefix.'POL'
+			,'type'=>'ajax'
+			,'table'=>'tbl_port'
+			,'prefix'=>'prt'
+			,'sql'=>'tbl_port'			
+			,'disabled'=>!$this->flagUpdate			
+		);
+		
+		$this->Columns[] = Array(
+			'title'=>'Port of discharge'
+			,'field'=>self::Prefix.'POD'
+			,'type'=>'ajax'
+			,'table'=>'tbl_port'
+			,'prefix'=>'prt'
+			,'sql'=>'tbl_port'			
+			,'disabled'=>!$this->flagUpdate			
+		);
 
 	}
 	
@@ -298,6 +320,8 @@ class Sales extends Document{
 			$this->destination_agent = isset($_POST[$this->prefix.'DA'])?$_POST[$this->prefix.'DA']:$this->destination_agent;
 			$this->business_owner = isset($_POST[$this->prefix.'BO'])?$_POST[$this->prefix.'BO']:$this->business_owner;
 			$this->gbr = isset($_POST[$this->prefix.'GBR'])?$_POST[$this->prefix.'GBR']:$this->gbr;
+			$this->pol = isset($_POST[$this->prefix.'POL'])?$_POST[$this->prefix.'POL']:$this->pol;
+			$this->pod = isset($_POST[$this->prefix.'POD'])?$_POST[$this->prefix.'POD']:$this->pod;
 			
 			if (isset($_POST[$this->prefix.'ProfitID']) && count($this->records[$this->gridName])){
 				foreach ($this->records[$this->gridName] as $id=>$row){
@@ -341,6 +365,16 @@ class Sales extends Document{
 						// die('row #'.$id." updated with route value (".$this->route.")");							
 						$row->jo = $this->job_owner;
 					}
+					
+					if ($row->pol!=$this->pol){
+						$row->flagUpdated = true;							
+						$row->pol = $this->pol;
+					}
+					
+					if ($row->pod!=$this->pod){
+						$row->flagUpdated = true;							
+						$row->pod = $this->pod;
+					}
 				}
 			}
 						
@@ -375,6 +409,8 @@ class Sales extends Document{
 						$row->sales = $this->sales;				
 						$row->bo = $this->business_owner;
 						$row->jo = $this->job_owner;						
+						$row->pol = $this->pol;						
+						$row->pod = $this->pod;						
 						$row->route = $this->route;				
 						$row->freehand = ($row->activity==48 && $this->business_owner==self::PB_Ourselves && $this->job_owner!=self::PB_Ourselves) || ($row->activity==63 && $this->business_owner==self::PB_Ourselves);				
 						for ($m=1;$m<=15;$m++){							

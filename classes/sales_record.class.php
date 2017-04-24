@@ -24,6 +24,8 @@ class sales_record extends table_record{
 			$this->hbl= $data['hbl'];	
 			$this->bo= $data['bo'];	
 			$this->jo= $data['jo'];	
+			$this->pol= $data['pol'];	
+			$this->pod= $data['pod'];	
 		}		
 		return (true);
 	}	
@@ -59,6 +61,8 @@ class sales_record extends table_record{
 			$arrRes[] = "`unit`='".$oProduct->unit."'";
 			$arrRes[] = "`formula`=".$oSQL->e($this->formula);
 			$arrRes[] = "`sales`=".$oSQL->e($this->sales);
+			$arrRes[] = "`pol`=".$oSQL->e($this->pol);
+			$arrRes[] = "`pod`=".$oSQL->e($this->pod);
 			$arrRes[] = "`bdv`=(SELECT usrProfitID FROM stbl_user WHERE usrID=".$oSQL->e($this->sales).")";
 			$arrRes[] = "`route`=".($this->route?(integer)$this->route:'NULL');
 			$arrRes[] = "`kpi`=".(integer)$this->kpi;
