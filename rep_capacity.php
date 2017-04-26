@@ -22,7 +22,7 @@ echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'<
 include ('includes/inc_report_selectors.php');
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
-$sql = "SELECT pol, pod, cntTitle, cntYunas, rteTitle, gbr, POL.prtTitle as polTitle, POD.prtTitle as podTitle,
+$sql = "SELECT pol, pod, cntTitle, cntYUNAS, rteTitle, gbr, POL.prtTitle as polTitle, POD.prtTitle as podTitle,
 		".$oBudget->getMonthlySumSQL($oBudget->offset+1, $oBudget->offset+12)." 
 		FROM reg_sales
 		LEFT JOIN vw_counterparty ON cntID=customer
@@ -52,11 +52,11 @@ while ($rw = $oSQL->f($rs)){
 	?>
 	<tr>
 		<td><?php echo $rw['rteTitle'];?></td>
+		<td><?php echo $rw['gbr']?"Y":"";?></td>
 		<td><?php echo $rw['cntTitle'];?></td>
-		<td><?php echo $rw['cntYunas'];?></td>
+		<td><?php echo $rw['cntYUNAS'];?></td>
 		<td title="<?php echo $rw['pol'];?>"><?php echo $rw['polTitle'];?></td>
 		<td title="<?php echo $rw['pod'];?>"><?php echo $rw['podTitle'];?></td>		
-		<td><?php echo $rw['gbr']?"Y":"";?></td>
 		<?php 
 			$rowTotal = 0;
 			for ($m=$oBudget->offset+1;$m<=$oBudget->offset+12;$m++){
