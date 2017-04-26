@@ -21,11 +21,12 @@ echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'<
 include ('includes/inc_report_selectors.php');
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
-$sql = "SELECT pol, pod, ".$oBudget->getMonthlySumSQL($oBudget->offset+1, $oBudget->offset+12)." 
+$sql = "SELECT pol, pod, cntTitle, ".$oBudget->getMonthlySumSQL($oBudget->offset+1, $oBudget->offset+12)." 
 		FROM reg_sales
+		LEFT JOIN vw_counterparty ON cntID=customer
 		WHERE activity IN (48,63) AND scenario='{$oBudget->id}' AND company='{$company}'
-		GROUP BY pol, pod
-		ORDER BY pol, pod";
+		GROUP BY pol, pod, customer
+		ORDER BY pol, pod, customer";
 $rs = $oSQL->q($sql);
 ?>
 <table class='budget'>
@@ -33,6 +34,7 @@ $rs = $oSQL->q($sql);
 		<tr>
 			<th>POL</th>
 			<th>POD</th>
+			<th>Customer</th>
 			<?php echo $oBudget->getTableHeader('monthly',$oBudget->offset+1,$oBudget->offset+12);?>
 		</tr>
 	</thead>
@@ -42,6 +44,7 @@ while ($rw = $oSQL->f($rs)){
 	<tr>
 		<td><?php echo $rw['pol'];?></td>
 		<td><?php echo $rw['pod'];?></td>
+		<td><?php echo $rw['cntTitle'];?></td>
 		<?php 
 			for ($m=$oBudget->offset+1;$m<=$oBudget->offset+12;$m++){
 				$month = $oBudget->arrPeriod[$m];
