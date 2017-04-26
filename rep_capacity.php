@@ -26,7 +26,7 @@ $sql = "SELECT pol, pod, cntTitle, rteTitle, ".$oBudget->getMonthlySumSQL($oBudg
 		FROM reg_sales
 		LEFT JOIN vw_counterparty ON cntID=customer
 		LEFT JOIN tbl_route ON rteID=route
-		WHERE posted=1 AND activity IN (48,63) AND scenario='{$oBudget->id}' AND company='{$company}'
+		WHERE posted=1 AND kpi=1 AND activity IN (48,63) AND scenario='{$oBudget->id}' AND company='{$company}'
 		GROUP BY pol, pod, customer, route
 		ORDER BY route, pol, pod, customer";
 $rs = $oSQL->q($sql);
