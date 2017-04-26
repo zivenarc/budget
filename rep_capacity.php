@@ -1,5 +1,5 @@
 <?php
-$flagNoAuth = true;
+// $flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
@@ -9,12 +9,13 @@ include ('includes/inc_report_settings.php');
 $oBudget = new Budget($budget_scenario);
 $oReport = new Reports(Array('budget_scenario'=>$budget_scenario));
 
-if ($reference!=$oBudget->reference_scenario->id){
-	$oReference = new Budget($reference);
-	$strVsTitle = ' vs '.$oReference->title;
-} else {
-	$reference = $oBudget->reference_scenario->id;
-}
+// if ($reference!=$oBudget->reference_scenario->id){
+	// $oReference = new Budget($reference);
+	// $strVsTitle = ' vs '.$oReference->title;
+// } else {
+	// $reference = $oBudget->reference_scenario->id;
+// }
+
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
 
