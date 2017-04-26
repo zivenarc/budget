@@ -44,6 +44,7 @@ class Sales extends Document{
 		$this->gbr = $this->data['salGBR'];
 		$this->pol = $this->data['salPOL'];
 		$this->pod = $this->data['salPOD'];
+		$this->ghq = $this->data['salGHQ'];
 		
 	}
 	public function refresh($id){
@@ -130,75 +131,84 @@ class Sales extends Document{
 			,'disabled'=>!$this->flagUpdate
 		);
 		
-		$this->Columns[] = Array(
-			'title'=>'Ocean/Air route'
-			,'field'=>self::Prefix.'Route'
-			,'type'=>'combobox'			
-			,'prefix'=>'rte'
-			,'sql'=>'tbl_route'
-			,'mandatory'=>false
-			,'default'=>2
-			// ,'defaultText'=>'---Non-FHD---'
-			,'disabled'=>!$this->flagUpdate
-		);
-		
-		$this->Columns[] = Array(
-			'title'=>'Job owner'
-			,'field'=>self::Prefix.'JO'
-			,'type'=>'ajax'
-			,'table'=>'vw_pb_intercompany'
-			,'prefix'=>'cnt'
-			,'sql'=>'vw_pb_intercompany'			
-			,'disabled'=>!$this->flagUpdate			
-		);
-		
-		$this->Columns[] = Array(
-			'title'=>'Business owner'
-			,'field'=>self::Prefix.'BO'
-			,'type'=>'ajax'
-			,'table'=>'vw_pb_intercompany'
-			,'prefix'=>'cnt'
-			,'sql'=>'vw_pb_intercompany'			
-			,'disabled'=>!$this->flagUpdate			
-		);
-		
-		$this->Columns[] = Array(
-			'title'=>'Destination agent'
-			,'field'=>self::Prefix.'DA'
-			,'type'=>'ajax'
-			,'table'=>'vw_pb_intercompany'
-			,'prefix'=>'cnt'
-			,'sql'=>'vw_pb_intercompany'			
-			,'disabled'=>!$this->flagUpdate			
-		);
-		
-		$this->Columns[] = Array(
-			'title'=>'SAP/GBR (USD per TEU)'
-			,'field'=>self::Prefix.'GBR'
-			,'type'=>'integer'		
-			,'disabled'=>!$this->flagUpdate			
-		);
-		
-		$this->Columns[] = Array(
-			'title'=>'Port of loading'
-			,'field'=>self::Prefix.'POL'
-			,'type'=>'ajax'
-			,'table'=>'tbl_port'
-			,'prefix'=>'prt'
-			,'sql'=>'tbl_port'			
-			,'disabled'=>!$this->flagUpdate			
-		);
-		
-		$this->Columns[] = Array(
-			'title'=>'Port of discharge'
-			,'field'=>self::Prefix.'POD'
-			,'type'=>'ajax'
-			,'table'=>'tbl_port'
-			,'prefix'=>'prt'
-			,'sql'=>'tbl_port'			
-			,'disabled'=>!$this->flagUpdate			
-		);
+		if (strpos($this->ghq,'Ocean')!==false || strpos($this->ghq,'Air')!==false){
+			$this->Columns[] = Array(
+				'title'=>'Ocean/Air route'
+				,'field'=>self::Prefix.'Route'
+				,'mandatory'=>true
+				,'type'=>'combobox'			
+				,'prefix'=>'rte'
+				,'sql'=>'tbl_route'
+				,'mandatory'=>false
+				,'default'=>2
+				// ,'defaultText'=>'---Non-FHD---'
+				,'disabled'=>!$this->flagUpdate
+			);
+			
+			$this->Columns[] = Array(
+				'title'=>'Job owner'
+				,'field'=>self::Prefix.'JO'
+				,'mandatory'=>true
+				,'type'=>'ajax'
+				,'table'=>'vw_pb_intercompany'
+				,'prefix'=>'cnt'
+				,'sql'=>'vw_pb_intercompany'			
+				,'disabled'=>!$this->flagUpdate			
+			);
+			
+			$this->Columns[] = Array(
+				'title'=>'Business owner'
+				,'field'=>self::Prefix.'BO'
+				,'mandatory'=>true
+				,'type'=>'ajax'
+				,'table'=>'vw_pb_intercompany'
+				,'prefix'=>'cnt'
+				,'sql'=>'vw_pb_intercompany'			
+				,'disabled'=>!$this->flagUpdate			
+			);
+			
+			$this->Columns[] = Array(
+				'title'=>'Destination agent'
+				,'field'=>self::Prefix.'DA'
+				,'mandatory'=>true
+				,'type'=>'ajax'
+				,'table'=>'vw_pb_intercompany'
+				,'prefix'=>'cnt'
+				,'sql'=>'vw_pb_intercompany'			
+				,'disabled'=>!$this->flagUpdate			
+			);
+			
+			$this->Columns[] = Array(
+				'title'=>'SAP/GBR (USD per TEU)'
+				,'field'=>self::Prefix.'GBR'
+				,'type'=>'integer'		
+				,'disabled'=>!$this->flagUpdate			
+			);
+		};
 
+		if (strpos($this->ghq,'Ocean')!==false){
+			$this->Columns[] = Array(
+				'title'=>'Port of loading'
+				,'field'=>self::Prefix.'POL'
+				,'mandatory'=>true
+				,'type'=>'ajax'
+				,'table'=>'tbl_port'
+				,'prefix'=>'prt'
+				,'sql'=>'tbl_port'			
+				,'disabled'=>!$this->flagUpdate			
+			);
+			
+			$this->Columns[] = Array(
+				'title'=>'Port of discharge'
+				,'field'=>self::Prefix.'POD'
+				,'mandatory'=>true
+				,'type'=>'ajax'
+				,'table'=>'tbl_port'
+				,'prefix'=>'prt'
+				,'sql'=>'tbl_port'			
+				,'disabled'=>!$this->flagUpdate			
+			);
+		}
 	}
 	
 	//==========================================Definition of document GRID ===================================================
@@ -432,25 +442,19 @@ class Sales extends Document{
 		$sql = Array();
 		$sql[] = "SET AUTOCOMMIT = 0;";
 		$sql[] = "START TRANSACTION;";
-		// if ($mode!='new'){
-			// $sql[] = "UPDATE `tbl_sales` 
-					// SET salProfitID=".(integer)$this->profit."
-					// ,salProductFolderID=".(integer)$this->product_folder."
-					// ,salCustomerID=".(integer)$this->customer."
-					// ,salComment=".$this->oSQL->e($this->comment)."
-					// ,salScenario='".$this->scenario."'
-					// ,salEditBy='".$arrUsrData['usrID']."'
-					// ,salUserID='".$this->sales."'
-					// ,salEditDate=NOW()
-					// WHERE salID={$this->ID};";
-		// };
 		if(is_array($this->records[$this->gridName])){			
-			foreach ($this->records[$this->gridName] as $i=>$row){				
+			foreach ($this->records[$this->gridName] as $i=>$row){
+				if (!isset($sqlGHQ)){
+					$sqlGHQ = "UPDATE `{$this->table}`, `common_db`.`tbl_product_type` 
+								SET `{$this->prefix}GHQ`=`prtGHQ`
+								WHERE `prtID`='{$row->activity}'
+								AND `{$this->prefix}GUID`='{$this->GUID}';";
+				};
 				if ($row->flagUpdated || $row->flagDeleted){
 					$sql[] = $row->getSQLstring();
-					// print_r($sql);die();
 				}
 			}
+			$sql[] = $sqlGHQ;
 		};
 		
 		$sql[] = "SET AUTOCOMMIT = 1;";

@@ -62,11 +62,16 @@ class Master {
 		
 		// $this->oSQL->startProfiling();		
 		// echo '<pre>',implode(";\r\n",$sql),'</pre>';
-		$res = true;
+		$success = true;
 		
 		for($i=0;$i<count($sql);$i++){
 			if ($sql[$i]) {
-				$res &= $this->oSQL->q($sql[$i]);
+				try {
+					$res &= $this->oSQL->q($sql[$i]);
+				} catch (Exception $e){
+					$res = Array('error'=>true,'description'=>$e->getMessage());
+					return ($res);
+				}
 			}
 		}
 		
