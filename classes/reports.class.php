@@ -19,6 +19,7 @@ class Reports{
 	const GOP_FILTER = "AND account LIKE 'J%' ";
 	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';
 	const SALARY_THRESHOLD = 10000;
+	const ACTUAL_DATA_FILTER = "`source` IN ('Actual','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Correction')";
 	
 	function __construct($params){
 		
@@ -99,7 +100,7 @@ class Reports{
 							(SELECT pc, activity, unit,
 									".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 			
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND `company`='{$this->company}'
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER." AND `company`='{$this->company}'
 							GROUP BY activity, unit
 							UNION ALL
 							SELECT pc, activity, unit,
@@ -221,7 +222,7 @@ class Reports{
 			default:
 				$sqlFrom = "SELECT activity, route,  source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND freehand=1 AND `company`='{$this->company}'
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER." AND freehand=1 AND `company`='{$this->company}'
 							GROUP BY activity, route, unit, source
 							UNION ALL
 						SELECT activity, route, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
@@ -339,7 +340,7 @@ class Reports{
 			default:
 				$sqlFrom = "SELECT activity, route,  source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and source='Actual' AND activity IN (46,47) AND `company`='{$this->company}'
+							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER." AND activity IN (46,47) AND `company`='{$this->company}'
 							GROUP BY activity, route, unit, source
 							UNION ALL
 						SELECT activity, route, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
@@ -1696,7 +1697,7 @@ class Reports{
 			
 			$sql = "SELECT {$sqlSelect}
 					FROM `reg_sales` 			
-					{$sqlWhere} AND scenario='{$this->oReference->id}' AND activity={$activity} AND source='Actual'";			
+					{$sqlWhere} AND scenario='{$this->oReference->id}' AND activity={$activity} AND ".self::ACTUAL_DATA_FILTER."";			
 			$rs = $this->oSQL->q($sql);
 			$res['Budget'] = $this->oSQL->f($rs);
 			
@@ -1713,7 +1714,7 @@ class Reports{
 			
 			$sql = "SELECT {$sqlSelect}
 					FROM `reg_sales` 			
-					{$sqlWhere} AND scenario='{$this->oBudget->id}' AND activity={$activity} AND source='Actual'";
+					{$sqlWhere} AND scenario='{$this->oBudget->id}' AND activity={$activity} AND ".self::ACTUAL_DATA_FILTER."";
 			$rs = $this->oSQL->q($sql);			
 			$res['Actual'] = $this->oSQL->f($rs);
 			
@@ -2322,7 +2323,7 @@ class Reports{
 		$sql = "SELECT activity, unit, 
 					{$strFieldsKPI['actual']}
 			FROM `reg_sales`			
-			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND kpi=1 AND posted=1 AND source='Actual'
+			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND kpi=1 AND posted=1 AND ".self::ACTUAL_DATA_FILTER."
 			GROUP BY activity, unit
 			UNION ALL
 			SELECT activity, unit, 
@@ -2467,7 +2468,7 @@ class Reports{
 		$sql = "SELECT  {$field} as `Budget item`, 
 					{$strFieldsKPI['actual']}
 			FROM `vw_headcount`			
-			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND source='Actual' AND salary>".self::SALARY_THRESHOLD."
+			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND ".self::ACTUAL_DATA_FILTER." AND salary>".self::SALARY_THRESHOLD."
 			GROUP BY  {$groupBy}
 			UNION ALL
 			SELECT   {$field}, 
@@ -2551,7 +2552,7 @@ class Reports{
 		$sql = "SELECT customer,cntTitle, customer_group_code,customer_group_title, 
 					{$strFields['actual']}
 			FROM `vw_sales`			
-			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND source='Actual'
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND ".self::ACTUAL_DATA_FILTER."
 			GROUP BY customer
 			UNION ALL
 			SELECT customer,cntTitle, customer_group_code,customer_group_title, 
@@ -3238,7 +3239,7 @@ class Reports{
 				$sql = "SELECT activity, unit, prtTitle,
 						{$strFieldsKPI['actual']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND source='Actual'
+				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND ".self::ACTUAL_DATA_FILTER."
 				GROUP BY activity, unit
 				UNION ALL
 				SELECT activity, unit, prtTitle, 

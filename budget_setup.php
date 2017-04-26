@@ -23,7 +23,11 @@ if ($_GET['option']=='full'){
 			<td><?php echo $rw['scnTitle'];?></td>
 			<td><?php echo $rw['scnYear'];?></td>
 			<td><?php echo $rw['scnDateStart'];?></td>
-			<td><a class='scenario_delete' href="?tab=<?php echo $rw['scnID'];?>&DataAction=delete">[delete]</a></td>
+			<td>
+			<?php if($rw['scnFlagArchive'] && $rw['scnFlagReadOnly']){ ?>
+				<a class='scenario_delete' href="?tab=<?php echo $rw['scnID'];?>&DataAction=delete">[delete]</a>
+			<?php } ?>
+			</td>
 		</tr>
 		<?php
 	}

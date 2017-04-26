@@ -21,17 +21,19 @@ echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'<
 include ('includes/inc_report_selectors.php');
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
-$sql = "SELECT pol, pod, cntTitle, ".$oBudget->getMonthlySumSQL($oBudget->offset+1, $oBudget->offset+12)." 
+$sql = "SELECT pol, pod, cntTitle, rteTitle, ".$oBudget->getMonthlySumSQL($oBudget->offset+1, $oBudget->offset+12)." 
 		FROM reg_sales
 		LEFT JOIN vw_counterparty ON cntID=customer
+		LEFT JOIN tbl_route ON rteID=route
 		WHERE activity IN (48,63) AND scenario='{$oBudget->id}' AND company='{$company}'
-		GROUP BY pol, pod, customer
-		ORDER BY pol, pod, customer";
+		GROUP BY pol, pod, customer, route
+		ORDER BY route, pol, pod, customer";
 $rs = $oSQL->q($sql);
 ?>
 <table class='budget'>
 	<thead>
 		<tr>
+			<th>Trade</th>
 			<th>POL</th>
 			<th>POD</th>
 			<th>Customer</th>
@@ -42,6 +44,7 @@ $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	?>
 	<tr>
+		<td><?php echo $rw['rteTitle'];?></td>
 		<td><?php echo $rw['pol'];?></td>
 		<td><?php echo $rw['pod'];?></td>
 		<td><?php echo $rw['cntTitle'];?></td>
