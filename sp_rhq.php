@@ -27,7 +27,7 @@ $startMonth = isset($_GET['mthStart'])?$_GET['mthStart']:1+$oBudget->offset;
 $endMonth = isset($_GET['mthEnd'])?$_GET['mthEnd']:12+$oBudget->offset;
 $colspan = $endMonth - $startMonth + 3;
 
-$sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)." FROM reg_profit_ghq WHERE scenario='$budget_scenario'
+$sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)." FROM reg_profit_ghq WHERE scenario='{$budget_scenario}' AND company='{$company}'
 		GROUP BY prtGHQ, pc";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -59,7 +59,7 @@ $arrFilter = Array(
 );
 $reportKey = '<i>Revenue correction</i>';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') AND account='J00802'
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') AND account='J00802'
 		GROUP by prtGHQ"; 
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -79,7 +79,7 @@ $arrFilter = Array(
 );
 $reportKey = '<i>Freight revenue</i>';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') AND activity in (".implode(",",$arrFreightFilter).")
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') AND activity in (".implode(",",$arrFreightFilter).")
 		GROUP by prtGHQ"; 
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -92,7 +92,7 @@ while ($rw = $oSQL->f($rs)){
 }
 $reportKey = '<i>Other revenue</i>';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') AND activity not in (".implode(",",$arrFreightFilter).")
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') AND activity not in (".implode(",",$arrFreightFilter).")
 		GROUP by prtGHQ"; 
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -110,7 +110,7 @@ $arrFilter = Array(
 );
 $reportKey = 'Revenue';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') 
 		GROUP by prtGHQ"; 
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -132,7 +132,7 @@ $arrFilter = Array(
 );
 $reportKey = 'Direct costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND item IN ('".implode("','",$arrFilter)."')
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND item IN ('".implode("','",$arrFilter)."')
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -145,7 +145,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = '<i>thereof: Freight costs</i>';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') AND activity in (".implode(",",$arrFreightFilter).")
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') AND activity in (".implode(",",$arrFreightFilter).")
 		GROUP by prtGHQ"; 
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -158,7 +158,7 @@ while ($rw = $oSQL->f($rs)){
 }
 $reportKey = '<i>Other costs</i>';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') AND activity not in (".implode(",",$arrFreightFilter).")
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND item in ('".implode("','",$arrFilter)."') AND activity not in (".implode(",",$arrFreightFilter).")
 		GROUP by prtGHQ"; 
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -174,7 +174,7 @@ $reportKey = 'RFC: Labor costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
 		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='J' AND pccFLagProd = 1
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN('J00801') AND pccFLagProd = 1
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account IN('J00801') AND pccFLagProd = 1
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -197,7 +197,7 @@ $reportKey = 'RFC: Warehouse costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
 		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='J' AND pccFLagProd = 1
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN('J0080W') AND pccFLagProd = 1
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account IN('J0080W') AND pccFLagProd = 1
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -219,7 +219,7 @@ $reportKey = 'RFC: Depreciation';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
 		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('512000','J00806') AND pccFLagProd = 1
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('J00806') AND pccFLagProd = 1
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account IN ('J00806') AND pccFLagProd = 1
 		GROUP by pc, prtGHQ";
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -242,7 +242,7 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'RFC: Other';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (YACT.yctParentID IN ('SZ0040') AND account NOT IN ('J00806','J00801','J0080W')) AND pccFLagProd = 1
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (YACT.yctParentID IN ('SZ0040') AND account NOT IN ('J00806','J00801','J0080W')) AND pccFLagProd = 1
 		GROUP by pc, prtGHQ";
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -265,7 +265,7 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'SGA:Personnel costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account		
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND (pccFLagProd = 1 OR pc=9 OR activity is not null)
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND (pccFLagProd = 1 OR pc=9 OR activity is not null)
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -296,7 +296,7 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'SGA:Other';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account		
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S') AND (pccFLagProd = 1  OR pc=9 OR activity is not null)
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S') AND (pccFLagProd = 1  OR pc=9 OR activity is not null)
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -327,7 +327,7 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'Corporate costs: personnel';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P')  AND ((pccFLagProd = 0 AND pc<>9)and activity is null)
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P')  AND ((pccFLagProd = 0 AND pc<>9)and activity is null)
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -348,7 +348,7 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'Corporate costs: other';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S')  AND ((pccFLagProd = 0 AND pc<>9)  and activity is null)
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S')  AND ((pccFLagProd = 0 AND pc<>9)  and activity is null)
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -374,7 +374,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'Interest income';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('601000') 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account IN ('601000') 
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -386,7 +386,7 @@ while ($rw = $oSQL->f($rs)){
 }
 $reportKey = 'Gain on sale';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('606000') 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account IN ('606000') 
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -398,7 +398,7 @@ while ($rw = $oSQL->f($rs)){
 }
 $reportKey = 'Other non-op income';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account like '60%' AND account NOT IN ('601000','606000') 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account like '60%' AND account NOT IN ('601000','606000') 
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -411,7 +411,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'Interest costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('650000')
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account IN ('650000')
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -429,7 +429,7 @@ while ($rw = $oSQL->f($rs)){
 }
 $reportKey = 'Other non-op. costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND (account like '65%' or account like '66%') AND account NOT IN ('650000')
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account like '65%' or account like '66%') AND account NOT IN ('650000')
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -447,7 +447,7 @@ while ($rw = $oSQL->f($rs)){
 }
 $reportKey = 'MSF';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account='527000' 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account='527000' 
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -471,7 +471,7 @@ while ($rw = $oSQL->f($rs)){
 
 $reportKey = 'NO YACT';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND source<>'Estimate' AND IFNULL(account,'') LIKE '' 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND IFNULL(account,'') LIKE '' 
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
