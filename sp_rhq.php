@@ -263,6 +263,38 @@ while ($rw = $oSQL->f($rs)){
 }
 
 /////////////////////// SG&A costs //////////////////////////////// 
+$reportKey = 'SGA:Sales commission';
+$sql = "SELECT $sqlFields FROM vw_master 		
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' 
+			AND account='523000' AND (pccFLagProd = 1 OR pc IN (9,130))
+		GROUP by pc, prtGHQ";
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	for($m=$startMonth;$m<=$endMonth;$m++){
+			$month = $oBudget->arrPeriod[$m];
+		if ($rw['prtGHQ']){
+			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
+		} else {
+			if (!is_array($arrRatio[$rw['pc']])) {
+						if ($rw['pccFlagProd']){
+							error_distribution(Array('data'=>$rw,'reportKey'=>$key,'month'=>$month, 'sql'=>$sql));
+						} else {
+							echo '<pre>PC ',$rw['pc'],' has no activity for account ',$rw['account'],'</pre>';
+							// foreach($arrGHQSubtotal as $ghq=>$revenue){
+								// $arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+								// $arrBreakDown[$reportKey][$rw['account'].$rw['title']][$ghq] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+							// }
+						}
+			} else {
+				foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
+					$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];
+				}
+			}
+		}
+		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+	}
+}
+
 
 $reportKey = 'SGA:Personnel costs';
 $sql = "SELECT $sqlFields FROM vw_master 
