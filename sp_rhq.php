@@ -281,10 +281,11 @@ while ($rw = $oSQL->f($rs)){
 						if ($rw['pccFlagProd']){
 							error_distribution(Array('data'=>$rw,'reportKey'=>$key,'month'=>$month, 'sql'=>$sql));
 						} else {
-							foreach($arrGHQSubtotal as $ghq=>$revenue){
-								$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$revenue[$month]/$arrRevenue[$month];
-								$arrBreakDown[$reportKey][$rw['account'].$rw['title']][$ghq] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
-							}
+							echo '<pre>PC ',$rw['pc'],' has no activity for account ',$rw['account'],'</pre>';
+							// foreach($arrGHQSubtotal as $ghq=>$revenue){
+								// $arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+								// $arrBreakDown[$reportKey][$rw['account'].$rw['title']][$ghq] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+							// }
 						}
 			} else {
 				foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
