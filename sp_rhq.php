@@ -262,10 +262,13 @@ while ($rw = $oSQL->f($rs)){
 	}
 }
 
+/////////////////////// SG&A costs //////////////////////////////// 
+
 $reportKey = 'SGA:Personnel costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account		
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND (pccFLagProd = 1 OR pc=9 OR activity is not null)
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' 
+			AND YACT.yctParentID IN ('59900P') AND (pccFLagProd = 1 OR pc IN (9,130))
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -296,7 +299,8 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'SGA:Other';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account		
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S') AND (pccFLagProd = 1  OR pc=9 OR activity is not null)
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' 
+			AND YACT.yctParentID IN ('59900S') AND (pccFLagProd = 1 OR pc IN (9,130))
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -327,20 +331,21 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'Corporate costs: personnel';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P')  AND ((pccFLagProd = 0 AND pc<>9)and activity is null)
-		##GROUP by pc, prtGHQ";
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' 
+			AND YACT.yctParentID IN ('59900P')  AND (pccFLagProd = 0 AND pc NOT IN(9,130))
+		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
-		// if ($rw['prtGHQ']){
+		if ($rw['prtGHQ']){
 			$arrReport['Corporate'][$reportKey][$month] -= $rw[$month];
-		// } else {
-			// foreach($arrGHQSubtotal as $ghq=>$revenue){
-				// $arrReport[$ghq][$key][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
-			// }
-		// }
+		} else {
+			foreach($arrGHQSubtotal as $ghq=>$revenue){
+				$arrReport[$ghq][$key][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+			}
+		}
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
@@ -348,8 +353,9 @@ while ($rw = $oSQL->f($rs)){
 $reportKey = 'Corporate costs: other';
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND YACT.yctParentID IN ('59900S')  AND ((pccFLagProd = 0 AND pc<>9)  and activity is null)
-		##GROUP by pc, prtGHQ";
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' 
+			AND YACT.yctParentID IN ('59900S')  AND (pccFLagProd = 0 AND pc NOT IN(9,130))
+		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 
@@ -361,20 +367,21 @@ while ($rw = $oSQL->f($rs)){
 
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
-		// if ($rw['prtGHQ']){
+		if ($rw['prtGHQ']){
 			$arrReport['Corporate'][$reportKey][$month] -= $rw[$month];
-		// } else {
-			// foreach($arrGHQSubtotal as $ghq=>$revenue){
-				// $arrReport[$ghq][$key][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
-			// }
-		// }
+		} else {
+			foreach($arrGHQSubtotal as $ghq=>$revenue){
+				$arrReport[$ghq][$key][$month] += $rw[$month]*$revenue[$month]/$arrRevenue[$month];
+			}
+		}
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
 
 $reportKey = 'Interest income';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account IN ('601000') 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' 
+			AND account IN ('601000') 
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -386,7 +393,8 @@ while ($rw = $oSQL->f($rs)){
 }
 $reportKey = 'Gain on sale';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account IN ('606000') 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' 
+			AND account IN ('606000') 
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -398,7 +406,8 @@ while ($rw = $oSQL->f($rs)){
 }
 $reportKey = 'Other non-op income';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account like '60%' AND account NOT IN ('601000','606000') 
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' 
+			AND account like '60%' AND account NOT IN ('601000','606000') 
 		##GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -503,20 +512,27 @@ foreach ($arrReport as $ghq=>$arrItems){
 	echo "</tr>\r\n";
 	
 	foreach ($arrItems as $item=>$values){
-		echo '<tr>';
-		echo '<td>',$item,'</td>';
+		?>
+		<tr class="<?php echo $strClass;?>">
+		<td><?php echo $item;?></td>
+		<?php
 			for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 				echo '<td class="budget-decimal">',number_format($values[$month],0,'.',','),'</td>';
 			}
-		echo '<td class="budget-ytd budget-decimal">',number_format(array_sum($values),0,'.',','),'</td>';
-		echo "</tr>\r\n";
+		?>
+		<td class="budget-ytd budget-decimal"><?php echo number_format(array_sum($values),0,'.',',');?></td>
+		</tr>
+		<?php
 	}
 }
-
-echo '<tr>';
-echo "<th colspan='{$colspan}'>Grand total</th>";
-echo "</tr>\r\n";
+?>
+</tbody>
+<tfoot>
+	<tr>
+		<th colspan='<?php echo $colspan;?>'>Grand total</th>
+	</tr>
+<?php
 foreach ($arrGrandTotal as $item=>$values){
 		echo '<tr>';
 		echo '<td>',$item,'</td>';
@@ -539,11 +555,75 @@ for($m=$startMonth;$m<=$endMonth;$m++){
 echo '<td class="budget-decimal budget-ytd">',number_format(array_sum($arrNRBT),0,'.',','),'</td>';
 ?>
 </tr>
-</tbody>
+</tfoot>
 </table>
 
 <ul class='link-footer'>
 	<li><a href='javascript:SelectContent("report");'>Select table</a></li>
+</ul>
+
+
+<?php
+$sql = "SELECT * FROM vw_profit WHERE pccFLagProd = 0 AND pccID NOT IN(9,130) AND pccFlagFolder=0";
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	$arrPCCorp[] = $rw['pccTitle'];
+}
+
+$sql = "SELECT account, yctTitle, SUM(Total) as Total, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)."
+		FROM vw_master 
+		LEFT JOIN vw_yact YACT ON yctID=account
+		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' 
+			AND account LIKE '5%'  AND (pccFLagProd = 0 AND pc NOT IN(9,130))
+		GROUP by account";
+$rs = $oSQL->q($sql);
+?>
+<h2>Corporate costs</h2>
+<p><?php echo implode(', ',$arrPCCorp);?></p>
+<table class='budget' id='corporate_costs'>
+	<thead>
+		<th>Title</th>
+		<th>Account</th>
+		<?php echo $oBudget->getTableHeader('monthly', $startMonth, $endMonth);?>
+		<th>Total</th>
+	</thead>
+	<tbody>
+	<?php 
+	$arrTotal = Array();
+	while ($rw = $oSQL->f($rs)){ ?>
+		<tr>
+			<td><?php echo $rw['yctTitle'];?></td>
+			<td><?php echo $rw['account'];?></td>
+			<?php
+			$rowTotal = 0;
+			for($m=$startMonth;$m<=$endMonth;$m++){
+				$month = $oBudget->arrPeriod[$m];
+				$rowTotal += $rw[$month];
+				$arrTotal[$month]+=$rw[$month];
+					echo '<td class="budget-decimal">',number_format(-$rw[$month],0,'.',','),'</td>';				
+				}
+			?>
+			<td class='budget-decimal budget-ytd'><?php echo number_format(-$rowTotal,0,'.',',');?></td>
+		</tr>
+	<?php } ?>
+	</tbody>
+	<tfoot>
+		<tr class='budget-total'>
+			<td colspan="2">Total</td>
+			<?php
+			$rowTotal = 0;
+			for($m=$startMonth;$m<=$endMonth;$m++){
+				$month = $oBudget->arrPeriod[$m];
+				$rowTotal += $arrTotal[$month];
+					echo '<td class="budget-decimal">',number_format(-$arrTotal[$month],0,'.',','),'</td>';				
+				}
+			?>
+			<td class='budget-decimal budget-ytd'><?php echo number_format(-$rowTotal,0,'.',',');?></td>
+		</tr>
+	</tfoot>
+</table>
+<ul class='link-footer'>
+	<li><a href='javascript:SelectContent("corporate_costs");'>Select table</a></li>
 </ul>
 
 <h2>Activity ratios</h2>
