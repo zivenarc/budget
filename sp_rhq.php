@@ -397,7 +397,9 @@ echo '<td class="budget-decimal budget-ytd">',number_format(array_sum($arrNRBT),
 
 
 <?php
-$sql = "SELECT * FROM vw_profit WHERE pccFLagProd = 0 AND pccID NOT IN(9,130) AND pccFlagFolder=0";
+
+// $sql = "SELECT * FROM vw_profit WHERE pccFLagProd = 0 AND pccID NOT IN(9,130) AND pccFlagFolder=0";
+$sql = "SELECT * FROM vw_profit";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	$arrPCCorp[] = $rw['pccTitle']."({$rw['pccID']})";
@@ -407,7 +409,8 @@ $sql = "SELECT account, yctTitle, SUM(Total) as Total, ".$oBudget->getMonthlySum
 		FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
 		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' 
-			AND account LIKE '5%'  AND (pccFLagProd = 0 AND pc NOT IN(9,130))
+			AND account LIKE '5%'
+			##AND (pccFLagProd = 0 AND pc NOT IN(9,130))
 		GROUP by account";
 $rs = $oSQL->q($sql);
 ?>
