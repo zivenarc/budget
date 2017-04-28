@@ -297,6 +297,14 @@ $arrSubreport = Array(
 								'sql' => "SELECT $sqlFields FROM vw_master 
 										WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account='527000' 
 										GROUP by pc, prtGHQ"),
+					Array('reportKey' => 'Non-operating income',
+								'sql' => "SELECT $sqlFields FROM vw_master 
+										WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account LIKE '60%' AND account<>'607000'
+										GROUP by pc, prtGHQ"),
+					Array('reportKey' => 'Non-operating costs',
+								'sql' => "SELECT $sqlFields FROM vw_master 
+										WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account LIKE '65%' or account LIKE '66%'
+										GROUP by pc, prtGHQ"),
 					Array('reportKey' => 'NO YACT',
 								'sql' => "SELECT $sqlFields FROM vw_master 
 									WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND IFNULL(account,'') LIKE '' 
