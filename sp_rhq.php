@@ -300,10 +300,11 @@ $arrSubreport = Array(
 					Array('reportKey' => 'Non-operating income',
 								'sql' => "SELECT $sqlFields FROM vw_master 
 										WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account LIKE '60%' AND account<>'607000'
-										GROUP by pc, prtGHQ"),
+										GROUP by pc, prtGHQ",
+								'positive' => true),
 					Array('reportKey' => 'Non-operating costs',
 								'sql' => "SELECT $sqlFields FROM vw_master 
-										WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account LIKE '65%' or account LIKE '66%'
+										WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account LIKE '65%' OR account LIKE '66%')
 										GROUP by pc, prtGHQ"),
 					Array('reportKey' => 'NO YACT',
 								'sql' => "SELECT $sqlFields FROM vw_master 
@@ -317,7 +318,7 @@ for ($i=0;$i<count($arrSubreport);$i++){
 	$activity = $rw['prtGHQ']?$rw['prtGHQ']:"[NO ACTIVITY]";
 	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
-		$arrReport[$activity][$arrSubreport[$i]['reportKey']][$month] -= $rw[$month];		
+		$arrReport[$activity][$arrSubreport[$i]['reportKey']][$month] += $arrSubreport[$i]['positive']?$rw[$month]:-$rw[$month];		
 		$arrGrandTotal[$arrSubreport[$i]['reportKey']][$month] += $rw[$month];
 	}
 }
@@ -399,7 +400,7 @@ echo '<td class="budget-decimal budget-ytd">',number_format(array_sum($arrNRBT),
 $sql = "SELECT * FROM vw_profit WHERE pccFLagProd = 0 AND pccID NOT IN(9,130) AND pccFlagFolder=0";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	$arrPCCorp[] = $rw['pccTitle'];
+	$arrPCCorp[] = $rw['pccTitle']."({$rw['pccID']})";
 }
 
 $sql = "SELECT account, yctTitle, SUM(Total) as Total, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)."
