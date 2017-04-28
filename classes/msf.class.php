@@ -210,11 +210,11 @@ class MSF extends Document{
 			$oMaster = new Master($this->scenario, $this->GUID, $this->company);
 			// print_r($this->subtotal);
 			if(is_array($this->records[$this->gridName])){
-					// echo '<pre>';print_r($this->records[$this->gridName]);echo '</pre>';die();					
+					//-------------- Get activity distribution for every PC ---------------
 					$sql = "SELECT pc, activity, ".$this->budget->getMonthlySumSQL(1,15)."
 							FROM reg_master							
 							WHERE account='J00400'
-							AND scenario =  '{$this->scenario}' AND source NOT IN ('Estimate')
+							AND scenario =  '{$this->scenario}' AND company='{$this->company}' AND source NOT IN ('Estimate')
 							GROUP BY pc, activity";
 					$rs = $this->oSQL->q($sql);
 					while ($rw = $this->oSQL->f($rs)){
@@ -226,101 +226,150 @@ class MSF extends Document{
 						}						
 					}
 					
-					$sql = "SELECT account, item, SUM(".$this->budget->getYTDSQL(1,15).") as Total, ".$this->budget->getMonthlySumSQL(1,15)." 
+					//-------------- Get all costs for donor unit ---------------
+					$sql = "SELECT account, activity, item, SUM(".$this->budget->getYTDSQL(1,15).") as Total, ".$this->budget->getMonthlySumSQL(1,15)." 
 						FROM reg_master 
-						WHERE scenario='{$this->scenario}' AND pc={$this->profit} AND source NOT IN ('Estimate')
-						GROUP BY account, item"; 
+						WHERE scenario='{$this->scenario}' AND company='{$this->company}' AND pc={$this->profit} AND source NOT IN ('Estimate')
+						GROUP BY account, activity, item"; 
 					 
 					$rs = $this->oSQL->q($sql);
-					while ($rw = $this->oSQL->f($rs)){
-					
-						if(strpos($rw['account'],'6')===0){
-							$item = $rw['item'];
-						} else {
-							$item = $this->item;							
-						}
+					while ($rw = $this->oSQL->f($rs)){		
 						for($m=1;$m<=15;$m++){
-							// $month = date('M',mktime(0,0,0,$m,15));
-							$month = $this->budget->arrPeriod[$m];
-							
+							$month = $this->budget->arrPeriod[$m];					
 							if ($rw[$month]!=0){
-								$arrAccounts[$item][$month] += $rw[$month];
+								$arrAccounts[$rw['account']][$rw['item']][$month] += $rw[$month];
+								//----------- Distribute SG&A costs in place ------------------------------
+								if(strpos($rw['account'],'5')===0){
+									$arrSource[$rw['account']][$rw['activity']][$rw['item']][$month] += $rw[$month];								
+								}
 							}
 						}
 					}					
-					// echo '<pre>';print_r($arrAccounts);echo '</pre>';
+					 // echo '<pre>';print_r($arrAccounts);echo '</pre>'; die();
 					// echo '<pre>';print_r($arrDistribution);echo '</pre>';die();
 					
 					foreach($this->records[$this->gridName] as $id=>$record){
 						if(is_array($arrDistribution[$record->pc])){
-							foreach ($arrDistribution[$record->pc] as $activity=>$values){							
-								foreach($arrAccounts as $item_code=>$item_values){									
-									$master_row = $oMaster->add_master();
-									$master_row->profit = $record->pc;
-									$master_row->bdv = $this->profit;
-									$master_row->activity = $activity;									
-									$item = $Items->getById($item_code);									
-									$master_row->account = $item->getYACT($record->pc);									
-									$master_row->item = $item_code;
-									for($m=1;$m<=15;$m++){										
-										$month = $this->budget->arrPeriod[$m];										
-										if ($record->{$month}){
-											if ($arrPCSubtotal[$record->pc][$month]) {
-											$master_row->{$month} = round(
-																		$record->{$month}/$this->subtotal[strtolower($month)]
-																		*$item_values[$month]															
-																		*($values[$month]/$arrPCSubtotal[$record->pc][$month])
-																	,2);
-											} else {
-												$master_row->{$month} = 0;
-											}
-										}									
-									}				
-								}																					
+							foreach ($arrDistribution[$record->pc] as $activity=>$values){
+								foreach ($arrAccounts as $account=>$arrItems){
+									foreach($arrItems as $item_code=>$item_values){									
+										$master_row = $oMaster->add_master();
+										$master_row->profit = $record->pc;
+										$master_row->bdv = $this->profit;
+										$master_row->activity = $activity;
+										if (strpos($account,'6')===0){
+											$item = $Items->getById($item_code);
+											$master_row->item = $item_code;
+										} else {
+											$item = $Items->getById($this->item);
+											$master_row->item = $this->item;
+										}
+										$master_row->account = $item->getYACT($record->pc);									
+										
+										for($m=1;$m<=15;$m++){										
+											$month = $this->budget->arrPeriod[$m];										
+											if ($record->{$month}){
+												if ($arrPCSubtotal[$record->pc][$month]) {
+												$master_row->{$month} = round(
+																			$record->{$month}/$this->subtotal[strtolower($month)]
+																			*$item_values[$month]															
+																			*($values[$month]/$arrPCSubtotal[$record->pc][$month])
+																		,2);
+												} else {
+													$master_row->{$month} = 0;
+												}
+												
+												$arrDestination[$account][$master_row->activity][$item_code][$month] += $master_row->{$month};
+												
+											}									
+										}				
+									}
+								}
 							}	
 						} else {
-							foreach($arrAccounts as $item_code=>$item_values){									
+							foreach ($arrAccounts as $account=>$arrItems){
+								foreach($arrItems as $item_code=>$item_values){									
 									$master_row = $oMaster->add_master();
 									$master_row->profit = $record->pc;									
 									$master_row->bdv = $this->profit;									
 									$oProfit = $ProfitCenters->getById($record->pc);
 									$master_row->activity = $oProfit->activity;									
-									$item = $Items->getById($item_code);									
-									$master_row->account = $item->getYACT($record->pc);									
-									$master_row->item = $item_code;
+									if (strpos($account,'6')===0){
+										$item = $Items->getById($item_code);
+										$master_row->item = $item_code;
+									} else {
+										$item = $Items->getById($this->item);
+										$master_row->item = $this->item;
+									}									
+									$master_row->account = $item->getYACT($record->pc);																		
 									for($m=1;$m<=15;$m++){										
 										$month = $this->budget->arrPeriod[$m];										
 										if ($record->{$month}){											
 											$master_row->{$month} = round(
 																		$record->{$month}/$this->subtotal[strtolower($month)]
 																		*$item_values[$month]
-																	,2);											
+																	,2);
+
+											$arrDestination[$account][$master_row->activity][$item_code] += $master_row->{$month};
 										}									
 									}				
-								}	
+								}
+							}
 						}
 						//echo $id,"\r\n";
 					}
 					
-					
-					
-					foreach($arrAccounts as $item_code=>$item_values){
+				// echo '<pre>';print_r($arrAccounts); echo '</pre>';
+				
+				foreach ($arrAccounts as $account=>$arrItems){	
+					foreach($arrItems as $item_code=>$item_values){
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $this->profit;
-						// $master_row->activity = $total['activity'];
-						// $master_row->customer = self::EMPTY_CUSTOMER;					
-						//$item = $Items->getById($this->item);
-						$item = $Items->getById($item_code);
+						if (strpos($account,'6')===0){
+							$item = $Items->getById($item_code);
+							$master_row->item = $item_code;
+						} else {
+							$item = $Items->getById($this->item);
+							$master_row->item = $this->item;
+						}	
+						
 						$master_row->account = $item->getYACT($this->profit);
-						// $master_row->item = $this->item;
-						$master_row->item = $item_code;
-						for($m=1;$m<=15;$m++){
-							// $month = date('M',mktime(0,0,0,$m,15));
-							$month = $this->budget->arrPeriod[$m];
-							//$master_row->{$month} = -$total[$month];
+						for($m=1;$m<=15;$m++){							
+							$month = $this->budget->arrPeriod[$m];							
 							$master_row->{$month} = -$item_values[$month];
 						}
 					}
+					
+					if(is_array($arrSource[$account])){
+						foreach ($arrSource[$account] as $activity=>$arrItem){
+							foreach ($arrItem as $item=>$item_values){
+								$master_row = $oMaster->add_master();
+								$master_row->profit = $this->profit;														
+								$master_row->item = $item_code;						
+								$master_row->account = $account;
+								$master_row->activity = $activity;
+								for($m=1;$m<=15;$m++){							
+									$month = $this->budget->arrPeriod[$m];							
+									$master_row->{$month} = -$item_values[$month];
+								}
+								// echo '<pre>',$account; print_r($master_row);echo '</pre>\r\n';
+							}
+						}
+						foreach ($arrDestination[$account] as $activity=>$arrItem){
+							foreach ($arrItem as $item=>$item_values){
+								$master_row = $oMaster->add_master();
+								$master_row->profit = $this->profit;														
+								$master_row->item = $item_code;						
+								$master_row->account = $account;
+								$master_row->activity = $activity;
+								for($m=1;$m<=15;$m++){							
+									$month = $this->budget->arrPeriod[$m];							
+									$master_row->{$month} = $item_values[$month];
+								}
+							}
+						}
+					}
+				}
 										
 				
 				$oMaster->save(true);//Save into actual periods				

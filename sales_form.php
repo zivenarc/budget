@@ -15,6 +15,19 @@ $oDocument->defineGrid();
 
 if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
+	if($_POST['DataAction']=='route'){
+		
+		$sql = "SELECT route FROM reg_route 
+				WHERE pol_country=LEFT(".$oSQL->e($_POST['pol']).",2)
+				AND pod_country=LEFT(".$oSQL->e($_POST['pod']).",2)";
+			
+		$rs = $oSQL->q($sql);
+		$res = $oSQL->f($rs);
+	
+		header('Content-type:application/json;');
+		echo json_encode($res);
+		die();
+	}
 	
 	if($_POST['DataAction']=='fill'){		
 		

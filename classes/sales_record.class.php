@@ -71,6 +71,7 @@ class sales_record extends table_record{
 			$arrRes[] = "`bdv`=(SELECT usrProfitID FROM stbl_user WHERE usrID=".$oSQL->e($this->sales).")";
 			$arrRes[] = "`route`=".($this->route?(integer)$this->route:'NULL');
 			$arrRes[] = "`kpi`=".(integer)$this->kpi;
+			$arrRes[] = "`gbr`=".(integer)$this->gbr;
 			$arrRes[] = "`hbl`=".(integer)$this->hbl;
 			$arrRes[] = "`bo`=".(integer)$this->bo;
 			$arrRes[] = "`jo`=".(integer)$this->jo;

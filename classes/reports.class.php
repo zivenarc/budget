@@ -643,7 +643,10 @@ class Reports{
 				?>
 			</tr>
 		</tfoot>
-		</table>		
+		</table>
+		<ul class='link-footer'>
+				<li><a href='javascript:SelectContent("<?php echo $source;?>");'>Select table</a></li>
+		</ul>		
 		<?php
 		if ($docClass=='Interco_sales' || $docClass=='Sales'){
 			$sql = "SELECT reg_sales.*, tbl_profit.pccTitle as Profit, tbl_counterparty.cntTitle as Customer_name, tbl_product.prdTitle as Product_title, tbl_product_type.prtGHQ as Activity_title

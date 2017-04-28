@@ -131,6 +131,30 @@ class Sales extends Document{
 			,'disabled'=>!$this->flagUpdate
 		);
 		
+		if (strpos($this->ghq,'Ocean')!==false){
+			$this->Columns[] = Array(
+				'title'=>'Port of loading'
+				,'field'=>self::Prefix.'POL'
+				,'mandatory'=>true
+				,'type'=>'ajax'
+				,'table'=>'tbl_port'
+				,'prefix'=>'prt'
+				,'sql'=>'tbl_port'			
+				,'disabled'=>!$this->flagUpdate			
+			);
+			
+			$this->Columns[] = Array(
+				'title'=>'Port of discharge'
+				,'field'=>self::Prefix.'POD'
+				,'mandatory'=>true
+				,'type'=>'ajax'
+				,'table'=>'tbl_port'
+				,'prefix'=>'prt'
+				,'sql'=>'tbl_port'			
+				,'disabled'=>!$this->flagUpdate			
+			);
+		}
+		
 		if (strpos($this->ghq,'Ocean')!==false || strpos($this->ghq,'Air')!==false){
 			$this->Columns[] = Array(
 				'title'=>'Ocean/Air route'
@@ -186,29 +210,6 @@ class Sales extends Document{
 			);
 		};
 
-		if (strpos($this->ghq,'Ocean')!==false){
-			$this->Columns[] = Array(
-				'title'=>'Port of loading'
-				,'field'=>self::Prefix.'POL'
-				,'mandatory'=>true
-				,'type'=>'ajax'
-				,'table'=>'tbl_port'
-				,'prefix'=>'prt'
-				,'sql'=>'tbl_port'			
-				,'disabled'=>!$this->flagUpdate			
-			);
-			
-			$this->Columns[] = Array(
-				'title'=>'Port of discharge'
-				,'field'=>self::Prefix.'POD'
-				,'mandatory'=>true
-				,'type'=>'ajax'
-				,'table'=>'tbl_port'
-				,'prefix'=>'prt'
-				,'sql'=>'tbl_port'			
-				,'disabled'=>!$this->flagUpdate			
-			);
-		}
 	}
 	
 	//==========================================Definition of document GRID ===================================================
@@ -421,7 +422,8 @@ class Sales extends Document{
 						$row->jo = $this->job_owner;						
 						$row->pol = $this->pol;						
 						$row->pod = $this->pod;						
-						$row->route = $this->route;				
+						$row->route = $this->route;	
+						$row->gbr = $this->gbr?1:0;						
 						$row->freehand = ($row->activity==48 && $this->business_owner==self::PB_Ourselves && $this->job_owner!=self::PB_Ourselves) || ($row->activity==63 && $this->business_owner==self::PB_Ourselves);				
 						for ($m=1;$m<=15;$m++){							
 							$month = $this->budget->arrPeriod[$m];	
