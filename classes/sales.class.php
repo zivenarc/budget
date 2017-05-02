@@ -165,7 +165,7 @@ class Sales extends Document{
 				,'sql'=>'tbl_route'
 				,'mandatory'=>false
 				,'default'=>2
-				// ,'defaultText'=>'---Non-FHD---'
+				,'defaultText'=>'---Undefined---'
 				,'disabled'=>!$this->flagUpdate
 			);
 			

@@ -330,14 +330,14 @@ function initCheckboxes(){
 
 function initialize_autocomplete(oForm){
 
-	console.log('Looking for AC in '+oForm.attr('id')+'...');
+	// console.log('Looking for AC in '+oForm.attr('id')+'...');
 
 	oForm.find("input.autocomplete").each(function(){
 		var arrData = $.parseJSON($(this).attr('data-autocomplete'));		
 		var field_id = $(this).attr('id').replace('input_','');
 		var url = 'json_list.php?table='+arrData.table;
 		
-		console.log(this);
+		// console.log(this);
 		
 		$(this).autocomplete({
 			minLength: 3,
