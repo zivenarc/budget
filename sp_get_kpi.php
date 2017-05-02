@@ -184,6 +184,14 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 			FROM tnt.tbl_air_shipment WHERE ashCCDate BETWEEN @dateStart AND @dateEnd";
 };
 
+$sql[] = "INSERT IGNORE INTO ref_route
+			SELECT LEFT(pol,2),LEFT(pod,2),0 
+			FROM reg_sales
+			WHERE IFNULL(pol,'')<>'' AND IFNULL(pod,'')<>''
+			GROUP by pol, pod";
+
+$sql[] = "UPDATE reg_sales, ref_route SET reg_sales.route=ref_route.route WHERE LEFT(pol,2)=pol_country AND LEFT(pod,2)=pod_country AND scenario=@scenario";
+
 for ($i=0;$i<count($sql);$i++){	
 	if (!$oSQL->q($sql[$i]) || $_GET['debug']){
 		echo '<h2>Error:</h2>';
