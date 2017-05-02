@@ -18,15 +18,38 @@ if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
 	if($_POST['DataAction']=='route'){
 		
-		$sql = "SELECT * FROM ref_route 
+		$sql = "SELECT ref_route.*, POL.cntTitle as polTitle, POD.cntTitle as podTitle 
+				FROM ref_route 
+				LEFT JOIN geo.tbl_country POL ON POL.cntID=pol_country
+				LEFT JOIN geo.tbl_country POD ON POD.cntID=pod_country
 				WHERE pol_country=LEFT(".$oSQL->e($_POST['pol']).",2)
 				AND pod_country=LEFT(".$oSQL->e($_POST['pod']).",2)";
-			
+		
 		$rs = $oSQL->q($sql);
-		$res = $oSQL->f($rs);
-	
+		if ($oSQL->n($rs)){
+			$res = $oSQL->f($rs);
+		} else {
+			$oSQL->q("INSERT IGNORE INTO ref_route VALUES(LEFT(".$oSQL->e($_POST['pol']).",2),LEFT(".$oSQL->e($_POST['pod']).",2),0)");
+			$rs = $oSQL->q($sql);
+			$res = $oSQL->f($rs);
+		}
+		
 		header('Content-type:application/json;');
 		echo json_encode($res);
+		die();
+	}
+	
+	if($_POST['DataAction']=='route_update'){
+		try {
+			$oSQL->q("UPDATE ref_route SET route=".(integer)$_POST['route']." WHERE pol_country=".$oSQL->e($_POST['pol_country'])." AND pod_country=".$oSQL->e($_POST['pod_country']));	
+			$res = Array('status'=>'success','description'=>"");
+		} catch (Exception $e){
+			$res = Array('status'=>'error','description'=>$e->getMessage());
+		}
+		
+		header('Content-type:application/json;');
+		echo json_encode($res);
+		
 		die();
 	}
 	
@@ -140,6 +163,13 @@ $oDocument->fillGrid();
 require ('includes/inc-frame_top.php');
 require ('includes/inc_document_header.php');
 ?>
+<div id='route_select' style='display:none;'>
+	<p id='route_select_prompt'/>
+	<div id='route_select_wrap'>
+		<select id='route_select_select'>
+		</select>
+	</div>
+</div>
 <script>
 
 $(document).ready(function(){

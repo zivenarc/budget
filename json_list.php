@@ -19,7 +19,15 @@ if ($rw = $oSQL->d($sql)){
 	$prefix = substr($id_col,0,3);
 	
 	$fldTitle = Array("Title"=>"{$prefix}Title","TitleLocal"=>"{$prefix}TitleLocal");
-	if ($table=="stbl_user") $fldTitle=Array("Title"=>"{$prefix}Name","TitleLocal"=>"{$prefix}NameLocal");//--------- Костыли для нестандартной таблицы с юзерами
+	switch($table){
+		case "stbl_user":
+			$fldTitle=Array("Title"=>"{$prefix}Name","TitleLocal"=>"{$prefix}NameLocal");
+			break;
+		case 'tbl_port':
+			$fldTitle=Array("Title"=>"CONCAT('[',prtID,']',prtTitle)","TitleLocal"=>"CONCAT('[',prtID,']',prtTitleLocal)",'icon'=>"LCASE(LEFT(prtID,2))");
+			break;
+	}
+			
 	
 	if ($id) {
 		$sql = "SELECT `{$prefix}ID` as value, `{$fldTitle["Title$strLocal"]}` as label
@@ -27,14 +35,14 @@ if ($rw = $oSQL->d($sql)){
 				WHERE `{$prefix}ID` = '$id' 				
 				LIMIT 1;";
 	} else {
-		$sql = "SELECT `{$prefix}ID` as value, `{$fldTitle["Title$strLocal"]}` as label
+		$sql = "SELECT `{$prefix}ID` as value, {$fldTitle["Title$strLocal"]} as label".($fldTitle["desc"]?", {$fldTitle["desc"]} as desc,":"").($fldTitle["icon"]?",{$fldTitle["icon"]} as icon":"")."
 				FROM `$table`
-				WHERE (`{$fldTitle["Title"]}` LIKE '%".addslashes($q)."%' 
-				OR `{$fldTitle["TitleLocal"]}` LIKE '%".addslashes($q)."%' 
-				OR `{$fldTitle["TitleLocal"]}` LIKE '%".addslashes(mb_convert_case($q, MB_CASE_TITLE, "UTF-8"))."%'
-				OR `{$fldTitle["TitleLocal"]}` LIKE '%".addslashes(mb_convert_case($q, MB_CASE_UPPER, "UTF-8"))."%')
+				WHERE ({$fldTitle["Title"]} LIKE '%".addslashes($q)."%' 
+				OR {$fldTitle["TitleLocal"]} LIKE '%".addslashes($q)."%' 
+				OR {$fldTitle["TitleLocal"]} LIKE '%".addslashes(mb_convert_case($q, MB_CASE_TITLE, "UTF-8"))."%'
+				OR {$fldTitle["TitleLocal"]} LIKE '%".addslashes(mb_convert_case($q, MB_CASE_UPPER, "UTF-8"))."%')
 				AND `{$prefix}FlagDeleted`<>1
-				ORDER BY `{$fldTitle["Title"]}`, `{$fldTitle["TitleLocal"]}`
+				ORDER BY {$fldTitle["Title"]}, {$fldTitle["TitleLocal"]}
 				LIMIT $limit;";
 	}
 		

@@ -367,7 +367,7 @@ function initialize_autocomplete(oForm){
 				}
 				return false;
 			}
-		});
+		})
 	});
 }
 
