@@ -1,18 +1,11 @@
-$(document).ready(function(){
-	$('#input_salPOL').on( "autocompleteselect", function( event, ui ){
-		updateRoute();
-	});
-	$('#input_salPOD').on( "autocompleteselect", function( event, ui ){
-		updateRoute();
-	});
-});
-
-function updateRoute(){
-	var pol = $('#salPOL').val();
-	var pod = $('#salPOD').val();
+function autocomplete_callback(field_id){
 	
-	$.load(location.href,{DataAction:'route',pol:pol,pod:pod},function(data){
-		$('#salRouteID').val(data.route);
-	});
-	
+	if(field_id=='input_salPOL' || field_id=='input_salPOD'){
+		var pol = $('#salPOL').val();
+		var pod = $('#salPOD').val();
+		
+		$.load(location.href,{DataAction:'route',pol:pol,pod:pod},function(data){
+			$('#salRouteID').val(data.route);
+		});
+	}
 }
