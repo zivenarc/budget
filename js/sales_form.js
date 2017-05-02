@@ -1,8 +1,8 @@
 $(document).ready(function(){
-	$('#salPOL').on( "autocompleteselect", function( event, ui ){
+	$('#input_salPOL').on( "autocompleteselect", function( event, ui ){
 		updateRoute();
 	});
-	$('#salPOD').on( "autocompleteselect", function( event, ui ){
+	$('#input_salPOD').on( "autocompleteselect", function( event, ui ){
 		updateRoute();
 	});
 });
