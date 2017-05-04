@@ -1,4 +1,11 @@
 <?php 
+$arrJS[] = '../common/jquery/jquery-1.7.1.min.js';
+$arrJS[] = '../common/jquery/jquery-ui-1.12.0.custom/jquery-ui.min.js';
+//$arrJS[] = 'js/ef_common.js';
+$arrCSS[] = "common/style.css";
+$arrCSS[] = Array('file'=>"common/print.css",'media'=>'print');
+// $arrCSS[] = "../common/jquery/jquery-ui-1.12.0.custom/themes/redmond/jquery-ui.css";
+$arrCSS[] = '../common/jquery/jquery-ui-1.12.0.custom/jquery-ui.css';
 
 define ("TABLES_OR_VIEWS","/(tbl_|vw_|stbl_|svw_)/i");
 define ("subjPrefix", "[INTRANET] ");
