@@ -1,4 +1,6 @@
 <?php
+$arrActions[] = Array("title" => ShowFieldTitle('Print'), "class" => "print", "action" => "javascript:window.print();");
+
 //------------------------------------------- Determine report scenario ------------------------------------//
 if (isset($_GET['budget_scenario'])) {
 	$budget_scenario = $_GET['budget_scenario'];
@@ -42,7 +44,8 @@ if (isset($_GET['currency'])) {
 }
 SetCookie('report_currency',$currency,0,'/budget/');
 
-$arrCurrencySelector = Array(978=>'EUR',840=>'USD',643=>'RUB');
+// $arrCurrencySelector = Array(978=>'EUR',840=>'USD',643=>'RUB');
+$arrCurrencySelector = Array(978=>'EUR',643=>'RUB');
 
 //------------------------------------- type of report details -------------------------------------------//
 if (isset($_GET['type'])){

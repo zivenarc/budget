@@ -192,3 +192,7 @@ td.costs_supplier{
 .code-9907 {
 	background-color: yellow !important;
 }
+
+#report_selectors{
+	display:none;
+}
