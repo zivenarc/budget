@@ -84,7 +84,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer, current month",
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM vw_master 
-								WHERE scenario='{$oBudget->id}' 
+								WHERE scenario='{$oBudget->id}'  AND company='{$company}'
 									AND account IN ('J00400', 'J00802')
 									{$sqlActivityFilter}
 								GROUP BY customer_group_code
@@ -94,8 +94,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer, current month",
 											0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 
-								WHERE
-								scenario='{$oReference->id}' 
+								WHERE scenario='{$oReference->id}'  AND company='{$company}'
 									AND source<>'Estimate' 
 									AND account IN ('J00400', 'J00802')
 									{$sqlActivityFilter}
