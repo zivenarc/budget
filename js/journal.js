@@ -25,6 +25,7 @@ function spinner_div(){
 
 $(document).ready(function(){
 	$('#tabs').tabs(tabs_options);
+	$('button').button();
 });
 
 function repost(tab, event){
