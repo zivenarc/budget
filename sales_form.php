@@ -74,6 +74,8 @@ if ($_POST['DataAction']){
 			$row->profit = $oDocument->profit;
 			$row->product = $rw['jitProductID'];				
 			$row->customer = $oDocument->customer;				
+			$row->sales = $oDocument->sales;
+			$row->kpi = 1;
 			//$row->comment = $_POST['comment'][$id];				
 			$row->selling_rate = (double)$rw['IncomeRate'];				
 			switch($rw['jitEstIncomeCurr']){
