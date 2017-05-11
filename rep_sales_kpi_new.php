@@ -101,7 +101,6 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc-frame_bottom.php');
 } else {
 	
-	include ('includes/inc_report_buttons.php');
 	if ($_GET['pccGUID']=='all'){
 		$sqlWhere = " WHERE customer IN (".implode(',',$arrCounterparty['codes']).")"; 
 	} else {
@@ -119,7 +118,7 @@ if(!isset($_GET['pccGUID'])){
 	// if (false){
 		$oReport->monthlyReport($type);	
 	} else {
-		
+		include ('includes/inc_report_buttons.php');
 		$oReport->periodicPnL($type);
 		$oReport->salesByActivity($sqlWhere);
 		
