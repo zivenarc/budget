@@ -83,7 +83,7 @@ if(!isset($_GET['pccGUID'])){
 											{$sqlActual} as Diff
 									FROM vw_master 
 									{$sqlWhere}
-										AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
+										AND  scenario='{$oBudget->id}' AND company='{$company}' AND account IN ('J00400', 'J00802')
 									GROUP BY customer_group_code
 									UNION ALL
 									SELECT  customer_group_code as optValue, 
@@ -93,7 +93,7 @@ if(!isset($_GET['pccGUID'])){
 									-{$sqlBudget} as Diff
 									FROM vw_master 									
 									{$sqlWhere}
-										AND scenario='{$oReference->id}' 
+										AND scenario='{$oReference->id}' AND company='{$company}' 
 										AND source<>'Estimate' 
 										AND account IN ('J00400', 'J00802')										
 									GROUP BY customer_group_code",
@@ -114,7 +114,7 @@ if(!isset($_GET['pccGUID'])){
 											{$sqlActual} as Diff
 									FROM vw_master 
 									{$sqlWhere}
-										AND  scenario='{$oBudget->id}'
+										AND  scenario='{$oBudget->id}' AND company='{$company}' 
 										AND account NOT LIKE 'SZ%'																				
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)
 									UNION ALL
@@ -124,7 +124,7 @@ if(!isset($_GET['pccGUID'])){
 									{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 									FROM vw_master 
 									{$sqlWhere}
-										AND scenario='{$oReference->id}' 
+										AND scenario='{$oReference->id}' AND company='{$company}' 
 										AND source<>'Estimate' 	
 										AND account NOT LIKE 'SZ%'										
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)",
@@ -148,7 +148,7 @@ if(!isset($_GET['pccGUID'])){
 												({$sqlActual}-{$sqlBudget}) as Diff
 										FROM vw_master 
 										{$sqlWhere}
-											AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
+											AND  scenario='{$oBudget->id}' AND company='{$company}' AND account IN ('J00400', 'J00802')
 										GROUP BY customer_group_code",
 								'denominator'=>$denominator,
 								'budget_title'=>'This month',
@@ -167,7 +167,7 @@ if(!isset($_GET['pccGUID'])){
 												({$sqlActual}-{$sqlBudget}) as Diff
 										FROM vw_master 
 										{$sqlWhere}
-											AND  scenario='{$oBudget->id}' AND account NOT IN ('J00400', 'J00802') AND item<>''
+											AND  scenario='{$oBudget->id}' AND company='{$company}' AND account NOT IN ('J00400', 'J00802') AND item<>''
 										GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
 								'denominator'=>$denominator,
 								'budget_title'=>'This month',
