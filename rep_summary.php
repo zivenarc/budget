@@ -57,14 +57,26 @@ if(!isset($_GET['pccGUID'])){
 		$sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
 		$filter = Array('pc'=>$arrPC);
 	} else {
-		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 		
-		$sql = "SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']);
-		$arrPC = $oSQL->get_data($sql);
-		$filter = Array('pc'=>$arrPC);
+		
+		$sql = "SELECT pccID, pccTitle, pccFlagFolder FROM common_db.tbl_profit 
+				WHERE pccGUID=".$oSQL->e($_GET['pccGUID'])." 
+					OR pccParentCode1C=(SELECT pccCode1C FROM common_db.tbl_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
+		$rs = $oSQL->q($sql);		
+		while ($rw = $oSQL->f($rs)){
+			$arrPC[] = $rw['pccID'];
+			if(!$rw['pccFlagFolder']) $arrPCHeader[] = $rw['pccTitle'];
+		};
+		
+		$filter = Array('pc'=>$arrPC);		
+		
+		$sqlWhere = "WHERE pc in (".implode(',',$filter['pc']).")";
+		
 	}
 	
-	
+	if(is_array($arrPCHeader)){
+		echo '<p>',implode(' | ',$arrPCHeader),'</p>';
+	}
 	$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
 	$oReport->shortMonthlyReport($period_type);	
 	
