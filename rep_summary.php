@@ -5,6 +5,9 @@ require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
 
+$arrActions[] = Array('title'=>'Current month','action'=>'?period_type=cm');
+$arrActions[] = Array('title'=>'FYE','action'=>'?period_type=fye');
+
 if ($bu_group){
 	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
 	$rs = $oSQL->q($sql);
