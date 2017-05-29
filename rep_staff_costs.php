@@ -155,7 +155,7 @@ include ('includes/inc-frame_top.php');
 					<td><?php echo $rw['Location'];?></td>
 					<td><?php echo $rw['Activity'];?></td>
 					<td><?php echo $rw['empTitleLocal'];?></td>
-					<td><?php echo $rw['empFunction'];?></td>
+					<td class="<?php echo $rw['empFunction']?"":"ui-state-error";?>"><?php echo $rw['empFunction'];?></td>
 					<td class='budget-decimal'><?php echo number_format($rw['empSalary'],2,'.',',');?></td>
 					<td><?php echo $rw['empStartDate'];?></td>
 					<td><?php echo $rw['empEndDate']?$rw['empEndDate']:($rw['end_date']?'('.$rw['end_date'].')':'');?></td>				
