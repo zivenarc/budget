@@ -2077,6 +2077,8 @@ class Reports{
 					$arrSubreport[$l1Code][$rw['level2_code']]['Q_B'] += $rw['Q_B'];
 					$arrSubreport[$l1Code][$rw['level2_code']]['NM_A'] += $rw['NM_A'];
 					$arrSubreport[$l1Code][$rw['level2_code']]['NM_B'] += $rw['NM_B'];
+					$arrSubreport[$l1Code][$rw['level2_code']]['FYE_A'] += $rw['FYE_A'];
+					$arrSubreport[$l1Code][$rw['level2_code']]['FYE_B'] += $rw['FYE_B'];
 
 					$arrSort[$l1Code]['value'] += $rw['YTD_A']+$rw['YTD_B']+$rw['Total_AM']+$rw['estimate_AM'];
 					
