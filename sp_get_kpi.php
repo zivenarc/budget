@@ -16,7 +16,7 @@ if (strpos($oBudget->type,'Budget')) die('Wrong budget type, cannot fill in the 
 $ytd = $oBudget->cm;
 $year = $oBudget->year;
 
-$arrKPI[] = Array('prtID'=>48,'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)');
+$arrKPI[] = Array('prtID'=>48,'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)" );
 $arrKPI[] = Array('prtID'=>63,'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>46,'ghq'=>'Air import','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobETAPort');
 $arrKPI[] = Array('prtID'=>47,'ghq'=>'Air export','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobShipmentDate');
@@ -47,7 +47,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 		$month = $oBudget->arrPeriod[$m];
 
 		$sql[] = "SET @dateStart:='{$repDateStart}', @dateEnd:='{$repDateEnd}'";
-		$sql[] = "INSERT INTO budget.reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales, bdv, bo, pol, pod,gbr)
+		$sql[] = "INSERT INTO budget.reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales, bdv, bo, pol, pod, gbr)
 					SELECT jobProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1, cntUserID, usrProfitID, IFNULL(jobGDSBusinessOwnerID,714), jobPOL, jobPOD,jobFlagSAP
 					FROM nlogjc.tbl_job
 					JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
@@ -55,6 +55,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 					WHERE {$arrKPI[$i]['date']} BETWEEN @dateStart AND @dateEnd
 						AND jobStatusID BETWEEN 15 AND 40
 						AND jobProfitID IS NOT NULL
+						{$arrKPI[$i]['sqlWhere']}
 						AND (SELECT COUNT(jitGUID) 
 									FROM nlogjc.tbl_job_item 
 									LEFT JOIN common_db.tbl_product ON prdID=jitProductID 
@@ -68,7 +69,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 		switch ($arrKPI[$i]['prtID']){
 			case 48:
 			case 63:
-				$sqlDetails = "SELECT jobID, cntTitle, {$arrKPI[$i]['kpi']} as 'TEU', jobShipmentDate, jobETAPort, jobATAPort, jobOrigin, jobDestination
+				$sqlDetails = "SELECT jobID, cntTitle, {$arrKPI[$i]['kpi']} as 'TEU', jobShipmentDate, jobETAPort, jobATAPort, jobPOL, jobPOD, jobFlagSAP
 					FROM nlogjc.tbl_job
 					JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
 					WHERE {$arrKPI[$i]['date']} BETWEEN '{$repDateStart}' AND '{$repDateEnd}'
