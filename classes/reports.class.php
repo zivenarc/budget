@@ -2775,6 +2775,14 @@ class Reports{
 				<td class='budget-decimal'><?php self::render($data['NM_A']-$data['NM_B'],0);?></td>
 				<td class='budget-decimal'><em><?php self::render_ratio($data['NM_A'],$data['NM_B']);?></em></td>
 				<?php		
+				if (!($this->oBudget->nm % 3)){
+				?>
+				<td class='budget-decimal budget-ytd'><?php self::render($data['FYE_A'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['FYE_B'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['FYE_A']-$data['Q_B'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['FYE_A'],$data['FYE_B']);?></em></td>
+				<?php
+				}
 				break;
 			case 'forecast':
 				?>		
@@ -2793,6 +2801,7 @@ class Reports{
 				<td class='budget-decimal'><?php self::render($data['FYE_A']-$data['FYE_B'],0);?></td>
 				<td class='budget-decimal'><em><?php self::render_ratio($data['FYE_A'],$data['FYE_B']);?></em></td>
 				<?php
+				break;
 			case 'periodic':
 			default:
 					
@@ -3050,7 +3059,7 @@ class Reports{
 		
 		$sqlWhere = $this->sqlWhere;
 
-		if($this->oBudget->cm % 3){
+		if($this->oBudget->cm % 3 && $this->oBudget->nm % 3){
 			$this->colspan = 14;
 		} else {
 			$this->colspan = 18;
@@ -3081,7 +3090,7 @@ class Reports{
 			case 'ytd':
 			case 'cm':
 			default:
-				$this->columns = Array('CM_A','CM_B','YTD_A','YTD_B','Q_A','Q_B','NM_A','NM_B');
+				$this->columns = Array('CM_A','CM_B','YTD_A','YTD_B','Q_A','Q_B','NM_A','NM_B','FYE_A','FYE_B');
 				$this->structure = 'monthly';
 				$strHeader = $this->oBudget->getTableHeader('mr');				
 		}

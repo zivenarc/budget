@@ -220,6 +220,9 @@ class Budget{
 					<?php } ?>
 					<th colspan="4">YTD</th>				
 					<th colspan="4">Next month (<?php echo date('M',$this->date_start);?>)</th>
+					<?php if (!($this->nm % 3)){ ?>
+					<th colspan="4">Full year</th>
+					<?php } ?>
 				</tr>
 				<tr>
 					<th class='budget-ytd'>Actual</th>
@@ -240,6 +243,12 @@ class Budget{
 					<th>Budget</th>
 					<th>Diff</th>
 					<th>%</th>
+					<?php if (!($this->nm % 3)){ ?>
+					<th class='budget-ytd'>Forecast</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+					<?php } ?>
 				</tr>
 				<?php
 				$res = ob_get_clean();				
