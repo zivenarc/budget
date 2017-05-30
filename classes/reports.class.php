@@ -1740,7 +1740,7 @@ class Reports{
 		
 		// GLOBAL $budget_scenario;
 		// $oBudget = new Budget($budget_scenario);
-		if($this->oBudget->cm % 3){
+		if($this->oBudget->cm % 3 && $this->oBudget->nm % 3){
 			$this->colspan = 14;
 		} else {
 			$this->colspan = 18;
@@ -1748,7 +1748,7 @@ class Reports{
 		
 		$sqlWhere = $this->sqlWhere;
 		
-		$this->columns = Array('CM_A','CM_B','YTD_A','YTD_B','Q_A','Q_B','NM_A','NM_B');
+		$this->columns = Array('CM_A','CM_B','YTD_A','YTD_B','Q_A','Q_B','NM_A','NM_B','FYE_A','FYE_B');
 		$this->sqlSelect = "";
 		foreach($this->columns as $i=>$field){
 			$this->sqlSelect .= ($this->sqlSelect?",\r\n":"")."SUM(`{$field}`) as '{$field}'";
