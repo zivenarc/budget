@@ -80,7 +80,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 									WHERE jitJobID=jobID AND prdCategoryID='{$arrKPI[$i]['prtID']}'
 									)>0				
 					GROUP BY jobID
-					ORDER BY jobID";
+					ORDER BY jobID, jobCustomerID";
 				$rsDetails = $oSQL->q($sqlDetails);
 				$nSumKPI = 0; $j=1;
 				$tableID = "details_".$arrKPI[$i]['prtID'];
@@ -91,6 +91,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 						<tr>
 							<th>#</th>
 							<th>Job</th>
+							<th>SAP</th>
 							<th>Customer</th>
 							<th>TEU</th>
 							<th>From</th>
@@ -106,10 +107,11 @@ for ($i=0; $i<count($arrKPI);$i++){
 					<tr>
 						<td><?php echo $j;?></td>
 						<td><a target='job' href="/nlogjc/job_form.php?jobID=<?php echo $rw['jobID'];?>"><?php echo $rw['jobID'];?></a></td>
+						<td><?php echo $rw['jobFlagSAP'];?></td>
 						<td><?php echo $rw['cntTitle'];?></td>
 						<td><?php echo $rw['TEU'];?></td>
-						<td><?php echo $rw['jobOrigin'];?></td>
-						<td><?php echo $rw['jobDestination'];?></td>
+						<td><?php echo $rw['jobPOL'];?></td>
+						<td><?php echo $rw['jobPOD'];?></td>
 						<td><?php echo $rw['jobShipmentDate'];?></td>
 						<td><?php echo $rw['jobETAPort'];?></td>
 						<td><?php echo $rw['jobATAPort'];?></td>
