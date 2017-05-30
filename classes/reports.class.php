@@ -2519,6 +2519,9 @@ class Reports{
 				$rw['Q_A'] = $rw['Q_A']/3;
 				$rw['Q_B'] = $rw['Q_B']/3;
 				
+				$rw['FYE_A'] = $rw['FYE_A']/12;
+				$rw['FYE_B'] = $rw['FYE_B']/12;
+				
 				for($q=1;$q<=5;$q++){
 					$rw["Q$q"] = $rw["Q$q"]/3;
 				}
