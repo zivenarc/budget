@@ -100,14 +100,18 @@ if(!isset($_GET['pccGUID'])){
 	$oWF = new Waterfall($settings);
 	
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).")/{$denominator} as Diff
-			FROM reg_master WHERE scenario='{$oReference->id}' ".Reports::GOP_FILTER;	
+			FROM reg_master 
+			{$sqlWhere} and company='{$company}' 
+			AND scenario='{$oReference->id}' ".Reports::GOP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);		
 	$oWF->arrReport[] = Array($oReference->title,null,null,$rw['Diff'],'budget-subtotal');
 	
 	$ytdBudget = $rw['Diff'];
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).")/{$denominator} as Actual
-			FROM reg_master WHERE scenario='{$Budget->id}' ".Reports::GOP_FILTER;
+			FROM reg_master 
+			{$sqlWhere} and company='{$company}'
+			AND scenario='{$oBudget->id}' ".Reports::GOP_FILTER;
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);			
 	$strDiff = ($rw['Actual']>=$ytdBudget?"YTD proficit":"YTD deficit");
