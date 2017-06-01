@@ -61,7 +61,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 									LEFT JOIN common_db.tbl_product ON prdID=jitProductID 
 									WHERE jitJobID=jobID AND prdCategoryID=@prtID
 									)>0				
-					GROUP BY jobCustomerID, jobProfitID, jobPOL, jobPOD,jobFlagSAP
+					GROUP BY jobCustomerID, jobProfitID, jobPOL, jobPOD,jobFlagSAP, IFNULL(jobGDSBusinessOwnerID,714), jobGDSOwnerID
 					HAVING `{$month}` IS NOT NULL";
 					// HAVING  {$arrKPI[$i]['kpi']} IS NOT NULL";
 		
