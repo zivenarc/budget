@@ -247,5 +247,41 @@ class Waterfall {
 		$res = '<div><h4>'.$title.'</h4><p style="color:'.($number<0?'red':'black').';">'.number_format($number,0,'.',',').'</p></div>';;
 		return($res);
 	}
+	
+	public function processSQL($sqlBase,$limit=3, $title=""){
+		GLOBAL $oSQL;
+		$sql = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
+				({$sqlBase}) Q1
+				";
+		$rs = $oSQL->q($sql);
+		$rwOther = $oSQL->f($rs);
+		
+		$sql = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
+			({$sqlBase}) Q1
+			GROUP BY optText
+			ORDER BY SUM(DIFF) DESC
+			LIMIT {$limit}";
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){			
+			$this->arrReport[] = Array($rw['optText'],$rw['Actual'],$rw['Budget'],$rw['Diff']);
+			$rwOther['Actual']-=$rw['Actual'];
+			$rwOther['Budget']-=$rw['Budget'];
+			$rwOther['Diff']-=$rw['Diff'];
+		}
+		$sql = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
+				({$sqlBase}) Q1
+				GROUP BY optText
+				ORDER BY SUM(DIFF) ASC
+				LIMIT {$limit}";
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){			
+			$this->arrReport[] = Array($rw['optText'],$rw['Actual'],$rw['Budget'],$rw['Diff']);
+			$rwOther['Actual']-=$rw['Actual'];
+			$rwOther['Budget']-=$rw['Budget'];
+			$rwOther['Diff']-=$rw['Diff'];
+		}
+		$this->arrReport[] = Array($title.', others',$rwOther['Actual'],$rwOther['Budget'],$rwOther['Diff']);
+	}
+	
 }
 ?>

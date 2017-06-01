@@ -96,13 +96,13 @@ if(!isset($_GET['pccGUID'])){
 	
 	$oWF = new Waterfall($settings);
 	
-	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).")/{$denominator} as Diff
+	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).")/{$denominator} as Diff
 			FROM reg_master 
 			{$sqlWhere} and company='{$company}' 
 			AND scenario='{$oReference->id}' ".Reports::GOP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);		
-	$oWF->arrReport[] = Array($oReference->title.", YTD",null,null,$rw['Diff'],'budget-subtotal');
+	$oWF->arrReport[] = Array($oReference->title,null,null,$rw['Diff'],'budget-subtotal');
 	
 	$ytdBudget = $rw['Diff'];
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).")/{$denominator} as Actual
@@ -139,37 +139,7 @@ if(!isset($_GET['pccGUID'])){
 				AND account IN ('J00400', 'J00802')										
 			GROUP BY customer_group_code";
 	
-	$sql = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
-			({$sqlBase}) Q1
-			";
-	$rs = $oSQL->q($sql);
-	$rwOther = $oSQL->f($rs);
-
-	$sql = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
-			({$sqlBase}) Q1
-			GROUP BY optText
-			ORDER BY SUM(DIFF) DESC
-			LIMIT {$limit}";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){			
-		$oWF->arrReport[] = Array($rw['optText'],$rw['Actual'],$rw['Budget'],$rw['Diff']);
-		$rwOther['Actual']-=$rw['Actual'];
-		$rwOther['Budget']-=$rw['Budget'];
-		$rwOther['Diff']-=$rw['Diff'];
-	}
-	$sql = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
-			({$sqlBase}) Q1
-			GROUP BY optText
-			ORDER BY SUM(DIFF) ASC
-			LIMIT {$limit}";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){			
-		$oWF->arrReport[] = Array($rw['optText'],$rw['Actual'],$rw['Budget'],$rw['Diff']);
-		$rwOther['Actual']-=$rw['Actual'];
-		$rwOther['Budget']-=$rw['Budget'];
-		$rwOther['Diff']-=$rw['Diff'];
-	}
-	$oWF->arrReport[] = Array('GP, others',$rwOther['Actual'],$rwOther['Budget'],$rwOther['Diff']);
+	$oWF->processSQL($sqlBase,$limit,'GP');
 	
 	$sqlBase="SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
 											IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
@@ -192,37 +162,7 @@ if(!isset($_GET['pccGUID'])){
 										".Reports::RFC_FILTER."										
 									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)";
 	
-	$sql = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
-			({$sqlBase}) Q1
-			";
-	$rs = $oSQL->q($sql);
-	$rwOther = $oSQL->f($rs);
-
-	$sql = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
-			({$sqlBase}) Q1
-			GROUP BY optText
-			ORDER BY SUM(DIFF) DESC
-			LIMIT {$limit}";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){			
-		$oWF->arrReport[] = Array($rw['optText'],$rw['Actual'],$rw['Budget'],$rw['Diff']);
-		$rwOther['Actual']-=$rw['Actual'];
-		$rwOther['Budget']-=$rw['Budget'];
-		$rwOther['Diff']-=$rw['Diff'];
-	}
-	$sql = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
-			({$sqlBase}) Q1
-			GROUP BY optText
-			ORDER BY SUM(DIFF) ASC
-			LIMIT {$limit}";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){			
-		$oWF->arrReport[] = Array($rw['optText'],$rw['Actual'],$rw['Budget'],$rw['Diff']);
-		$rwOther['Actual']-=$rw['Actual'];
-		$rwOther['Budget']-=$rw['Budget'];
-		$rwOther['Diff']-=$rw['Diff'];
-	}
-	$oWF->arrReport[] = Array('RFC, others',$rwOther['Actual'],$rwOther['Budget'],$rwOther['Diff']);
+	$oWF->processSQL($sqlBase,$limit,'RFC');
 	
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).")/{$denominator} as Diff
 			FROM reg_master 
@@ -230,8 +170,8 @@ if(!isset($_GET['pccGUID'])){
 			AND scenario='{$oBudget->id}' ".Reports::GOP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);		
-	$oWF->arrReport[] = Array($oBudget->title,null,null,$rw['Diff'],'budget-subtotal');
-	
+	$oWF->arrReport[] = Array($oBudget->title,null,null,$rw['Diff'],'budget-subtotal');	
+
 	$oWF->drawTable();
 	
 	
