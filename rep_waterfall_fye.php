@@ -50,13 +50,17 @@ if(!isset($_GET['pccGUID'])){
 
 	
 	if ($_GET['pccGUID']=='all'){
-		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-
-		$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
+	
+		if(is_array($arrUsrData['roleIDs'])){
+			$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
+			$sql = "SELECT DISTINCT pcrProfitID as optValue FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
+		} else {
+			$sql = "SELECT pccID as optValue FROM common_db.tbl_profit WHERE pccFlagDeleted=0";
+		}
 
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){
-			$arrPC[] = $rw['pcrProfitID'];
+			$arrPC[] = $rw['optValue'];
 		}
 		$sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
 		$filter = Array('pc'=>$arrPC);
