@@ -7,6 +7,7 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 				 },
 				spinner:'',
 				load: function (event, ui) {
+						$('button',ui.panel).button();
 						$('input.journal-cb-all').click(function(){
 							var thisCB = $(this);
 							var table = $(this).parents('table');
@@ -24,8 +25,7 @@ function spinner_div(){
 }
 
 $(document).ready(function(){
-	$('#tabs').tabs(tabs_options);
-	$('button').button();
+	$('#tabs').tabs(tabs_options);	
 });
 
 function repost(tab, event){
