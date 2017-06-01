@@ -5,6 +5,7 @@ require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
+include ('includes/inc_report_pcfilter.php');
 
 // $arrActions[] = Array('title'=>'Current month','action'=>'?period_type=cm');
 // $arrActions[] = Array('title'=>'FYE','action'=>'?period_type=fye');
@@ -43,45 +44,13 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc_report_selectors.php');
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	
-	$oBudget->getProfitTabs('reg_master', true);
+	$oBudget->getProfitTabs('reg_master', false);
 	
 	include ('includes/inc-frame_bottom.php');
 } else {
 
-	
-	if ($_GET['pccGUID']=='all'){
-	
-		if(is_array($arrUsrData['roleIDs'])){
-			$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-			$sql = "SELECT DISTINCT pcrProfitID as optValue FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
-		} else {
-			$sql = "SELECT pccID as optValue FROM common_db.tbl_profit WHERE pccFlagDeleted=0";
-		}
-
-		$rs = $oSQL->q($sql);
-		while ($rw = $oSQL->f($rs)){
-			$arrPC[] = $rw['optValue'];
-		}
-		$sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
-		$filter = Array('pc'=>$arrPC);
-	} else {
+	$sqlWhere = "WHERE pc in (".implode(',',$filter['pc']).")";
 		
-		
-		$sql = "SELECT pccID, pccTitle, pccFlagFolder FROM common_db.tbl_profit 
-				WHERE pccGUID=".$oSQL->e($_GET['pccGUID'])." 
-					OR pccParentCode1C=(SELECT pccCode1C FROM common_db.tbl_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
-		$rs = $oSQL->q($sql);		
-		while ($rw = $oSQL->f($rs)){
-			$arrPC[] = $rw['pccID'];
-			if(!$rw['pccFlagFolder']) $arrPCHeader[] = $rw['pccTitle'];
-		};
-		
-		$filter = Array('pc'=>$arrPC);		
-		
-		$sqlWhere = "WHERE pc in (".implode(',',$filter['pc']).")";
-		
-	}
-	
 	if(is_array($arrPCHeader)){
 		echo '<p>',implode(' | ',$arrPCHeader),'</p>';
 	}	

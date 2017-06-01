@@ -327,11 +327,11 @@ class Budget{
 	
 	public function getProfitTabs($register='', $acl = false, $params = Array()){
 		GLOBAL $oSQL;
-		GLOBAL $arrUsrData;
+		GLOBAL $arrUsrData, $flagNoAuth;
 		GLOBAL $budget_scenario;
 		GLOBAL $bu_group;
 		
-		if ($acl){
+		if ($acl && !$flagNoAuth){
 			$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
 			$sqlWhere = "JOIN stbl_profit_role ON pccID=pcrProfitID WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
 		}
@@ -343,9 +343,7 @@ class Budget{
 				$sqlWhere .= " AND `{$key}`='{$value}'\r\n";
 			}
 		}
-		
-		$sqlWhere .= " AND scenario='$budget_scenario'";
-		
+				
 		ob_start();
 		?>
 		<div id='tabs' class='tabs'>
@@ -357,9 +355,17 @@ class Budget{
 						WHERE pccFlagFolder=1 
 						ORDER BY pccTitle";
 			} else {
+				$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
+				$rs = $oSQL->q($sql);
+				while ($rw = $oSQL->f($rs)){
+					$arrBus[] = $rw['pccID']; 
+				}
+				$sqlWhere .= " AND pccID IN (".implode(',',$arrBus).")";
+				
 				if (!$register){
 					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText FROM vw_profit $sqlWhere ORDER BY pccParentCode1C";
 				} else {
+					$sqlWhere .= " AND scenario='$budget_scenario'";
 					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText 
 							FROM `$register` 
 							JOIN vw_profit ON pccID=pc

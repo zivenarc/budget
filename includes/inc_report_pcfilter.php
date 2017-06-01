@@ -12,7 +12,8 @@ while ($rw = $oSQL->f($rs)){
 }
 
 if ($_GET['pccGUID']=='all'){
-	$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
+	
+	if(is_array($arrUsrData['roleIDs'])) $strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
 	
 	if ($bu_group){
 		$strBUs = implode(',',$arrBus);
