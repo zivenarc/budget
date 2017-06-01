@@ -47,8 +47,8 @@ for ($i=0; $i<count($arrKPI);$i++){
 		$month = $oBudget->arrPeriod[$m];
 
 		$sql[] = "SET @dateStart:='{$repDateStart}', @dateEnd:='{$repDateEnd}'";
-		$sql[] = "INSERT INTO budget.reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales, bdv, bo, pol, pod, gbr)
-					SELECT jobProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1, cntUserID, usrProfitID, IFNULL(jobGDSBusinessOwnerID,714), jobPOL, jobPOD,jobFlagSAP
+		$sql[] = "INSERT INTO budget.reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales, bdv, bo, jo, pol, pod, gbr)
+					SELECT jobProfitID, @prtID, @unit, cntID, {$arrKPI[$i]['kpi']} as '{$month}', 'Actual', @scenario, 1,1,1, cntUserID, usrProfitID, IFNULL(jobGDSBusinessOwnerID,714), jobGDSOwnerID, jobPOL, jobPOD,jobFlagSAP
 					FROM nlogjc.tbl_job
 					JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
 					JOIN common_db.stbl_user ON usrID=cntUserID
@@ -178,7 +178,7 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 	$month = $oBudget->arrPeriod[$m];
 	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales, bdv)
 			SELECT 3, 4, 'CCD', 17218, COUNT(shpID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID, @usrProfitID
-			FROM tnt.tbl_shipment WHERE shpCCendDate BETWEEN @dateStart AND @dateEnd";
+			FROM tnt.tbl_shipment WHERE shpCCendDate BETWEEN @dateStart AND @dateEnd";	
 	$sql[] = "INSERT INTO reg_sales (pc,activity,unit,customer,`{$month}`,source,scenario,active,posted,kpi,sales, bdv)
 			SELECT 3, 3, 'Trips', 17218, COUNT(shpID) as '{$month}', 'Actual', @scenario, 1,1,1,@cntUserID, @usrProfitID
 			FROM tnt.tbl_shipment WHERE shpTransitFromPort BETWEEN @dateStart AND @dateEnd";
@@ -194,6 +194,9 @@ $sql[] = "INSERT IGNORE INTO ref_route
 			GROUP by pol, pod";
 
 $sql[] = "UPDATE reg_sales, ref_route SET reg_sales.route=ref_route.route WHERE LEFT(pol,2)=pol_country AND LEFT(pod,2)=pod_country AND scenario=@scenario";
+$sql[] = "UPDATE reg_sales SET freehand=1 WHERE bo=714 and jo<>714 AND activity=48 AND scenario=@scenario";
+$sql[] = "UPDATE reg_sales SET freehand=1 WHERE bo=714 and jo=714 AND activity=63 AND scenario=@scenario";
+
 
 for ($i=0;$i<count($sql);$i++){	
 	if (!$oSQL->q($sql[$i]) || $_GET['debug']){
