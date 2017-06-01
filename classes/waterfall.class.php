@@ -8,13 +8,13 @@ $arrJS[]="https://code.highcharts.com/modules/exporting.js";
 
 class Waterfall {
 	
-	private $arrReport, $arrChart, $chartID;
-	public $title;
+	private $chartID;
+	public $arrReport, $arrHSChart, $title;
 	
 	public function __construct($options){		
 		$this->sqlBase = $options['sqlBase'];
 		$this->limit = $options['limit'];
-		$this->chartID = md5($this->sqlBase);
+		$this->chartID = md5($this->sqlBase?$this->sqlBase:time());
 		$this->title = $options['title'];
 		$this->tolerance = $options['tolerance']?$options['tolerance']:0.1;
 		$this->currency = $options['currency']?$options['currency']:'RUB';
@@ -33,15 +33,14 @@ class Waterfall {
 				$this->denominator_title = "";			
 		}
 		
-	}
-	
-	private function _initData(){
-	
 		$this->arrReport = Array();
 		$this->arrChart = Array();
 		$this->arrHSChart = Array();
 		
-		
+	}
+	
+	private function _initData(){
+	
 		
 		GLOBAL $oSQL;
 		$sql = "SELECT SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
@@ -140,7 +139,7 @@ class Waterfall {
 		}
 		
 		$this->arrReport[] = Array('Total diff',null, null, $baseData['Diff']/$this->denominator,'budget-subtotal');
-		$this->arrReport[] = Array('Ratio',null, null, $baseData['Actual']/$baseData['Budget']*100,'budget-ratio');
+		$this->arrReport[] = Array('Ratio',null, null, ($baseData['Budget']!=0?$baseData['Actual']/$baseData['Budget']*100:"0"),'budget-ratio');
 		
 		// if ($this->min > 0){
 			// $this->min *= 0.95;
