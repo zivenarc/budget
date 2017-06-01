@@ -17,6 +17,7 @@ class Reports{
 	const SC_FILTER = "AND group_code=95";
 	const GP_FILTER = "AND account IN ('J00400', 'J00802') ";
 	const GOP_FILTER = "AND account LIKE 'J%' ";
+	const RFC_FILTER = "AND account LIKE 'J%' AND account NOT IN ('J00400', 'J00802') ";
 	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';
 	const SALARY_THRESHOLD = 10000;
 	const ACTUAL_DATA_FILTER = "`source` IN ('Actual','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Correction')";

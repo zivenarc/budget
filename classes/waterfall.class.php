@@ -180,11 +180,8 @@ class Waterfall {
 			<?php
 		}
 		?>
-		</table>
-		<ul class='link-footer'>
-		<li><a href="javascript:SelectContent('table_<?php echo $this->chartID;?>');">Select table</a></li>
-		<li><a target="_blank" id="chart_png_href_<?php echo $this->chartID;?>">Get chart as image</a></li>
-		</ul>
+		</table>		
+		<button onclick="javascript:SelectContent('table_<?php echo $this->chartID;?>');">Select table</button>				
 		<?php
 	}
 	
