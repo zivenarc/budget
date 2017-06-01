@@ -256,6 +256,8 @@ class Waterfall {
 		$rs = $oSQL->q($sql);
 		$rwOther = $oSQL->f($rs);
 		
+		$this->max += $rwOther['Diff'];
+		
 		$sql = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
 			({$sqlBase}) Q1
 			GROUP BY optText
@@ -263,10 +265,13 @@ class Waterfall {
 			LIMIT {$limit}";
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){			
-			$this->arrReport[] = Array($rw['optText'],$rw['Actual'],$rw['Budget'],$rw['Diff']);
+			$this->arrReport[] = Array($rw['optText'],$rw['Actual']/$this->denominator,$rw['Budget']/$this->denominator,$rw['Diff']/$this->denominator);
+			if((integer)$rw['Diff']) {
+				$this->arrHSChart[] = Array('name'=>$rw['optText'],'y'=>(integer)$rw['Diff']);
+			}
 			$rwOther['Actual']-=$rw['Actual'];
 			$rwOther['Budget']-=$rw['Budget'];
-			$rwOther['Diff']-=$rw['Diff'];
+			$rwOther['Diff']-=$rw['Diff'];			
 		}
 		$sql = "SELECT optValue, optText, SUM(Actual) as Actual, SUM(Budget) as Budget, SUM(Diff) as Diff FROM 
 				({$sqlBase}) Q1
@@ -275,12 +280,18 @@ class Waterfall {
 				LIMIT {$limit}";
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){			
-			$this->arrReport[] = Array($rw['optText'],$rw['Actual'],$rw['Budget'],$rw['Diff']);
+			$this->arrReport[] = Array($rw['optText'],$rw['Actual']/$this->denominator,$rw['Budget']/$this->denominator,$rw['Diff']/$this->denominator);
+			if((integer)$rw['Diff']) {
+				$this->arrHSChart[] = Array('name'=>$rw['optText'],'y'=>(integer)$rw['Diff']);
+			}
 			$rwOther['Actual']-=$rw['Actual'];
 			$rwOther['Budget']-=$rw['Budget'];
 			$rwOther['Diff']-=$rw['Diff'];
 		}
-		$this->arrReport[] = Array($title.', others',$rwOther['Actual'],$rwOther['Budget'],$rwOther['Diff']);
+		$this->arrReport[] = Array($title.', others',$rwOther['Actual']/$this->denominator,$rwOther['Budget']/$this->denominator,$rwOther['Diff']/$this->denominator);
+		if((integer)$rwOther['Diff']) {
+			$this->arrHSChart[] = Array('name'=>$title.', others','y'=>(integer)$rwOther['Diff']);
+		}
 	}
 	
 }

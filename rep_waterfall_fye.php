@@ -6,8 +6,8 @@ require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
 
-$arrActions[] = Array('title'=>'Current month','action'=>'?period_type=cm');
-$arrActions[] = Array('title'=>'FYE','action'=>'?period_type=fye');
+// $arrActions[] = Array('title'=>'Current month','action'=>'?period_type=cm');
+// $arrActions[] = Array('title'=>'FYE','action'=>'?period_type=fye');
 
 if ($bu_group){
 	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
@@ -96,34 +96,39 @@ if(!isset($_GET['pccGUID'])){
 	
 	$oWF = new Waterfall($settings);
 	
-	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).")/{$denominator} as Diff
+	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).") as Budget
 			FROM reg_master 
 			{$sqlWhere} and company='{$company}' 
 			AND scenario='{$oReference->id}' ".Reports::GOP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);		
-	$oWF->arrReport[] = Array($oReference->title,null,null,$rw['Diff'],'budget-subtotal');
+	$oWF->max = $rw['Budget'];
+	$oWF->min = $rw['Budget'];
+	$oWF->arrReport[] = Array($oReference->title,null,null,$rw['Budget']/$oWF->denominator,'budget-subtotal');
+	$oWF->arrHSChart[] = Array('name'=>$oWF->budget_title,'y'=>(integer)$rw['Budget'], 'color'=>'blue');
 	
-	
-	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).")/{$denominator} as Diff
+	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).") as Diff
 		FROM reg_master 
 		{$sqlWhere} and company='{$company}' 
 		AND scenario='{$oReference->id}' ".Reports::GOP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
 	$ytdBudget = $rw['Diff'];
-	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).")/{$denominator} as Actual
+	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).") as Actual
 			FROM reg_master 
 			{$sqlWhere} and company='{$company}'
 			AND scenario='{$oBudget->id}' ".Reports::GOP_FILTER;
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);			
 	$strDiff = ($rw['Actual']>=$ytdBudget?"YTD proficit":"YTD deficit");
-	$oWF->arrReport[] = Array($strDiff,$rw['Actual'],$ytdBudget,$rw['Actual']-$ytdBudget);
+	$oWF->max += max(0,$rw['Actual']-$ytdBudget);
+	$oWF->min += min(0,$rw['Actual']-$ytdBudget);
+	$oWF->arrReport[] = Array($strDiff,$rw['Actual']/$oWF->denominator,$ytdBudget/$oWF->denominator,($rw['Actual']-$ytdBudget)/$oWF->denominator);
+	$oWF->arrHSChart[] = Array('name'=>$strDiff,'y'=>(integer)($rw['Actual']-$ytdBudget));
 	
 	$limit = 3;
-	$sqlActual = "SUM(".$oBudget->getThisYTDSQL('roy',$arrActualRates).")/{$denominator}";
-	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('roy',$arrBudgetRates).")/{$denominator}";
+	$sqlActual = "SUM(".$oBudget->getThisYTDSQL('roy',$arrActualRates).")";
+	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('roy',$arrBudgetRates).")";
 	$sqlBase = "SELECT  customer_group_code as optValue, 
 					customer_group_title as optText,  
 					{$sqlActual} as Actual, 
@@ -171,15 +176,18 @@ if(!isset($_GET['pccGUID'])){
 	
 	$oWF->processSQL($sqlBase,$limit,'RFC');
 	
-	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).")/{$denominator} as Diff
+	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).") as Diff
 			FROM reg_master 
 			{$sqlWhere} and company='{$company}' 
 			AND scenario='{$oBudget->id}' ".Reports::GOP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);		
-	$oWF->arrReport[] = Array($oBudget->title,null,null,$rw['Diff'],'budget-subtotal');	
-
+	$oWF->arrReport[] = Array($oBudget->title,null,null,$rw['Diff']/$oWF->denominator,'budget-subtotal');	
+	$oWF->arrHSChart[] = Array('name'=>$oWF->actual_title,'y'=>(integer)$rw['Diff'], 'color'=>'blue','isSum'=>true);
+		
+	
 	$oWF->drawTable();
+	$oWF->drawChart();
 	
 	
 	// }
