@@ -101,9 +101,7 @@ if(!isset($_GET['pccGUID'])){
 			{$sqlWhere} and company='{$company}' 
 			AND scenario='{$oReference->id}' ".Reports::GOP_FILTER;	
 	$rs = $oSQL->q($sql);
-	$rw = $oSQL->f($rs);		
-	$oWF->max = $rw['Budget'];
-	$oWF->min = $rw['Budget'];
+	$rw = $oSQL->f($rs);			
 	$oWF->arrReport[] = Array($oReference->title,null,null,$rw['Budget']/$oWF->denominator,'budget-subtotal');
 	$oWF->arrHSChart[] = Array('name'=>$oWF->budget_title,'y'=>(integer)$rw['Budget'], 'color'=>'blue');
 	
@@ -121,8 +119,6 @@ if(!isset($_GET['pccGUID'])){
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);			
 	$strDiff = ($rw['Actual']>=$ytdBudget?"YTD proficit":"YTD deficit");
-	$oWF->max += max(0,$rw['Actual']-$ytdBudget);
-	$oWF->min += min(0,$rw['Actual']-$ytdBudget);
 	$oWF->arrReport[] = Array($strDiff,$rw['Actual']/$oWF->denominator,$ytdBudget/$oWF->denominator,($rw['Actual']-$ytdBudget)/$oWF->denominator);
 	$oWF->arrHSChart[] = Array('name'=>$strDiff,'y'=>(integer)($rw['Actual']-$ytdBudget));
 	
@@ -185,9 +181,17 @@ if(!isset($_GET['pccGUID'])){
 	$oWF->arrReport[] = Array($oBudget->title,null,null,$rw['Diff']/$oWF->denominator,'budget-subtotal');	
 	$oWF->arrHSChart[] = Array('name'=>$oWF->actual_title,'y'=>(integer)$rw['Diff'], 'color'=>'blue','isSum'=>true);
 		
-	
-	$oWF->drawTable();
-	$oWF->drawChart();
+	?>
+		<table>
+		<tr>
+		<td>
+		<?php $oWF->drawTable(); ?>
+		</td>
+		<td>
+		<?php $oWF->drawChart(); ?>
+		</td>
+		</table>
+		<?php	
 	
 	
 	// }

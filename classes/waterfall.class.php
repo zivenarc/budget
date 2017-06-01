@@ -8,7 +8,7 @@ $arrJS[]="https://code.highcharts.com/modules/exporting.js";
 
 class Waterfall {
 	
-	private $chartID;
+	private $chartID, $min, $max;
 	public $arrReport, $arrHSChart, $title;
 	
 	public function __construct($options){		
@@ -185,7 +185,21 @@ class Waterfall {
 		<?php
 	}
 	
-	public function drawChart(){			
+	public function drawChart(){
+		
+		$lastValue = $this->arrHSChart[0]['y'];
+		$this->min = min($this->arrHSChart[0]['y']*0.98,$this->arrHSChart[0]['y']);
+		$this->max = max($this->arrHSChart[0]['y']*1.02,$this->arrHSChart[0]['y']);
+		
+		
+		for($i=1;$i<count($this->arrHSChart);$i++){
+			if (!$this->arrHSChart[$i]['isSum']){
+				$lastValue += $this->arrHSChart[$i]['y'];
+				$this->min = min($this->min,$lastValue);
+				$this->max = max($this->max,$lastValue);
+			}
+		}
+				
 		?>
 		<div id="<?php echo $this->chartID;?>" class="google_chart" style="width: 1200px; height: 700px;"></div>
 		<div id="toolbar_div"></div>
