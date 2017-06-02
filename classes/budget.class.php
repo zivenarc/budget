@@ -363,14 +363,14 @@ class Budget{
 				$sqlWhere .= " AND pccID IN (".implode(',',$arrBus).")";
 				
 				if (!$register){
-					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText FROM vw_profit $sqlWhere ORDER BY pccParentCode1C";
+					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText FROM vw_profit $sqlWhere ORDER BY pccParentCode1C, pccTitle";
 				} else {
 					$sqlWhere .= " AND scenario='$budget_scenario'";
 					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText 
 							FROM `$register` 
 							JOIN vw_profit ON pccID=pc
 							 $sqlWhere
-							ORDER BY pccParentCode1C";
+							ORDER BY pccParentCode1C, pccTitle";
 					
 				}
 			}
