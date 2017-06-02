@@ -3290,7 +3290,7 @@ class Reports{
 					$filter['activity'] = $rw['activity'];
 					$arrMetadata = Array('filter' => $filter, 'DataAction' => 'kpiByCustomer', 'title'=>$rw['prtTitle']);
 					$rw['metadata'] = json_encode($arrMetadata);
-					$rw['href'] = "javascript:getDetails(".json_encode($arrMetadata).");";
+					$rw['href'] = "javascript:getCustomerKPI(".json_encode($arrMetadata).");";
 					$this->echoBudgetItemString($rw);
 				}
 			}
