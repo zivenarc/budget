@@ -29,7 +29,11 @@ if ($_POST['pccGUID']=='all'){
 	if (isset($_POST['pccGUID'])){
 		$strPCFilter = " AND pccGUID=".$oSQL->e($_POST['pccGUID']);
 	} elseif (isset($_POST['filter']['pc'])) {
-		$strPCFilter = " AND pccID=".$oSQL->e($_POST['filter']['pc']);
+		if(is_array($_POST['filter']['pc'])){
+			$strPCFilter = " AND pc IN (".implode(',', $_POST['filter']['pc']).")";
+		} else {
+			$strPCFilter = " AND pc=".$oSQL->e($_POST['filter']['pc']);
+		}
 	}
 }
 
