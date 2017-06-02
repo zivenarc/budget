@@ -6,7 +6,7 @@ require ('classes/reports.class.php');
 $budget_scenario = isset($_REQUEST['budget_scenario'])?$_REQUEST['budget_scenario']:$budget_scenario;
 $oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$reference));
 
-if (isset($_POST['activity'])){
+if (isset($_POST['filter']['activity'])){
 	$sqlWhere = " AND activity=".$oSQL->e($_POST['activity']);
 	if ($_POST['freehand']){
 		$sqlWhere.= " AND freehand=1";
@@ -28,7 +28,7 @@ if ($_POST['pccGUID']=='all'){
 } else {
 	if (isset($_POST['pccGUID'])){
 		$strPCFilter = " AND pccGUID=".$oSQL->e($_POST['pccGUID']);
-	} elseif (isset($_POST['pc'])) {
+	} elseif (isset($_POST['filter']['pc'])) {
 		$strPCFilter = " AND pccID=".$oSQL->e($_POST['pc']);
 	}
 }

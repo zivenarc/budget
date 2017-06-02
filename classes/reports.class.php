@@ -160,7 +160,9 @@ class Reports{
 					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
 					<?php
 				};
-				echo "<td><a href='javascript:getCustomerKPI({activity:{$rw['prtID']}});'>",$rw['Activity'],'</a></td>';
+				$arrMetadata = Array('filter' => $filter, 'DataAction' => 'kpiByCustomer', 'title'=>$rw['prtTitle']);
+				
+				echo "<td><a href='javascript:getCustomerKPI(".json_encode($arrMetadata).");'>",$rw['Activity'],'</a></td>';
 				echo '<td class="unit">',$rw['Unit'],'</td>';
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
