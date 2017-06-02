@@ -1739,7 +1739,7 @@ class Reports{
 			return($res);
 	}
 	
-	public function monthlyReport($type='ghq'){
+	public function monthlyReport($type='ghq',$options=Array()){
 		
 		// GLOBAL $budget_scenario;
 		// $oBudget = new Budget($budget_scenario);
@@ -1749,7 +1749,8 @@ class Reports{
 			$this->colspan = 18;
 		}
 		
-		$sqlWhere = $this->sqlWhere;
+		$sqlWhere = $this->sqlWhere;		
+		// echo '<pre>',$sqlWhere,'</pre>';
 		
 		$this->columns = Array('CM_A','CM_B','YTD_A','YTD_B','Q_A','Q_B','NM_A','NM_B','FYE_A','FYE_B');
 		$this->sqlSelect = "";
@@ -1831,7 +1832,7 @@ class Reports{
 			self::firstLevelReportMR($sql, $strGroupTitle, $this->oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
-			self::_noFirstLevelMonthly($this->currency);
+			self::_noFirstLevelMonthly($this->currency, $options);
 			?>
 			</tbody>
 			</table>
@@ -2280,108 +2281,117 @@ class Reports{
 		
 	}
 	
-	private function _getOtherFinancials($sql,$sqlGroup,$sqlOrder){
+	private function _getOtherFinancials($sql,$sqlGroup,$sqlOrder,$options = Array()){
 		
 		$sqlWhere = $this->sqlWhere;
 		$oSQL = $this->oSQL;
 		
-		?>
-		<tr><th colspan="<?php echo $this->colspan;?>">Other financials</th></tr>
-		<?php							
-		$arrOther[] = Array('title'=>'Gross revenue','sqlWhere'=>" AND (account = 'J00400')");
-				
-		if (!(isset($this->filter['customer']) || isset($this->filter['sales']) || isset($this->filter['bdv']))){
-			$arrOther[] = Array('title'=>'Gross operatng profit','sqlWhere'=>" AND (account LIKE 'J%')");
-			$arrOther[] = Array('title'=>'Net operatng profit','sqlWhere'=>" AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')");	
-		}
-		
-		if (!(isset($this->filter['customer']) || isset($this->filter['sales']) )){
-			$arrOther[] = Array('title'=>'BD costs','sqlWhere'=>" AND (account = '5999BD')");				
-		}
-		
-		for($i=0;$i<count($arrOther);$i++){
-			$sqlOps = str_replace($sqlWhere, $sqlWhere.$arrOther[$i]['sqlWhere'], $sql);
-			$nPos = strpos($sqlOps,"##GROUPING BY ITEM");
-			if ($nPos!==false){
-				$sqlOps = substr($sqlOps,0,$nPos);
+		if ($options['summary']){
+			?>
+			<tr><th colspan="<?php echo $this->colspan;?>">Other financials</th></tr>
+			<?php							
+			$arrOther[] = Array('title'=>'Gross revenue','sqlWhere'=>" AND (account = 'J00400')");
+					
+			if (!(isset($this->filter['customer']) || isset($this->filter['sales']) || isset($this->filter['bdv']))){
+				$arrOther[] = Array('title'=>'Gross operatng profit','sqlWhere'=>" AND (account LIKE 'J%')");
+				$arrOther[] = Array('title'=>'Net operatng profit','sqlWhere'=>" AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')");	
 			}
 			
-			if (!$rs = $oSQL->q($sqlOps)){
-				echo 'Error: <pre>',$sqlOps,'</pre>';
+			if (!(isset($this->filter['customer']) || isset($this->filter['sales']) )){
+				$arrOther[] = Array('title'=>'BD costs','sqlWhere'=>" AND (account = '5999BD')");				
 			}
-			while ($rw = $oSQL->f($rs)){
-				$rw['Budget item'] = $arrOther[$i]['title'];
-				$this->echoBudgetItemString($rw,$arrOther[$i]['class']);
-			}
-		}		
+			
+			for($i=0;$i<count($arrOther);$i++){
+				$sqlOps = str_replace($sqlWhere, $sqlWhere.$arrOther[$i]['sqlWhere'], $sql);
+				$nPos = strpos($sqlOps,"##GROUPING BY ITEM");
+				if ($nPos!==false){
+					$sqlOps = substr($sqlOps,0,$nPos);
+				}
+				
+				if (!$rs = $oSQL->q($sqlOps)){
+					echo 'Error: <pre>',$sqlOps,'</pre>';
+				}
+				while ($rw = $oSQL->f($rs)){
+					$rw['Budget item'] = $arrOther[$i]['title'];
+					$this->echoBudgetItemString($rw,$arrOther[$i]['class']);
+				}
+			}		
+		}
 		
 		//------- KPIs -----------------
-				
-		switch ($this->structure){
-			case 'monthly':
-			case 'forecast':
-				$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
-				break;
-			case 'periodic':
-			default:
-				$strFieldsKPI = self::_getPeriodicFields(Array('currency'=>643,'denominator'=>1));
-				break;
-		}
-		
-		$sql = "SELECT activity, unit, 
-					{$strFieldsKPI['actual']}
-			FROM `reg_sales`			
-			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND kpi=1 AND posted=1 AND ".self::ACTUAL_DATA_FILTER."
-			GROUP BY activity, unit
-			UNION ALL
-			SELECT activity, unit, 
-					{$strFieldsKPI['next']}
-			FROM `reg_sales`			
-			{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND kpi=1 AND posted=1
-			GROUP BY activity, unit
-			UNION ALL
-				SELECT activity, unit, 
-				{$strFieldsKPI['budget']}
-			FROM `reg_sales`				
-			{$sqlWhere} AND scenario='{$strFieldsKPI['from_b']}' AND kpi=1 AND posted=1 
-			GROUP BY activity, unit
-			ORDER BY activity, unit";
+		if ($options['kpi']){		
+			switch ($this->structure){
+				case 'monthly':
+				case 'forecast':
+					$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
+					break;
+				case 'periodic':
+				default:
+					$strFieldsKPI = self::_getPeriodicFields(Array('currency'=>643,'denominator'=>1));
+					break;
+			}
 			
-		$sql = "SELECT prtTitle, activity, unit, 
-					{$this->sqlSelect}					
-				FROM ($sql) U
-				LEFT JOIN vw_product_type ON activity=prtID
-				WHERE unit<>''
+			$sql = "SELECT activity, unit, 
+						{$strFieldsKPI['actual']}
+				FROM `reg_sales`			
+				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND kpi=1 AND posted=1 AND ".self::ACTUAL_DATA_FILTER."
 				GROUP BY activity, unit
-				ORDER BY prtGHQ";
-		// echo '<pre>',$sql,'</pre>';
-		$rs = $oSQL->q($sql);
-		if ($oSQL->n($rs)){
-			?>
-			<tr><th colspan="<?php echo $this->colspan;?>">Operational KPIs</th></tr>
-			<?php		
-			while ($rw = $oSQL->f($rs)){			
-				$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
-				$filter = $this->filter;
-				$filter['activity'] = $rw['activity'];
-				$arrMetadata = Array('filter' => $filter, 'DataAction' => 'kpiByCustomer', 'title'=>$rw['prtTitle']);
-				$rw['metadata'] = json_encode($arrMetadata);
-				$rw['href'] = "javascript:getCustomerKPI(".json_encode($arrMetadata).");";
-				$this->echoBudgetItemString($rw);
+				UNION ALL
+				SELECT activity, unit, 
+						{$strFieldsKPI['next']}
+				FROM `reg_sales`			
+				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND kpi=1 AND posted=1
+				GROUP BY activity, unit
+				UNION ALL
+					SELECT activity, unit, 
+					{$strFieldsKPI['budget']}
+				FROM `reg_sales`				
+				{$sqlWhere} AND scenario='{$strFieldsKPI['from_b']}' AND kpi=1 AND posted=1 
+				GROUP BY activity, unit
+				ORDER BY activity, unit";
+				
+			$sql = "SELECT prtTitle, activity, unit, 
+						{$this->sqlSelect}					
+					FROM ($sql) U
+					LEFT JOIN vw_product_type ON activity=prtID
+					WHERE unit<>''
+					GROUP BY activity, unit
+					ORDER BY prtGHQ";
+			// echo '<pre>',$sql,'</pre>';
+			$rs = $oSQL->q($sql);
+			if ($oSQL->n($rs)){
+				?>
+				<tr><th colspan="<?php echo $this->colspan;?>">Operational KPIs</th></tr>
+				<?php		
+				while ($rw = $oSQL->f($rs)){			
+					$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
+					$filter = $this->filter;
+					$filter['activity'] = $rw['activity'];
+					$arrMetadata = Array('filter' => $filter, 'DataAction' => 'kpiByCustomer', 'title'=>$rw['prtTitle']);
+					$rw['metadata'] = json_encode($arrMetadata);
+					$rw['href'] = "javascript:getCustomerKPI(".json_encode($arrMetadata).");";
+					$this->echoBudgetItemString($rw);
+				}
 			}
 		}
 		
-		
 		//------- Headcount -----------------
-		if (!(isset($this->filter['customer']) || isset($this->filter['sales']) || isset($this->filter['bdv']))){
-			$this->_getMRHeadcount($sqlWhere,'funTitle');
+		if ($options['headcount']){
+			if (!(isset($this->filter['customer']) || isset($this->filter['sales']) || isset($this->filter['bdv']))){
+				$this->_getMRHeadcount($sqlWhere,'funTitle');
+			}
 		}
 	}
 	
-	private function _noFirstLevelMonthly($currency=643){
+	private function _noFirstLevelMonthly($currency=643, $options=Array()){
 				
 		global $oSQL;		
 		$sqlWhere = $this->sqlWhere;
+		
+		$settings = Array('financial'=>true,'summary'=>true,'headcount'=>true,'kpi'=>true);
+		foreach($options as $key=>$value){
+			$settings[$key] = $value;
+		}
 		
 		$strFields = self::_getMRFields($currency);
 				
@@ -2441,7 +2451,7 @@ class Reports{
 			$data['Budget item']='Profit before tax';
 			$this->echoBudgetItemString($data,'budget-total');
 		
-		$this->_getOtherFinancials($sql,$sqlGroup,$sqlOrder);
+		$this->_getOtherFinancials($sql,$sqlGroup,$sqlOrder, $settings);
 		
 	}
 	
@@ -2888,7 +2898,7 @@ class Reports{
 			if (is_array($first)){				
 				?>
 				<td class="budget-tdh code-<?php echo urlencode($first['level1_code']);?>" data-code='<?php echo $first['metadata'];?>' rowspan='<?php echo count($data);?>'>
-					<?php 
+					<?php 					
 					if ($first['level1_code']==$arrUsrData['usrID']) echo '<strong>';
 					echo $first['Level1_title'];
 					if ($first['level1_code']==$arrUsrData['usrID']) echo '</strong>';
@@ -2902,7 +2912,7 @@ class Reports{
 						<tr class="budget-item">					
 					<?php };
 					?>
-					<td><?php echo $values['Budget item'];?></td>
+					<td><?php echo (isset($values['href'])?"<a href='{$values['href']}'>":""), $values['Budget item'].(isset($values['href'])?"</a>":"");?></td>
 					<?php
 					$this->_echoNumericTDs($values);
 					$row++;
@@ -3173,6 +3183,9 @@ class Reports{
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Reclassified fixed costs";
 			$rw['title'] = "Direct production costs: labor, rent, fuel, depreciation";
+			$metadata = Array('filter'=>$this->filter, 'DataAction'=>'budget_item');
+			$metadata['filter']['account'] = Array('J00801','J00803','J00804','J00805','J00806','J00808','J0080W');
+			$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
 			$this->echoBudgetItemString($rw);
 		}
 		

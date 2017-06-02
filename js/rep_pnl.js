@@ -234,3 +234,27 @@ function getCustomerKPI(data){
 	// });
 	// console.log(data);
 }
+
+function getYACTDetails(data){
+	
+	if(localStorage.pccGUID!='undefined'){
+		data.pccGUID = localStorage.pccGUID;	
+	}
+	data.budget_scenario = $('#budget_scenario').val();
+	
+	$('#sources').detach();
+	$('<div>',{id:'sources'}).load('rep_details.php #output',data, function(){
+		$(this).dialog({
+			'title':'Account details',
+			'modal':true,
+			'width':'auto'
+		});
+	});
+	
+	// $('<div>').dialog({
+		// create:function(event, ui){
+			// $(this).html('Lorem ipsum');
+		// }
+	// });
+	// console.log(data);
+}
