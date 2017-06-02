@@ -213,7 +213,7 @@ function getSource(data){
 
 function getCustomerKPI(data){
 	
-	if(typeof(localStorage.pccGUID)!='undefined'){
+	if(localStorage.pccGUID!='undefined'){
 		data.pccGUID = localStorage.pccGUID;	
 	}
 	data.budget_scenario = $('#budget_scenario').val();
