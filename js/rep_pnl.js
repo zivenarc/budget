@@ -213,7 +213,9 @@ function getSource(data){
 
 function getCustomerKPI(data){
 	
-	data.pccGUID = localStorage.pccGUID;	
+	if(localStorage.pccGUID){
+		data.pccGUID = localStorage.pccGUID;	
+	}
 	data.budget_scenario = $('#budget_scenario').val();
 	
 	$('#sources').detach();
