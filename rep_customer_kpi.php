@@ -26,7 +26,11 @@ if (isset($_POST['route'])){
 if ($_POST['pccGUID']=='all'){
 	$strPCFilter = '';
 } else {
-	$strPCFilter = " AND pccGUID=".$oSQL->e($_POST['pccGUID']);
+	if (isset($_POST['pccGUID'])){
+		$strPCFilter = " AND pccGUID=".$oSQL->e($_POST['pccGUID']);
+	} elseif (isset($_POST['pc'])) {
+		$strPCFilter = " AND pccID=".$oSQL->e($_POST['pc']);
+	}
 }
 
 include ('includes/inc-frame_top.php');
