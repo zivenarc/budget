@@ -15,7 +15,7 @@ if(!isset($_GET['pccGUID'])){
 	?>
 	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
 	<?php
-	Budget::getProfitTabs('reg_sales');	
+	Budget::getProfitTabs('reg_sales', false);	
 	include ('includes/inc-frame_bottom.php');
 } else {	
 	include ('includes/inc_report_buttons.php');
