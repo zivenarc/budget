@@ -13,11 +13,12 @@ $oBudget = new Budget($reference);
 $actual = $oActual->id;
 $budget = $oBudget->id;
 
+$limit = 8;
+$denominator = 1;
+$currency = 643;
+
 $arrActualRates = $oActual->getMonthlyRates($currency);
 $arrBudgetRates = $oBudget->getMonthlyRates($currency);
-
-$limit = 8;
-//$denominator = 1000;
 
 
 SetCookie('period_type',$period_type,0,'/budget/');
@@ -222,7 +223,7 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 			'tolerance'=>0.07,
 			'limit'=>5);
 			
-$type = $_GET['type']?$_GET['type']:'gpcus';
+$type = $_GET['type']?$_GET['type']:'teucus';
 			
 if (is_array($settings[$type])){
 	$settings[$type]['title'] .= ', '.$arrPeriodType[$period_type];
