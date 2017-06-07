@@ -271,7 +271,10 @@ include ('includes/inc_report_selectors.php');
 
 	$oWF->draw();
 ?>
-
+<script>
+	$('#currency_selector').find('input').attr('disabled',true);
+	$('#denominator_selector').find('input').attr('disabled',true);
+</script>
 <nav>
 <ul class='link-footer'>
 <?php
