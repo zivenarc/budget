@@ -65,9 +65,32 @@ $settings['teucus'] = Array('title'=>"TEU by customer",
 								WHERE
 								scenario='{$budget}' AND source<>'Estimate' AND company='{$company}' AND activity IN (48,63)
 								GROUP BY customer_group_code",
+						'currency'=>'TEU',
 						'tolerance'=>0.05,
 						'limit'=>10);
 
+$settings['kgcus'] = Array('title'=>"AFF volume by customer",
+					'sqlBase' => "SELECT customer_group_code as optValue, 
+											customer_group_title as optText,
+										{$sqlActual} as Actual, 
+										0 as Budget, 
+										{$sqlActual} as Diff
+								FROM `{$sqlBaseTable}` 								
+								WHERE scenario='{$actual}' AND company='{$company}' AND activity IN (46,47)
+								GROUP BY customer_group_code
+								UNION ALL
+								SELECT customer_group_code as optValue, 
+											customer_group_title as optText, 
+											0 as Actual, 
+								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+								FROM `{$sqlBaseTable}` 								
+								WHERE
+								scenario='{$budget}' AND source<>'Estimate' AND company='{$company}' AND activity IN (46,47)
+								GROUP BY customer_group_code",
+						'currency'=>'Kgs',
+						'tolerance'=>0.05,
+						'limit'=>10);						
+						
 $settings['gpsal'] = Array('title'=>"GP by sales",
 					'sqlBase' => "SELECT sales as optValue, 
 										usrTitle as optText, 
@@ -230,7 +253,6 @@ if (is_array($settings[$type])){
 	$settings[$type]['actual_title'] = $oActual->title;
 	$settings[$type]['budget_title'] = $oBudget->title;
 	$settings[$type]['denominator'] = $denominator;
-	$settings[$type]['currency'] = $arrCurrencySelector[$currency];
 	
 	$oWF = new Waterfall($settings[$type]);
 } else {
@@ -246,21 +268,6 @@ require ('includes/inc-frame_top.php');
 <h1>Waterfall<?php echo ': ',$oActual->title, ": ",$arrPeriodType[$period_type];?></h1>
 <?php
 include ('includes/inc_report_selectors.php');
-
-if($currency!=643){
-		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
-		$rs = $oSQL->q($sql);
-		$rw = $oSQL->f($rs);
-		$curTitle = $rw["curTitle$strLocal"];		
-} else {
-	$curTitle = "RUB";
-}
-
-if ($denominator!=1) {
-	echo "<h2>{$curTitle} x{$denominator}</h2>";
-} else {
-	echo "<h2>{$curTitle}</h2>";
-}
 
 	$oWF->draw();
 ?>
