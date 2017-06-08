@@ -21,13 +21,22 @@ $arrJS[] = "../common/jquery/jQCloud/jqcloud/jqcloud-1.0.4.min.js";
 $arrCSS[] = "../common/jquery/jQCloud/jqcloud/jqcloud.css";
 include ('includes/inc-frame_top.php');
 ?>
-<div id='cloud' style='width:1900px; height: 800px;'></div>
+<div id='cloud' style='width:1900px; height: 900px;'></div>
 <script>
 $(document).ready(function(){
+	
+	var width = $('body').css('width');
+	var height = $('body').css('height');
+	$('#cloud').css({'width':width,'height':height});
+
 	var words = <?php echo json_encode($arrJQCloud); ?>;
 	
 	$('#cloud').jQCloud(words,{
-	  autoResize: false
+	  autoResize: true,
+	  fontSize: {
+		from: 6,
+		to: 48
+	  }	  
 	});
 });
 </script>
