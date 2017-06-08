@@ -45,6 +45,18 @@ if(!isset($_GET['pccGUID'])){
 
 	Budget::getProfitTabs('reg_sales', false, Array('bdv'=>$bdv));
 
+	$sql = "SELECT pccID, pccTitle FROM common_db.tbl_profit WHERE pccFlagFolder=0 ORDER BY pccTitle";
+	$rs = $oSQL->q($sql);
+		
+	?>
+	<ul class='link-footer'>		
+		<?php
+		while ($rw = $oSQL->f($rs)){
+			?><li><a href="?bdv=<?php echo $rw['pccID'];?>"><?php echo $rw['pccTitle'];?></a><?php
+		}		
+		?>
+	</ul>
+	<?php
 	include ('includes/inc-frame_bottom.php');
 
 } else {
