@@ -225,21 +225,21 @@ class Budget{
 					<?php } ?>
 				</tr>
 				<tr>
-					<th class='budget-ytd'>Actual</th>
-					<th>Budget</th>
-					<th>Diff</th>
-					<th>%</th>
-					<?php if (!($this->cm % 3)){ ?>
-					<th class='budget-ytd'>Actual</th>
-					<th>Budget</th>
-					<th>Diff</th>
-					<th>%</th>
-					<?php } ?>
 					<th class='budget-quarterly'>Actual</th>
 					<th>Budget</th>
 					<th>Diff</th>
 					<th>%</th>
-					<th class='budget-ytd'>Forecast</th>
+					<?php if (!($this->cm % 3)){ ?>
+					<th class='budget-quarterly'>Actual</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+					<?php } ?>
+					<th class='budget-ytd'>Actual</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+					<th class='budget-quarterly'>Forecast</th>
 					<th>Budget</th>
 					<th>Diff</th>
 					<th>%</th>
@@ -266,11 +266,11 @@ class Budget{
 					<th>Budget</th>
 					<th>Diff</th>
 					<th>%</th>
-					<th class='budget-ytd'>Forecast</th>
+					<th class='budget-quarterly'>Forecast</th>
 					<th>Budget</th>
 					<th>Diff</th>
 					<th>%</th>
-					<th class='budget-quarterly'>Forecast</th>
+					<th class='budget-ytd'>Forecast</th>
 					<th>Budget</th>
 					<th>Diff</th>
 					<th>%</th>

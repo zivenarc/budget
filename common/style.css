@@ -5,12 +5,12 @@
 .phpL_table {
 background:transparent;
 border-collapse:collapse;
-border:1px solid windowtext;
+border:1px solid #646464;
 }
 
 .phpL_table TD {
-border:1px solid windowtext;
-color:windowtext;
+border:1px solid #646464;
+color:#646464;
 font-family:Calibri, Verdana,Arial,sans-serif;
 font-size:11px;
 padding:1px 3px;
@@ -297,9 +297,9 @@ background-image:url(/common/images/simpleTree/minus.gif);
 
 
 body {
-font-family: Calibri,Arial,sans-serif;
+font-family: "Akkurat-Light",Calibri,Arial,sans-serif;
 font-size:13px;
-color:windowtext;
+color:#646464;
 margin:0;
 padding:0;
 }
@@ -322,6 +322,8 @@ zoom: 1;
 }
 
 h1 {
+font-family: "GTPressuraMono",sans-serif;
+color: #06183D;
 font-size:1.7em;
 font-weight:500;
 margin-top:0.7em;
@@ -333,6 +335,8 @@ text-shadow:-1px -1px 1px rgba(255,255,255,0.2), /* наверх и влево *
 }
 
 h2 {
+font-family: "GTPressuraMono",sans-serif;
+color: #06183D;
 font-size:1.4em;
 font-weight:700;
 margin-top:0.3em;
@@ -344,12 +348,16 @@ h1+h2 {
 }
 
 h3 {
+font-family: "GTPressuraMono",sans-serif;
+color: #06183D;
 margin-top:0.5em;
 font-size:1.2em;
 font-weight:700;
 }
 
 h4 {
+font-family: "GTPressuraMono",sans-serif;
+color: #06183D;
 font-size:1.05em;
 font-weight:700;
 margin-top:0.4em;
@@ -561,7 +569,7 @@ padding:5px;
 .panel {
 border:1px solid #a6c9e2 ;
 border-radius: 5px;
-color:black;
+color: #646464;
 background-color:#EEE;
 margin:0.2em;
 padding:0.5em;
@@ -639,7 +647,7 @@ text-align:center;
 
 .info {
 	background: #fff url(/common/images/icons/information.png);
-	border: 1px solid black;
+	border: 1px solid #06183D;
 }
 
 .history {
@@ -676,14 +684,14 @@ color:buttonface;
 }
 
 #sysmsg {
-color:Navy;
+color:#06183D;
 position:absolute;
 top:3px;
 right:7px;
 white-space:nowrap;
 z-index:125;
 text-align:right;
-border:1px solid Navy;
+border:1px solid #06183D;
 font:bold 0.8em Calibri, Verdana,Arial,sans-serif;
 background:#B0C4DE;
 padding:1px 3px;
@@ -966,12 +974,12 @@ padding:0;
 }
 
 dl.form_narrow input {
-border:1px solid navy;
+border:1px solid #06183D;
 padding:0 1px;
 }
 
 dl.form_narrow select {
-border:1px solid navy;
+border:1px solid #06183D;
 }
 
 .easyForm_calendar {
@@ -1144,19 +1152,19 @@ color:inherit;
 	padding-left: 20px;
 }
 .auth_matrix {
-border:1px solid navy;
+border:1px solid #06183D;
 width:100%;
 background-color: #fff;
 }
 
 .auth_matrix td {
-border:1px solid navy;
+border:1px solid #06183D;
 }
 
 .auth_matrix th {
-border:1px solid navy;
+border:1px solid #06183D;
 background-color:#E6E6FA;
-color:navy;
+color:#06183D;
 text-align:left;
 height: 18px;
 margin: 2px;
@@ -1337,7 +1345,7 @@ padding:0;
 }
 
 .simpleTree a:link,.simpleTree a:visited {
-color:WindowText;
+color:#646464;
 text-decoration:none;
 }
 
@@ -1390,7 +1398,7 @@ padding:0;
 .menu-h { overflow: hidden; border-left: 1px solid #ccc; margin: 3px 0 3px 0; font: 11px Verdana}
 ul.menu-h {	padding: 0;}
 .menu-h li { float: left; list-style: none; padding: 0; border-right: 1px solid #aac; line-height: 18px;}
-.menu-h a { text-decoration: none; display: block; color: Black; padding: 0 24px;}
+.menu-h a { text-decoration: none; display: block; color: #06183D; padding: 0 24px;}
 .menu-h a:hover { text-decoration: none;
 						background-color: #FFD700; }
 
@@ -1532,21 +1540,21 @@ display: block;
 		padding: 0.5em 1em;
 	}
 	.tabsheet a:link{
-		color:windowtext;
+		color:#646464;
 		text-decoration:none;
 	}
 	.tabsheet a:visited{
-		color:windowtext;
+		color:#646464;
 		text-decoration:none;		
 	}
 	
 	.tabsheet a:hover{
-		color:windowtext;
+		color:#646464;
 		text-decoration:none;
 		background-color: #FFD700;
 	}
 	.tabsheet a:active{
-		color:windowtext;
+		color:#646464;
 		text-decoration:none;
 		background-color: buttonhighlight;
 	}
@@ -1632,7 +1640,7 @@ display: block;
 	}
 	
 .error,.warning,.good,.info{
-	color: black;
+	color: #06183D;
 	font-weight: normal;
 	background-repeat: no-repeat;
 	background-position: 10px 50%;
@@ -1660,7 +1668,7 @@ display: block;
 			background-color: #ddf;
 		}
 		.mailbox tr:hover td small{
-			color: black;
+			color: #06183D;
 		}
 		.tag{
 			background-color: #eee;
@@ -1729,19 +1737,23 @@ display: block;
 
 
 .budget{
-	font-family:Calibri;
+	font-family:"Akkurat-Light", Calibri;
 	font-size:9pt;
-	border:1px solid gray;
+	border:1px solid #06183D;
 	width:100%;
 }
 .budget td{
-	border-right: 1px solid gray;
-	border-left: 1px solid gray;
-	border-top: 1px dotted gray;
+	border-right: 1px solid #06183D;
+	border-left: 1px solid #06183D;
+	border-top: 1px dotted #06183D;
+	color: #06183D;
 }
 .budget th{
-	border: 1px solid gray;
-	background-color: #d0e5f5;
+	font-family: "GTPressuraMono", Calibri, sans-serif;
+	border: 1px solid #06183D;
+	background-color: #06183D;
+	border: 1px solid white;
+	color: white;
 }
 .budget-decimal{
 	text-align:right;
@@ -1750,27 +1762,28 @@ display: block;
 	color:red;
 }
 td.budget-ytd{
-	background-color:#fffee4 !important;
+	background-color:#3BACEE !important;
 	font-weight:bold;
 }
 th.budget-ytd{
-	background-color:#5c9ccc
+	background-color:#FF6D10;
 }
 th.budget-quarterly{
-	background-color:#0099FF;	
+	background-color:#3BACEE;	
+	color: white;
 }
 td.budget-quarterly{
-	background-color:#D6EBFF !important;	
+	background-color:#CCCCCC !important;	
 }
 .budget-month th{
-	background-color:navy;
+	background-color:#06183D;
 }
 th.sales_YTD {
-	background-color:navy !important;
+	background-color:#06183D !important;
 	color: white !important;
 }
 td.sales_YTD{
-	background-color:#ddd !important;
+	background-color:#CCCCCC !important;
 }
 th.sales_product, th.interco_sales_product{
 	min-width:40em;
@@ -1788,8 +1801,8 @@ td.costs_supplier{
 	min-width:18em;
 }
 .budget-subtotal td{
-	border-bottom:3px double black;
-	border-top:2px solid black;
+	border-bottom:3px double #06183D;
+	border-top:2px solid #06183D;
 	font-weight:bold;
 	background-color: white;
 }
@@ -1797,7 +1810,7 @@ td.costs_supplier{
 	background-color: #eee;
 	font-weight: bold;
 	font-size: 1.2em;
-	border-bottom:2px solid black;
+	border-bottom:2px solid #06183D;
 }
 .budget-tdh{
 	background-color: gray;
@@ -1834,9 +1847,9 @@ td.costs_supplier{
 
 .budget-ratio td{
 	font-style: italic;
-	color: navy;
+	color: #06183D;
 	background-color: #eef;
-	border-bottom: 1px solid navy;
+	border-bottom: 1px solid #06183D;
 }
 
 .report-selected td{
@@ -1845,7 +1858,7 @@ td.costs_supplier{
 }
 
 td.report-selected {
-	border: 2px solid black !important;
+	border: 2px solid #06183D !important;
 	
 }
 
@@ -1880,7 +1893,7 @@ td.report-selected {
 
 .code-9907,.code-33242, .code-33239 {
 	background-color: yellow !important;
-	color: black !important;
+	color: #06183D !important;
 }
 
 .investment_comment {
@@ -1918,5 +1931,5 @@ background-position:left -7597px;
 }
 
 td.budget-current{
-	border-right: 2px solid black;
+	border-right: 2px solid #06183D;
 }
