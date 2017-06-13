@@ -1146,10 +1146,12 @@ class Reports{
 			<tbody>
 			<?php			
 			while ($rw=$oSQL->f($rs)){
-				echo '<tr>';
-				echo '<th>',$rw['prtGHQ'],'</th>';
-				echo '<th>',$rw['account'],'</th>';
-				echo '<th>',$rw['Title'],'</th>';
+				?>
+				<tr>
+					<td class='budget-tdh'><?php echo $rw['prtGHQ'];?></td>
+					<td class='budget-tdh'><?php echo $rw['account'];?></td>
+					<td class='budget-tdh'><?php echo $rw['Title'];?></td>
+				<?php
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
