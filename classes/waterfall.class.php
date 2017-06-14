@@ -54,7 +54,7 @@ class Waterfall {
 		
 		$this->arrReport[] = Array($this->budget_title,null,null,$baseData['Budget']/$this->denominator, 'budget-subtotal');
 		$this->arrChart[] = Array('Budget',0,0,(integer)$baseData['Budget'],(integer)$baseData['Budget'], $this->getTooltip('Budget',$baseData['Budget']));
-		$this->arrHSChart[] = Array('name'=>$this->budget_title,'y'=>(integer)$baseData['Budget'], 'color'=>'blue');
+		$this->arrHSChart[] = Array('name'=>$this->budget_title,'y'=>(integer)$baseData['Budget'], 'color'=>'#646464');
 		$diffBalance = $baseData['Diff'];
 		$thisBalance = $baseData['Actual'];
 		$thatBalance = $baseData['Budget'];
@@ -129,7 +129,7 @@ class Waterfall {
 		}
 		$this->arrReport[] = Array($this->actual_title,null, null, $baseData['Actual']/$this->denominator,'budget-subtotal');
 		$this->arrChart[] = Array('Actual',0,0,(integer)$baseData['Actual'],(integer)$baseData['Actual'], $this->getTooltip('Actual',$baseData['Actual']));
-		$this->arrHSChart[] = Array('name'=>$this->actual_title,'y'=>(integer)$baseData['Actual'],'isSum'=>true, 'color'=>'blue');
+		$this->arrHSChart[] = Array('name'=>$this->actual_title,'y'=>(integer)$baseData['Actual'],'isSum'=>true, 'color'=>'#646464');
 
 		if ($baseData['Actual'] > $this->max){
 			$this->max = $baseData['Actual'];
@@ -218,8 +218,8 @@ class Waterfall {
 															}},
 													legend: {enabled: false},
 													tooltip: {pointFormat: '<b>{point.y:,.0f}</b> <?php echo $this->currency;?>'},
-													series: [{upColor: 'green',
-															color: 'red',
+													series: [{upColor: '#3BACEE',
+															color: '#FF6D10',
 													data: <?php echo json_encode($this->arrHSChart);?>,
 													dataLabels: {
 														enabled: true,
