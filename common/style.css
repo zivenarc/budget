@@ -1226,7 +1226,7 @@ color:blue;
 }
 
 ul.link-footer{
-	border-top: 1px solid Silver;
+	border-top: 1px solid #FF6D10;
 	list-style: none;
 	margin: 3px;
 	padding: 4px 1px;
@@ -1235,8 +1235,7 @@ ul.link-footer li{
 	margin: 4px 0px;
 	display: inline;
 	text-indent: 0;
-	text-transform: uppercase;
-	font: 400 10px Verdana;
+	text-transform: uppercase;	
 }
 ul.link-footer li:after{
 	content: '|';
@@ -1251,7 +1250,7 @@ ul.link-footer a:link, ul.link-footer a:visited{
 	color: blue;
 }
 ul.link-footer a:hover{
-	color: #6699FF;
+	color: #3BACEE;
 }
 
 ul.actions li{
@@ -1848,12 +1847,12 @@ td.costs_supplier{
 .budget-ratio td{
 	font-style: italic;
 	color: #06183D;
-	background-color: #eef;
+	background-color: #BDE3F9;
 	border-bottom: 1px solid #06183D;
 }
 
 .report-selected td{
-	background-color:#FFCC99 !important;
+	background-color:#FFCEAF !important;
 	color: #222 !important;
 }
 
