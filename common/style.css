@@ -1349,7 +1349,7 @@ text-decoration:none;
 }
 
 ins,label:hover {
-color:Blue;
+color: #FF6D10;
 }
 
 .auth_matrix ul,ul.attachment {
@@ -1398,8 +1398,7 @@ padding:0;
 ul.menu-h {	padding: 0;}
 .menu-h li { float: left; list-style: none; padding: 0; border-right: 1px solid #aac; line-height: 18px;}
 .menu-h a { text-decoration: none; display: block; color: #06183D; padding: 0 24px;}
-.menu-h a:hover { text-decoration: none;
-						background-color: #FFD700; }
+.menu-h a:hover { text-decoration: none;	background-color: #3BACEE;}
 
 /* Content Form
 ------------------------------ */
@@ -1436,10 +1435,10 @@ select.i-datetime{
 				font-family: Calibri, Verdana,Arial,sans-serif;
 			}
 .i-text:focus {
-	background-color: #D5F1F2;
+	background-color: #BDE3F9;
 }
 .i-combobox:focus{
-	border: 1px solid #305C8B;
+	border: 1px solid #3BACEE;
 }
 .i-button-add{
 background-image:url(/common/images/sprites/sprites.png);
