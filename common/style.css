@@ -1467,7 +1467,7 @@ width: 20px;
 }
 
 .log input{
-	font: normal 8pt Calibri, Verdana,Arial,sans-serif !important;	
+	font: normal 8pt "Akkurat-Light",sans-serif !important;	
 }
 
 .log td{
@@ -1477,18 +1477,18 @@ width: 20px;
 .log td, .log th{
 	font-weight: normal;
 	font-size: 12px;
-	font-family: Calibri, Verdana,Arial,sans-serif;	
-	border: 1px solid #79b7e7;
+	font-family: "Akkurat-Light",sans-serif;	
+	border: 1px solid #3BACEE;
 }
 .log th{
-	background-color: #2e6e9e;
+	background-color: #3BACEE;
 	color: white;
 	font-weight: 700;
 	padding:2px 3px;
 	text-shadow:-1px -1px 1px gray;
 }
 .log tr:nth-child(odd) td{
-	background-color: #c5dbec !important; 
+	background-color: #BDE3F9 !important; 
 }
 
 
