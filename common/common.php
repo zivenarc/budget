@@ -6,6 +6,7 @@ $arrCSS[] = "common/style.css";
 $arrCSS[] = Array('file'=>"common/print.css",'media'=>'print');
 // $arrCSS[] = "../common/jquery/jquery-ui-1.12.0.custom/themes/redmond/jquery-ui.css";
 $arrCSS[] = '../common/jquery/jquery-ui-1.12.0.custom/jquery-ui.css';
+$arrCSS[] = "../common/jquery/jquery-ui-1.12.0.custom/themes/transform/jquery-ui.theme.min.css";
 
 define ("TABLES_OR_VIEWS","/(tbl_|vw_|stbl_|svw_)/i");
 define ("subjPrefix", "[INTRANET] ");
