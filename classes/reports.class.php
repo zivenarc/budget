@@ -3332,15 +3332,17 @@ class Reports{
 			case 31158:
 				$cusGroup = "TOYOTA";
 				break;
-			case 33239:
-			case 40933:
+			case 33239: //
+			case 40933: // New 2017
+			case 42763: // New 2017 J
 				switch ($rw['customer']){
 					case 33242:
 					case 40934:
+					case 41976:
 						$cusGroup = 'New customers, unknown';
 						break;
 					default:
-						$cusGroup = "New and landed in 2016";
+						$cusGroup = "New and landed";
 						break;
 				}
 				break;
@@ -3348,7 +3350,7 @@ class Reports{
 				$cusGroup = 'Brought in 2015';
 				break;
 			default:
-				$cusGroup = 'Old customers';
+				$cusGroup = 'Existing customers';
 				break;
 		}
 		return($cusGroup);
