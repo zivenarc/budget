@@ -561,7 +561,7 @@ class Sales extends Document{
 									}
 																
 									$freight_c_row->item = $activity->item_cost;
-									$freight_c_row->account = 'J00400';
+									$freight_c_row->account = 'J00802';
 									$freight_c_row->profit = $this->profit;
 									$freight_c_row->activity = $Activities::OFIGB;
 									$freight_c_row->customer = $record->customer;				
