@@ -78,11 +78,7 @@ $arrRevenueFilter = Array(
 	Items::INTERCOMPANY_REVENUE
 );
 
-$arrDCFilter = Array(
-	Items::DIRECT_COSTS,
-	Items::INTERCOMPANY_COSTS,
-	Items::KAIZEN
-);
+
 
 $arrAccounts = Array(
 		'Revenue'=>Array('sql'=>"SELECT $sqlFields FROM vw_master 
@@ -91,7 +87,7 @@ $arrAccounts = Array(
 							GROUP by {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
 		'Direct costs'=>Array('negative'=>true, 'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere}  
-									AND item IN ('".implode("','",$arrDCFilter)."')
+									AND account IN ('J00802')) AND item<>'".Reports::REVENUE_ITEM."'
 								GROUP BY {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
 		'Gross profit'=>Array('class'=>'budget-subtotal'),
 		'Reclassified fixed costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
