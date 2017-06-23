@@ -364,7 +364,7 @@ class Depreciation extends Document{
 		
 		$sql = "SELECT *, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateReplacementStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart)) AS months,
 				fixValueStart as fixValuePrimo,
-				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateReplacementEnd}'), EXTRACT(YEAR_MONTH FROM dateReplacementStart))/fixDeprDuration) as fixValueUltimo
+				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateReplacementEnd}'), EXTRACT(YEAR_MONTH FROM '{$dateReplacementStart}'))/fixDeprDuration) as fixValueUltimo
 				FROM vw_fixed_assets 
 				LEFT JOIN vw_item ON itmID=fixItemID
 				WHERE fixProfitID=".$this->profit." AND DATEDIFF(fixDeprEnd,'{$dateReplacementStart}')>0 AND DATEDIFF(fixDeprEnd,'{$dateReplacementEnd}')<0 AND fixFlagDeleted=0
