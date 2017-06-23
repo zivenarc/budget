@@ -8,7 +8,8 @@ if ($_GET['tab']){
 	$sql = "SELECT *, edit_date as timestamp FROM vw_master 		
 		LEFT JOIN vw_journal ON source=guid
 		LEFT JOIN stbl_user ON usrID=edit_by		
-		WHERE posted=1 AND vw_master.scenario='{$_GET['tab']}' AND IFNULL(account,'') = ''
+		WHERE posted=1 AND vw_master.scenario='{$_GET['tab']}' AND company='{$company}'
+		AND (IFNULL(account,'') = '' OR IFNULL(item,'')='')
 		GROUP BY guid
 		ORDER BY vw_master.timestamp DESC";	
 
@@ -17,7 +18,7 @@ if ($_GET['tab']){
 			$data[] = $rw;
 		}
 		?>
-		<h3>Missing YACT</h3>
+		<h3>Missing YACT or Account</h3>
 		<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
 		<div id='div_<?php echo $_GET['tab'];?>'>
 		<?php
@@ -31,7 +32,8 @@ if ($_GET['tab']){
 		$sql = "SELECT *, edit_date as timestamp FROM vw_master 		
 		LEFT JOIN vw_journal ON source=guid
 		LEFT JOIN stbl_user ON usrID=edit_by		
-		WHERE posted=1 AND vw_master.scenario='{$_GET['tab']}' AND IFNULL(vw_master.pc,0) = 0
+		WHERE posted=1 AND vw_master.scenario='{$_GET['tab']}' AND company='{$company}'
+			AND IFNULL(vw_master.pc,0) = 0
 		GROUP BY guid
 		ORDER BY vw_master.timestamp DESC";	
 
@@ -57,7 +59,7 @@ if ($_GET['tab']){
 		$sql = "SELECT *, edit_date as timestamp FROM vw_master 		
 		LEFT JOIN vw_journal ON source=guid
 		LEFT JOIN stbl_user ON usrID=edit_by		
-		WHERE posted=1 AND vw_master.scenario='{$_GET['tab']}' 
+		WHERE posted=1 AND vw_master.scenario='{$_GET['tab']}' AND company='{$company}'
 			##AND IFNULL(vw_master.activity,'') = '' 
 			AND IFNULL(prtGHQ,'')=''
 			AND account IN ({$strAccounts})
