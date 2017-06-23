@@ -351,7 +351,7 @@ class Depreciation extends Document{
 				
 	}
 	
-	public function fill_replacement($oBudget){
+	public function fill_replacement(){
 		
 		if (is_array($this->records[$this->gridName])){
 			foreach($this->records[$this->gridName] as $id=>$record){
@@ -359,8 +359,8 @@ class Depreciation extends Document{
 			}
 		}
 		
-		$dateReplacementStart = ($oBudget->year-1).'-12-01';
-		$dateReplacementEnd = $oBudget->year.'-12-01';
+		$dateReplacementStart = date('Y-m-d',$this->budget->date_start);
+		$dateReplacementEnd = date('Y-m-d',$this->budget->date_end);
 		
 		$sql = "SELECT *, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart)) AS months,
 				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValuePrimo,

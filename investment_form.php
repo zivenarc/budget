@@ -16,7 +16,7 @@ if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
 	switch ($_POST['DataAction']){
 		case 'fill_replacement':
-			$oDocument->fill_replacement($oBudget);
+			$oDocument->fill_replacement();
 			break;
 		default:
 			//
