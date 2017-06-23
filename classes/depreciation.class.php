@@ -362,9 +362,9 @@ class Depreciation extends Document{
 		$dateReplacementStart = date('Y-m-d',$this->budget->date_start);
 		$dateReplacementEnd = date('Y-m-d',$this->budget->date_end);
 		
-		$sql = "SELECT *, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart)) AS months,
-				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValuePrimo,
-				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetEnd}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValueUltimo
+		$sql = "SELECT *, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateReplacementStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart)) AS months,
+				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateReplacementStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValuePrimo,
+				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateReplacementEnd}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValueUltimo
 				FROM vw_fixed_assets 
 				LEFT JOIN vw_item ON itmID=fixItemID
 				WHERE fixProfitID=".$this->profit." AND DATEDIFF(fixDeprEnd,'{$dateReplacementStart}')>0 AND DATEDIFF(fixDeprEnd,'{$dateReplacementEnd}')<0 AND fixFlagDeleted=0
