@@ -1,0 +1,197 @@
+﻿.budget{
+	font-family:"Akkurat-Light", Calibri, sans-serif;
+	font-size:9pt;
+	border:1px solid #06183D;
+	width:100%;
+}
+.budget td{
+	border-right: 1px solid #06183D;
+	border-left: 1px solid #06183D;
+	border-top: 1px dotted #06183D;
+	color: #06183D;
+}
+.budget th{
+	font-family: "GTPressuraMono", Calibri, sans-serif;
+	border: 1px solid #06183D;
+	background-color: #06183D;
+	border: 1px solid white;
+	color: white;
+}
+.budget-decimal{
+	text-align:right;
+}
+.budget-negative{
+	color:red;
+}
+td.budget-ytd{
+	background-color:#7CC7F3 !important;
+	font-weight:bold;
+}
+th.budget-ytd{
+	background-color:#FF6D10;
+}
+th.budget-quarterly{
+	background-color:#3BACEE;	
+	color: white;
+}
+td.budget-quarterly{
+	background-color:#CCCCCC !important;	
+}
+.budget-month th{
+	background-color:#06183D;
+}
+th.sales_YTD {
+	background-color:#06183D !important;
+	color: white !important;
+}
+td.sales_YTD{
+	background-color:#CCCCCC !important;
+}
+th.sales_product, th.interco_sales_product{
+	min-width:40em;
+}
+td.sales_customer, td.interco_sales_customer{
+	min-width:18em;
+}
+
+.interco_sales_product div, .sales_product div{
+	width: 40em !important;
+	white-space: normal !important;
+}
+
+td.costs_supplier{
+	min-width:18em;
+}
+.budget-subtotal td{
+	border-bottom:3px double #06183D;
+	border-top:2px solid #06183D;
+	font-weight:bold;
+	background-color: white;
+}
+.budget-total td{
+	background-color: #eee;
+	font-weight: bold;
+	font-size: 1.2em;
+	border-bottom:2px solid #06183D;
+}
+.budget-tdh{
+	background-color: #CCC;
+	color:white;
+}
+
+.budget-dependent input{
+	color: blue;
+}
+
+.eiseGrid tfoot td{
+	font-weight: bold;
+	border-bottom:1px solid #333;
+	border-top:3px double #333;
+}
+
+#doc_status{
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin-right: 30px;
+	font-family: stencil;
+	border: 3px solid;
+	border-radius: 5px;
+	padding: 10px;
+	font-size: 20pt;
+}
+.budget-doc-deleted{
+	color:red;
+}
+.budget-doc-posted{
+	color:darkgreen;
+}	
+
+.budget-ratio td{
+	font-style: italic;
+	color: #06183D;
+	background-color: #BDE3F9;
+	border-bottom: 1px solid #06183D;
+}
+
+.report-selected td{
+	background-color:#FFCEAF !important;
+	color: #222 !important;
+}
+
+td.report-selected {
+	border: 2px solid #06183D !important;
+	
+}
+
+.report-radio{
+	padding: 5px;
+	display:block;
+}
+
+.report-radio span{
+	margin-right: 5px;
+}
+
+.report-radio label{
+	width: auto;
+}
+
+#report{
+	margin-top:15px;
+}
+
+.button-delete{
+	
+}
+
+.code-9802 {
+	background-color: maroon !important;
+}
+
+.code-1894 {
+	background-color: pink !important;
+}
+
+.code-9907,.code-33242, .code-33239 {
+	background-color: yellow !important;
+	color: #06183D !important;
+}
+
+.investment_comment {
+	white-space: normal;
+	width: 40% !important;
+}
+.investment_comment  input{
+	width: 100% !important;
+}
+
+.budget-icon-posted{
+	background: url(/common/images/icons/page_green.png) no-repeat;
+}
+
+.budget-icon-deleted{
+	background: url(/common/images/icons/page_white_delete.png) no-repeat;
+}
+
+th.budget-inactive{
+	background-color:#E3EBF0 !important;	
+}
+td.budget-inactive{
+	background-color:#eee !important;
+	color:#222 !important;
+}
+.eg_controlbar {
+    margin-bottom: -25px;
+    margin-left: 3px;
+}
+.folder-open {
+padding-left: 18px;
+background-image:url(/common/images/sprites/sprites.png);
+background-repeat:no-repeat;
+background-position:left -7597px;
+}
+
+td.budget-current{
+	border-right: 2px solid #06183D;
+}
