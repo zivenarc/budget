@@ -17,6 +17,11 @@
 	border: 1px solid white;
 	color: white;
 }
+
+.budget th a:link{
+	color:#FF6D10;
+}
+
 .budget-decimal{
 	text-align:right;
 }

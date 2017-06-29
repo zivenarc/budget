@@ -74,7 +74,7 @@ class Reports{
 		$this->caption = $this->oBudget->title.' vs '.$this->oReference->title.', '.$this->CurrencyTitle.($this->Denominator!=1?'x'.$this->Denominator:'');
 	}
 	
-	public function salesByActivity($sqlWhere=''){
+	public function salesByActivity(){
 		GLOBAL $oSQL;
 		ob_start();
 			
@@ -86,7 +86,7 @@ class Reports{
 								SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM 
 							FROM `reg_sales`					
 							LEFT JOIN vw_product_type ON prtID=activity
-							{$sqlWhere} AND posted=1 AND kpi=1 AND scenario='{$this->oBudget->id}' AND `company`='{$this->company}'
+							{$this->sqlWhere} AND posted=1 AND kpi=1 AND scenario='{$this->oBudget->id}' 
 							GROUP BY `reg_sales`.`activity`, `reg_sales`.`unit`
 							ORDER BY prtGHQ, prtRHQ";
 					break;
@@ -101,13 +101,13 @@ class Reports{
 							(SELECT pc, activity, unit,
 									".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 			
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER." AND `company`='{$this->company}'
+							{$this->$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER."
 							GROUP BY activity, unit
 							UNION ALL
 							SELECT pc, activity, unit,
 									".str_repeat("0, ",$mthStart-1).$this->oBudget->getMonthlySumSQL($mthStart,15)."
 							FROM `reg_sales` 			
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND `company`='{$this->company}'
+							{$this->$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' 
 							GROUP BY activity, unit) U
 					LEFT JOIN vw_product_type ON prtID=activity
 					GROUP BY U.activity, unit
@@ -160,7 +160,8 @@ class Reports{
 					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
 					<?php
 				};
-				$arrMetadata = Array('filter' => $filter, 'DataAction' => 'kpiByCustomer', 'title'=>$rw['prtTitle']);
+				$arrMetadata = Array('filter' => $this->filter, 'DataAction' => 'kpiByCustomer', 'title'=>$rw['prtTitle']);
+				$arrMetadata['filter']['activity'] = $rw['prtID'];
 				
 				echo "<td><a href='javascript:getCustomerKPI(".json_encode($arrMetadata).");'>",$rw['Activity'],'</a></td>';
 				echo '<td class="unit">',$rw['Unit'],'</td>';
@@ -195,28 +196,28 @@ class Reports{
 			<?php
 			
 			if ($flagShowOFFReport) {
-				$this->offByRoute($sqlWhere);
+				$this->offByRoute();
 			}
 			
 			if ($flagShowAFFReport) {
-				$this->affByRoute($sqlWhere);
+				$this->affByRoute();
 			}
 			
 			if ($flagShowWHReport) {
-				$this->whByCustomer($sqlWhere);
+				$this->whByCustomer();
 			}
 			
 			ob_flush();
 	}
 	
-	function offByRoute($sqlWhere){
+	function offByRoute(){
 		
 		switch($this->oBudget->type){
 			case 'Budget':
 			case 'Budget_AM':
 				$sqlFrom = "SELECT activity, route, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' 
+							{$this->sqlWhere} AND scenario='{$this->oBudget->id}' 
 							AND kpi=1 AND freehand=1 AND posted=1
 							AND `company`='{$this->company}'
 							GROUP BY activity, route, unit
@@ -225,12 +226,12 @@ class Reports{
 			default:
 				$sqlFrom = "SELECT activity, route,  source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER." AND freehand=1 AND `company`='{$this->company}'
+							{$this->sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER." AND freehand=1 AND `company`='{$this->company}'
 							GROUP BY activity, route, unit, source
 							UNION ALL
 						SELECT activity, route, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
 						FROM `reg_sales` 										
-						{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND freehand=1 AND `company`='{$this->company}'
+						{$this->sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND freehand=1 AND `company`='{$this->company}'
 					GROUP BY activity, route, unit";
 				break;
 		}
@@ -327,14 +328,14 @@ class Reports{
 		
 	}
 	
-	function affByRoute($sqlWhere){
+	function affByRoute(){
 		
 		switch($this->oBudget->type){
 			case 'Budget':
 			case 'Budget_AM':
 				$sqlFrom = "SELECT activity, route, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' 
+							{$this->sqlWhere} AND scenario='{$this->oBudget->id}' 
 							AND kpi=1 AND activity IN (46,47) AND posted=1
 							AND `company`='{$this->company}'
 							GROUP BY activity, route, unit
@@ -343,12 +344,12 @@ class Reports{
 			default:
 				$sqlFrom = "SELECT activity, route,  source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
-							{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER." AND activity IN (46,47) AND `company`='{$this->company}'
+							{$this->sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER." AND activity IN (46,47) AND `company`='{$this->company}'
 							GROUP BY activity, route, unit, source
 							UNION ALL
 						SELECT activity, route, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
 						FROM `reg_sales` 										
-						{$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND activity IN (46,47) AND `company`='{$this->company}'
+						{$this->sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND activity IN (46,47) AND `company`='{$this->company}'
 					GROUP BY activity, route, unit";
 				break;
 		}
@@ -445,7 +446,7 @@ class Reports{
 		
 	}
 	
-	function whByCustomer($sqlWhere){
+	function whByCustomer(){
 		
 		require_once('item.class.php');
 		$empty = 1894;
@@ -455,7 +456,7 @@ class Reports{
 						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates).") as Total,
 						SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as Total_AM 
 		FROM reg_master 
-		{$sqlWhere} AND item='".Items::REVENUE."' AND scenario='{$this->oBudget->id}' AND `company`='{$this->company}'
+		{$this->sqlWhere} AND item='".Items::REVENUE."' AND scenario='{$this->oBudget->id}' AND `company`='{$this->company}'
 		GROUP BY customer";
 		$rs = $this->oSQL->q($sql); 
 		while ($rw = $this->oSQL->f($rs)){
@@ -467,7 +468,7 @@ class Reports{
 					SUM(".$this->oBudget->getYTDSQL(4,15).") as Total_AM
 				FROM reg_rent 
 				LEFT JOIN vw_customer ON cntID=customer
-				{$sqlWhere} AND posted=1 AND item='".Items::WH_RENT."' AND scenario='{$this->oBudget->id}' AND `company`='{$this->company}'
+				{$this->sqlWhere} AND posted=1 AND item='".Items::WH_RENT."' AND scenario='{$this->oBudget->id}' AND `company`='{$this->company}'
 				GROUP BY customer";
 		$rs = $this->oSQL->q($sql); 
 		$tableID = "kpi_".md5($sql);
