@@ -107,7 +107,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 					<tr>
 						<td><?php echo $j;?></td>
 						<td><a target='job' href="/nlogjc/job_form.php?jobID=<?php echo $rw['jobID'];?>"><?php echo $rw['jobID'];?></a></td>
-						<td><?php echo $rw['jobFlagSAP'];?></td>
+						<td><?php echo $rw['jobFlagSAP']?"&bull;":"";?></td>
 						<td><?php echo $rw['cntTitle'];?></td>
 						<td><?php echo $rw['TEU'];?></td>
 						<td><?php echo $rw['jobPOL'];?></td>
@@ -121,8 +121,8 @@ for ($i=0; $i<count($arrKPI);$i++){
 					$nSumKPI += $rw['TEU'];
 				}
 				?>
-				<tr>
-					<td colspan="3">Total:</td>
+				<tr class="budget-subtotal">
+					<td colspan="4">Total:</td>
 					<td><?php echo number_format($nSumKPI,0,'.',',');?></td>
 				</tr>
 				<?php
