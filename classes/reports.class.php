@@ -101,13 +101,13 @@ class Reports{
 							(SELECT pc, activity, unit,
 									".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 			
-							{$this->$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER."
+							{$this->sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER."
 							GROUP BY activity, unit
 							UNION ALL
 							SELECT pc, activity, unit,
 									".str_repeat("0, ",$mthStart-1).$this->oBudget->getMonthlySumSQL($mthStart,15)."
 							FROM `reg_sales` 			
-							{$this->$sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' 
+							{$this->sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' 
 							GROUP BY activity, unit) U
 					LEFT JOIN vw_product_type ON prtID=activity
 					GROUP BY U.activity, unit
