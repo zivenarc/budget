@@ -708,7 +708,7 @@ class Reports{
 		<?php
 	}
 	
-	public function salesByCustomer($sqlWhere=''){
+	public function salesByCustomer(){
 		
 		ob_start();
 			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL(1,15).", 
@@ -721,7 +721,7 @@ class Reports{
 					LEFT JOIN vw_profit ON pc=pccID	
 					LEFT JOIN stbl_user ON sales=usrID
 					## LEFT JOIN tbl_sales ON salGUID=source
-					WHERE posted=1 AND scenario='{$this->oBudget->id}' and kpi=1  AND `company`='{$this->company}' {$sqlWhere} 
+					{$this->sqlWhere} AND posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 
 					GROUP BY sales, `reg_sales`.`customer`, unit, freehand
 					ORDER BY sales, Total DESC"; 
 			// echo '<pre>',$sql,'</pre>';
@@ -757,7 +757,7 @@ class Reports{
 				<tr>
 					<td><?php echo $rw['Customer'];?></td>
 					<td><?php echo $rw['unit'];?></td>
-					<td><?php echo $rw['freehand']?"&#x263A;":"";?></td>
+					<td><?php echo $rw['freehand']?"FH":"";?></td>
 				<?php
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
