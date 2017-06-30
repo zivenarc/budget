@@ -99,17 +99,17 @@ td.costs_supplier{
 	top: 0;
 	right: 0;
 	margin-right: 30px;
-	font-family: stencil;
-	border: 3px solid;
-	border-radius: 5px;
+	font-family: GTPressuraMono;
+	text-transform:uppercase;
+	border: 3px solid;	
 	padding: 10px;
 	font-size: 20pt;
 }
 .budget-doc-deleted{
-	color:red;
+	color:#F30F2F;
 }
 .budget-doc-posted{
-	color:darkgreen;
+	color:#45BD8C;
 }	
 
 .budget-ratio td{
@@ -172,11 +172,13 @@ td.report-selected {
 }
 
 .budget-icon-posted{
-	background: url(/common/images/icons/page_green.png) no-repeat;
+	content: "\f14a";
+	color: #45BD8C;
 }
 
 .budget-icon-deleted{
-	background: url(/common/images/icons/page_white_delete.png) no-repeat;
+	content: "\f05e";
+	color: #F30F2F;
 }
 
 th.budget-inactive{
