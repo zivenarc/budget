@@ -20,7 +20,7 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 			};
 
 function spinner_div(){
-	var res = $('<div>',{'class':'spinner',html:'Loading...'});
+	var res = $('<div>',{'class':'spinner',html:'Connecting...'});
 	return (res);
 }
 
@@ -68,7 +68,7 @@ function repost(tab, event){
 								// console.log(data);
 								if (data.flagPosted==1){
 									tr.addClass('journal-posted');
-									td_posted.addClass('budget-icon-posted');
+									td_posted.addClass('budget-icon-posted').removeClass('spinner');
 									tr.find('#amount_'+guid).next().html($('<span>',{text:number_format(data.amount,0,'.',','), class:(data.amount<0?'budget-negative':'')}));
 									tr.find('#usrTitle_'+guid).text(data.editor);
 									tr.find('#timestamp_'+guid).text(data.timestamp_short);
@@ -88,7 +88,7 @@ function repost(tab, event){
 						// console.log(data);
 						if (data.flagPosted==1){
 							tr.addClass('journal-posted');
-							td_posted.addClass('budget-icon-posted');
+							td_posted.addClass('budget-icon-posted').removeClass('spinner');
 							tr.find('#amount_'+guid).next().html($('<span>',{text:number_format(data.amount,0,'.',','), class:(data.amount<0?'budget-negative':'')}));
 							tr.find('#usrTitle_'+guid).text(data.editor);
 							tr.find('#timestamp_'+guid).text(data.timestamp_short);

@@ -171,12 +171,14 @@ td.report-selected {
 	width: 100% !important;
 }
 
-.budget-icon-posted{
+.budget-icon-posted:before{
+	font:18px FontAwesome;
 	content: "\f14a";
 	color: #45BD8C;
 }
 
-.budget-icon-deleted{
+.budget-icon-deleted:before{
+	font:18px FontAwesome;
 	content: "\f05e";
 	color: #F30F2F;
 }
