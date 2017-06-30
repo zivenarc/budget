@@ -24,13 +24,6 @@ $arrJS[]='js/rep_pnl.js';
 
 include('includes/inc_group_buttons.php');
 
-if(isset($currency)){
-		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
-		$rs = $oSQL->q($sql);
-		$rw = $oSQL->f($rs);
-		echo '<h2>',$rw["curTitle$strLocal"],'</h2>';
-}
-
 $sql = "SELECT * FROM stbl_user WHERE usrID=".$oSQL->e($ownerID);
 $rs = $oSQL->q($sql);
 $rw = $oSQL->f($rs);
