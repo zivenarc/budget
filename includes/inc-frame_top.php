@@ -32,7 +32,7 @@ $(document).ready(function(){
 			MsgShow();
 		});
 </script>
-<img src='/common/images/spinner.gif' style='display:none;'/>
+<img src='/common/images/spinner-orange.gif' style='display:none;'/>
 </head>
 <body>
 <div id="body">
@@ -41,16 +41,16 @@ $(document).ready(function(){
 if (!$flagNoMenu && is_array($arrActions)) {
  ?>
 <div id="menubar" class="menubar">
-	<div id="loader"><img alt="Loading..." src="/common/images/ajax-loader.gif" /></div>
+	<div id="loader"><img alt="Connecting..." src="/common/images/ajax-loader-orange.gif" /></div>
 	<ul class="menu-h">
 <?php
     for ($i=0;$i<count($arrActions);$i++) {
-			$strClass = ($arrActions[$i]['class'] != "" ? " class='".$arrActions[$i]['class']."'" : "");
+			$strClass = 'sprite '.$arrActions[$i]['class'];
             $isJS = preg_match("/javascript\:(.+)$/", $arrActions[$i]['action'], $arrJSAction);
             if (!$isJS){
-                 echo "\t<li><a $strClass href=\"".$arrActions[$i]['action']."\">".$arrActions[$i]['title']."</a></li>\r\n";
+                 echo "\t<li><a class='{$strClass}' href=\"".$arrActions[$i]['action']."\">".$arrActions[$i]['title']."</a></li>\r\n";
              } else {
-                 echo "\t<li><a $strClass href=\"".$arrActions[$i]['action']."\" onclick=\"".$arrJSAction[1]."; return false;\">".$arrActions[$i]['title']."</a></li>\r\n";
+                 echo "\t<li><a class='{$strClass}' href=\"".$arrActions[$i]['action']."\" onclick=\"".$arrJSAction[1]."; return false;\">".$arrActions[$i]['title']."</a></li>\r\n";
              }
     }
 ?>
