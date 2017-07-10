@@ -180,15 +180,8 @@ $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];			
-		} else {
-			if (!is_array($arrRatio[$rw['pc']])) echo '<pre>','Error for PC',$arrProfit[$rw['pc']]['pccTitle'], " ({$rw['pc']})"," cannot distribute $month",$rw[$month] ,'</pre>';
-			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
-				$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];				
-			}
-		}
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
+		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
 
@@ -203,15 +196,8 @@ $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];			
-		} else {
-			if (!is_array($arrRatio[$rw['pc']])) echo '<pre>','Error for PC',$arrProfit[$rw['pc']]['pccTitle'], " ({$rw['pc']})"," cannot distribute $month",$rw[$month] ,'</pre>';
-			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
-				$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];				
-			}
-		}
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
+		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
 
@@ -226,16 +212,8 @@ $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		} else {
-			if (!is_array($arrRatio[$rw['pc']])) echo '<pre>','Error for PC',$rw['pc'],' cannot distribute ',$rw[$month] ,'</pre>';
-			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
-				// echo '<pre>distributing pc',$rw['pc'],' to ',$ghq, ', '.$ratios[$month]*100,'</pre>';
-				$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];
-			}
-		}
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
+		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
 
@@ -249,16 +227,8 @@ $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
-		if ($rw['prtGHQ']){
-			$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		} else {
-			if (!is_array($arrRatio[$rw['pc']])) echo '<pre>','Error for PC',$rw['pc'],' cannot distribute ',$rw[$month] ,'</pre>';
-			foreach($arrRatio[$rw['pc']] as $ghq=>$ratios){
-				// echo '<pre>distributing pc',$rw['pc'],' to ',$ghq, ', '.$ratios[$month]*100,'</pre>';
-				$arrReport[$ghq][$reportKey][$month] -= $rw[$month]*$ratios[$month];
-			}
-		}
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
+		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
 
@@ -340,9 +310,11 @@ echo '<p>',$oBudget->timestamp,'</p>';
 <tbody>
 <?php
 foreach ($arrReport as $ghq=>$arrItems){
-	echo '<tr>';
-	echo "<th colspan='{$colspan}'>",$ghq,'</th>';
-	echo "</tr>\r\n";
+	?>
+	<tr>
+		<th colspan='<?php echo $colspan;?>'><?php echo $ghq;?></th>
+	</tr>
+	<?php
 	
 	foreach ($arrItems as $item=>$values){
 		?>
