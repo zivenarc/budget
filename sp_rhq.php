@@ -181,7 +181,7 @@ while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
+		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
 
@@ -197,7 +197,7 @@ while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
+		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
 
@@ -213,7 +213,7 @@ while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
+		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
 
@@ -228,7 +228,7 @@ while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
+		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
 }
 
