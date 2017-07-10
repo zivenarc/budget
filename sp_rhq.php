@@ -309,6 +309,7 @@ echo '<p>',$oBudget->timestamp,'</p>';
 </thead>
 <tbody>
 <?php
+$strClass='';
 foreach ($arrReport as $ghq=>$arrItems){
 	?>
 	<tr>
