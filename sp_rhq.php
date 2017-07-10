@@ -269,12 +269,12 @@ $arrSubreport = Array(
 										GROUP by pc, prtGHQ"),
 					Array('reportKey' => 'Non-operating income',
 								'sql' => "SELECT $sqlFields FROM vw_master 
-										WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account LIKE '60%' AND account<>'607000'
+										WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND account LIKE '60%' AND account<>'607000' and pccFlagProd=1
 										GROUP by pc, prtGHQ",
 								'positive' => true),
 					Array('reportKey' => 'Non-operating costs',
 								'sql' => "SELECT $sqlFields FROM vw_master 
-										WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account LIKE '65%' OR account LIKE '66%')
+										WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account LIKE '65%' OR account LIKE '66%')  and pccFlagProd=1
 										GROUP by pc, prtGHQ"),
 					Array('reportKey' => 'NO YACT',
 								'sql' => "SELECT $sqlFields FROM vw_master 
