@@ -8,6 +8,7 @@ $sql = "SELECT PG1.pagID
             , PG1.pagIdxLeft
             , PG1.pagIdxRight
             , PG1.pagFlagShowInMenu
+            , PG1.pagClass
             , PG1.pagEntityID
             , COUNT(DISTINCT PG2.pagID) as iLevelInside
             , MAX(PGR.pgrFlagRead) as FlagRead
@@ -21,6 +22,7 @@ $sql = "SELECT PG1.pagID
     WHERE 
      (RLU.rluUserID='$usrID' OR ROL.rolFlagDefault=1)
      AND PG1.pagFlagShowInMenu=1
+	 AND PG1.pagParentID<>1
     GROUP BY 
             PG1.pagID
             , PG1.pagParentID
@@ -36,46 +38,45 @@ $sql = "SELECT PG1.pagID
 	?>
 
     
-<ul class="simpleTree" id="toc">
-<li id="" class="root"><span><strong><?php echo ShowFieldTitle('Menu');?></strong></span>
+<ul role="nav" class="sidebar-menu" id="toc">
+<li class='sidebar-header'>Menu</li>
 <?php
 $strOutput .= "";	
-$rw_old["iLevelInside"] = 1;
+$rw_old["iLevelInside"] = 3;
 
 while ($rw = $oSQL->fetch_array($rs)){
     
     $hrefSuffix = "";
     
     for ($i=$rw_old["iLevelInside"]; $i>$rw["iLevelInside"]; $i--)
-       echo "</ul>\r\n\r\n";
+       echo str_repeat("\t",$i-1),"</ul>\r\n";
     
     for ($i=$rw_old["iLevelInside"]; $i<$rw["iLevelInside"]; $i++)
-       echo "<ul>\r\n";
+       echo str_repeat("\t",$i),"<ul class='treeview-menu sidebar-submenu'>\r\n";
     
     if (preg_match("/list\.php$/", $rw["pagFile"]) && $rw["pagEntityID"]!=""){
        $hrefSuffix = "?".$rw["pagEntityID"]."_staID=";
     }
     
-    echo "<li".($rw["pagParentID"]==1
-             ? " class='open'"
-             : "")." id='".$rw["pagID"]."'>".
-      ($rw["pagFile"] 
-        ? "<a target='pane' href='".$app_path.$prj_path.$rw["pagFile"].$hrefSuffix."'>"
-        //? "<a target='pane' href='".$rw["pagFile"].$hrefSuffix."'>"
-        : "")
-      ."<span>".$rw["pagTitle$strLocal"]."</span>".
-      ($rw["pagFile"] 
-        ? "</a>"
-        : ""
-        )
-        ."\r\n";
-   
-   if ($hrefSuffix){
+    echo str_repeat("\t",$rw["iLevelInside"]);
+		if ($rw['pagFile']){
+		?>
+		<li class="<?php echo ($rw["pagParentID"]==1? "open": "");?>" id="<?php echo $rw["pagID"];?>">
+			<a target='pane' href='<?php echo $app_path.$prj_path.$rw["pagFile"].$hrefSuffix;?>'><span class='fa <?php echo $rw['pagClass'];?>'></span><span><?php echo $rw["pagTitle$strLocal"];?></span></a>			
+		</li>
+		<?php
+		} else {
+			?>
+		<li class='treeview'><a href='#'><span class='fa <?php echo $rw['pagClass'];?>'></span><span><?php echo $rw["pagTitle$strLocal"];?></span><span class="fa fa-angle-left pull-right"></span></a>
+		
+		<?php }
+		
+    if ($hrefSuffix){
       $sqlSta = "SELECT * FROM stbl_status WHERE staEntityID='".$rw["pagEntityID"]."'";
       $rsSta = $oSQL->do_query($sqlSta);
       while ($rwSta = $oSQL->fetch_array($rsSta)){
          echo "<li id='".$rw["pagID"]."_".$rwSta["staID"]."'><a target='pane' href='".
-            $app_path.$prj_path.$rw["pagFile"]."?".$rw["pagEntityID"]."_staID=".$rwSta["staID"]."'>".$rwSta["staTitle$strLocal"]."</a>\r\n";
+            $app_path.$prj_path.$rw["pagFile"]."?".$rw["pagEntityID"]."_staID=".$rwSta["staID"]."'>".$rwSta["staTitle$strLocal"]."</a></li>";
             //$rw["pagFile"]."?".$rw["pagEntityID"]."_staID=".$rwSta["staID"]."'>".$rwSta["staTitle$strLocal"]."</a>\r\n";
       }
    }
@@ -83,7 +84,7 @@ while ($rw = $oSQL->fetch_array($rs)){
    $rw_old = $rw;
 }
 for ($i=$rw_old["iLevelInside"]; $i>1; $i--)
-   echo "</ul>\r\n\r\n";
+   echo str_repeat("\t",$i),"</li>\r\n\r\n";
 /*============================= OUTPUT ==================================*/	
 
 ?>
