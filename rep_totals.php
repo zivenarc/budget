@@ -382,7 +382,7 @@ foreach($arrProfit as $pc=>$flag){
 	<?php
 }
 ?>
-	<td class='budget-decimal'><?php Reports::render_ratio(array_sum($arrGrandTotal),array_sum($arrReport['this'][GROSS_PROFIT]['Revenue']));?></td>
+	<td class='budget-decimal'><?php if(is_array($arrReport['this'][GROSS_PROFIT]['Revenue'])) Reports::render_ratio(array_sum($arrGrandTotal),array_sum($arrReport['this'][GROSS_PROFIT]['Revenue']));?></td>
 </tr>
 <tr class="budget-subtotal">
 	<td>Headcount</td>
@@ -429,7 +429,7 @@ foreach($arrProfit as $pc=>$flag){
 	<?php
 }
 ?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrossRevenue));?></td>
+	<td class='budget-decimal budget-ytd'><?php if(is_array($arrGrossRevenue)) Reports::render(array_sum($arrGrossRevenue));?></td>
 	<td class='budget-decimal'><?php Reports::render($arrGrossRevenueEstimate);?></td>
 	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrossRevenue)-$arrGrossRevenueEstimate);?></td>
 	<td class='budget-decimal budget-ratio'><?php Reports::render_ratio(array_sum($arrGrossRevenue),$arrGrossRevenueEstimate);?></td>
