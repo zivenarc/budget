@@ -431,8 +431,8 @@ foreach($arrProfit as $pc=>$flag){
 ?>
 	<td class='budget-decimal budget-ytd'><?php if(is_array($arrGrossRevenue)) Reports::render(array_sum($arrGrossRevenue));?></td>
 	<td class='budget-decimal'><?php Reports::render($arrGrossRevenueEstimate);?></td>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrossRevenue)-$arrGrossRevenueEstimate);?></td>
-	<td class='budget-decimal budget-ratio'><?php Reports::render_ratio(array_sum($arrGrossRevenue),$arrGrossRevenueEstimate);?></td>
+	<td class='budget-decimal'><?php if(is_array($arrGrossRevenue)) Reports::render(array_sum($arrGrossRevenue)-$arrGrossRevenueEstimate);?></td>
+	<td class='budget-decimal budget-ratio'><?php if(is_array($arrGrossRevenue)) Reports::render_ratio(array_sum($arrGrossRevenue),$arrGrossRevenueEstimate);?></td>
 </tr>
 <tr class="budget-ratio">
 	<td>%of total</td>
