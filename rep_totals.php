@@ -374,7 +374,7 @@ foreach($arrProfit as $pc=>$flag){
 	} else {
 		$arrCostRatio[$pc]=0;
 	}
-	if(!$flag){
+	if(!$flag && is_array($arrReport['this'][GROSS_PROFIT]['Revenue'])){
 		$arrCostRatio[$pc] = - $arrGrandTotal[$pc]/array_sum($arrReport['this'][GROSS_PROFIT]['Revenue'])*100;
 	}
 	?>
@@ -439,7 +439,7 @@ foreach($arrProfit as $pc=>$flag){
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
-	<td class='budget-decimal'><?php Reports::render_ratio($arrGrossRevenue[$pc],array_sum($arrGrossRevenue));?></td>
+	<td class='budget-decimal'><?php if(is_array($arrGrossRevenue)) Reports::render_ratio($arrGrossRevenue[$pc],array_sum($arrGrossRevenue));?></td>
 	<?php
 }
 ?>
