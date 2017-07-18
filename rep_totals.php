@@ -490,7 +490,7 @@ foreach($arrProfit as $pc=>$flag){
 	<?php
 }
 ?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOpIncome['this']),array_sum($arrGrossRevenue));?></td>	
+	<td class='budget-decimal budget-ytd'><?php if(is_array($arrGrossRevenue)) Reports::render_ratio(array_sum($arrOpIncome['this']),array_sum($arrGrossRevenue));?></td>	
 	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOpIncome['last']),$arrGrossRevenueEstimate);?></td>	
 </tr>
 <tr>
@@ -513,7 +513,7 @@ foreach($arrProfit as $pc=>$flag){
 	<?php
 }
 ?>
-<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome['this']) - array_sum($arrTotal['this'][GROSS_PROFIT]));?></td>	
+<td class='budget-decimal budget-ytd'><?php if(is_array($arrTotal['this'][GROSS_PROFIT]))) Reports::render(array_sum($arrOpIncome['this']) - array_sum($arrTotal['this'][GROSS_PROFIT]));?></td>	
 </tr>
 <tr class="">
 	<td>OP costs, <?php echo $strLastTitle;?></td>
@@ -524,7 +524,7 @@ foreach($arrProfit as $pc=>$flag){
 	<?php
 }
 ?>
-<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome['last']) - array_sum($arrTotal['last'][GROSS_PROFIT]));?></td>	
+<td class='budget-decimal budget-ytd'><?php if(is_array($arrTotal['last'][GROSS_PROFIT])) Reports::render(array_sum($arrOpIncome['last']) - array_sum($arrTotal['last'][GROSS_PROFIT]));?></td>	
 </tr>
 <tr>
 	<td>Op.cost per headcount</td>
@@ -535,7 +535,7 @@ foreach($arrProfit as $pc=>$flag){
 	<?php
 }
 ?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio((array_sum($arrOpIncome['this'])-array_sum($arrTotal['this'][GROSS_PROFIT]))/100,array_sum($arrHeadcount['FTE']),0);?></td>
+	<td class='budget-decimal budget-ytd'><?php if(is_array($arrTotal['this'][GROSS_PROFIT]))Reports::render_ratio((array_sum($arrOpIncome['this'])-array_sum($arrTotal['this'][GROSS_PROFIT]))/100,array_sum($arrHeadcount['FTE']),0);?></td>
 </tr>
 <?php
 foreach ($arrGP as $bdv=>$arrCusGP){
