@@ -513,7 +513,7 @@ foreach($arrProfit as $pc=>$flag){
 	<?php
 }
 ?>
-<td class='budget-decimal budget-ytd'><?php if(is_array($arrTotal['this'][GROSS_PROFIT]))) Reports::render(array_sum($arrOpIncome['this']) - array_sum($arrTotal['this'][GROSS_PROFIT]));?></td>	
+<td class='budget-decimal budget-ytd'><?php if(is_array($arrTotal['this'][GROSS_PROFIT])) Reports::render(array_sum($arrOpIncome['this']) - array_sum($arrTotal['this'][GROSS_PROFIT]));?></td>	
 </tr>
 <tr class="">
 	<td>OP costs, <?php echo $strLastTitle;?></td>
