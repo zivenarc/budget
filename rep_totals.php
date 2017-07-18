@@ -538,14 +538,16 @@ foreach($arrProfit as $pc=>$flag){
 	<td class='budget-decimal budget-ytd'><?php if(is_array($arrTotal['this'][GROSS_PROFIT]))Reports::render_ratio((array_sum($arrOpIncome['this'])-array_sum($arrTotal['this'][GROSS_PROFIT]))/100,array_sum($arrHeadcount['FTE']),0);?></td>
 </tr>
 <?php
-foreach ($arrGP as $bdv=>$arrCusGP){
-	?>
-	<tr><th colspan="<?php echo count($arrProfit)+5;?>">Gross Profit delivered by <?php echo $bdv;?></th></tr>
-	<?php
-	foreach ($arrCusGP as $customer=>$data){
-		renderDataByPC($data, $arrProfit, $customer);	
+if(is_array($arrGP)){
+	foreach ($arrGP as $bdv=>$arrCusGP){
+		?>
+		<tr><th colspan="<?php echo count($arrProfit)+5;?>">Gross Profit delivered by <?php echo $bdv;?></th></tr>
+		<?php
+		foreach ($arrCusGP as $customer=>$data){
+			renderDataByPC($data, $arrProfit, $customer);	
+		}
+		renderDataByPC($arrGPTotal[$bdv], $arrProfit, "Total GP", "budget-subtotal");	
 	}
-	renderDataByPC($arrGPTotal[$bdv], $arrProfit, "Total GP", "budget-subtotal");	
 }
 ?>
 </tfoot>
