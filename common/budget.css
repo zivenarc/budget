@@ -11,7 +11,7 @@
 	color: #06183D;
 }
 .budget th{
-	font-family: "GTPressuraMono", Calibri, sans-serif;
+	font-family: "Open Sans", Calibri, sans-serif;
 	border: 1px solid #06183D;
 	background-color: #06183D;
 	border: 1px solid white;
@@ -96,20 +96,21 @@ td.costs_supplier{
 
 #doc_status{
 	position: absolute;
-	top: 0;
+	top: 56px;
 	right: 0;
 	margin-right: 30px;
 	font-family: GTPressuraMono;
 	text-transform:uppercase;
-	border: 3px solid;	
-	padding: 10px;
-	font-size: 20pt;
+	//border: 3px solid;	
+	padding: 5px;
+	font-size: 20px;
+	color: #FFF;
 }
 .budget-doc-deleted{
-	color:#F30F2F;
+	background-color:#F30F2F;
 }
 .budget-doc-posted{
-	color:#45BD8C;
+	background-color:#45BD8C;
 }	
 
 .budget-ratio td{
