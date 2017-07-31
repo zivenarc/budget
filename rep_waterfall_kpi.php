@@ -122,13 +122,13 @@ if (isset($_GET['pccGUID'])){
 										{$sqlActual} as Actual, 
 										0 as Budget, 
 										{$sqlActual} as Diff
-								FROM `{$sqlBaseTable}` 							
+								FROM `vw_master` 							
 								WHERE scenario='{$actual}' ".Reports::GP_FILTER." AND pc IN (".implode(',',$filter['pc']).") AND company='{$company}'
 								GROUP BY sales
 								UNION ALL
 								SELECT sales, usrTitle as optText, 0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
-								FROM `{$sqlBaseTable}` 								
+								FROM `vw_master` 								
 								WHERE
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND pc IN (".implode(',',$filter['pc']).") AND company='{$company}'
 								GROUP BY sales";
