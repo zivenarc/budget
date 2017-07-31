@@ -58,7 +58,7 @@ $settings = Array(
 				'teucus'=>Array('title'=>"TEU by customer",'currency'=>'TEU','tolerance'=>0.05,'limit'=>10),
 				'kgcus'=>Array('title'=>"AFF volume by customer",'currency'=>'Kgs','tolerance'=>0.05,'limit'=>10),
 				'rffcus'=>Array('title'=>"RFF volume by customer",'currency'=>'Trips','tolerance'=>0.05,'limit'=>10),
-				'gpsal'=>Array('title'=>"GP by sales",'currency'=>'RUB','tolerance'=>0.05,'limit'=>10, 'denominator'=>1000)				
+				'gpsal'=>Array('title'=>"GP by sales",'currency'=>'RUB','tolerance'=>0.05,'limit'=>8, 'denominator'=>1000)				
 			);
 						
 if (isset($_GET['pccGUID'])){
