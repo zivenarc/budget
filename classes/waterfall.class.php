@@ -223,21 +223,21 @@ class Waterfall {
 													legend: {enabled: false},
 													tooltip: {pointFormat: '<b>{point.y:,.0f}</b> <?php echo $this->currency;?>'},
 													series: [{upColor: '#3BACEE',
-															color: '#FF6D10',
-													data: <?php echo json_encode($this->arrHSChart);?>,
-													dataLabels: {
-														enabled: true,
-														formatter: function () {
-															return Highcharts.numberFormat(this.y/<?php echo $this->denominator;?>, 0, ',');
-														},
-													style: {
-														color: '#FFFFFF',
-														fontWeight: 'bold',
-														textShadow: '0px 0px 3px black'
-														}
-													},
-													pointPadding: 0
-												}]};
+																	color: '#FF6D10',
+															data: <?php echo json_encode($this->arrHSChart);?>,
+															dataLabels: {
+																enabled: true,
+																formatter: function () {
+																	return Highcharts.numberFormat(this.y/<?php echo $this->denominator;?>, 0, ',');
+																},
+															style: {
+																color: '#FFFFFF',
+																fontWeight: 'bold',
+																textShadow: '0px 0px 3px black'
+																}
+															},
+															pointPadding: 0
+													}]};
 				
 				// $('#<?php echo $this->chartID;?>').highcharts(hs_data["<?php echo $this->chartID;?>"]);	
 				chart["<?php echo $this->chartID;?>"] = Highcharts.chart('<?php echo $this->chartID;?>',hs_data["<?php echo $this->chartID;?>"]);
@@ -255,7 +255,7 @@ class Waterfall {
 											}, 
 						function(data){
 							console.log(data);
-							chart['<?php echo $this->chartID;?>'].update({data:data});
+							chart['<?php echo $this->chartID;?>'].update({series[0].data:data});
 						});
 					  },
 					  min: 1,
