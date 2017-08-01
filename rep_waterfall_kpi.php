@@ -52,16 +52,16 @@ $sqlBudget = "SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")";
 						
 
 			
-$type = $_GET['type']?$_GET['type']:'teucus';
+$type = $_REQUEST['type']?$_REQUEST['type']:'teucus';
 						
 $settings = Array(
-				'teucus'=>Array('title'=>"TEU by customer",'currency'=>'TEU','tolerance'=>0.05,'limit'=>10),
-				'kgcus'=>Array('title'=>"AFF volume by customer",'currency'=>'Kgs','tolerance'=>0.05,'limit'=>10),
-				'rffcus'=>Array('title'=>"RFF volume by customer",'currency'=>'Trips','tolerance'=>0.05,'limit'=>10),
-				'gpsal'=>Array('title'=>"GP by sales",'currency'=>'RUB','tolerance'=>0.05,'limit'=>7, 'denominator'=>1000)				
+				'teucus'=>Array('title'=>"TEU by customer",'currency'=>'TEU','tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,'limit'=>10),
+				'kgcus'=>Array('title'=>"AFF volume by customer",'currency'=>'Kgs','tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,'limit'=>10),
+				'rffcus'=>Array('title'=>"RFF volume by customer",'currency'=>'Trips','tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,'limit'=>10),
+				'gpsal'=>Array('title'=>"GP by sales",'currency'=>'RUB','tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,'limit'=>7, 'denominator'=>1000)				
 			);
 						
-if (isset($_GET['pccGUID'])){
+if (isset($_REQUEST['pccGUID'])){
 	
 	$settings['teucus']['sqlBase'] = "SELECT customer_group_code as optValue, 
 											customer_group_title as optText,
@@ -144,6 +144,15 @@ if (isset($_GET['pccGUID'])){
 		die('Wrong report type');
 	}
 						
+	if($_REQUEST['DataAction']=='reload'){
+		header('Content-type: application/json');
+		echo json_encode($oWF->getDataTable());
+		die();
+	}	
+	
+	?>
+	<input type='hidden' id='pccGUID' value='<?php echo $_REQUEST['pccGUID'];?>'/>
+	<?php
 	$oWF->draw();
 } else {					
 	$arrJS[] = 'js/rep_pnl.js';					

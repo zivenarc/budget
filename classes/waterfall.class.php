@@ -157,7 +157,10 @@ class Waterfall {
 	
 	public function drawTable($strClass="budget"){
 		?>		
-		<p>Tolerance = <?php echo ($this->tolerance*100).'%';?></p>
+		<label>Tolerance</label>
+		<div id="tolerance_<?php echo $this->chartID;?>" class='tolerance'>
+			<div id="tolerance_<?php echo $this->chartID;?>-handle" class="ui-slider-handle"></div>
+		</div>
 		<table id="table_<?php echo $this->chartID;?>" class="<?php echo $strClass;?>" style="width:auto;">
 		<caption><?php echo $this->title, ': ', $this->actual_title,' vs ',$this->budget_title, ', ', $this->currency, 'x', $this->denominator;?></caption>
 		<thead>			
@@ -205,6 +208,7 @@ class Waterfall {
 		<div id="toolbar_div"></div>
 		<script>
 			var hs_data = [];
+			var chart = [];
 			
 			//google_chart_data["<?php echo $this->chartID;?>"] = {data:<?php echo json_encode($this->arrChart);?>,title:'<?php echo $this->title;?>'};			
 			hs_data["<?php echo $this->chartID;?>"] = {chart: {type: 'waterfall'},
@@ -235,8 +239,28 @@ class Waterfall {
 													pointPadding: 0
 												}]};
 				
-				$('#<?php echo $this->chartID;?>').highcharts(hs_data["<?php echo $this->chartID;?>"]);
-			
+				// $('#<?php echo $this->chartID;?>').highcharts(hs_data["<?php echo $this->chartID;?>"]);	
+				chart["<?php echo $this->chartID;?>"] = Highcharts.chart('<?php echo $this->chartID;?>',hs_data["<?php echo $this->chartID;?>"]);
+				var handle = $('#tolerance_<?php echo $this->chartID;?>-handle');
+				$('#tolerance_<?php echo $this->chartID;?>').slider({
+					  value: <?php echo ($this->tolerance*100);?>,
+					  create: function() {
+						handle.text( $( this ).slider( "value" )+'%');
+					  },
+					  slide: function( event, ui ) {
+						handle.text( ui.value+'%' );
+						$.get(location.href,{DataAction:'reload', 
+											tolerance:ui.value/100,
+											pccGUID:$('#pccGUID').val()
+											}, 
+						function(data){
+							console.log(data);
+							chart['<?php echo $this->chartID;?>'].update({data:data});
+						});
+					  },
+					  min: 1,
+					  max: 15
+					});
 			</script>
 		<?php
 	}
@@ -307,6 +331,10 @@ class Waterfall {
 			$this->arrHSChart[] = Array('name'=>$title.', others','y'=>(integer)$rwOther['Diff']);
 		}
 	}
-	
+		
+	function getDataTable(){
+		$this->_initData();
+		return $this->arrHSChart;
+	}
 }
 ?>
