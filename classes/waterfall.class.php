@@ -255,7 +255,7 @@ class Waterfall {
 											}, 
 						function(data){
 							console.log(data);
-							chart['<?php echo $this->chartID;?>'].update({series:[{data:data}]);
+							chart['<?php echo $this->chartID;?>'].update({series:[{data:data}]});
 						});
 					  },
 					  min: 1,
