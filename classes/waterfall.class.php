@@ -263,9 +263,9 @@ class Waterfall {
 							for(i=0;i<data.table.length;i++){
 								var tr = $('<tr>',{'class':data.table[i][4]}).appendTo(datatable);
 								$('<td>',{html:data.table[i][0]}).appendTo(tr);
-								$('<td>',{'class':'budget-decimal',html:data.table[i][1]}).appendTo(tr);
-								$('<td>',{'class':'budget-decimal',html:data.table[i][2]}).appendTo(tr);
-								$('<td>',{'class':'budget-decimal',html:data.table[i][3]}).appendTo(tr);
+								$('<td>',{'class':'budget-decimal',html:Math.round(data.table[i][1],0)}).appendTo(tr);
+								$('<td>',{'class':'budget-decimal',html:Math.round(data.table[i][2],0)}).appendTo(tr);
+								$('<td>',{'class':'budget-decimal',html:Math.round(data.table[i][3],0)}).appendTo(tr);
 							}
 						});
 					  },
