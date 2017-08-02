@@ -1,10 +1,9 @@
 <?php
 // $arrJS[] = 'https://www.google.com/jsapi';
-//$arrJS[] = 'js/waterfall.js';
-
 $arrJS[]="https://code.highcharts.com/highcharts.js";
 $arrJS[]="https://code.highcharts.com/highcharts-more.js";
 $arrJS[]="https://code.highcharts.com/modules/exporting.js";
+$arrJS[] = 'js/waterfall.js';
 
 class Waterfall {
 	
@@ -268,26 +267,8 @@ class Waterfall {
 						if (typeof(requestOptions)!='undefined'){
 							request[requestOptions.tabKey] = requestOptions.tabValue;
 						};
-						$.get(location.href,request, 
-						function(data){
-							console.log(data);
-							chart['<?php echo $this->chartID;?>'].update({
-																		series:[{data:data.chart}],
-																		yAxis:{min:data.min,max:data.max}							
-																	});
-							var datatable = $('#table_<?php echo $this->chartID;?> tbody');
-							$('tr',datatable).remove();
-							for(i=0;i<data.table.length;i++){
-								var tr = $('<tr>',{'class':data.table[i][4]}).appendTo(datatable);
-								$('<td>',{html:data.table[i][0]}).appendTo(tr);
-								for(var j=1;j<=3;j++){
-									var strNumber = (data.table[i][j] == null ? '' : number_format(data.table[i][j],0,'.',','));
-									if (data.table[i][j]<0) {
-										strNumber = '<span class="budget-negative">'+strNumber+'</span>';
-									};
-									$('<td>',{'class':'budget-decimal',html:strNumber}).appendTo(tr);
-								}
-							}
+						$.get(location.href,request, function(data){
+							updateChart('<?php echo $this->chartID;?>',data);
 						});
 					  },
 					  min: 1,
