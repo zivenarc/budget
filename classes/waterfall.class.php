@@ -257,7 +257,10 @@ class Waterfall {
 											}, 
 						function(data){
 							console.log(data);
-							chart['<?php echo $this->chartID;?>'].update({series:[{data:data.chart}]});
+							chart['<?php echo $this->chartID;?>'].update({
+																		series:[{data:data.chart}],
+																		yAxis:{min:data.min,max:data.max}							
+																	});
 							var datatable = $('#table_<?php echo $this->chartID;?> tbody');
 							$('tr',datatable).remove();
 							for(i=0;i<data.table.length;i++){
@@ -349,7 +352,7 @@ class Waterfall {
 		
 	function getDataTable(){
 		$this->_initData();
-		$res = Array('chart'=>$this->arrHSChart,'table'=>$this->arrReport);
+		$res = Array('chart'=>$this->arrHSChart,'table'=>$this->arrReport,'min'=>(integer)$this->min, 'max'=>(integer)$this->max);
 		return $res;
 	}
 }
