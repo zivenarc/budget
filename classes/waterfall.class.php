@@ -263,9 +263,13 @@ class Waterfall {
 							for(i=0;i<data.table.length;i++){
 								var tr = $('<tr>',{'class':data.table[i][4]}).appendTo(datatable);
 								$('<td>',{html:data.table[i][0]}).appendTo(tr);
-								$('<td>',{'class':'budget-decimal',html:Math.round(data.table[i][1],0)}).appendTo(tr);
-								$('<td>',{'class':'budget-decimal',html:Math.round(data.table[i][2],0)}).appendTo(tr);
-								$('<td>',{'class':'budget-decimal',html:Math.round(data.table[i][3],0)}).appendTo(tr);
+								for(j=1;j<3;j++){
+									var strNumber = (data.table[i][j] == null) ? '' : number_format(data.table[i][j],0,'.',',');
+									if (data.table[i][j]<0) {
+										strNumber = '<span class="budget-negative">'+strNumber+'</span>';
+									};
+									$('<td>',{'class':'budget-decimal',html:strNumber}).appendTo(tr);
+								}
 							}
 						});
 					  },
