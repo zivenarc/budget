@@ -6,7 +6,7 @@ function updateChart(id, data){
 					});
 	var datatable = $('#table_'+id+' tbody');
 	$('tr',datatable).remove();
-	for(i=0;i<data.table.length;i++){
+	for(var i=0;i<data.table.length;i++){
 		var tr = $('<tr>',{'class':data.table[i][4]}).appendTo(datatable);
 		$('<td>',{html:data.table[i][0]}).appendTo(tr);
 		for(var j=1;j<=3;j++){
