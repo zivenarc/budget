@@ -22,6 +22,19 @@ class Waterfall {
 		$this->actual_title = $options['actual_title']?$options['actual_title']:'Actual';
 		$this->budget_title = $options['budget_title']?$options['budget_title']:'Budget';
 		
+		if(isset($options['filter'])){
+			foreach($options['filter'] as $field=>$value){
+				if(is_array($value)){
+					$strWhere[] = "`$field` IN ('".implode("','",$value)."')";
+				} else {
+					$strWhere[] = "`$field` = '$value'";
+				}
+			}
+			$sqlWhere = ' AND '.implode(" AND ",$strWhere);
+		};
+		
+		$this->sqlBase = str_replace("%WHERE%", $sqlWhere, $this->sqlBase);
+		
 		switch ($this->denominator){
 			case 1000:
 				$this->denominator_title = "k";
@@ -251,10 +264,11 @@ class Waterfall {
 					  },
 					  slide: function( event, ui ) {
 						handle.text( ui.value+'%' );
-						$.get(location.href,{DataAction:'reload', 
-											tolerance:ui.value/100,
-											pccGUID:$('#pccGUID').val()
-											}, 
+						var request = {DataAction:'reload',	tolerance:ui.value/100};
+						if (typeof(requestOptions)!='undefined'){
+							request[requestOptions.tabKey] = requestOptions.tabValue;
+						};
+						$.get(location.href,request, 
 						function(data){
 							console.log(data);
 							chart['<?php echo $this->chartID;?>'].update({
@@ -266,7 +280,7 @@ class Waterfall {
 							for(i=0;i<data.table.length;i++){
 								var tr = $('<tr>',{'class':data.table[i][4]}).appendTo(datatable);
 								$('<td>',{html:data.table[i][0]}).appendTo(tr);
-								for(j=1;j<3;j++){
+								for(j=1;j<4;j++){
 									var strNumber = (data.table[i][j] == null) ? '' : number_format(data.table[i][j],0,'.',',');
 									if (data.table[i][j]<0) {
 										strNumber = '<span class="budget-negative">'+strNumber+'</span>';

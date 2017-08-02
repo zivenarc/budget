@@ -60,16 +60,14 @@ $settings = Array(
 				'rffcus'=>Array('title'=>"RFF volume by customer",'currency'=>'Trips','tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,'limit'=>10),
 				'gpsal'=>Array('title'=>"GP by sales",'currency'=>'RUB','tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,'limit'=>7, 'denominator'=>1000)				
 			);
-						
-if (isset($_REQUEST['pccGUID'])){
-	
+
 	$settings['teucus']['sqlBase'] = "SELECT customer_group_code as optValue, 
 											customer_group_title as optText,
 										{$sqlActual} as Actual, 
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM `{$sqlBaseTable}` 								
-								WHERE scenario='{$actual}' AND company='{$company}' AND pc IN (".implode(',',$filter['pc']).") AND activity IN (48,63)
+								WHERE scenario='{$actual}' AND company='{$company}' %WHERE% AND activity IN (48,63)
 								GROUP BY customer_group_code
 								UNION ALL
 								SELECT customer_group_code as optValue, 
@@ -78,7 +76,7 @@ if (isset($_REQUEST['pccGUID'])){
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM `{$sqlBaseTable}` 								
 								WHERE
-								scenario='{$budget}' AND source<>'Estimate' AND company='{$company}' AND pc IN (".implode(',',$filter['pc']).") AND activity IN (48,63)
+								scenario='{$budget}' AND source<>'Estimate' AND company='{$company}' %WHERE% AND activity IN (48,63)
 								GROUP BY customer_group_code";
 
 	$settings['kgcus']['sqlBase']="SELECT customer_group_code as optValue, 
@@ -87,7 +85,7 @@ if (isset($_REQUEST['pccGUID'])){
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM `{$sqlBaseTable}` 								
-								WHERE scenario='{$actual}' AND company='{$company}' AND pc IN (".implode(',',$filter['pc']).") AND activity IN (46,47)
+								WHERE scenario='{$actual}' AND company='{$company}' %WHERE% AND activity IN (46,47)
 								GROUP BY customer_group_code
 								UNION ALL
 								SELECT customer_group_code as optValue, 
@@ -96,7 +94,7 @@ if (isset($_REQUEST['pccGUID'])){
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM `{$sqlBaseTable}` 								
 								WHERE
-								scenario='{$budget}' AND source<>'Estimate' AND company='{$company}' AND pc IN (".implode(',',$filter['pc']).") AND activity IN (46,47)
+								scenario='{$budget}' AND source<>'Estimate' AND company='{$company}' %WHERE% AND activity IN (46,47)
 								GROUP BY customer_group_code";
 
 	$settings['rffcus']['sqlBase']="SELECT customer_group_code as optValue, 
@@ -105,7 +103,7 @@ if (isset($_REQUEST['pccGUID'])){
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM `{$sqlBaseTable}` 								
-								WHERE scenario='{$actual}' AND company='{$company}' AND pc IN (".implode(',',$filter['pc']).") AND activity IN (69,3,7,13)
+								WHERE scenario='{$actual}' AND company='{$company}' %WHERE% AND activity IN (69,3,7,13)
 								GROUP BY customer_group_code
 								UNION ALL
 								SELECT customer_group_code as optValue, 
@@ -114,7 +112,7 @@ if (isset($_REQUEST['pccGUID'])){
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM `{$sqlBaseTable}` 								
 								WHERE
-								scenario='{$budget}' AND source<>'Estimate' AND company='{$company}' AND pc IN (".implode(',',$filter['pc']).") AND activity IN (69,3,7,13)
+								scenario='{$budget}' AND source<>'Estimate' AND company='{$company}' %WHERE% AND activity IN (69,3,7,13)
 								GROUP BY customer_group_code";
 						
 	$settings['gpsal']['sqlBase'] = "SELECT sales as optValue, 
@@ -123,22 +121,27 @@ if (isset($_REQUEST['pccGUID'])){
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM `vw_master` 							
-								WHERE scenario='{$actual}' ".Reports::GP_FILTER." AND pc IN (".implode(',',$filter['pc']).") AND company='{$company}'
+								WHERE scenario='{$actual}' ".Reports::GP_FILTER." %WHERE% AND company='{$company}'
 								GROUP BY sales
 								UNION ALL
 								SELECT sales, usrTitle as optText, 0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM `vw_master` 								
 								WHERE
-								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND pc IN (".implode(',',$filter['pc']).") AND company='{$company}'
+								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." %WHERE% AND company='{$company}'
 								GROUP BY sales";
 
+
+			
+if (isset($_REQUEST['pccGUID'])){
+	
 	if (is_array($settings[$type])){
 		$settings[$type]['title'] .= ', '.$arrPeriodType[$period_type];
 		$settings[$type]['actual_title'] = $oActual->title;
 		$settings[$type]['budget_title'] = $oBudget->title;
 		//$settings[$type]['denominator'] = $denominator;
-		
+		$settings[$type]['filter'] = $filter;
+	
 		$oWF = new Waterfall($settings[$type]);
 	} else {
 		die('Wrong report type');
@@ -151,9 +154,12 @@ if (isset($_REQUEST['pccGUID'])){
 	}	
 	
 	?>
-	<input type='hidden' id='pccGUID' value='<?php echo $_REQUEST['pccGUID'];?>'/>
+	<script>
+		var requestOptions = {tabKey:'pccGUID',tabValue:'<?php echo $_REQUEST['pccGUID'];?>'};
+	</script>
 	<?php
 	$oWF->draw();
+	
 } else {					
 	$arrJS[] = 'js/rep_pnl.js';					
 	require ('includes/inc-frame_top.php');
