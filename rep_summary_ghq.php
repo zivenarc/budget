@@ -5,7 +5,7 @@ require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
-
+include ('includes/inc_report_ghqfilter.php');
 	
 	$oBudget = new Budget($budget_scenario);
 	$oReference = new Budget($reference);
@@ -33,37 +33,10 @@ if(!isset($_GET['prtGHQ'])){
 } else {
 
 	
-	if ($_GET['prtGHQ']=='all'){
-		$sqlWhere = " WHERE company='$company'";
-		// $filter = Array();
-	} else {
-		if ($_GET['prtGHQ']=='OFF') {
-		$sqlWhereP = " WHERE prtGHQ IN ('Ocean import','Ocean export')";
-		$filter = Array('prtGHQ'=>Array('Ocean import','Ocean export'));
-		
-		} elseif ($_GET['prtGHQ']=='AFF') {
-			$sqlWhereP = " WHERE prtGHQ IN ('Air import','Air export')";
-			$filter = Array('prtGHQ'=>Array('Air import','Air export'));
-
-		} else {
-			$sqlWhereP = " WHERE prtGHQ=".$oSQL->e(urldecode($_GET['prtGHQ']));
-			$filter = Array('prtGHQ'=>urldecode($_GET['prtGHQ']));
-			
-		}
-		
-		$sql = "SELECT * FROM vw_product_type {$sqlWhereP}";
-		$rs = $oSQL->q($sql);
-		while ($rw = $oSQL->f($rs)){
-			$arrProducts['title'][] = $rw['prtTitle'];
-			$arrProducts['id'][] = $rw['prtID'];
-		}
-		
-		$sqlWhere = "WHERE activity IN (".implode(',',$arrProducts['id']).") AND company='$company'";
-		$filter = Array('activity'=>$arrProducts['id']);
-		
-		?>
-		<p><?php echo implode(', ',$arrProducts['title']);?></p>
-		<?php
+	if(is_array($arrProducts)){
+	?>
+	<p><?php echo implode(', ',$arrProducts['title']);?></p>
+	<?php
 	}
 	
 	if(strpos($oBudget->type,"Budget")===false){
