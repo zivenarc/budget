@@ -239,6 +239,10 @@ if(!isset($_GET['prtGHQ'])){
 		<?php
 	}
 	
+	$period_type = 'fye'; $period_title = "Full year";
+	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
+	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
+	
 	$sql = "SELECT customer_group_code as optValue, 
 						customer_group_title as optText,  
 						{$sqlActual} as GP
