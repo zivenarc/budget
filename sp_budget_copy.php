@@ -137,7 +137,7 @@ foreach ($arrEntity as $entity=>$entity_data){
 		}
 		
 		//----------------------------------Copy documents------------------------------------------------------
-		$sqlDoc = "SELECT * FROM `$entity` WHERE `{$prefix}FlagPosted`=1 and `{$prefix}Scenario`='{$old_budget}'";
+		$sqlDoc = "SELECT * FROM `$entity` WHERE `{$prefix}FlagDeleted`=0 and `{$prefix}Scenario`='{$old_budget}'";
 		$rs = $oSQL->q($sqlDoc);
 		while ($rw=$oSQL->f($rs)){
 			
