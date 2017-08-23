@@ -1,5 +1,5 @@
 <?php 
-$arrJS[] = '../common/jquery/jquery-1.7.1.min.js';
+$arrJS[] = '../common/jquery/jquery-2.1.1.min.js';
 $arrJS[] = '../common/jquery/jquery-ui-1.12.0.custom/jquery-ui.min.js';
 //$arrJS[] = 'js/ef_common.js';
 $arrCSS[] = "../common/izintra/style.css";

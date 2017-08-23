@@ -22,7 +22,7 @@ $sql = "SELECT PG1.pagID
     WHERE 
      (RLU.rluUserID='$usrID' OR ROL.rolFlagDefault=1)
      AND PG1.pagFlagShowInMenu=1
-	 AND PG1.pagParentID<>1
+	 ##AND PG1.pagParentID<>1
     GROUP BY 
             PG1.pagID
             , PG1.pagParentID
@@ -39,7 +39,7 @@ $sql = "SELECT PG1.pagID
 
     
 <ul role="nav" class="sidebar-menu" id="toc">
-<li class='sidebar-header'>Menu</li>
+<li class='sidebar-header'><?php echo $title;?></li>
 <?php
 $strOutput .= "";	
 $rw_old["iLevelInside"] = 3;

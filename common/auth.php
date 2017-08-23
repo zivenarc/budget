@@ -1,17 +1,15 @@
 <?php
 if(!$noCompression)
-	ini_set("zlib.output_compression","1");
+	//ini_set("zlib.output_compression","1");
 header("Content-Type: text/html; charset=UTF-8");
 header("Expires: 0");
 header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-
-
-
 
 ob_start();
 
 require ("../common/common.php");
 require ("config.php");
+include('../common/izintra/izintra.class.php');
 require ("common.php");
 
 $js_path = "";
@@ -59,8 +57,6 @@ if (!$flagNoAuth){
 require ("../common/inc_setup.php");
 //require ("../common/inc_russtuff.php");
 
-readUserData($arrUsrData);
-
 if ($strLocal){
 	require_once ("../common/language/ru.php");
 } else {
@@ -70,6 +66,9 @@ if ($strLocal){
 $arrCurr = Array('EUR'=> 'EUR', 'LOC'=>$arrSetup['stpLocalCurrencyName'],'USD'=>'USD');
 define ('UPLOAD_DIR',$arrSetup['stpUploadPath']);
 ini_set("SMTP",$arrSetup['stpSMTPAddress']);
+
+$Intra = new Izintra($oSQL, Array());
+$Intra->readUserData();
 
 //===============Fill the profit array=========================
 $sql = "SELECT * FROM vw_profit";
@@ -85,7 +84,8 @@ while ($rw = $oSQL->f($rs)){
 	$arrCompanyConfig[$rw['comID']] = $rw;
 }
 
-$company = isset($_COOKIE['company'])?$_COOKIE['company']:'000000001';
+$company = isset($_GET['company'])?$_GET['company']:(isset($_COOKIE['company'])?$_COOKIE['company']:'000000001');
+SetCookie('company',$company);
 
 //require ("lang_en.php");
 $budget_scenario = $arrSetup['stpScenarioID'];

@@ -1,12 +1,3 @@
-</div><!--frameContent-->
-</div><!--#body-->
-<div id="error_log">
-<?php 
-echo "<pre>";
-print_r($arrErrorLog);
-echo "</pre>";	
+<?php
+include ('../common/izintra/inc-frame_bottom.php');
 ?>
-</div>
-<div id="debug_info"><?php echo $strDebugInfo; ?></div>
-</body>
-</html>

@@ -107,7 +107,4 @@ $arrUsrData["pagTitle$strLocal"] .= ': '.$curTitle;
 if ($denominator!=1) {
 	$arrUsrData["pagTitle$strLocal"] .= ' x'.$denominator;
 }
-
-
-
 ?>

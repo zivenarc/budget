@@ -548,7 +548,7 @@ class Budget{
 		}
 		?>
 		</select>
-		<?
+		<?php
 		$res = ob_get_clean();
 		return($res);
 	}
