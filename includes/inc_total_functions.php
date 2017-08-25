@@ -1,7 +1,7 @@
 <?php
 function renderDataByPC($data, $arrProfit, $strTitle, $strClass=""){
 	?>
-	<tr class="<?echo $strClass;?>">
+	<tr class="<?php echo $strClass;?>">
 		<td><?php echo $strTitle;?></td>
 		<?php
 		foreach($arrProfit as $pc=>$flag){
