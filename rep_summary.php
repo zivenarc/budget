@@ -48,34 +48,7 @@ if(!isset($_GET['pccGUID'])){
 } else {
 
 	
-	if ($_GET['pccGUID']=='all'){
-		$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-
-		$sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
-
-		$rs = $oSQL->q($sql);
-		while ($rw = $oSQL->f($rs)){
-			$arrPC[] = $rw['pcrProfitID'];
-		}
-		$sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
-		$filter = Array('pc'=>$arrPC);
-	} else {
-		
-		
-		$sql = "SELECT pccID, pccTitle, pccFlagFolder FROM common_db.tbl_profit 
-				WHERE pccGUID=".$oSQL->e($_GET['pccGUID'])." 
-					OR pccParentCode1C=(SELECT pccCode1C FROM common_db.tbl_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
-		$rs = $oSQL->q($sql);		
-		while ($rw = $oSQL->f($rs)){
-			$arrPC[] = $rw['pccID'];
-			if(!$rw['pccFlagFolder']) $arrPCHeader[] = $rw['pccTitle'];
-		};
-		
-		$filter = Array('pc'=>$arrPC);		
-		
-		$sqlWhere = "WHERE pc in (".implode(',',$filter['pc']).")";
-		
-	}
+	include ('includes/inc_report_pcfilter.php');
 	
 	if(is_array($arrPCHeader)){
 		echo '<p>',implode(' | ',$arrPCHeader),'</p>';

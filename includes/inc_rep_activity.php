@@ -1,5 +1,4 @@
 <?php
-
 $activity = (integer)$_GET['activity'];
 if (isset($_GET['ghq'])) $ghq = urldecode($_GET['ghq']);
 if (isset($_GET['unit'])) $unit = urldecode($_GET['unit']);
@@ -44,5 +43,4 @@ if ($unit){
 	$subtitle = $unit.implode(', ',$arrHref);
 	$sqlActivityFilter = "AND activity IN (".implode(',',$arrActivity).")";
 }
-
 ?>
