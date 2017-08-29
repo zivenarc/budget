@@ -28,7 +28,7 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 	
 	// $month = date('M',mktime(0,0,0,$m,1,$year));
 	$month = $oBudget->arrPeriod[$m];
-	echo '<pre>',$repDateStart,' - ',$repDateEnd,'</pre>';
+	// echo '<pre>',$repDateStart,' - ',$repDateEnd,'</pre>';
 	// echo $month;
 
 	$sql[] = "SET @repDateStart:='{$repDateStart}', @repDateEnd:='{$repDateEnd}';";
@@ -90,7 +90,9 @@ for ($i=0;$i<count($sql);$i++){
 	$oSQL->q($sql[$i]);
 }
 include ('includes/inc-frame_top.php');		
-
+?>
+<h1>Actual headcount, <?php echo $oBudget->title;?></h1>
+<?php
 $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empTitleLocal, empFunction, empSalary, empStartDate, empEndDate, end_date, 
 						locTitle as 'Location', prtGHQ as 'Activity', funTitle, funTitleLocal, pccTitle,pccTitleLocal , "
 						.$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset).", SUM(".$oBudget->getYTDSQL(1+$oBudget->offset,12+$oBudget->offset).")/12 as Total 
