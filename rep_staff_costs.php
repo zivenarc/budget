@@ -166,7 +166,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 					// $month = date('M',mktime(0,0,0,$m,15));
 					$month = $oBudget->arrPeriod[$m];
 					?>
-					<td class='budget-decimal budget-<?php echo $month;?> <?php echo ($m==$this->oBudget->cm?'budget-current':'');?>'><?php Reports::render($rw[$month],1);?></td>
+					<td class='budget-decimal budget-<?php echo $month;?> <?php echo ($m==$oBudget->cm?'budget-current':'');?>'><?php Reports::render($rw[$month],1);?></td>
 					<?php
 					$total[$month] += $rw[$month];		
 					$subtotal[$rw['pccTitle']][$month] += $rw[$month];					
