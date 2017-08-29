@@ -89,6 +89,7 @@ $sql[] = "COMMIT";
 for ($i=0;$i<count($sql);$i++){
 	$oSQL->q($sql[$i]);
 }
+include ('includes/inc-frame_top.php');		
 
 $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empTitleLocal, empFunction, empSalary, empStartDate, empEndDate, end_date, 
 						locTitle as 'Location', prtGHQ as 'Activity', funTitle, funTitleLocal, pccTitle,pccTitleLocal , "
@@ -112,7 +113,6 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 			
 			$tableID = md5($sql);
 			
-include ('includes/inc-frame_top.php');			
 			?>
 			<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
 			<table id='<?php echo $tableID;?>' class='budget'>
