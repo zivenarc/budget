@@ -1,8 +1,6 @@
 <?php
 if (!$_GET['tab'] && !$_GET['DataAction']){
-	$arrJS[] = "/common/eiseList/eiseList.js";
 	$arrJS[]='js/lst_entity.js';
-	$arrCSS[] = "/common/eiseList/themes/default/screen.css";
 	require ("includes/inc_entity_list_menu.php");
 	require ('includes/inc-frame_top.php');
 	

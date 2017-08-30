@@ -1,5 +1,8 @@
 <?php
-require_once ('../common/eiseList/inc_eiseList.php');
+require_once ('../common/eiseIntra/list/inc_eiseList.php');
+$arrJS[] = "../common/eiseList/eiseList.jQuery.js";
+$arrCSS[] = "../common/eiseList/themes/navy/screen.css";
+
 class EntityList extends eiseList {
 	private $sqlAttr;
 	private $oSQL;
