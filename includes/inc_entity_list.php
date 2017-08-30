@@ -8,6 +8,8 @@ if (!$_GET['tab'] && !$_GET['DataAction']){
 	<h1><?php echo $arrUsrData["pagTitle$strLocal"];?></h1>
 	<h2><?php echo $entity->status["staTitle$strLocal"];?></h2>
 	<p><?php echo $entity->status["staDescription$strLocal"];?></p>
+	
+	<div class="list-tabs-container">
 	<?php
 		if (count($arrTabs)){
 			getUITabs($arrTabs);
@@ -18,6 +20,7 @@ if (!$_GET['tab'] && !$_GET['DataAction']){
 	<ul class='link-footer'>
 		<li><a href='<?php echo $_SERVER['REQUEST_URI']; ?>'><?php echo ($strLocal?"Постоянная ссылка":"Link to this list");?></a></li>
 	</ul>
+	</div>
 	<?php
 	require ('includes/inc-frame_bottom.php');
 } else {

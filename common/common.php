@@ -555,7 +555,7 @@ function sortAge($age){
 
 function getUITabs($arrTabs){
 	?>
-	<div id='tabs'>
+	<div class='tabs' id='tabs'>
 	<ul>
 		<?php for($i=0;$i<count($arrTabs);$i++){?>
 		<li><a href='<?php echo $_SERVER['PHP_SELF'],'?',$_SERVER['QUERY_STRING'],'&tab=',$arrTabs[$i]['optValue'];?>'><?php echo $arrTabs[$i]["optText"];?></a></li>
