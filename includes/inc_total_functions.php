@@ -18,13 +18,19 @@ function renderDataByPC($data, $arrProfit, $strTitle, $strClass=""){
 	<?php
 }
 
-function getTableHeader(){
+function getTableHeader($arrHeader = null){
 	GLOBAL $oBudget, $oReference, $arrProfit, $periodTitle;
 	ob_start();
 	?>
 		<tr>
 		<th>Account</th>
-		<?php foreach($arrProfit as $pc=>$flag){
+		<?php 
+		if(is_array($arrHeader)){
+				foreach($arrHeader as $title){
+					echo '<th>',$title,'</th>';
+				}
+		}
+		foreach($arrProfit as $pc=>$flag){
 					echo '<th>',$pc,'</th>';
 		};?>
 		<th class='budget-ytd'><?php echo $oBudget->type=='FYE'?'FYE':'Total';?><br/><small><?php echo $periodTitle;?></small></th>
