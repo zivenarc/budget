@@ -1,5 +1,6 @@
 <?php
 ob_start();
+if (is_object($oSQL)){
 ?>
 <div id='topbar-company-select'>
 	<select id='company-select' name='company'>
@@ -14,6 +15,9 @@ ob_start();
 	?>
 	</select>
 </div>
+<?php
+}
+?>
 <div id='topbar-search'>
 	<form method="GET" id="customer-search" action='rep_sales_kpi_new.php'>
 		<input name='cntID' placeholder='Customer...'/>
