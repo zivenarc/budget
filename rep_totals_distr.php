@@ -343,6 +343,11 @@ foreach($arrProfit as $pc=>$flag){
 	<ul class='link-footer'>
 		<li><a href='javascript:SelectContent("report");'>Select table</a></li>
 	</ul>
+<script>
+	$(document).ready(function(){
+		$('#bu_group').selectmenu( "option", "disabled", true );
+	});
+</script>
 <?php
 include ('includes/inc-frame_bottom.php');
 ?>
