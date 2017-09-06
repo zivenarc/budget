@@ -336,7 +336,7 @@ class Reports{
 				$sqlFrom = "SELECT activity, route, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
 							{$this->sqlWhere} AND scenario='{$this->oBudget->id}' 
-							AND kpi=1 AND activity IN (46,47) AND posted=1 AND fh=1
+							AND kpi=1 AND activity IN (46,47) AND posted=1 AND freehand=1
 							AND `company`='{$this->company}'
 							GROUP BY activity, route, unit
 							";
@@ -348,7 +348,7 @@ class Reports{
 								AND scenario='{$this->oBudget->id}' 
 								AND kpi=1 and ".self::ACTUAL_DATA_FILTER." 
 								AND activity IN (46,47) 
-								AND fh=1
+								AND freehand=1
 								AND `company`='{$this->company}'
 							GROUP BY activity, route, unit, source
 							UNION ALL
@@ -360,7 +360,7 @@ class Reports{
 							AND posted=1 
 							and source<>'Actual' 
 							AND activity IN (46,47) 
-							AND fh=1
+							AND freehand=1
 							AND `company`='{$this->company}'
 					GROUP BY activity, route, unit";
 				break;
