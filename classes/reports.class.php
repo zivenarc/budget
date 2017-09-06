@@ -336,7 +336,7 @@ class Reports{
 				$sqlFrom = "SELECT activity, route, source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
 							{$this->sqlWhere} AND scenario='{$this->oBudget->id}' 
-							AND kpi=1 AND activity IN (46,47) AND posted=1
+							AND kpi=1 AND activity IN (46,47) AND posted=1 AND fh=1
 							AND `company`='{$this->company}'
 							GROUP BY activity, route, unit
 							";
@@ -344,12 +344,24 @@ class Reports{
 			default:
 				$sqlFrom = "SELECT activity, route,  source, ".$this->oBudget->getMonthlySumSQL(1,15)."
 							FROM `reg_sales` 							
-							{$this->sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER." AND activity IN (46,47) AND `company`='{$this->company}'
+							{$this->sqlWhere} 
+								AND scenario='{$this->oBudget->id}' 
+								AND kpi=1 and ".self::ACTUAL_DATA_FILTER." 
+								AND activity IN (46,47) 
+								AND fh=1
+								AND `company`='{$this->company}'
 							GROUP BY activity, route, unit, source
 							UNION ALL
 						SELECT activity, route, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15)."
 						FROM `reg_sales` 										
-						{$this->sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 AND posted=1 and source<>'Actual' AND activity IN (46,47) AND `company`='{$this->company}'
+						{$this->sqlWhere} 
+							AND scenario='{$this->oBudget->id}' 
+							AND kpi=1 
+							AND posted=1 
+							and source<>'Actual' 
+							AND activity IN (46,47) 
+							AND fh=1
+							AND `company`='{$this->company}'
 					GROUP BY activity, route, unit";
 				break;
 		}
@@ -371,7 +383,7 @@ class Reports{
 		
 		$tableID = "kpi_".md5($sql);
 			?>
-			<h2>Airdreight by route</h2>
+			<h2>Airfreight by route (business-owner volume)</h2>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
 				<tr>
