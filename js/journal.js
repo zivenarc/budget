@@ -8,12 +8,12 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 				spinner:'',
 				load: function (event, ui) {
 						$('button',ui.panel).button();
-						$('input.journal-cb-all').click(function(){
-							var thisCB = $(this);
+						$('input.journal-cb-all', ui.panel).change(function(){
+							var thisCB = $(this); 
 							var table = $(this).parents('table');
 							var arrCB = table.find('tr input:checkbox');
 							arrCB.each(function(){
-								$(this).attr('checked',thisCB.attr('checked')=='checked');
+								$(this).attr('checked',thisCB.prop('checked'));
 							})
 						});
 				},	
@@ -47,7 +47,7 @@ function repost(tab, event){
 			var tr = $(this).parents('tr');
 			var cb = tr.find('input:checkbox');
 			//console.log(cb);
-			if(cb.attr('checked')){			
+			if(cb.prop('checked')){			
 				// console.log(tr);
 				var td_posted = tr.find('td.td-posted'); 
 				// console.log(td_posted);
