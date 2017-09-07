@@ -36,6 +36,6 @@ if (is_object($oSQL)){
 	});
 </script>
 <?php
-$Intra->projectTopbar = ob_get_clean();
+if (is_object($Intra)) $Intra->projectTopbar = ob_get_clean();
 include('../common/izintra/inc-frame_top.php');
 ?>
