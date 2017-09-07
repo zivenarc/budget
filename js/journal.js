@@ -35,11 +35,12 @@ function repost(tab, event){
 		var total = 0;
 		$(event.srcElement).addClass('spinner');
 		
-		$('#sources',$('#div_'+tab)).find('tr').each(function(){
-			$(this).find('td.journal-current').eq(0).after('<td class="budget-decimal"></td>');
-			$(this).find('th.journal-current').eq(0).after('<th class="budget-ytd">New result</th>');
-		});
-		
+		if(!$('th.budget-ytd',$('#div_'+tab)).length){
+			$('#sources',$('#div_'+tab)).find('tr').each(function(){
+				$(this).find('td.journal-current').eq(0).after('<td class="budget-decimal"></td>');
+				$(this).find('th.journal-current').eq(0).after('<th class="budget-ytd">New result</th>');
+			});
+		}
 		//return;
 		
 		$('.budget-document-link',$('#div_'+tab)).each(function(){
