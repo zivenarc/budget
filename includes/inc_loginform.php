@@ -1,5 +1,6 @@
 <?php
 require ('../common/common.php');
+$ldap_domain = 'ylrus.com';
 
 function Authenticate($login, $password, &$strError, $method="LDAP"){
     GLOBAL $ldap_server;
