@@ -1,5 +1,5 @@
 <?php
-if(!$noCompression)
+// if(!$noCompression)
 	//ini_set("zlib.output_compression","1");
 header("Content-Type: text/html; charset=UTF-8");
 header("Expires: 0");
@@ -9,13 +9,18 @@ ob_start();
 
 require ("../common/common.php");
 require ("config.php");
-include('../common/izintra/izintra.class.php');
 require ("common.php");
 
 $js_path = "";
 
-$oSQL = new sql($DBHOST, $DBUSER, $DBPASS, $DB, false, CP_UTF8);
-$oSQL->connect();
+try {
+
+	$oSQL = new sql($DBHOST, $DBUSER, $DBPASS, $DB, false, CP_UTF8);
+	$oSQL->connect();
+
+} catch(Exception $e){
+	die($e->getMessage());
+}
 
 if (!$flagNoAuth){
     // checking is session available
