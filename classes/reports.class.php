@@ -2599,7 +2599,7 @@ class Reports{
 			SELECT customer,cntTitle, customer_group_code,customer_group_title, 
 					{$strFields['next']}
 			FROM `vw_sales`			
-			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1
+			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND kpi=1 AND posted=1 AND source<>'Actual'
 			GROUP BY customer
 			UNION ALL
 				SELECT customer,cntTitle, customer_group_code,customer_group_title , 
@@ -3298,7 +3298,7 @@ class Reports{
 				SELECT activity, unit, prtTitle, 
 						{$strFieldsKPI['next']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}'  
+				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND source<>'Actual'
 				GROUP BY activity, unit
 				";
 			}
