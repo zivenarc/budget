@@ -10,6 +10,7 @@ ob_start();
 require ("../common/common.php");
 require ("config.php");
 require ("common.php");
+$ldap_domain = 'ylrus.com';
 
 $js_path = "";
 
