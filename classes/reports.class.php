@@ -2360,7 +2360,7 @@ class Reports{
 				SELECT activity, unit, 
 						{$strFieldsKPI['next']}
 				FROM `reg_sales`			
-				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND kpi=1 AND posted=1
+				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND kpi=1 AND posted=1 AND source<>'Actual'
 				GROUP BY activity, unit
 				UNION ALL
 					SELECT activity, unit, 
