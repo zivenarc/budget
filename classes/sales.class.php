@@ -424,7 +424,7 @@ class Sales extends Document{
 						$row->pod = $this->pod;						
 						$row->route = $this->route;	
 						$row->gbr = $this->gbr?1:0;						
-						$row->freehand = ($row->activity==48 && $this->business_owner==self::PB_Ourselves && $this->job_owner!=self::PB_Ourselves) || ($row->activity==63 && $this->business_owner==self::PB_Ourselves);				
+						$row->freehand = ($row->activity==48 || $row->activity==63 || $row->activity==46 || $row->activity==47) && $this->business_owner==self::PB_Ourselves;				
 						for ($m=1;$m<=15;$m++){							
 							$month = $this->budget->arrPeriod[$m];	
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
