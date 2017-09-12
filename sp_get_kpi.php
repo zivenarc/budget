@@ -17,7 +17,9 @@ $ytd = $oBudget->cm;
 $year = $oBudget->year;
 
 $arrKPI[] = Array('prtID'=>48,'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)" );
+$arrKPI[] = Array('prtID'=>58,'ghq'=>'Ocean import, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)" );
 $arrKPI[] = Array('prtID'=>63,'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>52,'ghq'=>'Ocean export, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>46,'ghq'=>'Air import','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobETAPort');
 $arrKPI[] = Array('prtID'=>47,'ghq'=>'Air export','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>7,'ghq'=>'Distribution','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
@@ -198,7 +200,7 @@ $sql[] = "INSERT IGNORE INTO ref_route
 			GROUP by pol, pod";
 
 $sql[] = "UPDATE reg_sales, ref_route SET reg_sales.route=ref_route.route WHERE LEFT(pol,2)=pol_country AND LEFT(pod,2)=pod_country AND scenario=@scenario";
-$sql[] = "UPDATE reg_sales SET freehand=1 WHERE bo=714 AND activity IN (46,47,48,63) AND scenario=@scenario";
+$sql[] = "UPDATE reg_sales SET freehand=1 WHERE bo=714 AND activity IN (46,47,48,63,52,58) AND scenario=@scenario";
 // $sql[] = "UPDATE reg_sales SET freehand=1 WHERE bo=714 and jo=714 AND activity=63 AND scenario=@scenario";
 $sql[] = "update reg_sales set customer_group_code=common_db.fn_parentl2(customer) where customer is not null and scenario=@scenario";
 
