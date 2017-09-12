@@ -293,6 +293,7 @@ class Reports{
 					$arrSubtotal[$rw['prtGHQ']][$month]+=$rw[$month];
 				};
 				$arrTotal['Total']+=$rw['Total'];				
+				$arrSubtotal[$rw['prtGHQ']]['Total']+=$rw['Total'];				
 				
 				$arrQuarter = $this->_getQuarterTotals($rw);
 				
@@ -311,7 +312,7 @@ class Reports{
 			?>
 			</tbody>
 			<tfoot>
-				<?php foreach ($arrSubtotal as $prtGHQ=>$arrTotal){
+				<?php foreach ($arrSubtotal as $prtGHQ=>$data){
 					?>
 					<tr class='budget-subtotal'>
 					<td>Total <?php echo $prtGHQ;?></td>
@@ -319,15 +320,15 @@ class Reports{
 						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 						// $month = $this->oBudget->arrPeriod[$m];
 						$month = $this->oBudget->arrPeriod[$m];
-						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($arrTotal[$month]),'</td>';
+						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($data[$month]),'</td>';
 		
 						}
 						for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 						$quarter = 'Q'.$q;
-						echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($arrTotal[$quarter]),'</td>';
+						echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($data[$quarter]),'</td>';
 
 						}	
-						echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']),'</td>';					
+						echo '<td class=\'budget-decimal budget-ytd\'>',self::render($data['Total']),'</td>';					
 					?>
 					</tr>
 					<?php
