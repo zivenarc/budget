@@ -247,7 +247,7 @@ class Reports{
 					({$sqlFrom}) U 		
 				LEFT JOIN vw_product_type ON prtID=activity
 				LEFT JOIN tbl_route ON rteID=route
-				GROUP BY U.activity, U.route
+				GROUP BY prtGHQ, U.route
 				ORDER BY prtGHQ";
 		try {
 			$rs = $this->oSQL->q($sql); 
@@ -283,7 +283,7 @@ class Reports{
 					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
 					<?php
 				};
-				echo "<td><a href='javascript:getCustomerKPI({activity:{$rw['activity']},route:{$rw['route']} ,freehand:true});'>",$rw['rteTitle'],'</a></td>';								
+				echo "<td><a href='javascript:getCustomerKPI({prtGHQ:{$rw['prtGHQ']},route:{$rw['route']} ,freehand:true});'>",$rw['rteTitle'],'</a></td>';								
 				
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
