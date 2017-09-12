@@ -247,7 +247,8 @@ class Reports{
 					({$sqlFrom}) U 		
 				LEFT JOIN vw_product_type ON prtID=activity
 				LEFT JOIN tbl_route ON rteID=route
-				GROUP BY U.activity, U.route";
+				GROUP BY U.activity, U.route
+				ORDER BY prtGHQ";
 		try {
 			$rs = $this->oSQL->q($sql); 
 		} catch (Exception $e) {
@@ -272,6 +273,7 @@ class Reports{
 			</thead>			
 			<tbody>
 			<?php			
+			$arrSubtotal = Array();
 			while ($rw=$this->oSQL->f($rs)){				
 				?>
 				<tr class='graph'>
@@ -288,6 +290,7 @@ class Reports{
 					$month = $this->oBudget->arrPeriod[$m];
 					echo "<td class='budget-decimal budget-monthly budget-$month ".($m==$this->oBudget->cm?'budget-current':'')."'>",self::render($rw[$month]),'</td>';
 					$arrTotal[$month]+=$rw[$month];
+					$arrSubtotal[$rw['prtGHQ']][$month]+=$rw[$month];
 				};
 				$arrTotal['Total']+=$rw['Total'];				
 				
@@ -297,6 +300,7 @@ class Reports{
 					$quarter = 'Q'.$q;
 					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
 					$arrTotal[$quarter]+=$arrQuarter[$quarter];
+					$arrSubtotal[$rw['prtGHQ']][$quarter]+=$arrQuarter[$quarter];
 				}				
 									
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';								
@@ -307,6 +311,28 @@ class Reports{
 			?>
 			</tbody>
 			<tfoot>
+				<?php foreach ($arrSubtotal as $prtGHQ=>$arrTotal){
+					?>
+					<tr class='budget-subtotal'>
+					<td>Total <?php echo $prtGHQ;?></td>
+					<?php
+						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+						// $month = $this->oBudget->arrPeriod[$m];
+						$month = $this->oBudget->arrPeriod[$m];
+						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($arrTotal[$month]),'</td>';
+		
+						}
+						for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
+						$quarter = 'Q'.$q;
+						echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($arrTotal[$quarter]),'</td>';
+
+						}	
+						echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']),'</td>';					
+					?>
+					</tr>
+					<?php
+				}
+				?>
 				<tr class='budget-subtotal'>
 					<td>Total freehand volume</td>
 					<?php
