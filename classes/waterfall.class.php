@@ -20,6 +20,7 @@ class Waterfall {
 		$this->denominator = $options['denominator']?$options['denominator']:1;
 		$this->actual_title = $options['actual_title']?$options['actual_title']:'Actual';
 		$this->budget_title = $options['budget_title']?$options['budget_title']:'Budget';
+		$this->href = $options['href'];
 		
 		if(isset($options['filter'])){
 			foreach($options['filter'] as $field=>$value){
@@ -64,7 +65,12 @@ class Waterfall {
 		$this->min = $baseData['Budget'];
 		$this->max = $baseData['Budget'];
 		
-		$this->arrReport[] = Array($this->budget_title,null,null,$baseData['Budget']/$this->denominator, 'budget-subtotal');
+		$this->arrReport[] = Array('title'=>$this->budget_title,
+									'this'=>null,
+									'that'=>null,
+									'diff'=>$baseData['Budget']/$this->denominator,
+									'class'=>'budget-subtotal');
+									
 		$this->arrChart[] = Array('Budget',0,0,(integer)$baseData['Budget'],(integer)$baseData['Budget'], $this->getTooltip('Budget',$baseData['Budget']));
 		$this->arrHSChart[] = Array('name'=>$this->budget_title,'y'=>(integer)$baseData['Budget'], 'color'=>'#646464');
 		$diffBalance = $baseData['Diff'];
@@ -114,7 +120,10 @@ class Waterfall {
 				if (abs($rw['Diff'])>=$this->tolerance*abs($baseData['Diff'])){
 					// $this->arrReport[] = Array($rw['optText'],$rw['Diff']);
 					
-					$this->arrReport[] = Array($rw['optText'],$rw['Actual']/$this->denominator,$rw['Budget']/$this->denominator,$rw['Diff']/$this->denominator);
+					$this->arrReport[] = Array('title'=>$rw['optText'],
+												'this'=>$rw['Actual']/$this->denominator,
+												'that'=>$rw['Budget']/$this->denominator,
+												'diff'=>$rw['Diff']/$this->denominator);
 					$this->arrChart[] = Array($rw['optText'],(integer)$lastValue,(integer)$lastValue,(integer)($lastValue+$rw['Diff']),(integer)($lastValue+$rw['Diff']), $strTooltip);
 					$this->arrHSChart[] = Array('name'=>$rw['optText'],'y'=>(integer)$rw['Diff']);
 					$lastValue += $rw['Diff'];
@@ -134,12 +143,19 @@ class Waterfall {
 		}
 		
 		if (round($diffBalance)!=0){
-			$this->arrReport[] = Array('Other',$thisBalance/$this->denominator, $thatBalance/$this->denominator, $diffBalance/$this->denominator);
+			$this->arrReport[] = Array('title'=>'Other',
+										'this'=>$thisBalance/$this->denominator, 
+										'that'=>$thatBalance/$this->denominator, 
+										'diff'=>$diffBalance/$this->denominator);
 			$this->arrChart[] = Array('Other',(integer)$lastValue,(integer)$lastValue, (integer)($lastValue+$diffBalance), (integer)($lastValue+$diffBalance)
 							, $this->getTooltip('Other factors not included before',$diffBalance));
 			$this->arrHSChart[] = Array('name'=>'Other','y'=>(integer)$diffBalance);
 		}
-		$this->arrReport[] = Array($this->actual_title,null, null, $baseData['Actual']/$this->denominator,'budget-subtotal');
+		$this->arrReport[] = Array('title'=>$this->actual_title,
+									'this'=>null, 
+									'that'=>null, 
+									'diff'=>$baseData['Actual']/$this->denominator,
+									'class'=>'budget-subtotal');
 		$this->arrChart[] = Array('Actual',0,0,(integer)$baseData['Actual'],(integer)$baseData['Actual'], $this->getTooltip('Actual',$baseData['Actual']));
 		$this->arrHSChart[] = Array('name'=>$this->actual_title,'y'=>(integer)$baseData['Actual'],'isSum'=>true, 'color'=>'#646464');
 
@@ -150,8 +166,16 @@ class Waterfall {
 			$this->min = $baseData['Actual'];
 		}
 		
-		$this->arrReport[] = Array('Total diff',null, null, $baseData['Diff']/$this->denominator,'budget-subtotal');
-		$this->arrReport[] = Array('Ratio',null, null, ($baseData['Budget']!=0?$baseData['Actual']/$baseData['Budget']*100:"0"),'budget-ratio');
+		$this->arrReport[] = Array('title'=>'Total diff',
+									'this'=>null, 
+									'that'=>null, 
+									'diff'=>$baseData['Diff']/$this->denominator,
+									'class'=>'budget-subtotal');
+		$this->arrReport[] = Array('title'=>'Ratio',
+									'this'=>null, 
+									'that'=>null, 
+									'diff'=>($baseData['Budget']!=0?$baseData['Actual']/$baseData['Budget']*100:"0"),
+									'class'=>'budget-ratio');
 		
 		// if ($this->min > 0){
 			// $this->min *= 0.95;
@@ -187,11 +211,11 @@ class Waterfall {
 		<?php
 		foreach($this->arrReport as $record){
 			?>
-			<tr class="<?php echo $record[4];?>">
-				<td><?php echo $record[0];?></td>
-				<td class='budget-decimal'><span style='color:<?php echo $record[1]<0?'red':'black';?>;'><?php echo $record[1]==null?'&nbsp;':number_format($record[1],0,'.',',');?></span></td>
-				<td class='budget-decimal'><span style='color:<?php echo $record[2]<0?'red':'black';?>;'><?php echo $record[2]==null?'&nbsp;':number_format($record[2],0,'.',',');?></span></td>
-				<td class='budget-decimal'><span style='color:<?php echo $record[3]<0?'red':'black';?>;'><?php echo number_format($record[3],0,'.',',');?></span></td>
+			<tr class="<?php echo $record['class'];?>">
+				<td><?php echo $record['title'];?></td>
+				<td class='budget-decimal'><span style='color:<?php echo $record['this']<0?'red':'black';?>;'><?php echo $record['this']==null?'&nbsp;':number_format($record['this'],0,'.',',');?></span></td>
+				<td class='budget-decimal'><span style='color:<?php echo $record['that']<0?'red':'black';?>;'><?php echo $record['that']==null?'&nbsp;':number_format($record['that'],0,'.',',');?></span></td>
+				<td class='budget-decimal'><span style='color:<?php echo $record['diff']<0?'red':'black';?>;'><?php echo number_format($record['diff'],0,'.',',');?></span></td>
 			</tr>
 			<?php
 		}
@@ -316,7 +340,10 @@ class Waterfall {
 			LIMIT {$limit}";
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){			
-			$this->arrReport[] = Array($rw['optText'],$rw['Actual']/$this->denominator,$rw['Budget']/$this->denominator,$rw['Diff']/$this->denominator);
+			$this->arrReport[] = Array('title'=>$rw['optText'],
+										'this'=>$rw['Actual']/$this->denominator,
+										'that'=>$rw['Budget']/$this->denominator,
+										'diff'=>$rw['Diff']/$this->denominator);
 			if((integer)$rw['Diff']) {
 				$this->arrHSChart[] = Array('name'=>$rw['optText'],'y'=>(integer)$rw['Diff']);
 			}
@@ -331,7 +358,10 @@ class Waterfall {
 				LIMIT {$limit}";
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){			
-			$this->arrReport[] = Array($rw['optText'],$rw['Actual']/$this->denominator,$rw['Budget']/$this->denominator,$rw['Diff']/$this->denominator);
+			$this->arrReport[] = Array('title'=>$rw['optText'],
+										'this'=>$rw['Actual']/$this->denominator,
+										'that'=>$rw['Budget']/$this->denominator,
+										'diff'=>$rw['Diff']/$this->denominator);
 			if((integer)$rw['Diff']) {
 				$this->arrHSChart[] = Array('name'=>$rw['optText'],'y'=>(integer)$rw['Diff']);
 			}
@@ -339,7 +369,10 @@ class Waterfall {
 			$rwOther['Budget']-=$rw['Budget'];
 			$rwOther['Diff']-=$rw['Diff'];
 		}
-		$this->arrReport[] = Array($title.', others',$rwOther['Actual']/$this->denominator,$rwOther['Budget']/$this->denominator,$rwOther['Diff']/$this->denominator);
+		$this->arrReport[] = Array('title'=>$title.', others',
+									'this'=>$rwOther['Actual']/$this->denominator,
+									'that'=>$rwOther['Budget']/$this->denominator,
+									'diff'=>$rwOther['Diff']/$this->denominator);
 		if((integer)$rwOther['Diff']) {
 			$this->arrHSChart[] = Array('name'=>$title.', others','y'=>(integer)$rwOther['Diff']);
 		}

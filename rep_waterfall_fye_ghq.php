@@ -75,7 +75,11 @@ if(!isset($_GET['prtGHQ'])){
 			AND scenario='{$oReference->id}' ".Reports::GOP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);			
-	$oWF->arrReport[] = Array($oReference->title,null,null,$rw['Budget']/$oWF->denominator,'budget-subtotal');
+	$oWF->arrReport[] = Array('title'=>$oReference->title,
+								'this'=>null,
+								'that'=>null,
+								'diff'=>$rw['Budget']/$oWF->denominator,
+								'class'=>'budget-subtotal');
 	$oWF->arrHSChart[] = Array('name'=>$oWF->budget_title,'y'=>(integer)$rw['Budget'], 'color'=>'blue');
 	
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).") as Diff
@@ -92,7 +96,10 @@ if(!isset($_GET['prtGHQ'])){
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);			
 	$strDiff = ($rw['Actual']>=$ytdBudget?"YTD proficit":"YTD deficit");
-	$oWF->arrReport[] = Array($strDiff,$rw['Actual']/$oWF->denominator,$ytdBudget/$oWF->denominator,($rw['Actual']-$ytdBudget)/$oWF->denominator);
+	$oWF->arrReport[] = Array('title'=>$strDiff,
+								'this'=>$rw['Actual']/$oWF->denominator,
+								'that'=>$ytdBudget/$oWF->denominator,
+								'diff'=>($rw['Actual']-$ytdBudget)/$oWF->denominator);
 	$oWF->arrHSChart[] = Array('name'=>$strDiff,'y'=>(integer)($rw['Actual']-$ytdBudget));
 	
 	$limit = 3;
@@ -151,8 +158,12 @@ if(!isset($_GET['prtGHQ'])){
 			AND scenario='{$oBudget->id}' ".Reports::GOP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);		
-	$oWF->arrReport[] = Array($oBudget->title,null,null,$rw['Diff']/$oWF->denominator,'budget-subtotal');	
-	$oWF->arrHSChart[] = Array('name'=>$oWF->actual_title,'y'=>(integer)$rw['Diff'], 'color'=>'blue','isSum'=>true);
+	$oWF->arrReport[] = Array('title'=>$oBudget->title,
+								'this'=>null,
+								'that'=>null,
+								'diff'=>$rw['Diff']/$oWF->denominator,
+								'class'=>'budget-subtotal');	
+	$oWF->arrHSChart[] = Array('name'=>$oWF->actual_title,'y'=>(integer)$rw['Diff'], 'color'=>'#646464','isSum'=>true);
 		
 	?>
 		<table>
