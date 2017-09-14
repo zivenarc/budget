@@ -30,8 +30,7 @@ if (isset($_GET['no_activity'])){
    , "action" => "/wiki/Treasury"
    );
 
-$arrJS[]='js/about.js';
-require ('includes/inc-frame_top.php');
+
 
 $denominator = 1000;
 $oBudget = new Budget($arrSetup['stpFYEID']);
@@ -42,6 +41,9 @@ if($_GET['DataAction']=='summary'){
 	$oReport->shortMonthlyReport();	
 	die();
 }
+
+$arrJS[]='js/about.js';
+require ('includes/inc-frame_top.php');
 
 // echo '<pre>';print_r($arrUsrData);echo '</pre>';
 $arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>($arrUsrData['PCC']['pccFlagProd']?$arrUsrData['PCC']['pccParentCode1C']:''));
