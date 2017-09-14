@@ -56,7 +56,7 @@ $sql = "SELECT COUNT(guid) as nCount FROM vw_journal WHERE scenario='{$oBudget->
 $rs = $oSQL->q($sql);
 if($oSQL->n($rs)){
 	$rw = $oSQL->f($rs);
-	echo "<div class='warning'>You have {$rw['nCount']} <a href='sp_my.php'>unposted documents</a> in [{$oBudget->title}]</div>";
+	echo "<div class='warning'>You have {$rw['nCount']} <a href='sp_my.php?ownerID={$arrUsrData['usrID']}'>unposted documents</a> in [{$oBudget->title}]</div>";
 }
 ?>
 <nav><span>vs <?php echo $oReference->title;?>: </span>
