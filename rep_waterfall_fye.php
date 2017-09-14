@@ -163,7 +163,7 @@ if(!isset($_GET['pccGUID'])){
 								'that'=>null,
 								'diff'=>$rw['Diff']/$oWF->denominator,
 								'class'=>'budget-subtotal');	
-	$oWF->arrHSChart[] = Array('name'=>$oWF->actual_title,'y'=>(integer)$rw['Diff'], 'color'=>'blue','isSum'=>true);
+	$oWF->arrHSChart[] = Array('name'=>$oWF->actual_title,'y'=>(integer)$rw['Diff'], 'color'=>'#646464','isSum'=>true);
 		
 	?>
 		<table>
