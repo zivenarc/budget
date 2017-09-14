@@ -36,13 +36,27 @@ require ('includes/inc-frame_top.php');
 $denominator = 1000;
 $oBudget = new Budget($arrSetup['stpFYEID']);
 $oReference = new Budget($arrSetup['stpScenarioID']);
+
+if($_GET['DataAction']=='summary'){
+	$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>643, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
+	$oReport->shortMonthlyReport();	
+	die();
+}
+
 // echo '<pre>';print_r($arrUsrData);echo '</pre>';
 $arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>($arrUsrData['PCC']['pccFlagProd']?$arrUsrData['PCC']['pccParentCode1C']:''));
 $strQuery = http_build_query($arrDefaultParams);
 
 ?>
 <h1>Current scenario - <?php echo $oBudget->title; ?>, current budget - <?php echo $oReference->title; ?></h1>
-
+<?php
+$sql = "SELECT COUNT(guid) as nCount FROM vw_journal WHERE scenario='{$oBudget->id}' AND responsible='{$arrUsrData['usrID']}' AND posted=0 AND deleted=0";
+$rs = $oSQL->q($sql);
+if($oSQL->n($rs)){
+	$rw = $oSQL->f($rs);
+	echo "<div class='warning'>You have {$rw['nCount']} <a href='sp_my.php'>unposted documents</a> in [{$oBudget->title}]</div>";
+}
+?>
 <nav><span>vs <?php echo $oReference->title;?>: </span>
 	<a href="rep_summary.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Summary</a>|
 	<a href="rep_monthly.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oReference->id;?>">Monthly report</a>|
@@ -67,13 +81,18 @@ $strQuery = http_build_query($arrDefaultParams);
 if ($strActivity) {
 	echo '<div class="info">',$strActivity,'</div>';
 }
-
-$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>643, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
-$oReport->shortMonthlyReport();	
-
 //-----------------Waterfall
 ?>
-<div>
+<script>
+	$(document).ready(function(){
+		$('#summary').addClass('spinner').html('<h2>Loading summary...</h2>');
+		$.get('index.php?DataAction=summary',function(data){
+			$('#summary').html(data).removeClass('spinner');
+		});
+	});
+</script>
+<div id='summary'></div>
+<div id='waterfall'>
 <?php
 $period_type = 'cm';
 
