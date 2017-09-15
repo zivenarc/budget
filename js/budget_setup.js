@@ -9,14 +9,14 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 			load: function (event, ui) {			
 				var url = ui.tab.find('a').attr('href');
 				$('#scnFlagReadOnly',ui.panel).change(function(){
-					if($(this).attr('checked')){
+					if($(this).prop('checked')){
 						$.post(url,{DataAction:'readonly'});
 					} else {
 						$.post(url,{DataAction:'readwrite'});
 					}
 				});
 				$('#scnFlagArchive',ui.panel).change(function(){					
-					if($(this).attr('checked')){
+					if($(this).prop('checked')){
 						$.post(url,{DataAction:'archive'});
 					} else {
 						$.post(url,{DataAction:'unarchive'});
