@@ -19,7 +19,7 @@ if (is_object($oSQL)){
 	<form method="GET" id="customer-search" action='rep_sales_kpi_new.php'>
 		<input type="hidden" name="cntID" id="cntID" value=""/>
 		<input placeholder='Customer...' id="input_cntID" class="autocomplete" type="text" value=""  autocomplete="off" data-autocomplete='{"table":"vw_counterparty","prefix":"cnt"}'/>
-		<span id="customerSearchButton" class='fa fa-lg fa-search'></span>
+		<!--<span id="customerSearchButton" class='fa fa-lg fa-search'></span>-->
 	</form>
 
 </div>
@@ -76,9 +76,11 @@ if (is_object($oSQL)){
 				$( "#input_"+field_id).val(ui.item.label).removeClass('autocomplete-loading') ;
 				//$('#result').html('').append($('<div>',{'class':'spinner',text:'Loading...'}));
 				$('#result').html(spinner_div());
-				if (window.autocomplete_callback) {
-					autocomplete_callback(field_id,ui.item.value); //---defined in {entity_form}.js
-				}
+				//specific handler for customer form
+				location.href='rep_sales_kpi_new.php?cntID='+ui.item.value;
+				// if (window.autocomplete_callback) {
+					// autocomplete_callback(field_id,ui.item.value); //---defined in {entity_form}.js
+				// }
 				return false;
 			}
 		});

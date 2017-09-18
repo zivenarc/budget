@@ -39,7 +39,19 @@
 	</tr>
 	</table>
 	</form>
+	<?php
+		$sql = "SELECT S.scnID, S.scnTitle, S.scnLastID, L.scnTitle 
+				FROM tbl_scenario S
+				LEFT JOIN tbl_scenario L ON L.scnID=S.scnLastID
+				WHERE S.scnFlagArchive=0
+				ORDER BY S.scnDateStart";
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){
+			$arrScenario[$rw['scnID']] = $rw;
+		}
+	?>
 	<script>
+		var arrScenario = <?php echo json_encode($arrScenario); ?>;
 		$(document).ready(function(){			
 			$('#currency_selector, #denominator_selector').buttonset();
 			$('#submit_button').button();
@@ -51,7 +63,9 @@
 			});
 			$('#budget_scenario').selectmenu({
 				change: function(event,data) {
-					location.search = 'budget_scenario='+data.item.value;
+					var reference = arrScenario[data.item.value].scnLastID;
+					$('#reference').val(reference);
+					location.search = 'budget_scenario='+data.item.value+'&reference='+reference;
 				}
 			});
 			$('#reference').selectmenu({
