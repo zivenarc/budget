@@ -5,10 +5,12 @@ include_once ('classes/costs_record.class.php');
 include_once ('classes/yact_coa.class.php');
 include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
+include_once ('classes/profit.class.php');
 
 //$Activities = new Activities ();
 $YACT = new YACT_COA();
 $Items = new Items();
+$ProfitCenters = new ProfitCenters();
 
 class Location_costs extends Document{
 
@@ -167,6 +169,7 @@ class Location_costs extends Document{
 		GLOBAL $Activities;
 		GLOBAL $YACT;
 		GLOBAL $Items;
+		GLOBAL $ProfitCenters;
 		
 		parent::save($mode);
 		
@@ -305,9 +308,12 @@ class Location_costs extends Document{
 							$record->customer = 1894;
 						}
 					
+						
+					
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $hc_data['pc'];
-						$master_row->activity = $hc_data['activity'];
+						$pc = $ProfitCenters->getByCode($master_row->profit);
+						$master_row->activity = $hc_data['activity']?$hc_data['activity']:$pc->activity;
 						$master_row->customer = $record->customer;										
 						//$activity = $Activities->getByCode($record->activity);
 						$denominator = $record->period=='annual'?12:1;
