@@ -6,11 +6,13 @@ include_once ('classes/yact_coa.class.php');
 include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
 include_once ('classes/fixedassets.class.php');
+include_once ('classes/profit.class.php');
 
 //$Activities = new Activities ();
 $YACT = new YACT_COA();
 $Items = new Items();
 $FixedAssets = new FixedAssets();
+$ProfitCenters = new ProfitCenters();
 
 class Depreciation extends Document{
 	
@@ -48,6 +50,8 @@ class Depreciation extends Document{
 	}
 	public function refresh($id){
 		
+		GLOBAl $ProfitCenters;
+		
 		$sqlWhere = $this->getSqlWhere($id);
 		
 		$sql = "SELECT ".$this->prefix.".*, `usrTitle` FROM `".$this->table."` ".$this->prefix."
@@ -56,6 +60,7 @@ class Depreciation extends Document{
 		
 		parent::refresh($sql);
 		
+		$this->pc = $ProfitCenters->getByCode($this->profit);
 		$this->disposal_date = strtotime($this->data[$this->prefix."DisposalDate"]);
 		$this->disposal_value = $this->data[$this->prefix."DisposalValue"];
 		
@@ -427,7 +432,7 @@ class Depreciation extends Document{
 
 						$master_row = $oMaster->add_master(); //-----------------------Depreciation
 						$master_row->profit = $this->profit;
-						$master_row->activity = $record->activity;
+						$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 						$master_row->customer = $record->customer;										
 						$master_row->particulars = $record->particulars;										
 						$master_row->part_type = 'FIX';	
@@ -474,7 +479,7 @@ class Depreciation extends Document{
 												
 				$master_row = $oMaster->add_master();//------------------------ Property tax
 				$master_row->profit = $this->profit;
-				$master_row->activity = $record->activity;
+				$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 				$master_row->customer = $record->customer;										
 				
 				$item = $Items->getById(Items::PROPERTY_TAX);
@@ -489,7 +494,7 @@ class Depreciation extends Document{
 				if ($this->disposal_date){
 					$master_row = $oMaster->add_master();//------------------------ Property tax
 					$master_row->profit = $this->profit;
-					$master_row->activity = $record->activity;
+					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 					$master_row->customer = $record->customer;										
 					
 					$month = $this->budget->arrPeriod[$disposal_month];
