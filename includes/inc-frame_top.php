@@ -37,7 +37,8 @@ if (is_object($oSQL)){
 	});
 	
 	function initialize_autocomplete(oForm){
-	oForm.find("input.autocomplete").each(function(){
+	// oForm.find("input.autocomplete").each(function(){
+	$('#input_cntID').each(function(){
 	
 		arrData = $.parseJSON($(this).attr('data-autocomplete'));
 		var url = 'json_list.php?table='+arrData.table;
