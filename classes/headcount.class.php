@@ -389,13 +389,13 @@ class Headcount extends Document{
 							if ($this->type=='current'){
 								
 								$row->{$month} = (integer)$_POST[strtolower($month)][$id];
-								
 								$row->{$month} = $row->getFTE($m, $this->budget->year);
 								
-								
-								
 							} else {
-								if($row->start_date>$current_month_end){
+								
+								if($row->start_date<=$current_month_start){
+									$row->{$month} = $_POST['new_fte'][$id];
+								} elseif($row->start_date>$current_month_end){
 									$row->{$month} = 0;
 								} else {
 									$row->hc = $_POST['new_fte'][$id]*(date('t',$current_month_start)-date('j',$row->start_date))/date('t',$current_month_start);							 
