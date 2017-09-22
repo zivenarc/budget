@@ -26,7 +26,7 @@ if (is_object($oSQL)){
 <script>
 	$(document).ready(function(){
 		
-		initialize_autocomplete($('#customer-search'));
+		init_ac($('#customer-search'));
 		
 		$('#customerSearchButton').click(function(){
 			$('#customer-search').submit();
@@ -36,7 +36,7 @@ if (is_object($oSQL)){
 		});
 	});
 	
-	function initialize_autocomplete(oForm){
+	function init_ac(oForm){
 	// oForm.find("input.autocomplete").each(function(){
 	$('#input_cntID').each(function(){
 	
