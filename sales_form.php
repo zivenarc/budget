@@ -91,7 +91,7 @@ if ($_POST['DataAction']){
 			}
 			for ($m=1;$m<=15;$m++){							
 							$month = $oDocument->budget->arrPeriod[$m];	
-							$row->{$month} = abs($rw[strtolower($month)])*(1+$oDocument->budget->settings[$rw['prtGHQ']."_growth"]);
+							$row->{$month} = abs($rw[strtolower($month)])*(1+$oDocument->budget->settings[$rw['prtGHQ']."_growth"]/100);
 			}			
 				
 		}
