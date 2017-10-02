@@ -26,7 +26,7 @@ if ($_POST['DataAction']){
 			$oDocument->fill_distribution($oBudget, 'net_sales');
 			break;	
 		case 'fill_net_sales_last':
-			$oDocument->fill_distribution($oBudget->reference, 'net_sales');
+			echo $oDocument->fill_distribution($oBudget->reference, 'net_sales');
 			break;	
 		case 'fill_users':
 			$oDocument->fill_distribution($oBudget, 'users');
