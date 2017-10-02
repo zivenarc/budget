@@ -473,6 +473,30 @@ foreach($arrProfit as $pc=>$flag){
 </tr>
 <?php 
 renderDataByPC($arrGOP, $arrProfit, "Gross Operating Profit","budget-subtotal");
+?>
+<tr>
+	<td>GOP, <?php echo $strLastTitle;?></td>
+<?php
+foreach($arrProfit as $pc=>$flag){
+	?>
+	<td class='budget-decimal'><?php Reports::render($arrGOP['last'][$pc]);?></td>
+	<?php
+}
+?>
+	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGOP['last']));?></td>	
+</tr>
+<tr>
+	<td>Diff</td>
+<?php
+foreach($arrProfit as $pc=>$flag){
+	?>
+	<td class='budget-decimal'><?php Reports::render($arrGOP['this'][$pc] - $arrGOP['last'][$pc]);?></td>
+	<?php
+}
+?>
+	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome['this']) - array_sum($arrOpIncome['last']));?></td>	
+</tr>
+<?php
 renderDataByPC($arrOpIncome, $arrProfit, "Operating income","budget-subtotal");
 ?>
 <tr>
