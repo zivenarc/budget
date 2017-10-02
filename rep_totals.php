@@ -8,6 +8,16 @@ require ('classes/item.class.php');
 include ('includes/inc_report_settings.php');
 include ('includes/inc_total_functions.php');
 
+$arrJS[] = 'js/rep_totals.js';
+
+$arrActions[] = Array('title'=>'Apr-Mar','action'=>'?mthStart=4&mthEnd=15');
+$arrActions[] = Array('title'=>'Jan-Dec','action'=>'?mthStart=1&mthEnd=12');
+$arrActions[] = Array('title'=>'YTD','action'=>'?mthStart='.(1+$oBudget->offset).'&mthEnd='.$oBudget->cm);
+$arrActions[] = Array('title'=>'ROY','action'=>'?mthStart='.$oBudget->nm.'&mthEnd='.(12+$oBudget->offset));
+$arrActions[] = Array('title'=>'This month','action'=>'?mthStart='.$oBudget->cm.'&mthEnd='.$oBudget->cm);
+$arrActions[] = Array('title'=>'Next month','action'=>'?mthStart='.$oBudget->nm.'&mthEnd='.$oBudget->nm);
+
+
 if ($bu_group){
 	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
 	$rs = $oSQL->q($sql);
@@ -31,15 +41,6 @@ $strLastTitle = $reference;
 $arrRates_this = $oBudget->getMonthlyRates($currency);
 $arrRates_last = $oReference->getMonthlyRates($currency);
 // echo '<pre>'; print_r($arrRates);echo '</pre>';
-
-$arrJS[] = 'js/rep_totals.js';
-$arrActions[] = Array('title'=>'Apr-Mar','action'=>'?mthStart=4&mthEnd=15');
-$arrActions[] = Array('title'=>'Jan-Dec','action'=>'?mthStart=1&mthEnd=12');
-$arrActions[] = Array('title'=>'YTD','action'=>'?mthStart='.(1+$oBudget->offset).'&mthEnd='.$oBudget->cm);
-$arrActions[] = Array('title'=>'ROY','action'=>'?mthStart='.$oBudget->nm.'&mthEnd='.(12+$oBudget->offset));
-$arrActions[] = Array('title'=>'This month','action'=>'?mthStart='.$oBudget->cm.'&mthEnd='.$oBudget->cm);
-$arrActions[] = Array('title'=>'Next month','action'=>'?mthStart='.$oBudget->nm.'&mthEnd='.$oBudget->nm);
-
 
 $arrUsrData["pagTitle$strLocal"] .= ': '.$oBudget->title;
 
@@ -583,7 +584,4 @@ if(is_array($arrGP)){
 	</ul>
 <?php
 include ('includes/inc-frame_bottom.php');
-
-
-
 ?>
