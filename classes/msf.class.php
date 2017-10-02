@@ -385,6 +385,7 @@ class MSF extends Document{
 	}
 	
 	public function fill_distribution($oBudget,$type='sqm',$params=Array()){
+		GLOBAL $company;
 		
 		if (is_array($this->records[$this->gridName])){
 			foreach($this->records[$this->gridName] as $id=>$record){
@@ -416,9 +417,10 @@ class MSF extends Document{
 				$sql = "SELECT 'RUB' as unit, pc, ".$this->budget->getMonthlySumSQL(1,15, null, 1000)." FROM reg_master
 						LEFT JOIN vw_profit ON pccID=pc
 						WHERE scenario='".$oBudget->id."' 
-							AND posted=1 
+							AND active=1 
 							AND pc<>'{$this->profit}'
 							AND pccFlagProd=1 AND pc<>99
+							AND company='{$company}'
 							AND item='".self::REVENUE_ITEM."'
 						GROUP BY pc"; 
 			break;
