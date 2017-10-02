@@ -55,19 +55,20 @@ if ($_POST['DataAction']){
 	
 	if($_POST['DataAction']=='fill_estimate'){
 		
-		$sql = "SELECT activity, ".$oDocument->budget->getMonthlySumSQL(1,15, null, 1000)." 
+		$sql = "SELECT prtGHQ,prtTitle, activity,account, ".$oDocument->budget->getMonthlySumSQL(1,15, null, 1000)." 
 						FROM reg_master
+						LEFT JOIN vw_product_type ON prtID=activity
 						WHERE scenario='".$oDocument->budget->reference_scenario->id."' 
 							AND active=1 
 							AND pc='{$oDocument->profit}'
 							AND company='{$company}'
 							AND account IN ('J00400','J00802')
-						GROUP BY activity,account 
-						ORDER BY activity,account"; 
+						GROUP BY prtGHQ,account, prtBudgetIncomeID, prtBudgetCostID
+						ORDER BY prtGHQ,prtID, account"; 
 		
 		$oDocument->fillGridSQL = $sql;
 		
-		// $oDocument->deleteGridRecords();
+		$oDocument->deleteGridRecords();
 		
 		$rs = $oSQL->q($sql);
 		while ($rw=$oSQL->f($rs)){
@@ -76,17 +77,21 @@ if ($_POST['DataAction']){
 			$row->profit = $oDocument->profit;
 			$row->product = null;				
 			$row->activity = $rw['activity'];				
+			$row->comment = $rw['prtGHQ'].' ('.$rw['prtTitle'].')'." +".$oDocument->budget->settings[$rw['prtGHQ']."_growth"].'%';				
 			$row->customer = $oDocument->customer;				
 			$row->sales = $oDocument->sales;
 			$row->kpi = 0;
 			//$row->comment = $_POST['comment'][$id];				
-			$row->selling_rate = 1000;						
-			$row->selling_curr = 'RUB';	
-			$row->buying_curr = 'RUB';			
-			$row->buying_rate = 1000;
+			if($rw['account']=='J00400'){
+					$row->selling_rate = 1000;						
+					$row->selling_curr = 'RUB';
+			} else {
+				$row->buying_curr = 'RUB';			
+				$row->buying_rate = 1000;
+			}
 			for ($m=1;$m<=15;$m++){							
 							$month = $oDocument->budget->arrPeriod[$m];	
-							$row->{$month} = $rw[strtolower($month)];
+							$row->{$month} = abs($rw[strtolower($month)])*(1+$oDocument->budget->settings[$rw['prtGHQ']."_growth"]);
 			}			
 				
 		}

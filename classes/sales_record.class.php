@@ -62,7 +62,7 @@ class sales_record extends table_record{
 			$arrRes[] = "`selling_curr`='".$this->selling_curr."'";
 			$arrRes[] = "`buying_rate`=".(double)$this->buying_rate;
 			$arrRes[] = "`buying_curr`='".$this->buying_curr."'";
-			$arrRes[] = "`activity`=".(integer)$oProduct->activity;
+			$arrRes[] = "`activity`=".($this->activity?$this->activity:(integer)$oProduct->activity);
 			$arrRes[] = "`unit`='".$oProduct->unit."'";
 			$arrRes[] = "`formula`=".$oSQL->e($this->formula);
 			$arrRes[] = "`sales`=".$oSQL->e($this->sales);

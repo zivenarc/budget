@@ -213,7 +213,7 @@ class Document extends easyForm{
 			return ($oBR);	
 	}
 	
-	protected function deleteGridRecords(){
+	function deleteGridRecords(){
 				//-------------------Deleting grid records---------------------------------
 		$arrDeleted = explode('|',$_POST['inp_'.$this->gridName.'_deleted']);
 		if(is_array($arrDeleted)){
