@@ -53,6 +53,45 @@ if ($_POST['DataAction']){
 		die();
 	}
 	
+	if($_POST['DataAction']=='fill_estimate'){
+		
+		$sql = "SELECT activity, ".$oDocument->budget->getMonthlySumSQL(1,15, null, 1000)." 
+						FROM reg_master
+						WHERE scenario='".$oDocument->budget->reference_scenario->id."' 
+							AND active=1 
+							AND pc='{$oDocument->profit}'
+							AND company='{$company}'
+							AND account IN ('J00400','J00802')
+						GROUP BY activity,account 
+						ORDER BY activity,account"; 
+		
+		$oDocument->fillGridSQL = $sql;
+		
+		// $oDocument->deleteGridRecords();
+		
+		$rs = $oSQL->q($sql);
+		while ($rw=$oSQL->f($rs)){
+			$row = $oDocument->add_record();
+			$row->flagUpdated = true;				
+			$row->profit = $oDocument->profit;
+			$row->product = null;				
+			$row->activity = $rw['activity'];				
+			$row->customer = $oDocument->customer;				
+			$row->sales = $oDocument->sales;
+			$row->kpi = 0;
+			//$row->comment = $_POST['comment'][$id];				
+			$row->selling_rate = 1000;						
+			$row->selling_curr = 'RUB';	
+			$row->buying_curr = 'RUB';			
+			$row->buying_rate = 1000;
+			for ($m=1;$m<=15;$m++){							
+							$month = $oDocument->budget->arrPeriod[$m];	
+							$row->{$month} = $rw[strtolower($month)];
+			}			
+				
+		}
+	}
+	
 	if($_POST['DataAction']=='fill'){		
 		
 		$sql = "SELECT jitProductID, jitEstIncomeCurr, COUNT(jitProductID),AVG(jitEstIncome) as IncomeRate,jitEstCostCurr, AVG(jitEstCost) as CostRate FROM nlogjc.tbl_job_item
@@ -154,6 +193,7 @@ if ($_GET['tab']){
 include ('includes/inc_document_menu.php');
 if ($oDocument->customer && $oDocument->flagUpdate ){
 	$arrActions[] = Array ('title'=>'Fill grid','action'=>'javascript:fillGrid();','class'=>'brick');
+	$arrActions[] = Array ('title'=>'Estimate','action'=>"javascript:fillGrid('_estimate');",'class'=>'brick');
 }
 
 //============================== Main form definition ==============================
