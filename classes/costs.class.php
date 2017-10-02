@@ -10,7 +10,7 @@ include_once ('classes/profit.class.php');
 //$Activities = new Activities ();
 $YACT = new YACT_COA();
 $Items = new Items();
-$PCs = new ProfitCenters();
+$ProfitCenters = new ProfitCenters();
 
 class Indirect_costs extends Document{
 	
@@ -150,7 +150,7 @@ class Indirect_costs extends Document{
 	
 	public function defineGrid(){
 		
-		GLOBAL $Items, $PCs;
+		GLOBAL $Items, $ProfitCenters;
 			
 		if ($this->type=='indirect'){
 			$this->grid->Columns[] = Array(
@@ -180,7 +180,7 @@ class Indirect_costs extends Document{
 			$this->grid->Columns[] = Array(
 				'title'=>'Profit center'
 				,'field'=>'pc'
-				,'arrValues'=>$PCs->getStructuredRef()
+				,'arrValues'=>$ProfitCenters->getStructuredRef()
 				,'type'=>'combobox'
 				,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit'
 				,'default'=>$arrUsrData['empProfitID']
