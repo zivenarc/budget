@@ -456,7 +456,9 @@ class Headcount extends Document{
 			$oMaster = new Master($this->scenario, $this->GUID,$this->company);
 			
 			if(is_array($this->records[$this->gridName])){
-			
+					
+					
+					
 					//--------------------------------- Calculate vacations for the department
 					$arrVacation = Array();	
 					for($m=1;$m<=15;$m++){ 
@@ -487,7 +489,7 @@ class Headcount extends Document{
 				$eligible_date = mktime(0,0,0,10,1,$this->budget->year-1);
 				
 				foreach($this->records[$this->gridName] as $id=>$record){
-								
+					
 					// $start_date = strtotime($record->start_date);
 					$start_date = ($record->start_date);
 					// $review_date = strtotime($record->review_date);
@@ -599,7 +601,7 @@ class Headcount extends Document{
 						
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
-						$master_row->{$month} = - 2.33/29.4 * ($record->{$month})*($record->salary+$record->monthly_bonus);
+						$master_row->{$month} = - (28+$oEmployee->addlVacation)/12/29.4 * ($record->{$month})*($record->salary+$record->monthly_bonus);
 					}
 					
 					//-----------------------------------------------------------------Social tax

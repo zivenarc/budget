@@ -42,6 +42,7 @@ class Employee {
 		$this->job = $params['empFunction'];
 		$this->activity = $params['empProductTypeID'];
 		$this->salary = $params['empSalary'];
+		$this->addlVacation = $params['empAddlVacation'];
 		// $this->manager = parent::getByCode($params['empManagerID']);
 	}
 	
