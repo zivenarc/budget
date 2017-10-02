@@ -13,9 +13,7 @@ if(!isset($_GET['pccGUID'])){
 	$arrJS[]='js/rep_pnl.js';
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$oBudget->title,' :: ',$arrUsrData["pagTitle$strLocal"],'</h1>';
-	?>
-	<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo Budget::getScenarioSelect();?></div>
-	<?php
+	include ('includes/inc_report_selectors.php');
 	Budget::getProfitTabs('reg_sales', false);	
 	include ('includes/inc-frame_bottom.php');
 } else {	
