@@ -31,7 +31,9 @@ if(isset($_GET['tab'])){
 	<?php
 	while ($rw=$oSQL->f($rs)){
 		// print_r($rw);
-		echo "<li>[{$rw['fixID']}] {$rw["fixTitle"]} ({$rw['funTitle']}), {$rw["pccTitle$strLocal"]}</li>";
+		echo "<li>[{$rw['fixID']}] {$rw["fixTitle"]}, {$rw["pccTitle$strLocal"]}
+			<div><small>".$rw['fixDeprStart']." &ndash; ".$rw['fixDeprEnd']."</small></div>
+			</li>";
 	}
 	?>
 	</ol>
