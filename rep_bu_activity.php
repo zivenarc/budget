@@ -91,7 +91,7 @@ if(isset($_GET['pccGUID'])){
 			FROM vw_master
 			WHERE scenario='{$reference}' AND company='{$company}'  AND account NOT LIKE 'SZ%' {$sqlWherePC}
 			GROUP BY activity, {$sqlGroupBy}
-			ORDER BY `Group`, prtGHQ, activity";
+			ORDER BY `Total` DESC, `Group`, prtGHQ, activity";
 
 	// echo '<pre>',$sql,'</pre>';
 			
