@@ -14,7 +14,7 @@ if(isset($_GET['tab'])){
 					fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetEnd}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValueUltimo
 					FROM vw_fixed_assets 
 					LEFT JOIN vw_item ON itmID=fixItemID
-					LEFT JOIN reg_depreciation ON particulars=fixGUID AND scenario='$budget_scenario' AND posted=1
+					LEFT JOIN reg_depreciation ON particulars=fixGUID AND scenario='{$oBudget->id}' AND posted=1
 					LEFT JOIN vw_profit ON pccID=fixProfitID
 					WHERE DATEDIFF(fixDeprEnd,'{$dateBudgetStart}')>0 
 						AND fixFlagDeleted=0 
@@ -26,6 +26,7 @@ if(isset($_GET['tab'])){
 	
 	?>
 	<div id="report">
+	<pre style="display:none;"><?php echo $sql;?></pre>
 	<ol>
 	<?php
 	while ($rw=$oSQL->f($rs)){
