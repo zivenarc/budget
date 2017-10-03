@@ -412,9 +412,11 @@ class Indirect_costs extends Document{
 					
 					$nCount = $record->count();
 					
+					$record->pc = $ProfitCenters->getByCode($record->profit);
+					
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $record->profit;
-					$master_row->activity = $record->activity;
+					$master_row->activity =  $record->activity?$record->activity:$record->pc->activity;;
 					$master_row->customer = $record->customer;					
 					$item = $Items->getById($record->item);
 					$master_row->account = $item->getYACT($master_row->profit);
