@@ -474,7 +474,7 @@ class Headcount extends Document{
 						FROM treasury.tbl_vacation
 						JOIN common_db.tbl_employee ON empID=vacEmployeeID
 						WHERE ((vacDateStart BETWEEN @dateStart AND @dateEnd) OR (vacDateEnd BETWEEN @dateStart AND @dateEnd))
-						AND vacStateID BETWEEN 420 AND 450
+						AND vacStateID BETWEEN 410 AND 450
 						AND empProfitID={$this->pc->code}";
 						
 						for($i=0;$i<count($sqlV);$i++){
