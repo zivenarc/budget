@@ -1,5 +1,5 @@
 <?php
-$flagNoAuth = true;
+// $flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
@@ -133,26 +133,22 @@ if(isset($_GET['pccGUID'])){
 	}
 
 	//------------------------------ GROSS PROFIT ---------------------------
-	$sql = "SELECT account,Customer_group_code, customer, Profit, pccFlagProd, bdv, bdvTitle, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
+	$sql = "SELECT account,Customer_group_code, customer, activity, bdv, bdvTitle, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 			FROM vw_master		
 			WHERE scenario='{$oBudget->id}'  AND company='{$company}' {$sqlWherePC}
 				AND account IN('J00400','J00802')
-			GROUP BY account, Customer_group_code, customer, Profit, bdvTitle
+			GROUP BY account, Customer_group_code, customer, activity, bdvTitle
 			UNION ALL
-			SELECT account,Customer_group_code, customer,  Profit, pccFlagProd, bdv, bdvTitle, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
+			SELECT account,Customer_group_code, customer,  activity, bdv, bdvTitle, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 			FROM vw_master		
 			WHERE scenario='{$reference}'  AND company='{$company}' {$sqlWherePC}
 				AND account IN('J00400','J00802')
-			GROUP BY account,Customer_group_code, customer, Profit, bdvTitle
-			ORDER BY pccFlagProd,Profit";
+			GROUP BY account,Customer_group_code, customer, activity, bdvTitle
+			ORDER BY activity";
 	$rs = $oSQL->q($sql);
 	while ($rw=$oSQL->f($rs)){
-		if (!$bu_group) {
-			$keyActivity = $oBudget->getProfitAlias($rw);		
-		} else {
-			$keyActivity = $rw['Profit'];
-		}
-		
+		$keyActivity = $rw['activity'];
+				
 		if ($rw['account']=='J00400'){
 			$arrGrossRevenue[$keyActivity] += $rw['Total'];	
 			$arrGrossRevenueEstimate += $rw['Estimate'];
@@ -178,52 +174,40 @@ if(isset($_GET['pccGUID'])){
 		$arrGPTotal[$bdvGroup]['last'][$keyActivity] += $rw['Estimate'];
 	}
 
-	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
+	$sql = "SELECT activity, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 			FROM reg_master
-			LEFT JOIN vw_profit ON pccID=pc
 			WHERE scenario='{$oBudget->id}'  AND company='{$company}' {$sqlWherePC}
 				AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')
-			GROUP BY Profit
+			GROUP BY activity
 			UNION ALL
-			SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
+			SELECT activity, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 			FROM reg_master
-			LEFT JOIN vw_profit ON pccID=pc
 			WHERE scenario='{$reference}'  AND company='{$company}' {$sqlWherePC}
 				AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')
-			GROUP BY Profit
-			ORDER BY pccFlagProd,Profit";
+			GROUP BY activity
+			ORDER BY activity";
 	$rs = $oSQL->q($sql);
 	while ($rw=$oSQL->f($rs)){
-		if (!$bu_group) {
-			$keyActivity = $oBudget->getProfitAlias($rw);		
-		} else {
-			$keyActivity = $rw['Profit'];
-		}
+		$keyActivity = $rw['activity'];
 		$arrOpIncome['this'][$keyActivity] += $rw['Total'];	
 		$arrOpIncome['last'][$keyActivity] += $rw['Estimate'];	
 	}
 
-	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
+	$sql = "SELECT activity, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 			FROM reg_master
-			LEFT JOIN vw_profit ON pccID=pc
 			WHERE scenario='{$oBudget->id}'  AND company='{$company}' {$sqlWherePC}
 				".Reports::GOP_FILTER."
-			GROUP BY Profit
+			GROUP BY activity
 			UNION ALL
-			SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
+			SELECT activity, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 			FROM reg_master
-			LEFT JOIN vw_profit ON pccID=pc
 			WHERE scenario='{$reference}'  AND company='{$company}' {$sqlWherePC}
 				".Reports::GOP_FILTER."
-			GROUP BY Profit
-			ORDER BY pccFlagProd,Profit";
+			GROUP BY activity
+			ORDER BY activity";
 	$rs = $oSQL->q($sql);
 	while ($rw=$oSQL->f($rs)){
-		if (!$bu_group) {
-			$keyActivity = $oBudget->getProfitAlias($rw);		
-		} else {
-			$keyActivity = $rw['Profit'];
-		}
+		$keyActivity = $rw['activity'];
 		$arrGOP['this'][$keyActivity] += $rw['Total'];	
 		$arrGOP['last'][$keyActivity] += $rw['Estimate'];	
 	}
