@@ -132,48 +132,6 @@ if(isset($_GET['pccGUID'])){
 		$arrHeadcount['last'][$keyActivity] += $rw['Estimate'];	
 	}
 
-	//------------------------------ GROSS PROFIT ---------------------------
-	$sql = "SELECT account,Customer_group_code, customer, activity, bdv, bdvTitle, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
-			FROM vw_master		
-			WHERE scenario='{$oBudget->id}'  AND company='{$company}' {$sqlWherePC}
-				AND account IN('J00400','J00802')
-			GROUP BY account, Customer_group_code, customer, activity, bdvTitle
-			UNION ALL
-			SELECT account,Customer_group_code, customer,  activity, bdv, bdvTitle, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
-			FROM vw_master		
-			WHERE scenario='{$reference}'  AND company='{$company}' {$sqlWherePC}
-				AND account IN('J00400','J00802')
-			GROUP BY account,Customer_group_code, customer, activity, bdvTitle
-			ORDER BY activity";
-	$rs = $oSQL->q($sql);
-	while ($rw=$oSQL->f($rs)){
-		$keyActivity = $rw['activity'];
-				
-		if ($rw['account']=='J00400'){
-			$arrGrossRevenue[$keyActivity] += $rw['Total'];	
-			$arrGrossRevenueEstimate += $rw['Estimate'];
-		}
-		
-		switch($rw['bdv']){
-			case 9:
-			case 130:
-				$bdvGroup = $rw['bdvTitle'];
-				$cusGroup = Reports::getCustomerGroup($rw);
-				break;
-			default:
-				$bdvGroup = 'Other';
-				$cusGroup = 'Customers handled by OPS';
-				break;
-		}
-		
-		
-		
-		$arrGP[$bdvGroup][$cusGroup]['this'][$keyActivity] += $rw['Total'];
-		$arrGPTotal[$bdvGroup]['this'][$keyActivity] += $rw['Total'];
-		$arrGP[$bdvGroup][$cusGroup]['last'][$keyActivity] += $rw['Estimate'];
-		$arrGPTotal[$bdvGroup]['last'][$keyActivity] += $rw['Estimate'];
-	}
-
 	$sql = "SELECT activity, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 			FROM reg_master
 			WHERE scenario='{$oBudget->id}'  AND company='{$company}' {$sqlWherePC}
@@ -215,7 +173,7 @@ if(isset($_GET['pccGUID'])){
 	// echo '<pre>';print_r($arrHeadcount);echo '</pre>';echo $sql;
 	// echo '<pre>';print_r($arrReport);echo '</pre>';
 	?>
-	<table class='budget' id='report'>
+	<table class='budget' id='report_<?php echo $_GET['pccGUID'];?>'>
 	<caption><?php echo $arrUsrData["pagTitle$strLocal"], ' printed on ', date('d.m.Y h:i');?></caption>
 	<thead>
 		<?php echo getTableHeaderAct();?>
@@ -498,23 +456,10 @@ if(isset($_GET['pccGUID'])){
 	?>
 		<td class='budget-decimal budget-ytd'><?php if(is_array($arrTotal['this'][GROSS_PROFIT]))Reports::render_ratio((array_sum($arrOpIncome['this'])-array_sum($arrTotal['this'][GROSS_PROFIT]))/100,array_sum($arrHeadcount['this']),0);?></td>
 	</tr>
-	<?php
-	if(is_array($arrGP)){
-		foreach ($arrGP as $bdv=>$arrCusGP){
-			?>
-			<tr><th colspan="<?php echo count($arrActivity)+5;?>">Gross Profit delivered by <?php echo $bdv;?></th></tr>
-			<?php
-			foreach ($arrCusGP as $customer=>$data){
-				renderDataByPC($data, $arrActivity, $customer);	
-			}
-			renderDataByPC($arrGPTotal[$bdv], $arrActivity, "Total GP", "budget-subtotal");	
-		}
-	}
-	?>
 	</tfoot>
 	</table>
 		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("report");'>Select table</a></li>
+			<li><a href='javascript:SelectContent("report_<?php echo $_GET['pccGUID'];?>");'>Select table</a></li>
 		</ul>
 	<?php
 
