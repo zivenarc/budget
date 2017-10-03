@@ -240,7 +240,7 @@ class Indirect_costs extends Document{
 	}
 	
 	public function save($mode='update'){
-		GLOBAL $ProfitCenters;
+		
 		parent::save($mode);
 						
 		//echo '<pre>';print_r($_POST);die('</pre>');
@@ -398,6 +398,7 @@ class Indirect_costs extends Document{
 		GLOBAL $Activities;
 		GLOBAL $YACT;
 		GLOBAL $Items;		
+		GLOBAL $ProfitCenters;
 		
 		$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 		$oMaster = new Master($this->scenario, $this->GUID, $this->company);
