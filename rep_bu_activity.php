@@ -29,8 +29,6 @@ $arrActions[] = Array('title'=>'Next month','action'=>'?mthStart='.$oBudget->nm.
 	// $sqlWherePC = " AND pc IN ({$strBUs})";
 // }
 
-$sqlWherePC = "AND pc IN (".implode(',',$filter['pc']).")";
-
 
 $oBudget = new Budget($budget_scenario);
 $oReference = new Budget($reference);
@@ -61,6 +59,7 @@ if ($denominator!=1) {
 }
 
 if(isset($_GET['pccGUID'])){
+	$sqlWherePC = "AND pc IN (".implode(',',$filter['pc']).")";
 	$repType = 'budget';
 
 	switch($repType){
