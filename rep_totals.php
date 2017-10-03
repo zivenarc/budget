@@ -36,7 +36,7 @@ $oReference = new Budget($reference);
 $mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1+$oBudget->offset;
 $mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12+$oBudget->offset;
 // $strLastTitle = $oBudget->type=='FYE'?'Budget':$reference;
-$strLastTitle = $reference;
+$strLastTitle = $oReference->title;
 
 $arrRates_this = $oBudget->getMonthlyRates($currency);
 $arrRates_last = $oReference->getMonthlyRates($currency);
@@ -472,55 +472,9 @@ foreach($arrProfit as $pc=>$flag){
 	<td class='budget-decimal budget-ytd'><?php Reports::render(100,1);?></td>	
 </tr>
 <?php 
-renderDataByPC($arrGOP, $arrProfit, "Gross Operating Profit","budget-subtotal");
+renderActualVsBudget($arrGOP, $arrProfit, "Gross Operating Profit",$strLastTitle);
+renderActualVsBudget($arrOpIncome, $arrProfit, "Operating income",$strLastTitle);
 ?>
-<tr>
-	<td>GOP, <?php echo $strLastTitle;?></td>
-<?php
-foreach($arrProfit as $pc=>$flag){
-	?>
-	<td class='budget-decimal'><?php Reports::render($arrGOP['last'][$pc]);?></td>
-	<?php
-}
-?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGOP['last']));?></td>	
-</tr>
-<tr>
-	<td>Diff</td>
-<?php
-foreach($arrProfit as $pc=>$flag){
-	?>
-	<td class='budget-decimal'><?php Reports::render($arrGOP['this'][$pc] - $arrGOP['last'][$pc]);?></td>
-	<?php
-}
-?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome['this']) - array_sum($arrOpIncome['last']));?></td>	
-</tr>
-<?php
-renderDataByPC($arrOpIncome, $arrProfit, "Operating income","budget-subtotal");
-?>
-<tr>
-	<td>Operating income, <?php echo $strLastTitle;?></td>
-<?php
-foreach($arrProfit as $pc=>$flag){
-	?>
-	<td class='budget-decimal'><?php Reports::render($arrOpIncome['last'][$pc]);?></td>
-	<?php
-}
-?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome['last']));?></td>	
-</tr>
-<tr>
-	<td>Diff</td>
-<?php
-foreach($arrProfit as $pc=>$flag){
-	?>
-	<td class='budget-decimal'><?php Reports::render($arrOpIncome['this'][$pc] - $arrOpIncome['last'][$pc]);?></td>
-	<?php
-}
-?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome['this']) - array_sum($arrOpIncome['last']));?></td>	
-</tr>
 <tr class="budget-ratio">
 	<td>OI, %of total</td>
 <?php
