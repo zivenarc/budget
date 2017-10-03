@@ -240,7 +240,7 @@ class Indirect_costs extends Document{
 	}
 	
 	public function save($mode='update'){
-		
+		GLOBAL $ProfitCenters;
 		parent::save($mode);
 						
 		//echo '<pre>';print_r($_POST);die('</pre>');
