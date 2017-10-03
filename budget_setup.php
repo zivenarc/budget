@@ -55,7 +55,10 @@ if ($_GET['option']=='full'){
 
 if ($_GET['tab']){
 $oBudget = new Budget($_GET['tab']);
-
+	
+	$arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>($arrUsrData['PCC']['pccFlagProd']?$arrUsrData['PCC']['pccParentCode1C']:''));
+	$strQuery = http_build_query($arrDefaultParams);
+	
 	if ($_GET['DataAction']=='delete'){		
 		$res = $oBudget->delete();
 		header('Content-type:application/json');
@@ -117,6 +120,8 @@ $oBudget = new Budget($_GET['tab']);
 	} else {
 	?>
 	<span><input type='button' value='Set as default' id='default'/></span>
+	<span><input type='button' value='Get KPIs' onclick='sp_get_kpi.php?budget_scenario=<?php echo $oBudget->id;?>' id='kpis'/></span>
+	<span><input type='button' value='Get headcount' onclick='rep_staff_costs.php?budget_scenario=<?php echo $oBudget->id;?>' id='headcount'/></span>
 	<?php
 	}
 	?>
@@ -126,6 +131,17 @@ $oBudget = new Budget($_GET['tab']);
 	<nav>
 		<a target='_blank' href='sp_get_kpi.php?budget_scenario=<?php echo $_GET['tab'];?>'>Get KPIs from Nlogjc</a>|
 		<a  target='_blank' href='rep_staff_costs.php?budget_scenario=<?php echo $_GET['tab'];?>'>Refresh headcount</a>|	
+	</nav>
+	<nav><span>Compare to <?php echo $oBudget->reference_scenario->title;?>:</span>
+		<a href="rep_summary.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Summary</a>|
+		<a href="rep_monthly.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Monthly report</a>|
+		<a href="rep_pnl.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Full-year estimate</a>|
+		<a href="rep_totals.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Results per BU</a>|
+		<a href="rep_waterfall.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Waterfall</a>|
+		<a href="rep_graphs.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Charts</a>|
+		<a href="sp_ghq.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">GHQ report</a>|
+		<a href="rep_summary_ghq.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">GHQ summary</a>|
+		<a href="rep_sales_kpi.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Sales KPI</a>
 	</nav>
 	</div>
 	<h2>Budget variables</h2>
