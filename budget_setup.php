@@ -119,12 +119,13 @@ $oBudget = new Budget($_GET['tab']);
 	<?php
 	} else {
 	?>
-	<span><input type='button' value='Set as default' id='default'/></span>
-	<span><input type='button' value='Get KPIs' onclick='sp_get_kpi.php?budget_scenario=<?php echo $oBudget->id;?>' id='kpis'/></span>
-	<span><input type='button' value='Get headcount' onclick='rep_staff_costs.php?budget_scenario=<?php echo $oBudget->id;?>' id='headcount'/></span>
+	<span><button id='default'>Set as default</button></span>
+
 	<?php
 	}
 	?>
+	<span><button onclick="window.open('sp_get_kpi.php?budget_scenario=<?php echo $oBudget->id;?>','_blank');" id='kpis'>Get KPIs</button></span>
+	<span><button onclick="window.open('rep_staff_costs.php?budget_scenario=<?php echo $oBudget->id;?>','_blank');" id='headcount'>Get headcount</button></span>
 	</td>
 	</tr></table>
 	</div>

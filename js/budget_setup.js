@@ -6,7 +6,9 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 				});
 			 },
 			spinner:'',
-			load: function (event, ui) {			
+			load: function (event, ui) {
+				$('button',ui.panel).button();
+				$('input:checkbox',ui.panel).button();
 				var url = ui.tab.find('a').attr('href');
 				$('#scnFlagReadOnly',ui.panel).change(function(){
 					if($(this).prop('checked')){

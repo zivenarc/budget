@@ -16,10 +16,12 @@ if (strpos($oBudget->type,'Budget')) die('Wrong budget type, cannot fill in the 
 $ytd = $oBudget->cm;
 $year = $oBudget->year;
 
-$arrKPI[] = Array('prtID'=>48,'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)" );
-$arrKPI[] = Array('prtID'=>58,'ghq'=>'Ocean import, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)" );
-$arrKPI[] = Array('prtID'=>63,'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate');
-$arrKPI[] = Array('prtID'=>52,'ghq'=>'Ocean export, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate');
+set_time_limit($ytd*60);
+
+$arrKPI[] = Array('prtID'=>48,'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)",'output'=>true);
+$arrKPI[] = Array('prtID'=>58,'ghq'=>'Ocean import, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)",'output'=>true );
+$arrKPI[] = Array('prtID'=>63,'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate','output'=>true);
+$arrKPI[] = Array('prtID'=>52,'ghq'=>'Ocean export, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate','output'=>true);
 $arrKPI[] = Array('prtID'=>46,'ghq'=>'Air import','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobETAPort');
 $arrKPI[] = Array('prtID'=>47,'ghq'=>'Air export','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>7,'ghq'=>'Distribution','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
@@ -36,10 +38,38 @@ $sql = Array();
 
 $sql[] = "SET @scenario='{$oBudget->id}'";
 $sql[] = "DELETE FROM `reg_sales` WHERE scenario=@scenario AND source='Actual';";
-
+?>
+<div class='tabs'>
+<ul>
+	<?php
+		for ($i=0; $i<count($arrKPI);$i++){
+			if($arrKPI[$i]['output']){
+			?>
+			<li><a href='#<?php echo $arrKPI[$i]['prtID'];?>'><?php echo $arrKPI[$i]['ghq'];?></a></li>
+			<?php
+			}
+		}
+	?>
+	<li><a href='#other'>Other</a></li>
+</ul>
+<?php
 for ($i=0; $i<count($arrKPI);$i++){
 
-	echo '<pre>',$arrKPI[$i]['ghq'],'</pre>';
+	if($arrKPI[$i]['output']){
+		?>
+		<div id='<?php echo $arrKPI[$i]['prtID'];?>'>
+			<div class='tabs'>
+				<ul>
+					<?php
+					for($m=1+$oBudget->offset;$m<=$ytd;$m++){
+					?>
+					<li><a href="#<?php echo $arrKPI[$i]['prtID'].'_'.$m;?>"><?php echo $oBudget->arrPeriod[$m];?></a></li>
+					<?php
+					}
+					?>
+				</ul>
+		<?php
+	}
 	
 	$sql[] = "SELECT  @prtID:=prtID, @jobGHQ:=prtGHQ, @unit:=prtUnit 
 				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']};";
@@ -69,9 +99,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 					// HAVING  {$arrKPI[$i]['kpi']} IS NOT NULL";
 		
 		
-		switch ($arrKPI[$i]['prtID']){
-			case 48:
-			case 63:
+		if($arrKPI[$i]['output']){
 				$sqlDetails = "SELECT jobID, cntTitle, {$arrKPI[$i]['kpi']} as 'TEU', jobShipmentDate, jobETAPort, jobATAPort, jobPOL, jobPOD, jobFlagSAP, pccTitle
 					FROM nlogjc.tbl_job
 					JOIN common_db.tbl_counterparty ON cntID=jobCustomerID
@@ -87,8 +115,9 @@ for ($i=0; $i<count($arrKPI);$i++){
 					ORDER BY jobID, jobCustomerID";
 				$rsDetails = $oSQL->q($sqlDetails);
 				$nSumKPI = 0; $j=1;
-				$tableID = "details_".$arrKPI[$i]['prtID'];
+				$tableID = "details_".$arrKPI[$i]['prtID']."_".$month;
 				?>
+				<div id="<?php echo $arrKPI[$i]['prtID'].'_'.$m;?>">
 				<table class="budget" id="<?php echo $tableID;?>">
 					<thead>
 						<caption><?php echo $arrKPI[$i]['ghq'],' from ',$repDateStart,' to ',$repDateEnd;?></caption>
@@ -106,6 +135,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 							<th>ATA</th>
 						</tr>
 					</thead>
+					<tbody>
 				<?php
 				while ($rw = $oSQL->f($rsDetails)){
 					?>
@@ -127,18 +157,28 @@ for ($i=0; $i<count($arrKPI);$i++){
 					$nSumKPI += $rw['TEU'];
 				}
 				?>
+				</tbody>
+				<tfoot>
 				<tr class="budget-subtotal">
 					<td colspan="4">Total:</td>
 					<td><?php echo number_format($nSumKPI,0,'.',',');?></td>
 				</tr>
+				</tfoot>
+				</table>
+				</div>
 				<?php
-			break;
-			default:
-				// do not report		
 		};
 	};
+	if($arrKPI[$i]['output']){
+		?>
+			</div>
+		</div>
+		<?php
+	}
 };
-
+?>
+<div id='other'>
+<?php
 //-------------- Intercompany -----------------
 $arrKPI = Array();
 $arrKPI[] = Array('prtID'=>3,'ghq'=>'Transport','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
@@ -210,6 +250,9 @@ for ($i=0;$i<count($sql);$i++){
 		echo '<pre>',$sql[$i],'</pre>';
 	}
 }
-
+?>
+</div>
+</div>
+<?php
 include ('includes/inc-frame_bottom.php');
 ?>
