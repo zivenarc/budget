@@ -55,11 +55,34 @@ if ($_GET['tab']){
 			$data[] = $rw;
 		}
 		
-		echo "<div id='div_{$_GET['tab']}'>";
+		?>
+		<div style='float:none;'>
+		<div id='div_<?php echo $_GET['tab'];?>' style='float:left;'>
+		<?php
 		Reports::getJournalEntries($data);
-		echo '</div>';
+		?>
+		</div>
 		
-	
+		<div style='float:right;'>
+		<nav>
+		<?php
+		$sql = "SELECT responsible, usrTitle, COUNT(guid) as nCount
+				FROM vw_journal 
+				LEFT JOIN stbl_user ON responsible=usrID
+				WHERE scenario='{$_GET['tab']}'
+				GROUP BY responsible
+				ORDER BY nCount DESC";
+		$rs =$oSQL->q($sql);
+		while ($rw=$oSQL->f($rs)){
+			?>
+			<div><a href='?ownerID=<?php echo $rw['responsible'];?>'><?php echo $rw['usrTitle'],' (',$rw['nCount'],')';?></a></div>
+			<?php
+		}
+		?>
+		</nav>
+		</div>
+		</div>
+	<?php
 } else {
 	require ('classes/budget.class.php');
 	$arrJS[] = 'js/journal.js';
@@ -68,8 +91,5 @@ if ($_GET['tab']){
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
 	echo Budget::getScenarioTabs(true);
 	
-	include ('includes/inc_subordinates.php');
-	
 	include ('includes/inc-frame_bottom.php');
 }
-?>
