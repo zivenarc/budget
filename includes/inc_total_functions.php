@@ -97,7 +97,7 @@ function getTableHeaderAct($arrHeader = null){
 				}
 		}
 		foreach($arrActivity as $key=>$title){
-		echo "<th><div title='[{$key}] {$title}' style='float: left; transform: rotate(-90deg);'>{$title}</div></th>";
+		echo "<th><div title='[{$key}] {$title}'>{$title}</div></th>";
 		};?>
 		<th class='budget-ytd'><?php echo $oBudget->type=='FYE'?'FYE':'Total';?><br/><small><?php echo $periodTitle;?></small></th>
 		<th title="<?php echo $oReference->id;?>"><?php echo $oReference->title;?></th>
