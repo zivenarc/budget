@@ -24,11 +24,6 @@ if (isset($_GET['no_activity'])){
    , "class" => "print"
    , "action" => "javascript:window.print();"
    );
-   $arrActions[] = Array(
-   "title" => ShowFieldTitle('help')
-   , "class" => "question"
-   , "action" => "/wiki/Treasury"
-   );
 
 
 
@@ -37,7 +32,7 @@ $oActual = new Budget($arrSetup['stpFYEID']);
 $oBudget = new Budget($arrSetup['stpScenarioID']);
 
 if($_GET['DataAction']=='summary'){
-	$oReport = new Reports(Array('budget_scenario'=>$oActual->id, 'currency'=>643, 'denominator'=>$denominator, 'reference'=>$oBudget->id, 'filter'=>$filter));
+	$oReport = new Reports(Array('budget_scenario'=>$oActual->id, 'currency'=>643, 'denominator'=>$denominator, 'reference'=>$oActual->reference_scenario->id, 'filter'=>$filter));
 	$oReport->shortMonthlyReport();	
 	die();
 }
@@ -129,7 +124,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer, current month",
 											0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 
-								WHERE scenario='{$oBudget->id}'  AND company='{$company}'
+								WHERE scenario='{$oActual->reference_scenario->id}'  AND company='{$company}'
 									AND source<>'Estimate' 
 									AND account IN ('J00400', 'J00802')
 									{$sqlActivityFilter}
