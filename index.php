@@ -52,11 +52,21 @@ $strQuery = http_build_query($arrDefaultParams);
 ?>
 <h1>Current scenario - <?php echo $oBudget->title; ?>, current budget - <?php echo $oReference->title; ?></h1>
 <?php
-$sql = "SELECT COUNT(guid) as nCount FROM vw_journal WHERE scenario='{$oBudget->id}' AND responsible='{$arrUsrData['usrID']}' AND posted=0 AND deleted=0";
-$rs = $oSQL->q($sql);
-if($oSQL->n($rs)){
-	$rw = $oSQL->f($rs);
-	echo "<div class='warning'>You have {$rw['nCount']} <a href='sp_my.php?ownerID={$arrUsrData['usrID']}'>unposted documents</a> in [{$oBudget->title}]</div>";
+if($oBudget->flagUpdate){
+	$sql = "SELECT COUNT(guid) as nCount FROM vw_journal WHERE scenario='{$oBudget->id}' AND responsible='{$arrUsrData['usrID']}' AND posted=0 AND deleted=0";
+	$rs = $oSQL->q($sql);
+	if($oSQL->n($rs)){
+		$rw = $oSQL->f($rs);
+		echo "<div class='warning'>You have {$rw['nCount']} <a href='sp_my.php?ownerID={$arrUsrData['usrID']}'>unposted documents</a> in [{$oBudget->title}]</div>";
+	}
+}
+if($oReference->flagUpdate){
+	$sql = "SELECT COUNT(guid) as nCount FROM vw_journal WHERE scenario='{$oReference->id}' AND responsible='{$arrUsrData['usrID']}' AND posted=0 AND deleted=0";
+	$rs = $oSQL->q($sql);
+	if($oSQL->n($rs)){
+		$rw = $oSQL->f($rs);
+		echo "<div class='warning'>You have {$rw['nCount']} <a href='sp_my.php?ownerID={$arrUsrData['usrID']}'>unposted documents</a> in [{$oReference->title}]</div>";
+	}
 }
 ?>
 <nav><span>vs <?php echo $oReference->title;?>: </span>
