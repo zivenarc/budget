@@ -11,7 +11,7 @@ $oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$c
 include ('includes/inc-frame_top.php');
 ?>
 <div id='output'>
-<h2><?php echo $rwAct["prtTitle$strLocal"]," | ",$rwRte['rteTitle'];?></h2>
+<h2><?php echo $_POST['title'];?></h2>
 <?php
 $oReport->monthlyReport('activity',Array('financial'=>true,'summary'=>false,'kpi'=>false,'headcount'=>false));
 ?>

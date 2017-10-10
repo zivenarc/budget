@@ -3232,6 +3232,7 @@ class Reports{
 			$rw['title'] = "Direct production costs: labor, rent, fuel, depreciation";
 			$metadata = Array('filter'=>$this->filter, 'DataAction'=>'budget_item');
 			$metadata['filter']['account'] = Array('J00801','J00803','J00804','J00805','J00806','J00808','J0080W');
+			$metadata['title'] = $rw['Budget item'];
 			$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
 			$this->echoBudgetItemString($rw);
 		}
@@ -3245,12 +3246,23 @@ class Reports{
 		}
 		
 		// if (!($this->filter['activity'])){
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '5%' AND account<>'5999CO' AND pccFlagProd=1)", $sql);
+			$arrYCT = Array();
+			$_rs = $this->oSQL->q("SELECT yctID FROM vw_yact WHERE yctID LIKE '5%' AND yctID<>'5999CO'");
+			while ($rw = $this->oSQL->f($_rs)){
+					$arrYCT[] = $rw['yctID'];
+			}
+			
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('".implode("','",$arrYCT)."') AND pccFlagProd=1)", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
 				$rw['Budget item'] = "Selling & general";
 				$rw['title'] = "Costs of sales and BU management";
+				$metadata = Array('filter'=>$this->filter, 'DataAction'=>'budget_item');
+				$metadata['filter']['account'] = $arrYCT;
+				$metadata['filter']['pccFlagProd'] = 1;
+				$metadata['title'] = $rw['Budget item'];
+				$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
 				$this->echoBudgetItemString($rw);
 			}
 			
@@ -3260,6 +3272,10 @@ class Reports{
 			while ($rw = $this->oSQL->f($rs)){
 				$rw['Budget item'] = "Corporate costs";
 				$rw['title'] = "Costs of headquarters, except BDV";
+				$metadata = Array('filter'=>$this->filter, 'DataAction'=>'budget_item');
+				$metadata['filter']['account'] = '5999CO';
+				$metadata['title'] = $rw['Budget item'];
+				$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
 				$this->echoBudgetItemString($rw);
 			}
 			
@@ -3271,21 +3287,37 @@ class Reports{
 				$this->echoBudgetItemString($rw, 'budget-subtotal');
 			}
 			
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '60%' AND account<>'607000')", $sql);
+			$arrYCT = Array();
+			$_rs = $this->oSQL->q("SELECT yctID FROM vw_yact WHERE yctID LIKE '60%' AND yctID<>'607000'");
+			while ($rw = $this->oSQL->f($_rs)){
+					$arrYCT[] = $rw['yctID'];
+			}
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN('".implode("','",$arrYCT)."'))", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
 				$rw['Budget item'] = "Non-operating income";
 				$rw['title'] = "Interest receivable, sublease, sale of assets";
+				$metadata['filter']['account'] = $arrYCT;
+				$metadata['title'] = $rw['Budget item'];
+				$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
 				$this->echoBudgetItemString($rw);
 			}
 			
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '65%' OR account LIKE '66%')", $sql);
+			$arrYCT = Array();
+			$_rs = $this->oSQL->q("SELECT yctID FROM vw_yact WHERE yctID LIKE '65%' OR yctID LIKE '66%'");
+			while ($rw = $this->oSQL->f($_rs)){
+					$arrYCT[] = $rw['yctID'];
+			}
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN('".implode("','",$arrYCT)."'))", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
 				$rw['Budget item'] = "Non-operating losses";
 				$rw['title'] = "Interest and FX losses";
+				$metadata['filter']['account'] = $arrYCT;
+				$metadata['title'] = $rw['Budget item'];
+				$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
 				$this->echoBudgetItemString($rw);
 			}
 			
