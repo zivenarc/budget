@@ -10,6 +10,9 @@ include ('includes/inc_total_functions.php');
 
 $arrJS[] = 'js/rep_totals.js';
 
+$oBudget = new Budget($budget_scenario);
+$oReference = new Budget($reference);
+
 $arrActions[] = Array('title'=>'Apr-Mar','action'=>'?mthStart=4&mthEnd=15');
 $arrActions[] = Array('title'=>'Jan-Dec','action'=>'?mthStart=1&mthEnd=12');
 $arrActions[] = Array('title'=>'YTD','action'=>'?mthStart='.(1+$oBudget->offset).'&mthEnd='.$oBudget->cm);
@@ -31,8 +34,7 @@ if ($bu_group){
 
 
 
-$oBudget = new Budget($budget_scenario);
-$oReference = new Budget($reference);
+
 $mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1+$oBudget->offset;
 $mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12+$oBudget->offset;
 // $strLastTitle = $oBudget->type=='FYE'?'Budget':$reference;
