@@ -66,7 +66,7 @@ if ($_GET['tab']){
 		<div style='float:right;'>
 		<nav>
 		<?php
-		$sql = "SELECT responsible, usrTitle, COUNT(guid) as nCount
+		$sql = "SELECT responsible, usrTitle, SUM(1-posted-deleted) as nCount
 				FROM vw_journal 
 				LEFT JOIN stbl_user ON responsible=usrID
 				WHERE scenario='{$_GET['tab']}'
