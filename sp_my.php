@@ -2,45 +2,46 @@
 // $flagNoAuth =true;
 require ('common/auth.php');
 
-
-$ownerID = isset($_GET['ownerID'])?$_GET['ownerID']:($_COOKIE['ownerID']?$_COOKIE['ownerID']:$arrUsrData['usrID']);
-if ($_GET['ownerID']=='MYSELF'){
-	$ownerID = $arrUsrData['usrID'];
-}
-SetCookie('ownerID',$ownerID,0);
-$sqlWhere = " AND responsible=".$oSQL->e($ownerID);
-
-$sql = "SELECT * FROM stbl_user WHERE usrID=".$oSQL->e($ownerID);
-$rs = $oSQL->q($sql);
-$rw = $oSQL->f($rs);
-$arrUsrData["pagTitle$strLocal"] .= ' :: '.($rw['usrTitle']?$rw['usrTitle']:'<Unknown>');
-
-if(isset($_GET['ownerID'])){
-	SetCookie('pc',null);
-	unset($pcfilter);
-}
-
 if(isset($_GET['pc'])){
+	
 	$pcfilter = isset($_GET['pc'])?$_GET['pc']:($_COOKIE['pc']?$_COOKIE['pc']:$arrUsrData['usrProfitID']);
-	SetCookie('pc',$pcfilter,0);
+	SetCookie('pc',$pcfilter,0,'/budget/');
 	
 	$sql = "SELECT * FROM vw_profit WHERE pccID=".$oSQL->e($pcfilter);
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
 	$arrUsrData["pagTitle$strLocal"] .= ' :: '.($rw['pccTitle']?$rw['pccTitle']:'<Unknown PC>');
+	
+} else {
+	
+	$ownerID = isset($_GET['ownerID'])?$_GET['ownerID']:($_COOKIE['ownerID']?$_COOKIE['ownerID']:$arrUsrData['usrID']);
+	if ($_GET['ownerID']=='MYSELF'){
+		$ownerID = $arrUsrData['usrID'];
+	}
+	SetCookie('ownerID',$ownerID,0,'/budget/');
+	$sqlWhere = " AND responsible=".$oSQL->e($ownerID);
+
+	$sql = "SELECT * FROM stbl_user WHERE usrID=".$oSQL->e($ownerID);
+	$rs = $oSQL->q($sql);
+	$rw = $oSQL->f($rs);
 }
+
+if(isset($_GET['ownerID'])){
+	SetCookie('pc',null);
+	unset($pcfilter);
+	$arrUsrData["pagTitle$strLocal"] .= ' :: '.($rw['usrTitle']?$rw['usrTitle']:'<Unknown>');
+}
+
+
 
 if ($_COOKIE['pc']){
 	$pcfilter = $_COOKIE['pc'];
 	$sqlWhere = " AND (guid IN (SELECT source FROM reg_master WHERE pc=".$oSQL->e($pcfilter).") OR pc=".$oSQL->e($pcfilter).")";
 }
 
-if ($_GET['tab']){
-	
+if (isset($_GET['tab'])){
 	?>
-<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
-<div/>
-
+	<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
 	<?php
 	require ('classes/reports.class.php');
 	$sql = "SELECT vw_journal.*, stbl_user.*, edit_date as timestamp FROM vw_journal 				
@@ -63,32 +64,57 @@ if ($_GET['tab']){
 		?>
 		</div>
 		
-		<div style='float:right;'>
-		<nav>
-		<?php
-		$sql = "SELECT responsible, usrTitle, SUM(1-posted-deleted) as nCount
-				FROM vw_journal 
-				LEFT JOIN stbl_user ON responsible=usrID
-				WHERE scenario='{$_GET['tab']}'
-				GROUP BY responsible
-				ORDER BY nCount DESC";
-		$rs =$oSQL->q($sql);
-		while ($rw=$oSQL->f($rs)){
-			?>
-			<div><a href='?ownerID=<?php echo $rw['responsible'];?>'><?php echo $rw['usrTitle'],' (',$rw['nCount'],')';?></a></div>
+		<div class='panel' style='float:right;'>
+			<nav>
 			<?php
-		}
-		?>
-		</nav>
+			$sql = "SELECT responsible, usrTitle, SUM(1-posted-deleted) as nCount
+					FROM vw_journal 
+					LEFT JOIN stbl_user ON responsible=usrID
+					WHERE scenario='{$_GET['tab']}'
+					GROUP BY responsible
+					ORDER BY nCount DESC";
+			$rs =$oSQL->q($sql);
+			while ($rw=$oSQL->f($rs)){
+				?>
+				<div><a href='?ownerID=<?php echo $rw['responsible'];?>'><?php echo $rw['usrTitle'],($rw['nCount']?(' ('.$rw['nCount'].')'):'');?></a></div>
+				<?php
+			}
+			?>
+			</nav>
+		</div>
+		<div class='panel' style='float:right;'>
+			<nav>
+			<?php
+			$sql = "SELECT pc, pccTitle, SUM(1-posted-deleted) as nCount
+					FROM vw_journal 
+					LEFT JOIN common_db.tbl_profit ON pc=pccID
+					WHERE scenario='{$_GET['tab']}'
+					GROUP BY pc
+					ORDER BY nCount DESC";
+			$rs =$oSQL->q($sql);
+			while ($rw=$oSQL->f($rs)){
+				?>
+				<div><a href='?pc=<?php echo $rw['pc'];?>'><?php echo $rw['pccTitle'],' (',$rw['nCount'],')';?></a></div>
+				<?php
+			}
+			?>
+			</nav>
 		</div>
 		</div>
 	<?php
+	die();
 } else {
 	require ('classes/budget.class.php');
 	$arrJS[] = 'js/journal.js';
 	
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
+	?>
+	<nav>
+		<span><a href='?pc=<?php echo $arrUsrData['usrProfitID'];?>'>See docs for <?php echo $arrUsrData['PCC']['pccTitle'];?></a></span>| 
+		<span><a href='?ownerID=MYSELF'>See my own docs</a></span>
+	</nav>
+	<?php
 	echo Budget::getScenarioTabs(true);
 	
 	include ('includes/inc-frame_bottom.php');
