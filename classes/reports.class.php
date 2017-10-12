@@ -110,14 +110,19 @@ class Reports{
 				for ($m=$this->oBudget->nm;$m<=12+$this->oBudget->offset;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
 					$arrReport[$section][$rw['particulars']]['data']['actual'][$month] += $rw[$month];
+					$arrSubtotal[$section]['actual'][$month] += $rw[$month];
 				}
+							
 			}
 			if ($rw['scenario']==$this->oReference->id){
 				for ($m=$this->oBudget->nm;$m<=12+$this->oBudget->offset;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
 					$arrReport[$section][$rw['particulars']]['data']['budget'][$month] += $rw[$month];
+					$arrSubtotal[$section]['budget'][$month] += $rw[$month];
 				}
 			}
+
+					
 		}
 
 		$arrVacation = Array();	
@@ -147,6 +152,7 @@ class Reports{
 		// echo '<pre>';print_r($sqlV);echo '</pre>';
 		foreach($arrReport as $section=>$arrTable){
 			$tableID = "kpi_".md5($sql.$section);
+			$arrPayroll = Array();
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
 				<caption><?php echo $section;?></caption>
@@ -165,6 +171,8 @@ class Reports{
 				<tbody>
 			<?php
 			foreach ($arrTable as $employee=>$details){
+				$arrPayroll['salary'] += $details['salary'];
+				$arrPayroll['bonus'] += $details['bonus'];
 				?>
 				<tr>
 					<td rowspan="3"><?php echo $details['title'];?></td>
@@ -209,6 +217,44 @@ class Reports{
 				</tr>
 				<?php
 			}
+			?>
+			<tr class="budget-total">
+					<td rowspan="3">Total</td>
+					<td rowspan="3" class='budget-decimal'><?php self::render($arrPayroll['salary'])?></td>
+					<td rowspan="3" class='budget-decimal'><?php self::render($arrPayroll['bonus']);?></td>
+					<td>Actual</td>
+					<?php
+					for ($m=$this->oBudget->nm;$m<=12+$this->oBudget->offset;$m++){
+						// $month = $this->oBudget->arrPeriod[$m];
+						$month = $this->oBudget->arrPeriod[$m];
+						echo "<td title='{$title}' class='budget-decimal budget-monthly budget-$month'>",self::render($arrSubtotal[$section]['actual'][$month]),'</td>';
+					}
+					?>
+					<td class='budget-ytd budget-decimal '><?php self::render(array_sum($details['data']['actual']));?></td>
+				</tr>
+				<tr>
+					<td>Budget</td>
+					<?php
+					for ($m=$this->oBudget->nm;$m<=12+$this->oBudget->offset;$m++){
+						// $month = $this->oBudget->arrPeriod[$m];
+						$month = $this->oBudget->arrPeriod[$m];
+						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($arrSubtotal[$section]['budget'][$month]),'</td>';
+					}
+					?>
+					<td class='budget-ytd budget-decimal'><?php self::render(array_sum($details['data']['budget']));?></td>
+				</tr>
+				<tr class='budget-subtotal'>
+					<td>Diff</td>
+					<?php
+					for ($m=$this->oBudget->nm;$m<=12+$this->oBudget->offset;$m++){
+						// $month = $this->oBudget->arrPeriod[$m];
+						$month = $this->oBudget->arrPeriod[$m];
+						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($arrSubtotal[$section]['actual'][$month]-$arrSubtotal[$section]['budget'][$month]),'</td>';
+					}
+					?>
+					<td class='budget-ytd budget-decimal'><?php self::render(array_sum($arrSubtotal[$section]['actual'])-array_sum($arrSubtotal[$section]['budget']));?></td>
+				</tr>
+			<?php
 		}
 		?>
 		</tbody>
