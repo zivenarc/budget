@@ -45,6 +45,15 @@ class Reports{
 		$this->YACT = $params['yact']?true:false;
 		// echo '<pre>';print_r($this);echo '</pre>';
 		$this->filter = $params['filter'];
+		$this->_setWhere();
+		
+		$this->caption = $this->oBudget->title.' vs '.$this->oReference->title.', '.$this->CurrencyTitle.($this->Denominator!=1?'x'.$this->Denominator:'');
+	}
+	
+	private function _setWhere(){
+		
+		$this->sqlWhere = "";
+		
 		if(is_array($this->filter)){
 			foreach($this->filter as $key=>$value){
 				if (strpos($key,'no_')!==false){
@@ -71,7 +80,146 @@ class Reports{
 			$this->sqlWhere = "WHERE `company`='{$this->company}' ";
 		}
 		
-		$this->caption = $this->oBudget->title.' vs '.$this->oReference->title.', '.$this->CurrencyTitle.($this->Denominator!=1?'x'.$this->Denominator:'');
+		return($this->sqlWhere);
+	}
+	
+	public function employees($filter){
+		$this->filter = is_array($this->filter)?array_merge($this->filter,$filter):$filter;
+		$this->_setWhere();
+		$sql = "SELECT scenario, account, Title, particulars, empTitleLocal, empSalary, empMonthly, ".$this->oBudget->getMonthlySumSQL($this->oBudget->nm,12+$this->oBudget->offset)." 
+				FROM `vw_master`
+				LEFT JOIN common_db.tbl_employee ON particulars=empGUID1C
+				{$this->sqlWhere}  AND item='453d8da7-963b-4c4f-85ca-99e26d9fc7a2' AND scenario='{$this->oBudget->id}' 
+				GROUP BY particulars,account
+					UNION ALL
+				SELECT scenario, account, Title, particulars,empTitleLocal, empSalary, empMonthly , ".$this->oBudget->getMonthlySumSQL($this->oBudget->nm,12+$this->oBudget->offset)." 
+				FROM `vw_master`
+				LEFT JOIN common_db.tbl_employee ON particulars=empGUID1C 
+				{$this->sqlWhere}  AND item='453d8da7-963b-4c4f-85ca-99e26d9fc7a2' AND scenario='{$this->oReference->id}' 
+				GROUP BY particulars,account
+				ORDER BY empSalary DESC, particulars, scenario";
+		$rs = $this->oSQL->q($sql);
+		
+		while ($rw=$this->oSQL->f($rs)){
+			$section = $rw['account']."::".$rw['Title'];
+			$arrReport[$section][$rw['particulars']]['title']=$rw['empTitleLocal'];
+			$arrReport[$section][$rw['particulars']]['salary']=$rw['empSalary'];
+			$arrReport[$section][$rw['particulars']]['bonus']=$rw['empMonthly'];
+			if (!is_array($arrReport[$section][$rw['particulars']]['data'])) $arrReport[$section][$rw['particulars']]['data'] = Array('actual'=>Array(),'budget'=>Array());
+			if ($rw['scenario']==$this->oBudget->id){
+				for ($m=$this->oBudget->nm;$m<=12+$this->oBudget->offset;$m++){
+					$month = $this->oBudget->arrPeriod[$m];
+					$arrReport[$section][$rw['particulars']]['data']['actual'][$month] += $rw[$month];
+				}
+			}
+			if ($rw['scenario']==$this->oReference->id){
+				for ($m=$this->oBudget->nm;$m<=12+$this->oBudget->offset;$m++){
+					$month = $this->oBudget->arrPeriod[$m];
+					$arrReport[$section][$rw['particulars']]['data']['budget'][$month] += $rw[$month];
+				}
+			}
+		}
+
+		$arrVacation = Array();	
+		for($m=$this->oBudget->nm;$m<=12+$this->oBudget->offset;$m++){ 
+			$month = $this->oBudget->arrPeriod[$m];
+			
+			$current_month_start = mktime(0,0,0,$m,1,$this->oBudget->year);
+			$current_month_end = mktime(23,59,59,$m+1,0,$this->oBudget->year);
+			
+			$sqlV = Array();
+			$sqlV[]="SET @dateStart:='".date('Y-m-d',$current_month_start)."',@dateEnd:='".date('Y-m-d',$current_month_end)."', @daysMonth = nlogjc.fn_daycount(@dateStart, @dateEnd, 'workdays');";
+			$sqlV[] = "SELECT empGUID1C, vacEmployeeID, empTitle, vacDateStart, vacDateEnd, IF(vacDateStart<@dateStart,@dateStart, vacDateStart),IF(vacDateEnd>@dateEnd,@dateEnd, vacDateEnd), 
+				nlogjc.fn_daycount(IF(vacDateStart<@dateStart,@dateStart, vacDateStart),IF(vacDateEnd>@dateEnd,@dateEnd, vacDateEnd),'workdays') as Duration,@daysMonth as daysMonth
+			FROM treasury.tbl_vacation
+			JOIN common_db.tbl_employee ON empID=vacEmployeeID
+			WHERE ((vacDateStart BETWEEN @dateStart AND @dateEnd) OR (vacDateEnd BETWEEN @dateStart AND @dateEnd))
+			AND vacStateID BETWEEN 410 AND 450
+			AND empProfitID={$this->filter['pc']}";
+			
+			for($i=0;$i<count($sqlV);$i++){
+				$rs = $this->oSQL->q($sqlV[$i]);
+			};
+			while ($rw = $this->oSQL->f($rs)){
+				$arrVacation[$rw['empGUID1C']][$month] = $rw['Duration'];
+			}
+		}
+		// echo '<pre>';print_r($sqlV);echo '</pre>';
+		foreach($arrReport as $section=>$arrTable){
+			$tableID = "kpi_".md5($sql.$section);
+			?>
+			<table id='<?php echo $tableID;?>' class='budget'>
+				<caption><?php echo $section;?></caption>
+				<thead>
+					<tr>
+						<th>Employee</th>
+						<th>Salary</th>
+						<th>M.Bonus</th>
+						<th>Scenario</th>
+						<?php 
+						echo $this->oBudget->getTableHeader('monhtly',$this->oBudget->nm, 12+$this->oBudget->offset); 
+						?>
+						<th class='budget-ytd'>Total</th>
+					</tr>
+				</thead>			
+				<tbody>
+			<?php
+			foreach ($arrTable as $employee=>$details){
+				?>
+				<tr>
+					<td rowspan="3"><?php echo $details['title'];?></td>
+					<td rowspan="3" class='budget-decimal'><?php self::render($details['salary'])?></td>
+					<td rowspan="3" class='budget-decimal'><?php self::render($details['bonus']);?></td>
+					<td>Actual</td>
+					<?php
+					for ($m=$this->oBudget->nm;$m<=12+$this->oBudget->offset;$m++){
+						// $month = $this->oBudget->arrPeriod[$m];
+						$month = $this->oBudget->arrPeriod[$m];
+						if($arrVacation[$employee][$month]){
+							$title  = "Vacation, ".$arrVacation[$employee][$month].' working days';
+						} else {
+							$title = '';
+						}
+						echo "<td title='{$title}' class='budget-decimal budget-monthly budget-$month'>",self::render($details['data']['actual'][$month]),'</td>';
+					}
+					?>
+					<td class='budget-ytd budget-decimal '><?php self::render(array_sum($details['data']['actual']));?></td>
+				</tr>
+				<tr>
+					<td>Budget</td>
+					<?php
+					for ($m=$this->oBudget->nm;$m<=12+$this->oBudget->offset;$m++){
+						// $month = $this->oBudget->arrPeriod[$m];
+						$month = $this->oBudget->arrPeriod[$m];
+						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($details['data']['budget'][$month]),'</td>';
+					}
+					?>
+					<td class='budget-ytd budget-decimal'><?php self::render(array_sum($details['data']['budget']));?></td>
+				</tr>
+				<tr class='budget-subtotal'>
+					<td>Diff</td>
+					<?php
+					for ($m=$this->oBudget->nm;$m<=12+$this->oBudget->offset;$m++){
+						// $month = $this->oBudget->arrPeriod[$m];
+						$month = $this->oBudget->arrPeriod[$m];
+						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($details['data']['actual'][$month]-$details['data']['budget'][$month]),'</td>';
+					}
+					?>
+					<td class='budget-ytd budget-decimal'><?php self::render(array_sum($details['data']['actual'])-array_sum($details['data']['budget']));?></td>
+				</tr>
+				<?php
+			}
+		}
+		?>
+		</tbody>
+		<tfoot>
+		
+		</tfoot>
+		</table>
+		<ul class='link-footer'>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+		</ul>
+		<?php
 	}
 	
 	public function salesByActivity(){
