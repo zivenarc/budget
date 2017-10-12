@@ -3477,8 +3477,16 @@ class Reports{
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
-				$rw['Budget item'] = "Operating income";				
+				$rw['Budget item'] = "Operating profit";				
 				$this->echoBudgetItemString($rw, 'budget-subtotal');
+			}
+			
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND account NOT LIKE '5999%' AND pccFlagProd=1)", $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "Own operating profit";				
+				$this->echoBudgetItemString($rw, 'budget-ratio');
 			}
 			
 			$arrYCT = Array();
