@@ -6,6 +6,14 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 					});
 				 },
 				spinner:'',
+				create: function (event, ui){
+					tablist = $(this).find('li').find('a');
+					for(i=0;i<tablist.length;i++){
+						if(location.hash && tablist[i].href.match(location.hash.substr(1))){
+							$(this).tabs('option','active',i);
+						}
+					}
+				},
 				load: function (event, ui) {
 						$('button',ui.panel).button();
 						$('input.journal-cb-all', ui.panel).change(function(){

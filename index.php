@@ -42,7 +42,7 @@ require ('includes/inc-frame_top.php');
 
 // echo '<pre>';print_r($arrUsrData);echo '</pre>';
 $arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>($arrUsrData['PCC']['pccFlagProd']?$arrUsrData['PCC']['pccParentCode1C']:''));
-$strQuery = http_build_query($arrDefaultParams);
+$strBaseQuery = http_build_query($arrDefaultParams);
 
 ?>
 <h1>Current scenario - <?php echo $oActual->title; ?>, current budget - <?php echo $oBudget->title; ?></h1>
@@ -65,24 +65,30 @@ if($oBudget->flagUpdate){
 	
 	?>
 	<nav><span><?php echo $oBudget->title;?>: </span>
-		<a href="rep_summary.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Summary</a>|
-		<a href="rep_monthly.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Monthly report</a>|
-		<a href="rep_pnl.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Full-year estimate</a>|
-		<a href="rep_totals.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Results per BU</a>|
-		<a href="rep_waterfall.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Waterfall</a>|
-		<a href="rep_graphs.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Charts</a>
+		<?php 
+			$strQuery = $strBaseQuery."&budget_scenario=".$oBudget->id."&reference=".$oBudget->reference_scenario->id."#".$arrUsrData['PCC']['pccGUID'];
+		?>
+		<a href="rep_summary.php?<?php echo $strQuery;?>">Summary</a>|
+		<a href="rep_monthly.php?<?php echo $strQuery;?>">Monthly report</a>|
+		<a href="rep_pnl.php?<?php echo $strQuery;?>">Full-year estimate</a>|
+		<a href="rep_totals.php?<?php echo $strQuery;?>">Results per BU</a>|
+		<a href="rep_waterfall.php?<?php echo $strQuery;?>">Waterfall</a>|
+		<a href="rep_graphs.php?<?php echo $strQuery;?>">Charts</a>
 	</nav>
 	<?php
 }
 
 ?>
 <nav><span><?php echo $oActual->title;?> vs <?php echo $oActual->reference_scenario->title;?>:</span>
-	<a href="rep_summary.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oActual->id;?>&reference=<?php echo $oActual->reference_scenario->id;?>">Summary</a>|
-	<a href="rep_monthly.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oActual->id;?>&reference=<?php echo $oActual->reference_scenario->id;?>">Monthly report</a>|
-	<a href="rep_pnl.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oActual->id;?>&reference=<?php echo $oActual->reference_scenario->id;?>">Full-year estimate</a>|
-	<a href="rep_totals.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oActual->id;?>&reference=<?php echo $oActual->reference_scenario->id;?>">Results per BU</a>|
-	<a href="rep_waterfall.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oActual->id;?>&reference=<?php echo $oActual->reference_scenario->id;?>">Waterfall</a>|
-	<a href="rep_graphs.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oActual->id;?>&reference=<?php echo $oActual->reference_scenario->id;?>">Charts</a>
+	<?php 
+		$strQuery = $strBaseQuery."&budget_scenario=".$oActual->id."&reference=".$oActual->reference_scenario->id."#".$arrUsrData['PCC']['pccGUID'];
+	?>
+	<a href="rep_summary.php?<?php echo $strQuery;?>">Summary</a>|
+	<a href="rep_monthly.php?<?php echo $strQuery;?>">Monthly report</a>|
+	<a href="rep_pnl.php?<?php echo $strQuery;?>">Full-year estimate</a>|
+	<a href="rep_totals.php?<?php echo $strQuery;?>">Results per BU</a>|
+	<a href="rep_waterfall.php?<?php echo $strQuery;?>">Waterfall</a>|
+	<a href="rep_graphs.php?<?php echo $strQuery;?>">Charts</a>
 </nav>
 
 <br/>

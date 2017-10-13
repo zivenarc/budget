@@ -1,5 +1,5 @@
 //Common UI function for entity lists
-$(window).load(function(){
+$(document).ready(function(){
 	$('.tabs').tabs({
 				beforeLoad: function( event, ui ) {
 					ui.panel.html("<div class='spinner'>Connecting...</div>");
@@ -10,13 +10,28 @@ $(window).load(function(){
 				  },								
 				spinner:'',
 				create: function (){
-					if (sessionStorage['tabNo_'+$(this).attr('id')]!=undefined) {
-						$(this).tabs('option','active',sessionStorage['tabNo_'+$(this).attr('id')]);
-					}
+					var tablist = $(this).find('li').find('a');
+					var matchstring = 'tab='+location.hash.substr(1)+'$';
+					console.log(matchstring);
+						for(i=0;i<tablist.length;i++){
+							if(location.hash && tablist[i].href.match(matchstring)){
+								$(this).tabs('option','active',i);
+							}
+						}
 				},
 				load: function(event, ui){
 					sessionStorage['tabNo_'+$(this).attr('id')] = $(this).tabs('option','active');
 					ui.panel.find('.eiseList').eiseList();
+				},
+				activate: function(event, ui) {
+					var query = ui.newTab[0].firstChild.href.split('?')[1];
+					var vars = query.split('&');
+						for (var i = 0; i < vars.length; i++) {
+						var pair = vars[i].split('=');
+						if (decodeURIComponent(pair[0]) == 'tab') {
+							window.location.hash = decodeURIComponent(pair[1]);
+						}
+					}
 				}
 				});
 

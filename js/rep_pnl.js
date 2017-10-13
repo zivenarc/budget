@@ -35,21 +35,24 @@ function drawGraph(arrData, target, options){
 }
 
 var tabs_options = {beforeLoad: function( event, ui ) {
-				$(ui.panel).html(spinner_div());
-				ui.jqXHR.error(function() {
-					  $(ui.panel).html(
+						$(ui.panel).html(spinner_div());
+						ui.jqXHR.error(function() {
+						$(ui.panel).html(
 						"<div class='error'>Error loading the data</div>" );
 					});
 				 },				
 				spinner:'',
-				create: function (){
-					if (localStorage.repPnlTab!=undefined) {
-						$(this).tabs('option','active',localStorage.repPnlTab);
+				create: function (event, ui){
+					tablist = $(this).find('li').find('a');
+					for(i=0;i<tablist.length;i++){
+						if(location.hash && tablist[i].href.match(location.hash.substr(1))){
+							$(this).tabs('option','active',i);
+						}
 					}
 				},
 				load: function (event, ui) {
 					init_panel(ui.panel); 
-					console.log(ui);
+					// console.log(ui);
 					localStorage.repPnlTab = $(this).tabs('option','active');
 				},	
 			};
