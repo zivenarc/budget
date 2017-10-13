@@ -6,6 +6,14 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 				});
 			 },
 			spinner:'',
+			create: function (event, ui){
+				tablist = $(this).find('li').find('a');
+				for(i=0;i<tablist.length;i++){
+					if(location.hash && tablist[i].href.match('tab='+location.hash.substr(1))){
+						$(this).tabs('option','active',i);
+					}
+				}
+			},
 			load: function (event, ui) {
 				$('button',ui.panel).button();
 				$('input:checkbox',ui.panel).button();
@@ -29,7 +37,17 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 						console.log(data);
 					});
 				});
-			},	
+			},
+			activate: function(event, ui) {
+				var query = ui.newTab[0].firstChild.href.split('?')[1];
+				var vars = query.split('&');
+					for (var i = 0; i < vars.length; i++) {
+					var pair = vars[i].split('=');
+					if (decodeURIComponent(pair[0]) == 'tab') {
+						window.location.hash = decodeURIComponent(pair[1]);
+					}
+				}
+			}				
 		};
 			
 $(document).ready(function(){

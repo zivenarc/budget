@@ -24,7 +24,17 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 								$(this).attr('checked',thisCB.prop('checked'));
 							})
 						});
-				},	
+				},
+				activate: function(event, ui) {
+					var query = ui.newTab[0].firstChild.href.split('?')[1];
+					var vars = query.split('&');
+						for (var i = 0; i < vars.length; i++) {
+						var pair = vars[i].split('=');
+						if (decodeURIComponent(pair[0]) == 'tab') {
+							window.location.hash = decodeURIComponent(pair[1]);
+						}
+					}
+				}				
 			};
 
 function spinner_div(){
