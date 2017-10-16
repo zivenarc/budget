@@ -826,6 +826,15 @@ class Sales extends Document{
 					
 				}
 				$oMaster->save();
+				
+				$this->doSQL("UPDATE `{$this->table}`, (SELECT SUM(".$this->budget->getYTDSQL(1+$this->budget->offset,max($this->budget->length,12+$this->budget->offset)).") as Total, source 
+							FROM reg_master 
+							WHERE item='".Items::REVENUE."' 
+							GROUP BY source) Budget 
+							SET `{$this->prefix}Revenue`=`Budget`.`Total`
+							WHERE `{$this->prefix}ID`={$this->ID} 
+							AND `{$this->prefix}GUID`=`Budget`.`source`;");
+				
 				$this->markPosted();				
 			}		
 	}

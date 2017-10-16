@@ -335,6 +335,9 @@ class Document extends easyForm{
 		return($success);
 	}
 	protected function doSQL($sql){
+		if(!is_array($sql)){
+			$sql = Array($sql);
+		}
 		$sql[]= "COMMIT;";
 		$sqlSuccess = true;
 		for ($i=0;$i<count($sql);$i++){
