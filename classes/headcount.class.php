@@ -461,14 +461,16 @@ class Headcount extends Document{
 					
 					//--------------------------------- Calculate vacations for the department
 					$arrVacation = Array();	
-					for($m=1;$m<=15;$m++){ 
+					for($m=1+$this->budget->offset;$m<=12+$this->budget->offset;$m++){ 
 						$month = $this->budget->arrPeriod[$m];
 						
 						$current_month_start = mktime(0,0,0,$m,1,$this->budget->year);
 						$current_month_end = mktime(23,59,59,$m+1,0,$this->budget->year);
 						
 						$sqlV = Array();
-						$sqlV[]="SET @dateStart:='".date('Y-m-d',$current_month_start)."',@dateEnd:='".date('Y-m-d',$current_month_end)."', @daysMonth = nlogjc.fn_daycount(@dateStart, @dateEnd, 'workdays');";
+						$sqlV[]="SET @dateStart:='".date('Y-m-d',$current_month_start)."',
+									@dateEnd:='".date('Y-m-d',$current_month_end)."', 
+									@daysMonth := nlogjc.fn_daycount('".date('Y-m-d',$current_month_start)."', '".date('Y-m-d',$current_month_end)."', 'workdays');";
 						$sqlV[] = "SELECT empGUID1C, vacEmployeeID, empTitle, vacDateStart, vacDateEnd, IF(vacDateStart<@dateStart,@dateStart, vacDateStart),IF(vacDateEnd>@dateEnd,@dateEnd, vacDateEnd), 
 							nlogjc.fn_daycount(IF(vacDateStart<@dateStart,@dateStart, vacDateStart),IF(vacDateEnd>@dateEnd,@dateEnd, vacDateEnd),'workdays') as Duration,@daysMonth as daysMonth
 						FROM treasury.tbl_vacation
@@ -480,8 +482,8 @@ class Headcount extends Document{
 						for($i=0;$i<count($sqlV);$i++){
 							$rs = $this->oSQL->q($sqlV[$i]);
 						};
-						while ($rw = $this->oSQL->f($rs)){
-							$arrVacation[$rw['empGUID1C']][$month] = $rw['Duration']/$rw['daysMonth'];
+						while ($rw = $this->oSQL->f($rs)){							
+							if($rw['Duration']) $arrVacation[$rw['empGUID1C']][$month] = $rw['Duration']/$rw['daysMonth'];
 						}
 						
 					}
@@ -588,12 +590,16 @@ class Headcount extends Document{
 
 
 						
-					}				
+					}
+					if($record->activity){
+						$master_row->activity = $record->activity;
+					} else {
+						$oMaster->distribute_activity($master_row,$this->pc->activity);
+					}
 					
 					//-----------------------------------------------------------------Unused vacation accrual
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->pc->code;
-					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 					$master_row->customer = $record->customer;							
 					$master_row->item = Items::UNUSED_VACATION_ACCRUAL;
 					$oItem = $Items->getById($master_row->item);
@@ -603,11 +609,14 @@ class Headcount extends Document{
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = - (28+$oEmployee->addlVacation)/12/29.4 * ($record->{$month})*($record->salary+$record->monthly_bonus);
 					}
-					
+					if($record->activity){
+						$master_row->activity = $record->activity;
+					} else {
+						$oMaster->distribute_activity($master_row,$this->pc->activity);
+					}
 					//-----------------------------------------------------------------Social tax
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->pc->code;
-					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 					$master_row->customer = $record->customer;					
 					$master_row->particulars = $record->employee;
 					$master_row->part_type = 'EMP';	
@@ -619,12 +628,15 @@ class Headcount extends Document{
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -$social_tax[$month];
 					}
-					
+					if($record->activity){
+						$master_row->activity = $record->activity;
+					} else {
+						$oMaster->distribute_activity($master_row,$this->pc->activity);
+					}
 										
 					//-----------------------------------------------------------------Mobile costs
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->pc->code;
-					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 					$master_row->customer = $record->customer;
 					$master_row->particulars = $record->employee;
 					$master_row->part_type = 'EMP';					
@@ -637,12 +649,15 @@ class Headcount extends Document{
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = - $record->{$month}*$record->mobile_limit;
 					}
-					
+					if($record->activity){
+						$master_row->activity = $record->activity;
+					} else {
+						$oMaster->distribute_activity($master_row,$this->pc->activity);
+					}
 					//-----------------------------------------------------------------IT Equipment
 					if ($this->type=='new'){
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $this->pc->code;
-						$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 						$master_row->customer = $record->customer;
 						// $master_row->particulars = $record->employee;
 						// $master_row->part_type = 'EMP';					
@@ -659,12 +674,16 @@ class Headcount extends Document{
 							}
 							
 						}
+						if($record->activity){
+							$master_row->activity = $record->activity;
+						} else {
+							$oMaster->distribute_activity($master_row,$this->pc->activity);
+						}
 					}
 					//-----------------------------------------------------------------Fuel costs
 					if ($record->fuel>0){
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $this->pc->code;
-						$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 						$master_row->customer = $record->customer;
 						$master_row->particulars = $record->employee;
 						$master_row->part_type = 'EMP';					
@@ -677,11 +696,15 @@ class Headcount extends Document{
 							$month = $this->budget->arrPeriod[$m];
 							$master_row->{$month} = - $record->{$month}*$record->fuel;
 						}
+						if($record->activity){
+							$master_row->activity = $record->activity;
+						} else {
+							$oMaster->distribute_activity($master_row,$this->pc->activity);
+						}
 					}
 					//-----------------------------------------------------------------Bonus
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->pc->code;
-					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 					$master_row->customer = $record->customer;
 					$master_row->particulars = $record->employee;
 					$master_row->part_type = 'EMP';					
@@ -698,11 +721,14 @@ class Headcount extends Document{
 														+$this->bonus_department/100)
 													*$this->settings['regular_bonus_base']/100/3;
 					}
-					
+					if($record->activity){
+						$master_row->activity = $record->activity;
+					} else {
+						$oMaster->distribute_activity($master_row,$this->pc->activity);
+					}
 					//-----------------------------------------------------------------Medical insurance
 					$master_row = $oMaster->add_master();
-					$master_row->profit = $this->pc->code;
-					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;				
+					$master_row->profit = $this->pc->code;	
 					$master_row->customer = $record->customer;
 					$master_row->particulars = $record->employee;
 					$master_row->part_type = 'EMP';					
@@ -735,12 +761,15 @@ class Headcount extends Document{
 							}
 						}						
 					}
-					
+					if($record->activity){
+						$master_row->activity = $record->activity;
+					} else {
+						$oMaster->distribute_activity($master_row,$this->pc->activity);
+					}
 					if ($this->type=='new'){
 						//-----------------------------------------------------------------Hiring for newcomers
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $this->pc->code;
-						$master_row->activity = $record->activity?$record->activity:$this->pc->activity;		
 						$master_row->customer = $record->customer;
 						$master_row->particulars = $record->employee;
 						$master_row->part_type = 'EMP';	
@@ -757,6 +786,11 @@ class Headcount extends Document{
 								$master_row->{$month} = - abs($record->new_fte) * $this->settings['hiring'] * $record->salary * 12;							
 							}						
 						}
+						if($record->activity){
+							$master_row->activity = $record->activity;
+						} else {
+							$oMaster->distribute_activity($master_row,$this->pc->activity);
+						}
 					}
 					
 				}//---end of record cycle
@@ -766,9 +800,6 @@ class Headcount extends Document{
 				if ($this->type=='current'){
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->pc->code;
-					$master_row->activity = $this->pc->activity;	
-					// $master_row->customer = $record->customer;					
-					
 					$master_row->item = Items::HIRING_COSTS;
 					$oItem = $Items->getById($master_row->item);
 					$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
@@ -777,13 +808,12 @@ class Headcount extends Document{
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = - $this->settings['hiring'] * $payroll[$month] * $this->turnover/100;
 					}
+					$oMaster->distribute_activity($master_row,$this->pc->activity);
 				}
 				//-----------------------------------------------------------------Overtime
 				$master_row = $oMaster->add_master();
 				$master_row->profit = $this->pc->code;
 				$master_row->activity = $this->pc->activity;	
-				// $master_row->customer = $record->customer;					
-				
 				$master_row->item = Items::OVERTIME_WORK;
 				$oItem = $Items->getById($master_row->item);
 				$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;
@@ -792,12 +822,10 @@ class Headcount extends Document{
 					$month = $this->budget->arrPeriod[$m];
 					$master_row->{$month} = - $payroll[$month] * $this->overtime/100;
 				}
-				
+				$oMaster->distribute_activity($master_row,$this->pc->activity);
 				//-----------------------------------------------------------------Canteen
 				$master_row = $oMaster->add_master();
-				$master_row->profit = $this->pc->code;
-				$master_row->activity = $this->pc->activity;	
-				// $master_row->customer = $record->customer;					
+				$master_row->profit = $this->pc->code;			
 				$master_row->item = Items::CANTEEN;
 				$oItem = $Items->getById($master_row->item);
 				$master_row->account = $this->pc->prod ? $oItem->YACTProd : $oItem->YACTCorp;				
@@ -806,7 +834,8 @@ class Headcount extends Document{
 					$month = $this->budget->arrPeriod[$m];
 					$master_row->{$month} = - $hcCount[$month][1]*$this->settings['canteen_wc'] - $hcCount[$month][0]*$this->settings['canteen_bc'];
 				}
-				
+				$oMaster->distribute_activity($master_row,$this->pc->activity);
+									
 				$oMaster->save();
 				$this->markPosted();
 			}

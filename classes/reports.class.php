@@ -837,6 +837,7 @@ class Reports{
 				<th>#</th>
 				<th>PC</th>
 				<th>Customer</th>
+				<th>prdID</th>
 				<th>Activity</th>
 				<th colspan="2">YACT</th>
 				<th>Item</th>
@@ -852,6 +853,7 @@ class Reports{
 				<td><?php echo $i;?></td>
 				<td><?php echo $rw['Profit'];?></td>
 				<td><?php echo $rw['Customer_name'];?></td>
+				<td><?php echo $rw['activity'];?></td>
 				<td><?php echo $rw['Activity_title'];?></td>
 				<td><?php echo $rw['account'];?></td>
 				<td><?php echo $rw['Title'];?></td>
@@ -874,7 +876,7 @@ class Reports{
 		?>
 		<tfoot>
 			<tr class='budget-subtotal'>
-				<td colspan="9">Total:</td>
+				<td colspan="10">Total:</td>
 				<?php
 					for($m=1+$this->oBudget->offset;$m<=max(12+$this->oBudget->offset,$this->oBudget->length);$m++){
 						$month = $this->oBudget->arrPeriod[$m];

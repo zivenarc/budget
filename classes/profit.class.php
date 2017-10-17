@@ -46,14 +46,27 @@ class ProfitCenters extends Reference{
 class ProfitCenter {
 	
 	function __construct($id,$params){
-		GLOBAL $strLocal;
+		GLOBAL $oSQL, $strLocal;
 		
 		$this->code = $params['pccID'];
+		$this->guid = $params['pccGUID'];
 		$this->id = $id;
 		$this->name = $params["pccTitle$strLocal"];
 		$this->prod = $params["pccFlagProd"];
 		$this->location = $params["pccDefaultLocation"];
 		$this->activity = $params["pccProductTypeID"];
+		$sql = "SELECT activity, value FROM ref_distr WHERE pc='{$this->guid}'";
+		$rs = $oSQL->q($sql);
+		if($oSQL->n($rs)){
+			$this->activity = Array();
+			while($rw = $oSQL->f($rs)){
+				$this->activity[$rw['activity']] = $rw['value'];
+			}
+			$total = array_sum($this->activity);
+			foreach($this->activity as $key=>$value){
+				$this->activity[$key] = $value/$total;
+			}
+		}
 		// $this->manager = parent::getByCode($params['empManagerID']);
 	}
 	

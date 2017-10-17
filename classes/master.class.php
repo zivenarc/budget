@@ -127,6 +127,26 @@ class Master {
 		$arrRes['html']=ob_get_clean();
 		return($arrRes);
 	}
+	
+	public function distribute_activity(&$oRow, $arrActivity){
+		
+		if(is_array($arrActivity)){
+			foreach($arrActivity as $activity=>$ratio){
+				$newRow = $this->add_master();
+				foreach (get_object_vars($oRow) as $key => $value) {
+					$newRow->$key = $value;
+				}
+				$newRow->activity = $activity;
+				for($m=1;$m<=15;$m++){
+					$month = $this->budget->arrPeriod[$m];
+					$newRow->{$month} = $oRow->{$month}*$ratio;
+				}
+			}
+			$oRow->set_month_array(array_fill(0,15,0));
+		} else {
+			$oRow->activity = $arrActivity;
+		}
+	}
 }
 
 ?>

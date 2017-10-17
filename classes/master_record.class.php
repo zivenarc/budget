@@ -29,8 +29,17 @@ class master_record{
 		
 	public function set_month_value($i, $value){
 		//$month = date('M',time(0,0,0,(integer)$i,15));
-		$month = $this->_arrPeriod[$m];
+		$month = $this->_arrPeriod[$i];
 		$this->{$month} =(double)$value;
+		return(true);
+	}
+	
+	public function set_month_array($array=Array()){
+		//$month = date('M',time(0,0,0,(integer)$i,15));
+		for($m=1;$m<=15;$m++){
+			$month = $this->_arrPeriod[$m];
+			$this->{$month} =(double)$value;
+		}
 		return(true);
 	}
 	
@@ -46,11 +55,16 @@ class master_record{
 		
 		// echo '<pre>';print_r($this);echo '</pre>';die();
 		
+		$checkHasNumbers = false;
+		
 		for($m=$mStart;$m<=$mEnd;$m++){
 			// $month = date('M',mktime(0,0,0,$m,15));
 			$month = $this->_arrPeriod[$m];			
 			$arrRes[] = "`$month`=".$this->{$month};
+			$checkHasNumbers |= $this->{$month};
 		}
+		
+		if(!$checkHasNumbers) return (null);
 				
 		$arrRes[] = "`company`='{$this->company}'"; 
 		$arrRes[] = "`account`='".$this->account."'";		
