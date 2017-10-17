@@ -56,7 +56,6 @@ class Master {
 					,scnLastSource='".$this->id."'
 					,scnEditBy='".$arrUsrData['usrID']."'
 					,scnEditDate=NOW()
-					,scnChecksum='".$this->budget->get_checksum()."'
 					WHERE scnID='".$this->scenario."';";
 		
 		$sql[] = "COMMIT;";
