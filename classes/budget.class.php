@@ -52,6 +52,8 @@ class Budget{
 		$this->flagUpdate = !$rw['scnFlagReadOnly'];
 		$this->flagArchive = (integer)$rw['scnFlagArchive'];
 		
+		$this->checksum = $rw['scnChecksum'];
+		
 		$this->getSettings($this->oSQL, $this->id);
 		$this->rates = "<a href='?currency=840'>USD</a> = {$this->settings['usd']}, <a href='?currency=978'>EUR</a> = {$this->settings['eur']}";
 		
@@ -799,6 +801,25 @@ class Budget{
 		}
 		if ($success) $res['status'] = 'success';
 		return ($res);
+	}
+	
+	function write_checksum(){
+		$this->oSQL->q("DELETE FROM reg_summary WHERE scenario='{$this->id}'");
+		$this->oSQL->q("INSERT INTO reg_summary 
+						SELECT company,pc,pccFlagProd,activity,account,item,scenario,SUM(`jan`) AS 'jan',SUM(`feb`) AS 'feb',SUM(`mar`) AS 'mar',SUM(`apr`) AS 'apr',SUM(`may`) AS 'may',SUM(`jun`) AS 'jun',SUM(`jul`) AS 'jul',SUM(`aug`) AS 'aug',SUM(`sep`) AS 'sep',SUM(`oct`) AS 'oct',SUM(`nov`) AS 'nov',SUM(`dec`) AS 'dec',SUM(`jan_1`) AS 'jan_1',SUM(`feb_1`) AS 'feb_1',SUM(`mar_1`) AS 'mar_1'
+						FROM reg_master
+						LEFT JOIN common_db.tbl_profit ON pccID=pc
+						WHERE scenario='{$this->id}'
+						GROUP BY company,pc,pccFlagProd,activity,account,item,scenario");
+		$this->oSQL->q("UPDATE tbl_scenario SET scnEditDate=NOW(), scnChecksum='".$this->get_checksum()."' WHERE scnID='{$this->id}'");
+	}
+	
+	function get_checksum(){
+		$sql = "SELECT md5(GROUP_CONCAT(CONCAT_WS('#',company,pc,activity,customer,account,item,jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,`dec`,jan_1,feb_1,mar_1,source,scenario,sales,bdv,customer_group_code))) 
+					FROM reg_master 
+					WHERE scenario='{$this->id}'";
+		$res = $this->oSQL->get_data($sql);
+		return($res);
 	}
 	
 }

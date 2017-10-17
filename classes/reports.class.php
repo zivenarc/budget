@@ -3326,6 +3326,14 @@ class Reports{
 			$this->colspan = 18;
 		}
 		
+		//---------------check if summary is up to date--------------------
+		if($this->oBudget->checksum != $this->oBudget->get_checksum()){
+			$this->oBudget->write_checksum();
+		}
+		if($this->oReference->checksum != $this->oReference->get_checksum()){
+			$this->oReference->write_checksum();
+		}
+		
 		$strFields = $this->_getMRFields();
 		$strFieldsKPI = $this->_getMRFields(Array('denominator'=>1,'currency'=>643));
 		
@@ -3333,12 +3341,12 @@ class Reports{
 		
 		$sql = "SELECT 
 					{$strFields['actual']}
-			FROM `vw_master`			
+			FROM `reg_summary`			
 			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND `item` IS NOT NULL			
 			UNION ALL
 				SELECT 
 				{$strFields['budget']}
-			FROM `vw_master`				
+			FROM `reg_summary`				
 			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND `item` IS NOT NULL			
 			";
 		
