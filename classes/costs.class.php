@@ -417,7 +417,6 @@ class Indirect_costs extends Document{
 					
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $record->profit;
-					$master_row->activity =  $record->activity?$record->activity:$record->pc->activity;;
 					$master_row->customer = $record->customer;					
 					$item = $Items->getById($record->item);
 					$master_row->account = $item->getYACT($master_row->profit);
@@ -428,7 +427,11 @@ class Indirect_costs extends Document{
 						$denominator = $record->period=='annual'?1/min($nCount,12):1;						
 						$master_row->{$month} = -$record->{$month}*$record->buying_rate*$currency_rate*$denominator;
 					}				
-											
+					if($record->activity){
+						$master_row->activity = $record->activity;
+					} else {
+						$oMaster->distribute_activity($master_row,$record->pc->activity);
+					}						
 					
 					//echo '<pre>';print_r($master_row);echo '</pre>';
 
