@@ -223,7 +223,7 @@ if ($oDocument->flagPosted){
 		$arrWarning[] = Array('class'=>'info','text'=>"OFF Volume: <strong>{$nTEU} TEU</strong>. GP per unit: <strong>".number_format($oDocument->amount/$nTEU,0)."</strong>");
 	}
 	if($nKgs){
-		$arrWarning[] = Array('class'=>'info','text'=>"OFF Volume: <strong>{$nKgs} Kgs</strong>. GP per unit: <strong>".number_format($oDocument->amount/$nKgs,0)."</strong>");
+		$arrWarning[] = Array('class'=>'info','text'=>"AFF Volume: <strong>{$nKgs} Kgs</strong>. GP per unit: <strong>".number_format($oDocument->amount/$nKgs,0)."</strong>");
 	}
 }
 
