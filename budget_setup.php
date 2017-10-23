@@ -129,11 +129,7 @@ $oBudget = new Budget($_GET['tab']);
 	</td>
 	</tr></table>
 	</div>
-	<nav>
-		<a target='_blank' href='sp_get_kpi.php?budget_scenario=<?php echo $_GET['tab'];?>'>Get KPIs from Nlogjc</a>|
-		<a  target='_blank' href='rep_staff_costs.php?budget_scenario=<?php echo $_GET['tab'];?>'>Refresh headcount</a>|	
-	</nav>
-	<nav><span>Compare to <?php echo $oBudget->reference_scenario->title;?>:</span>
+	<nav><strong>Compare to <?php echo $oBudget->reference_scenario->title;?>:</strong>
 		<a href="rep_summary.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Summary</a>|
 		<a href="rep_monthly.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Monthly report</a>|
 		<a href="rep_pnl.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Full-year estimate</a>|
@@ -143,6 +139,12 @@ $oBudget = new Budget($_GET['tab']);
 		<a href="sp_ghq.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">GHQ report</a>|
 		<a href="rep_summary_ghq.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">GHQ summary</a>|
 		<a href="rep_sales_kpi.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Sales KPI</a>
+	</nav>
+	<nav>
+		<a href='sp_post_all.php#<?php echo $_GET['tab'];?>'>Post all</a>|
+		<a href='sp_repost_hr.php#<?php echo $_GET['tab'];?>'>HR docs</a>|
+		<a href='sp_repost_loc.php#<?php echo $_GET['tab'];?>'>Location costs</a>|
+		<a href='sp_repost_hq.php#<?php echo $_GET['tab'];?>'>HQ costs</a>
 	</nav>
 	</div>
 	<h2>Budget variables</h2>
@@ -204,14 +206,6 @@ $oBudget = new Budget($_GET['tab']);
 		include ('includes/inc-frame_top.php');
 		echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
 		Budget::getScenarioTabs();
-		?>
-		<nav>
-			<a href='sp_post_all.php'>Post all</a>|
-			<a href='sp_repost_hr.php'>HR docs</a>|
-			<a href='sp_repost_loc.php'>Location costs</a>|
-			<a href='sp_repost_hq.php'>HQ costs</a>
-		</nav>
-		<?php
 		include ('includes/inc-frame_bottom.php');
 }
 
