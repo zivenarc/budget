@@ -277,7 +277,7 @@ class Sales extends Document{
 		);	
 		
 		$this->grid->Columns[] =Array(
-				'title'=>"HBL/HAWB"
+				'title'=>"Gross billing"
 				,'field'=>'hbl'
 				,'type'=>'boolean'
 				,'width'=>'35px'

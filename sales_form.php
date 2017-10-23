@@ -209,9 +209,21 @@ $strPageSubtitle = $oDocument->ID?$oDocument->ID:"New";
 if ($oDocument->flagPosted){
 	foreach($oDocument->records[$oDocument->gridName] as $id=>$record){
 		$nKPI+=$record->kpi;
+		if ($record->kpi && $record->unit=='TEU'){
+			$nTEU += $record->total();
+		}
+		if ($record->kpi && $record->unit=='Kgs'){
+			$nKgs += $record->total();
+		}
 	}
 	if(!$nKPI){
 		$arrWarning[] = Array('class'=>'error','text'=>'No KPIs are reported by this document');
+	}
+	if($nTEU){
+		$arrWarning[] = Array('class'=>'info','text'=>"OFF Volume: <strong>{$nTEU} TEU</strong>. GP per unit: <strong>".number_format($oDocument->amount/$nTEU,0)."</strong>");
+	}
+	if($nKgs){
+		$arrWarning[] = Array('class'=>'info','text'=>"OFF Volume: <strong>{$nKgs} Kgs</strong>. GP per unit: <strong>".number_format($oDocument->amount/$nKgs,0)."</strong>");
 	}
 }
 
