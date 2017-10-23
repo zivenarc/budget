@@ -38,7 +38,7 @@ if($oDocument->flagDeleted){
 }
 
 if(isset($oDocument->budget) && !$oDocument->budget->flagUpdate){
-	echo '<p class="warning">The budget has been submitted and cannot be updated</p>';
+	$arrWarning[] = Array('class'=>'warning','text'=>'The budget has been submitted and cannot be updated');
 }
 
 if ($oDocument->classified) {
@@ -51,6 +51,11 @@ if ($oDocument->classified) {
 	}
 }
 
+for($i=0;$i<count($arrWarning);$i++){
+	?>
+	<div class='<?php echo $arrWarning[$i]['class']?$arrWarning[$i]['class']:'info';?>'><?php echo $arrWarning[$i]['text'];?></div>
+	<?php
+}
 ?>
 <script>
 	var doc = <?php $oDocument->getJSON(); ?>;

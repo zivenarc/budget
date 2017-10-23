@@ -206,6 +206,15 @@ $oDocument->fillGrid();
 
 // $arrUsrData["pagTitle$strLocal"] .= ' #'.$oDocument->ID;
 $strPageSubtitle = $oDocument->ID?$oDocument->ID:"New";
+if ($oDocument->flagPosted){
+	foreach($oDocument->records[$oDocument->gridName] as $id=>$record){
+		$nKPI+=$record->kpi;
+	}
+	if(!$nKPI){
+		$arrWarning[] = Array('class'=>'error','text'=>'No KPIs are reported by this document');
+	}
+}
+
 
 require ('includes/inc-frame_top.php');
 require ('includes/inc_document_header.php');
