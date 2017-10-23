@@ -313,7 +313,6 @@ class Location_costs extends Document{
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $hc_data['pc'];
 						$pc = $ProfitCenters->getByCode($master_row->profit);
-						$master_row->activity = $hc_data['activity']?$hc_data['activity']:$pc->activity;
 						$master_row->customer = $record->customer;										
 						//$activity = $Activities->getByCode($record->activity);
 						$denominator = $record->period=='annual'?12:1;
@@ -328,7 +327,11 @@ class Location_costs extends Document{
 								$master_row->{$month} = 0;
 							}
 						}				
-												
+						if($hc_data['activity']){
+							$master_row->activity = $hc_data['activity'];
+						} else {
+							$oMaster->distribute_activity($master_row,$pc->activity);
+						}					
 						
 						//echo '<pre>';print_r($master_row);echo '</pre>';
 					}
