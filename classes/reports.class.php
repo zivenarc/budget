@@ -2390,16 +2390,14 @@ class Reports{
 		$rs = $this->oSQL->q($sql);
 		
 		while ($rw=$this->oSQL->f($rs)){
-			
-			foreach ($rw as $key=>$value){
-				$arrGrandTotal[$key] += $value;
-			}
-			
+				
 			$l1Code = (string)$rw['level1_code'];
 			$arrSubreport[$l1Code][$rw['level2_code']] = Array('Level1_title'=>$rw['Level1_title'],'Budget item'=>$rw['level2_title'],'level1_code'=>$l1Code);
 			
 			for($i=0;$i<count($this->columns);$i++){
 				$arrSubreport[$l1Code][$rw['level2_code']][$this->columns[$i]] += $rw[$this->columns[$i]];
+				$arrTotal[$rw['level2_code']]['Budget item'] = 'Total '.$rw['level2_title'];
+				$arrTotal[$rw['level2_code']][$this->columns[$i]] += $rw[$this->columns[$i]];
 			}		
 		}
 		
@@ -2465,7 +2463,7 @@ class Reports{
 		}		
 				
 		?>
-		<table id='<?php echo $tableID;?>' class='budget'>
+		<table id='<?php echo $this->ID;?>' class='budget'>
 			<caption><?php echo $this->caption;?></caption>
 			<thead>
 				<tr>
@@ -2513,6 +2511,8 @@ class Reports{
 		foreach ($arrReport as $key=>$data){			
 			$this->echoBudgetItemString($data, 'budget-item',false);
 		}
+		$this->echoBudgetItemString($arrTotal, 'budget-subtotal');
+		$this->_getOtherFinancials('','','',Array('headcount'=>true));
 		?>
 		</tbody>
 		</table>
@@ -2520,7 +2520,7 @@ class Reports{
 			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
 		</ul>
 		<?php
-		$arrGrandTotal['Budget item'] = 'Grand total';
+
 		return ($arrGrandTotal);
 	}
 	
