@@ -1484,34 +1484,7 @@ class Reports{
 			$this->sqlSelect .= ($this->sqlSelect?",\r\n":"")."SUM(`{$field}`) as '{$field}'";
 		}
 		
-		// switch ($type){
-			// case 'activity':		
-				// $params = Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity');	
-				// break;
-			// case 'ghq':
-				// $params = Array('field_data'=>'prtGHQ','field_title'=>'prtGHQ','title'=>'GHQ');	
-				// break;
-			// case 'sales':			
-				// $params = Array('field_data'=>'sales','field_title'=>'usrTitle','title'=>'Responsible');	
-				// break;
-			// case 'bdv':			
-				// $params = Array('field_data'=>'bdv','field_title'=>'bdvTitle','title'=>'Selling unit');	
-				// break;
-			// case 'pc':			
-				// $params = Array('field_data'=>'pc','field_title'=>'Profit','title'=>'Business unit');	
-				// break;
-			// case 'bu_group':			
-				// $params = Array('field_data'=>'bu_group','field_title'=>'bu_group_title','title'=>'BU group');	
-				// break;
-			// case 'customer':
-				// $params = Array('field_data'=>'customer','field_title'=>'Customer_name','title'=>'Customer');
-				// break;
-			// case 'customer_group':
-			// default:			
-				// $params = Array('field_data'=>'customer_group_code','field_title'=>'customer_group_title','title'=>'Customer group');
-				// break;
-		// };		
-		
+	
 		$strFields = $this->_getPeriodicFields();
 		
 		if ($this->YACT){
@@ -2367,6 +2340,190 @@ class Reports{
 			return ($this->_processFLData($rs));
 	}
 	
+	public function productivityReport(){
+		$sqlWhere = $this->sqlWhere;
+		$this->columns = Array('Total','Total_AM','estimate','estimate_AM','YTD_A','YTD_B','ROY_A','ROY_B');
+		$this->sqlSelect = "";
+		for ($m = 1;$m<=15;$m++){
+			$this->columns[] = $this->oBudget->arrPeriod[$m];
+		}
+		for ($q = 1;$q<=5;$q++){
+			$this->columns[] = 'Q'.$q;
+		}
+		foreach($this->columns as $i=>$field){
+			$this->sqlSelect .= ($this->sqlSelect?",\r\n":"")."SUM(`{$field}`) as '{$field}'";
+		}
+		
+		$strFields = $this->_getPeriodicFields(Array('denominator'=>1));
+		$strGPFilter = "Group_code=".self::GP_CODE; 
+		$sqlMeasure = "customer_group_title as 'Level1_title'
+						, customer_group_code as 'level1_code', `Budget item`, `Group` as `level2_title`, `Group_code` as `level2_code`,`itmOrder`,";
+		$strGroupTitle = 'Customer group';			
+		$sqlGroup = "GROUP BY Level1_title, level1_code, `level2_title`, `level2_code`";
+		$sqlOrder = "ORDER BY `level1_code` ASC";
+
+		
+		ob_start();
+				$sql = "SELECT customer_group_title as 'Level1_title', customer_group_code as 'level1_code', `unit` as `level2_title`, `unit` as `level2_code`,
+					{$strFields['actual']}
+			FROM `vw_sales`			
+			{$sqlWhere}  
+				AND scenario='{$strFields['from_a']}' 
+				
+			GROUP BY level1_code,level2_code
+			UNION ALL
+				SELECT customer_group_title as 'Level1_title', customer_group_code as 'level1_code', `unit` as `level2_title`, `unit` as `level2_code`,
+				{$strFields['budget']}
+			FROM `vw_sales`				
+			{$sqlWhere} 
+				AND scenario='{$strFields['from_b']}' 
+				
+			GROUP BY level1_code,level2_code	
+			";
+		
+		$sql = "SELECT `Level1_title`, `level1_code`, `level2_title`, `level2_code`,
+					{$this->sqlSelect}
+				FROM ({$sql}) U 
+				{$sqlGroup} 
+				{$sqlOrder}";
+		
+		$rs = $this->oSQL->q($sql);
+		
+		while ($rw=$this->oSQL->f($rs)){
+			
+			foreach ($rw as $key=>$value){
+				$arrGrandTotal[$key] += $value;
+			}
+			
+			$l1Code = (string)$rw['level1_code'];
+			$arrSubreport[$l1Code][$rw['level2_code']] = Array('Level1_title'=>$rw['Level1_title'],'Budget item'=>$rw['level2_title'],'level1_code'=>$l1Code);
+			
+			for($i=0;$i<count($this->columns);$i++){
+				$arrSubreport[$l1Code][$rw['level2_code']][$this->columns[$i]] += $rw[$this->columns[$i]];
+			}		
+		}
+		
+		
+		$strFields = $this->_getPeriodicFields();
+		$sql = "SELECT {$sqlMeasure}
+					{$strFields['actual']}
+			FROM `vw_master`			
+			{$sqlWhere}  
+				AND scenario='{$strFields['from_a']}' 
+				AND {$strGPFilter}
+			{$sqlGroup}	
+			UNION ALL
+				SELECT {$sqlMeasure}
+				{$strFields['budget']}
+			FROM `vw_master`				
+			{$sqlWhere} 
+				AND scenario='{$strFields['from_b']}' 
+				AND {$strGPFilter}
+			{$sqlGroup}			
+			";
+		
+		$sql = "SELECT `Level1_title`, `level1_code`, `level2_title`, `level2_code`,`itmOrder`,
+					{$this->sqlSelect}
+				FROM ({$sql}) U 
+				{$sqlGroup} 
+				{$sqlOrder}";
+		
+		$rs = $this->oSQL->q($sql);
+		
+		while ($rw=$this->oSQL->f($rs)){
+			
+			foreach ($rw as $key=>$value){
+				$arrGrandTotal[$key] += $value;
+			}
+			
+			$l1Code = (string)$rw['level1_code'];
+			$arrSubreport[$l1Code][$rw['level2_code']] = Array('Level1_title'=>$rw['Level1_title'],'Budget item'=>$rw['level2_title'],'level1_code'=>$l1Code);
+			
+			for($i=0;$i<count($this->columns);$i++){
+				$arrSubreport[$l1Code][$rw['level2_code']][$this->columns[$i]] += $rw[$this->columns[$i]];
+			}
+								
+			$arrSort[$l1Code]['value'] += $rw['YTD_A']+$rw['YTD_B']+$rw['Total_AM']+$rw['estimate_AM'];	
+			//if (!$template) $template = $rw;
+			
+		}
+		
+		foreach($arrSubreport as $l1Code=>$data){
+			$arrSubreport[$l1Code]['ratio'] = Array('Level1_title'=>$data['Level1_title'],'Budget item'=>"GP per TEU",'level1_code'=>$l1Code,'class'=>'budget-ratio');
+			for($i=0;$i<count($this->columns);$i++){
+				if ($arrSubreport[$l1Code]['TEU'][$this->columns[$i]]) {
+					$arrSubreport[$l1Code]['ratio'][$this->columns[$i]] = $arrSubreport[$l1Code]['94'][$this->columns[$i]]/$arrSubreport[$l1Code]['TEU'][$this->columns[$i]];
+				} else {
+					$arrSubreport[$l1Code]['ratio'][$this->columns[$i]] = 'n/a';
+				}
+			}
+		}
+		
+		arsort($arrSort);
+		foreach ($arrSort as $key=>$value){
+			$arrReport[$key] = $arrSubreport[$key];
+		}		
+				
+		?>
+		<table id='<?php echo $tableID;?>' class='budget'>
+			<caption><?php echo $this->caption;?></caption>
+			<thead>
+				<tr>
+					<th><?php echo $firstLevelTitle; ?></th>
+					<th>Account</th>					
+					<?php 
+						echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset,12+$this->oBudget->offset);
+						echo $this->oBudget->getTableHeader('quarterly');
+					?>		
+					<th class='budget-ytd'><?php echo strpos($this->oBudget->type,'Budget')!==false?'Budget':'FYE';?></th>
+					<th><?php echo strpos($this->oBudget->type,'Budget')!==false?$this->oReference->id:'Budget';?></th>
+					<th>Diff</th>
+					<th>%</th>
+					<?php 
+					if ($this->oBudget->length>12){
+					?>
+						<th class='budget-monthly'>Jan+</th>
+						<th class='budget-monthly'>Feb+</th>
+						<th class='budget-monthly'>Mar+</th>
+						<th class='budget-quarterly'>Q5(Jan-Mar)</th>
+						<th class='budget-ytd'><?php echo $this->oBudget->type=='Budget'?'Budget':'FYE';?> Apr-Mar</th>
+						<th><?php echo $this->oBudget->type=='Budget'?$this->oReference->id:'Budget';?> Apr-Mar</th>
+						<th>Diff</th>
+					<?php
+						$this->colspan += 4;
+					}					
+					if (strpos($this->oBudget->type,'FYE')!== false) {
+					?>
+					<th class='budget-ytd FYE_analysis'>YTD Actual</th>
+					<th class='FYE_analysis'>YTD Budget</th>
+					<th class='FYE_analysis'>Diff</th>
+					<th class='FYE_analysis'>%</th>
+					<th class='budget-ytd FYE_analysis'>ROY Est</th>
+					<th class='FYE_analysis'>ROY Budget</th>
+					<th class='FYE_analysis'>Diff</th>
+					<th>%</th>
+					<?php
+						$this->colspan += 8;
+					}
+					?>
+				</tr>
+			</thead>			
+			<tbody>
+		<?php
+		foreach ($arrReport as $key=>$data){			
+			$this->echoBudgetItemString($data, 'budget-item',false);
+		}
+		?>
+		</tbody>
+		</table>
+		<ul class='link-footer'>
+			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
+		</ul>
+		<?php
+		$arrGrandTotal['Budget item'] = 'Grand total';
+		return ($arrGrandTotal);
+	}
+	
 	private function _processFLData($rs){
 		if ($this->oSQL->num_rows($rs)){
 				$Level1_title = '';		
@@ -2457,7 +2614,7 @@ class Reports{
 			$rs = $oSQL->q($sql);
 			while ($rw=$oSQL->f($rs)){
 				
-				if ($rw['Group_code']==94){
+				if ($rw['Group_code']==self::GP_CODE){
 					$tr_class = "budget-total";
 				} else {
 					$tr_class = 'budget-item';
@@ -3204,7 +3361,7 @@ class Reports{
 			}
 	}
 	
-	private function echoBudgetItemString($data, $strClass=''){							
+	private function echoBudgetItemString($data, $strClass='',$flagSubtotal=true){							
 		GLOBAL $arrUsrData;
 		ob_start();
 		static $Level1_title;
@@ -3233,7 +3390,7 @@ class Reports{
 				foreach ($data as $item=>$values){
 					if ($row>1){ ?>
 						</tr>
-						<tr class="budget-item">					
+						<tr class="budget-item <?php echo $values['class'];?>">					
 					<?php };
 					?>
 					<td><?php echo (isset($values['href'])?"<a href='{$values['href']}'>":""), $values['Budget item'].(isset($values['href'])?"</a>":"");?></td>
@@ -3248,7 +3405,8 @@ class Reports{
 					}
 				}
 				$arrSubtotal['Budget item'] = "Subtotal";						
-				$this->echoBudgetItemString($arrSubtotal,'budget-subtotal budget-item');
+				if ($flagSubtotal) $this->echoBudgetItemString($arrSubtotal,'budget-subtotal budget-item');
+				// $this->echoBudgetItemString($arrSubtotal,'budget-subtotal budget-item');
 			} else {	
 			?>
 			<td colspan="2" title="<?php echo $data['title'];?>" data-code='<?php echo $data['metadata'];?>'>
