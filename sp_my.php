@@ -2,42 +2,18 @@
 // $flagNoAuth =true;
 require ('common/auth.php');
 
-if(isset($_GET['pc'])){
-	
-	$pcfilter = isset($_GET['pc'])?$_GET['pc']:($_COOKIE['pc']?$_COOKIE['pc']:$arrUsrData['usrProfitID']);
-	SetCookie('pc',$pcfilter,0,'/budget/');
-	
-	$sql = "SELECT * FROM vw_profit WHERE pccID=".$oSQL->e($pcfilter);
-	$rs = $oSQL->q($sql);
-	$rw = $oSQL->f($rs);
-	$arrUsrData["pagTitle$strLocal"] .= ' :: '.($rw['pccTitle']?$rw['pccTitle']:'<Unknown PC>');
-	
-} else {
-	
-	$ownerID = isset($_GET['ownerID'])?$_GET['ownerID']:($_COOKIE['ownerID']?$_COOKIE['ownerID']:$arrUsrData['usrID']);
-	if ($_GET['ownerID']=='MYSELF'){
-		$ownerID = $arrUsrData['usrID'];
-	}
-	SetCookie('ownerID',$ownerID,0,'/budget/');
-	$sqlWhere = " AND responsible=".$oSQL->e($ownerID);
-
-	$sql = "SELECT * FROM stbl_user WHERE usrID=".$oSQL->e($ownerID);
-	$rs = $oSQL->q($sql);
-	$rw = $oSQL->f($rs);
+$ownerID = isset($_GET['ownerID'])?$_GET['ownerID']:($_COOKIE['ownerID']?$_COOKIE['ownerID']:$arrUsrData['usrID']);
+if ($_GET['ownerID']=='MYSELF'){
+	$ownerID = $arrUsrData['usrID'];
 }
+SetCookie('ownerID',$ownerID,0,'/budget/');
+$sqlWhere = " AND responsible=".$oSQL->e($ownerID);
 
-if(isset($_GET['ownerID'])){
-	SetCookie('pc',null);
-	unset($pcfilter);
-	$arrUsrData["pagTitle$strLocal"] .= ' :: '.($rw['usrTitle']?$rw['usrTitle']:'<Unknown>');
-}
+$sql = "SELECT * FROM stbl_user WHERE usrID=".$oSQL->e($ownerID);
+$rs = $oSQL->q($sql);
+$rw = $oSQL->f($rs);
 
-
-
-if ($_COOKIE['pc']){
-	$pcfilter = $_COOKIE['pc'];
-	$sqlWhere = " AND (guid IN (SELECT source FROM reg_master WHERE pc=".$oSQL->e($pcfilter).") OR pc=".$oSQL->e($pcfilter).")";
-}
+$arrUsrData["pagTitle$strLocal"] .= ' :: '.($rw['usrTitle']?$rw['usrTitle']:'<Unknown>');
 
 if (isset($_GET['tab'])){
 	?>
