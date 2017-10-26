@@ -136,6 +136,8 @@ class Vehicle extends Document{
 			,'disabled'=>!$this->flagUpdate
 		);
 		
+		$this->Columns[] = $this->getResponsibleEF();
+		
 
 	}
 	
