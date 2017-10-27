@@ -1,5 +1,5 @@
 <?php
-$flagNoAuth = true;
+// $flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/budget.class.php');
 include ('includes/inc_report_settings.php');
