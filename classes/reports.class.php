@@ -1484,87 +1484,10 @@ class Reports{
 			$this->sqlSelect .= ($this->sqlSelect?",\r\n":"")."SUM(`{$field}`) as '{$field}'";
 		}
 		
-	
 		$strFields = $this->_getPeriodicFields();
 		
-		if ($this->YACT){
-			// $strAccountTitle = "title";
-			// $strAccountGroup = "yact_group";
-			// $strAccountCode = "account";
-			$strGPFilter = "yact_group_code IN ('449000','499000')"; 
-			$sqlLevel2Default = "`title` as `level2_title`, `yact_group`, `account` as `level2_code`,";
-		} else {
-			// $strAccountTitle = "Budget item";
-			// $strAccountGroup = "Group";
-			// $strAccountCode = "item";
-			$strGPFilter = "Group_code=".self::GP_CODE; 
-			$sqlLevel2Default = "`Budget item` as `level2_title`, `Group`, `item` as `level2_code`,`itmOrder`,";
-		}
-		
-		// ob_start();
-		// $sql = "SELECT {$this->sqlSelect},
-				// Level1_title,level1_code,`{$strAccountTitle}` as 'level2_title',`{$strAccountGroup}` as 'Group', `{$strAccountCode}` as 'level2_code'
-			// FROM 
-				// (SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
-						// {$strFields['actual']}
-				// FROM `vw_master` 			
-				// {$sqlWhere} 
-				// AND scenario='{$this->oBudget->id}' 
-				// AND {$strGPFilter} ## Gross margin only
-				// GROUP BY Level1_code, Level1_title, `{$strAccountCode}` , `{$strAccountTitle}`
-				// UNION ALL
-				// SELECT ({$params['field_title']}) as 'Level1_title', ({$params['field_data']}) as 'level1_code', `{$strAccountTitle}`,`{$strAccountGroup}`, `{$strAccountCode}`,
-						// {$strFields['budget']}
-				// FROM `vw_master` 			
-				// {$sqlWhere} 
-				// AND scenario='{$this->oReference->id}' 
-				// AND {$strGPFilter}
-				// GROUP BY Level1_code, Level1_title,  `{$strAccountCode}` , `{$strAccountTitle}`) Q
-			// GROUP BY Level1_code, Level1_title, `level2_code` , `level2_title`
-			// ORDER BY Level1_title, `Group` ASC			
-			// ";
-		
-		
-
-		
-		switch($type){
-			case 'activity':
-				$sqlMeasure = "Activity_title as 'Level1_title', activity as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Activity';
-				break;
-			case 'customer':
-				$sqlMeasure = "Customer_name as 'Level1_title', customer as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Customer';
-				break;
-			case 'customer_group':
-				$sqlMeasure = "customer_group_title as 'Level1_title'
-						, customer_group_code as 'level1_code', `Budget item`, {$sqlLevel2Default}";
-				$strGroupTitle = 'Customer group';
-				break;
-			case 'sales':
-				$sqlMeasure = "usrTitle as 'Level1_title', sales as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'BDV employee';
-				break;
-			case 'bdv':
-				$sqlMeasure = "bdvTitle as 'Level1_title', bdv as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Selling unit';
-				break;
-			case 'pc':
-				$sqlMeasure = "Profit as 'Level1_title', pc as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Business unit';
-				break;
-			case 'bu_group':
-				// $sqlMeasure = "bu_group_title as 'Level1_title', bu_group as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";				
-				$sqlMeasure = "bu_group_title as 'Level1_title', bu_group as 'level1_code', `customer_group_title` as `level2_title`, `Group`, `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
-				$strGroupTitle = 'BU Group';
-				break;
-			case 'ghq':
-			default:
-				$sqlMeasure = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'GHQ segment';
-				break;
-		}
-		
+		$arrMeasure = $this->_getSQLMeasure($type);
+				
 		// $this->structure = 'monthly';
 		// $strFields = $this->_getPeriodicFields();
 		
@@ -1575,20 +1498,20 @@ class Reports{
 		
 		ob_start();
 		
-		$sql = "SELECT {$sqlMeasure}
+		$sql = "SELECT {$arrMeasure['sql']}
 					{$strFields['actual']}
 			FROM `vw_master`			
 			{$sqlWhere}  
 				AND scenario='{$strFields['from_a']}' 
-				AND {$strGPFilter}
+				AND {$this->strGPFilter}
 			{$sqlGroup}	
 			UNION ALL
-				SELECT {$sqlMeasure}
+				SELECT {$arrMeasure['sql']}
 				{$strFields['budget']}
 			FROM `vw_master`				
 			{$sqlWhere} 
 				AND scenario='{$strFields['from_b']}' 
-				AND {$strGPFilter}
+				AND {$this->strGPFilter}
 			{$sqlGroup}			
 			";
 		
@@ -1599,8 +1522,7 @@ class Reports{
 				{$sqlOrder}";
 		
 		// echo '<pre>',$sql,'</pre>';
-		$this->_firstLevelPeriodic($sql, $strGroupTitle, $this->oBudget);
-				
+		$this->_firstLevelPeriodic($sql, $arrMeasure['title'], $this->oBudget);
 		//==========================================================================================================================Non-customer-related data
 		$this->_nofirstLevelPeriodic($sqlWhere);
 		?>
@@ -2055,45 +1977,9 @@ class Reports{
 			$this->sqlSelect .= ($this->sqlSelect?",\r\n":"")."SUM(`{$field}`) as '{$field}'";
 		}
 		
-		$sqlLevel2Default = "`Budget item` as `level2_title`, `Group`, `item` as `level2_code`,`itmOrder`,";
+		//$sqlLevel2Default = "`Budget item` as `level2_title`, `Group`, `item` as `level2_code`,`itmOrder`,";
+		$arrMeasure = $this->_getSQLMeasure($type);
 		
-		switch($type){
-			case 'activity':
-				$sqlMeasure = "Activity_title as 'Level1_title', activity as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Activity';
-				break;
-			case 'customer':
-				$sqlMeasure = "Customer_name as 'Level1_title', customer as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Customer';
-				break;
-			case 'customer_group':
-				$sqlMeasure = "customer_group_title as 'Level1_title'
-						, customer_group_code as 'level1_code', `Budget item`, {$sqlLevel2Default}";
-				$strGroupTitle = 'Customer group';
-				break;
-			case 'sales':
-				$sqlMeasure = "usrTitle as 'Level1_title', sales as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'BDV employee';
-				break;
-			case 'bdv':
-				$sqlMeasure = "bdvTitle as 'Level1_title', bdv as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Selling unit';
-				break;
-			case 'pc':
-				$sqlMeasure = "Profit as 'Level1_title', pc as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Business unit';
-				break;
-			case 'bu_group':
-				// $sqlMeasure = "bu_group_title as 'Level1_title', bu_group as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";				
-				$sqlMeasure = "bu_group_title as 'Level1_title', bu_group as 'level1_code', `customer_group_title` as `level2_title`, `Group`, `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
-				$strGroupTitle = 'BU Group';
-				break;
-			case 'ghq':
-			default:
-				$sqlMeasure = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'GHQ segment';
-				break;
-		}
 		
 		$this->structure = 'monthly';
 		// $strFields = $this->_getPeriodicFields();
@@ -2105,13 +1991,13 @@ class Reports{
 		
 		ob_start();
 		
-		$sql = "SELECT {$sqlMeasure}
+		$sql = "SELECT {$arrMeasure['sql']}
 					{$strFields['actual']}
 			FROM `vw_master`			
 			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND Group_code=".self::GP_CODE." 
 			{$sqlGroup}	
 			UNION ALL
-				SELECT {$sqlMeasure}
+				SELECT {$arrMeasure['sql']}
 				{$strFields['budget']}
 			FROM `vw_master`				
 			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND Group_code=".self::GP_CODE."  
@@ -2126,7 +2012,7 @@ class Reports{
 			
 			// echo '<pre>',$sql,'</pre>';
 			
-			self::firstLevelReportMR($sql, $strGroupTitle, $this->oBudget);
+			self::firstLevelReportMR($sql, $arrMeasure['title'], $this->oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
 			self::_noFirstLevelMonthly($this->currency, $options);
@@ -2140,47 +2026,73 @@ class Reports{
 			ob_flush();
 	}
 	
+	private function _getSQLMeasure($type){
+		
+		if ($this->YACT){
+			// $strAccountTitle = "title";
+			// $strAccountGroup = "yact_group";
+			// $strAccountCode = "account";
+			$this->strGPFilter = "yact_group_code IN ('449000','499000')"; 
+			$sqlLevel2Default = "`title` as `level2_title`, `yact_group`, `account` as `level2_code`,";
+		} else {
+			// $strAccountTitle = "Budget item";
+			// $strAccountGroup = "Group";
+			// $strAccountCode = "item";
+			$this->strGPFilter = "Group_code=".self::GP_CODE; 
+			$sqlLevel2Default = "`Budget item` as `level2_title`, `Group`, `item` as `level2_code`,`itmOrder`,";
+		}
+		
+		
+		switch($type){
+			case 'activity':
+				$res['sql'] = "Activity_title as 'Level1_title', activity as 'level1_code', {$sqlLevel2Default}";
+				$res['title'] = 'Activity';
+				break;
+			case 'customer':
+				$res['sql'] = "Customer_name as 'Level1_title', customer as 'level1_code', {$sqlLevel2Default}";
+				$res['title'] = 'Customer';
+				break;
+			case 'customer_group':
+				$res['sql'] = "customer_group_title as 'Level1_title'
+						, customer_group_code as 'level1_code', `Budget item`, {$sqlLevel2Default}";
+				$res['title'] = 'Customer group';
+				break;
+			case 'sales':
+				$res['sql'] = "usrTitle as 'Level1_title', sales as 'level1_code', {$sqlLevel2Default}";
+				$res['title'] = 'BDV employee';
+				break;
+			case 'bdv':
+				$res['sql'] = "bdvTitle as 'Level1_title', bdv as 'level1_code', {$sqlLevel2Default}";
+				$res['title'] = 'Selling unit';
+				break;
+			case 'pc':
+				$res['sql'] = "Profit as 'Level1_title', pc as 'level1_code', {$sqlLevel2Default}";
+				$res['title'] = 'Business unit';
+				break;
+			case 'bu_group':
+				// $sqlMeasure = "bu_group_title as 'Level1_title', bu_group as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";				
+				$res['sql'] = "bu_group_title as 'Level1_title', bu_group as 'level1_code', `customer_group_title` as `level2_title`, `Group`, `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
+				$res['title'] = 'BU Group';
+				break;
+			case 'ghq':
+			default:
+				$res['sql'] = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', {$sqlLevel2Default}";
+				$res['title'] = 'GHQ segment';
+				break;
+		}
+		
+		return($res);
+	}
+	
 	public function monthlyReportGHQ($type='ghq'){
 		
 		GLOBAL $budget_scenario;
 		$oBudget = new Budget($budget_scenario);
 		
 		$sqlWhere = $this->sqlWhere;
+		$arrMeasure = $this->_getSQLMeasure($type);
 		
 		$sqlLevel2Default = "`Budget item` as `level2_title`, `Group`, `item` as `level2_code`,`itmOrder`,";
-		
-		switch($type){
-			case 'activity':
-				$sqlMeasure = "Activity_title as 'Level1_title', activity as 'level1_code',{$sqlLevel2Default}";
-				$strGroupTitle = 'Activity';
-				break;
-			case 'customer':
-				$sqlMeasure = "Customer_name as 'Level1_title', customer as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Customer';
-				break;
-			case 'customer_group':
-				$sqlMeasure = "CASE WHEN customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN Customer_name ELSE customer_group_title END as 'Level1_title'
-						, CASE WHEN customer_group_code=".self::CNT_GROUP_EXEMPTION." THEN customer ELSE customer_group_code END as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Customer group';
-				break;
-			case 'sales':
-				$sqlMeasure = "usrTitle as 'Level1_title', sales as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'BDV employee';
-				break;
-			case 'bdv':
-				$sqlMeasure = "bdvTitle as 'Level1_title', bdv as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Selling unit';
-				break;
-			case 'pc':
-				$sqlMeasure = "Profit as 'Level1_title', pc as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'Business unit';
-				break;
-			case 'ghq':
-			default:
-				$sqlMeasure = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', {$sqlLevel2Default}";
-				$strGroupTitle = 'GHQ segment';
-				break;
-		}
 		
 		// $strFields = $this->_getPeriodicFields();
 		
@@ -2190,13 +2102,13 @@ class Reports{
 		
 		ob_start();
 		
-		$sql = "SELECT {$sqlMeasure}
+		$sql = "SELECT {$arrMeasure['sql']}
 					{$strFields['actual']}
 			FROM `vw_master`			
 			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND Group_code=".self::GP_CODE." 
 			{$sqlGroup}	
 			UNION ALL
-				SELECT {$sqlMeasure}
+				SELECT {$arrMeasure['sql']}
 				{$strFields['budget']}
 			FROM `vw_master`				
 			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND Group_code=".self::GP_CODE."  
@@ -2216,7 +2128,7 @@ class Reports{
 				ORDER BY `level1_code`, `Group`, `itmOrder` ASC";
 			
 			
-			self::firstLevelReportMR($sql, $strGroupTitle, $oBudget);
+			self::firstLevelReportMR($sql, $arrMeasure['title'], $oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
 			// self::_noFirstLevelMonthly($this->currency);
@@ -2447,12 +2359,25 @@ class Reports{
 		}
 		
 		foreach($arrSubreport as $l1Code=>$data){
-			$arrSubreport[$l1Code]['ratio'] = Array('Level1_title'=>$data['Level1_title'],'Budget item'=>"GP per TEU",'level1_code'=>$l1Code,'class'=>'budget-ratio');
-			for($i=0;$i<count($this->columns);$i++){
-				if ($arrSubreport[$l1Code]['TEU'][$this->columns[$i]]) {
-					$arrSubreport[$l1Code]['ratio'][$this->columns[$i]] = $arrSubreport[$l1Code]['94'][$this->columns[$i]]/$arrSubreport[$l1Code]['TEU'][$this->columns[$i]];
-				} else {
-					$arrSubreport[$l1Code]['ratio'][$this->columns[$i]] = 'n/a';
+			if($this->filter['activity']==53){
+				//Profitability per Container
+				$arrSubreport[$l1Code]['ratio'] = Array('Level1_title'=>$data['Level1_title'],'Budget item'=>"GP per Cntr",'level1_code'=>$l1Code,'class'=>'budget-ratio');
+				for($i=0;$i<count($this->columns);$i++){
+					if ($arrSubreport[$l1Code]['Cont.'][$this->columns[$i]]) {
+						$arrSubreport[$l1Code]['ratio'][$this->columns[$i]] = $arrSubreport[$l1Code]['94'][$this->columns[$i]]/$arrSubreport[$l1Code]['Cont.'][$this->columns[$i]];
+					} else {
+						$arrSubreport[$l1Code]['ratio'][$this->columns[$i]] = 'n/a';
+					}
+				}
+			} else {
+				//Profitability per TEU
+				$arrSubreport[$l1Code]['ratio'] = Array('Level1_title'=>$data['Level1_title'],'Budget item'=>"GP per TEU",'level1_code'=>$l1Code,'class'=>'budget-ratio');
+				for($i=0;$i<count($this->columns);$i++){
+					if ($arrSubreport[$l1Code]['TEU'][$this->columns[$i]]) {
+						$arrSubreport[$l1Code]['ratio'][$this->columns[$i]] = $arrSubreport[$l1Code]['94'][$this->columns[$i]]/$arrSubreport[$l1Code]['TEU'][$this->columns[$i]];
+					} else {
+						$arrSubreport[$l1Code]['ratio'][$this->columns[$i]] = 'n/a';
+					}
 				}
 			}
 		}
