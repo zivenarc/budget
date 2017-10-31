@@ -52,7 +52,7 @@ if (isset($_GET['tab'])){
 			$rs =$oSQL->q($sql);
 			while ($rw=$oSQL->f($rs)){
 				?>
-				<div><a href='?ownerID=<?php echo $rw['responsible'];?>'><?php echo $rw['usrTitle'],($rw['nCount']?(' ('.$rw['nCount'].')'):'');?></a></div>
+				<div><a href='sp_my.php?ownerID=<?php echo $rw['responsible'];?>'><?php echo $rw['usrTitle'],($rw['nCount']?(' ('.$rw['nCount'].')'):'');?></a></div>
 				<?php
 			}
 			?>
@@ -70,7 +70,7 @@ if (isset($_GET['tab'])){
 			$rs =$oSQL->q($sql);
 			while ($rw=$oSQL->f($rs)){
 				?>
-				<div><a href='?pc=<?php echo $rw['pc'];?>'><?php echo $rw['pccTitle'],' (',$rw['nCount'],')';?></a></div>
+				<div><a href='sp_bu.php??pc=<?php echo $rw['pc'];?>'><?php echo $rw['pccTitle'],' (',$rw['nCount'],')';?></a></div>
 				<?php
 			}
 			?>
