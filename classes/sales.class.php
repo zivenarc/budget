@@ -96,14 +96,7 @@ class Sales extends Document{
 			'title'=>'Product folder'
 			,'field'=>self::Prefix.'ProductFolderID'
 			,'type'=>'combobox'
-			,'sql'=>'
-				SELECT 
-				PRD1.prdID AS optValue, PRD1.prdTitle AS optText, PRD1.prdParentID
-				, COUNT(DISTINCT PRD2.prdID) as prdLevelInside     
-				FROM vw_product PRD1 INNER JOIN vw_product PRD2 ON PRD2.prdIdxLeft<=PRD1.prdIdxLeft AND PRD2.prdIdxRight>=PRD1.prdIdxRight
-				WHERE PRD1.prdIdxRight-PRD1.prdIdxLeft>1
-				GROUP BY PRD1.prdID
-				HAVING prdLevelInside=1'
+			,'sql'=>'vw_folder'
 			,'default'=>22
 			,'disabled'=>!$this->flagUpdate
 		);
