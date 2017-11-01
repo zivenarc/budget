@@ -97,6 +97,7 @@ class Sales extends Document{
 			,'field'=>self::Prefix.'ProductFolderID'
 			,'type'=>'combobox'
 			,'sql'=>'vw_folder'
+			,'prefix'=>'prd'
 			,'default'=>22
 			,'disabled'=>!$this->flagUpdate
 		);
