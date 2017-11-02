@@ -99,6 +99,8 @@ $oBudget = new Budget($_GET['tab']);
 	?>
 	<div>
 	<h2><?php echo $oBudget->title;?></h2>
+	<pre>Checksum: <?php echo $oBudget->checksum; ?></pre>
+	<pre>Current:  <?php echo $oBudget->get_checksum(); ?></pre>
 	<div id='controlPanel' style="display:inline-block;">
 	<table><tr>
 	<td>
