@@ -3527,7 +3527,8 @@ class Reports{
 			case 'budget':
 				$this->columns = Array('FYE_A','FYE_B');
 				$this->structure = 'budget';
-				$strHeader = $this->oBudget->getTableHeader('budget');				
+				$strHeader = $this->oBudget->getTableHeader('budget');	
+				$this->colspan = 4;				
 				break;
 			case 'fye':
 				$this->columns = Array('YTD_A','YTD_B','ROY_A','ROY_B','FYE_A','FYE_B');
