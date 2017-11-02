@@ -24,7 +24,7 @@ if ($bu_group){
 	$oReference = new Budget($reference);
 	
 	if(strpos($oBudget->type,"Budget")!==false){	
-		$period_type = 'fye';
+		$period_type = 'budget';
 	}
 	//$period_type = 'cm';
 	

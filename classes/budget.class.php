@@ -255,6 +255,20 @@ class Budget{
 				<?php
 				$res = ob_get_clean();				
 				break;
+			case 'budget':
+				ob_start();
+				?>
+					<th colspan="4"><?php echo $this->year;?></th>
+				</tr>
+				<tr>
+					<th class='budget-ytd'>Budget</th>
+					<th>Reference</th>
+					<th>Diff</th>
+					<th>%</th>
+				</tr>
+				<?php
+				$res = ob_get_clean();					
+				break;
 			case 'roy':
 			case 'fye':
 				ob_start();

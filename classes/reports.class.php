@@ -2865,6 +2865,7 @@ class Reports{
 		
 		switch ($this->structure){
 			case 'monthly':
+			case 'budget':
 			case 'forecast':
 				$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
 				break;
@@ -3226,6 +3227,14 @@ class Reports{
 				<td class='budget-decimal'><em><?php self::render_ratio($data['FYE_A'],$data['FYE_B'],0);?></em></td>
 				<?php
 				break;
+			case 'budget':
+				?>
+				<td class='budget-decimal budget-ytd'><?php self::render($data['FYE_A'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['FYE_B'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['FYE_A']-$data['FYE_B'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['FYE_A'],$data['FYE_B'],0);?></em></td>
+				<?php
+				break;
 			case 'periodic':
 			default:
 					
@@ -3515,6 +3524,11 @@ class Reports{
 			";
 		
 		switch ($type){
+			case 'budget':
+				$this->columns = Array('FYE_A','FYE_B');
+				$this->structure = 'budget';
+				$strHeader = $this->oBudget->getTableHeader('budget');				
+				break;
 			case 'fye':
 				$this->columns = Array('YTD_A','YTD_B','ROY_A','ROY_B','FYE_A','FYE_B');
 				$this->structure = 'forecast';
@@ -3659,7 +3673,8 @@ class Reports{
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
-				$rw['Budget item'] = "Own operating profit";				
+				$rw['Budget item'] = "Own operating profit";		
+				$rw['title'] = "Result of business unit without any corporate costs";				
 				$this->echoBudgetItemString($rw, 'budget-ratio');
 			}
 			
