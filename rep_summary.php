@@ -126,7 +126,8 @@ if(!isset($_GET['pccGUID'])){
 	$oWF = new Waterfall($settings['pbt']);
 	$oWF->draw();
 	
-	// if (strpos($oBudget->type,'Budget')===false){
+	
+	if (strpos($oBudget->type,'Budget')===false){
 		$sqlActual = "SUM(".$oBudget->getThisYTDSQL('nm',$arrActualRates).")";
 		$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('cm',$arrActualRates).")";
 		$settings['nextGP'] = Array('title'=>"GP by customer, next month changes",
@@ -169,7 +170,7 @@ if(!isset($_GET['pccGUID'])){
 		
 		$oWF = new Waterfall($settings['nextCosts']);
 		$oWF->draw();
-	// }
+	}
 	?>
 	</div>
 	<?php

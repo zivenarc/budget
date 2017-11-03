@@ -3491,6 +3491,8 @@ class Reports{
 
 	public function shortMonthlyReport($type='cm'){
 		
+		// $this->oSQL->startProfiling();
+		
 		$sqlWhere = $this->sqlWhere;
 
 		if($this->oBudget->cm % 3 && $this->oBudget->nm % 3){
@@ -3793,7 +3795,7 @@ class Reports{
 				<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
 		</ul>
 		<?php
-		
+		// $this->oSQL->showProfileInfo();
 	}
 	
 	function getCustomerGroup($rw){
