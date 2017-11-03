@@ -831,6 +831,8 @@ class Budget{
 	}
 	
 	function get_checksum(){
+		$this->oSQL->q("SET SESSION group_concat_max_len = 10000000");
+		$this->oSQL->q("SET @@group_concat_max_len = 10000000");
 		$sql = "SELECT md5(GROUP_CONCAT(MD5(CONCAT_WS('#',company,pc,activity,customer,account,item,jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,`dec`,jan_1,feb_1,mar_1,source,scenario,sales,bdv,customer_group_code)))) 
 					FROM reg_master 
 					WHERE scenario='{$this->id}'";
