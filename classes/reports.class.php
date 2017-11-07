@@ -3380,8 +3380,9 @@ class Reports{
 		
 				$total += $data[$i]['amount'];	
 				?>
-				<tr id="tr_<?php echo $data[$i]['guid'];?>" class="<?php echo ($data[$i]['posted']?'journal-posted':'')?> <?php echo ($data[$i]['deleted']?'journal-deleted':'')?>">					
+				<tr id="tr_<?php echo $data[$i]['guid'];?>" class="<?php echo ($data[$i]['posted']?'journal-posted':'')?> <?php echo ($data[$i]['deleted']?'journal-deleted':'')?>">										
 					<td><input class='journal-cb' type='checkbox'/></td>
+					<td><?php echo $i+1;?></td>
 					<td><a class="budget-document-link" target="_blank" href="<?php echo $data[$i]['script'].'?'.$data[$i]['prefix'].'ID='.$data[$i]['id'];?>"><?php echo $data[$i]['title'],' #',$data[$i]['id'];?></a></td>
 					<td class="td-posted <?php echo ($data[$i]['posted']?'budget-icon-posted':'');?>">&nbsp;</td>
 					<td class="td-deleted <?php echo ($data[$i]['deleted']?'budget-icon-deleted':'');?>">&nbsp;</td>
@@ -3404,6 +3405,7 @@ class Reports{
 				<thead>
 					<tr>
 						<th><input class='journal-cb-all' type='checkbox'/></th>
+						<th>#</th>
 						<th>Document</th>
 						<!--<th>ID</th>
 						<th>GUID</th>-->
@@ -3419,7 +3421,7 @@ class Reports{
 				</thead>
 				<tfoot>
 					<tr class="budget-subtotal">
-						<td colspan="4">Total:</td>
+						<td colspan="5">Total:</td>
 						<td class='journal-current budget-decimal' id='journal_total'><?php self::render($total);?></td>
 					</tr>
 				</tfoot>
