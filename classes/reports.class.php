@@ -3806,10 +3806,14 @@ class Reports{
 			case 33239: //
 			case 40933: // New 2017
 			case 42763: // New 2017 J
+			case 44265: // New 2018 J
+			case 44264: // New 2018 
 				switch ($rw['customer']){
 					case 33242:
 					case 40934:
 					case 41976:
+					case 44267:
+					case 44266:
 						$cusGroup = 'New customers, unknown';
 						break;
 					default:
