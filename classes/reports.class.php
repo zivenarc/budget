@@ -2075,7 +2075,7 @@ class Reports{
 				$res['title'] = 'BU Group';
 				break;
 			case 'iv':
-				$res['sql'] = "ivlGroup as 'Level1_title', ivlGUID as 'level1_code', `customer_group_title` as `level2_title`, `Group`, `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
+				$res['sql'] = "ivlGroup as 'Level1_title', ivlGroup as 'level1_code', `customer_group_title` as `level2_title`, `Group`, `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
 				$res['title'] = 'Industry vertical';
 				break;
 			case 'ghq':
