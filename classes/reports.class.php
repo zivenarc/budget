@@ -2074,6 +2074,10 @@ class Reports{
 				$res['sql'] = "bu_group_title as 'Level1_title', bu_group as 'level1_code', `customer_group_title` as `level2_title`, `Group`, `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
 				$res['title'] = 'BU Group';
 				break;
+			case 'iv':
+				$res['sql'] = "ivlGroup as 'Level1_title', ivlGUID as 'level1_code', `customer_group_title` as `level2_title`, `Group`, `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
+				$res['title'] = 'Industry vertical';
+				break;
 			case 'ghq':
 			default:
 				$res['sql'] = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', {$sqlLevel2Default}";

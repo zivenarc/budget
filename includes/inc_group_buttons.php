@@ -7,4 +7,5 @@
 	$arrActions[] = Array ('title'=>'By BU','action'=>"?type=pc");	
 	$arrActions[] = Array ('title'=>'By BU Group','action'=>"?type=bu_group");	
 	$arrActions[] = Array ('title'=>'By BDV dept','action'=>"?type=bdv");	
+	$arrActions[] = Array ('title'=>'By IV','action'=>"?type=iv");	
 ?>
