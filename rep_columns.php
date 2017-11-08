@@ -102,6 +102,31 @@ if(!isset($_GET['pccGUID'])){
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 
 	
+	// $sql="SELECT 	sales as optValue, 
+					// usrTitle as optText,
+					// customer_group_code as optGroupValue, 
+					// customer_group_title as optGroupText,
+										// {$sqlActual} as Actual, 
+										// 0 as Budget, 
+										// {$sqlActual} as Diff
+								// FROM vw_master 								
+								// {$sqlWhere} AND scenario='{$oBudget->id}' ".Reports::GP_FILTER." 
+								// GROUP BY customer_group_code, sales
+								// UNION ALL
+								// SELECT sales as optValue, 
+								// usrTitle as optText,
+								// customer_group_code as optGroupValue, 
+								// customer_group_title as optGroupText,
+											// 0 as Actual, 
+								// {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+								// FROM vw_master 								
+								// {$sqlWhere} AND	scenario='{$oReference->id}' AND source<>'Estimate' ".Reports::GP_FILTER." 
+								// GROUP BY customer_group_code, sales";
+	
+	// $oReport = new Columns(Array('sqlBase'=>$sql, 'actual_title'=>$oBudget->title,'budget_title'=>$oReference->title,'xTitle'=>'Gross profit', 'title'=>'Gross profit'));
+		
+	// $oReport->draw();
+	
 	$sql="SELECT 	sales as optValue, 
 					usrTitle as optText,
 					customer_group_code as optGroupValue, 
@@ -110,7 +135,7 @@ if(!isset($_GET['pccGUID'])){
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM vw_master 								
-								{$sqlWhere} AND scenario='{$oBudget->id}' ".Reports::GP_FILTER." 
+								{$sqlWhere} AND scenario='{$oBudget->id}' AND Group_code=94
 								GROUP BY customer_group_code, sales
 								UNION ALL
 								SELECT sales as optValue, 
@@ -120,13 +145,12 @@ if(!isset($_GET['pccGUID'])){
 											0 as Actual, 
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM vw_master 								
-								{$sqlWhere} AND	scenario='{$oReference->id}' AND source<>'Estimate' ".Reports::GP_FILTER." 
+								{$sqlWhere} AND	scenario='{$oReference->id}' AND source<>'Estimate' AND Group_code=94
 								GROUP BY customer_group_code, sales";
 	
-	$oReport = new Columns(Array('sqlBase'=>$sql, 'actual_title'=>$oBudget->title,'budget_title'=>$oReference->title,'xTitle'=>'Gross profit', 'title'=>'Gross profit'));
+	$oReport = new Columns(Array('sqlBase'=>$sql, 'actual_title'=>$oBudget->title,'budget_title'=>$oReference->title,'xTitle'=>'Gross margin', 'title'=>'Gross margin'));
 		
 	$oReport->draw();
-	
 	
 
 }
