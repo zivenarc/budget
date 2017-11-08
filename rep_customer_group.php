@@ -4,6 +4,7 @@ require ('common/auth.php');
 require ('classes/budget.class.php');
 
 $oBudget = new Budget($budget_scenario);
+$pc = $_GET['pc']?(integer)$$_GET['pc']:$arrUsrData['usrProfitID'];
 
 $sql = "SELECT customer_group_code, cntTitle, SUM(".$oBudget->getThisYTDSQL('ytd').") as YTD 
 		FROM reg_master 
@@ -11,7 +12,7 @@ $sql = "SELECT customer_group_code, cntTitle, SUM(".$oBudget->getThisYTDSQL('ytd
 		WHERE account IN ('J00400','J00802') 
 			AND scenario IN ('{$arrSetup['stpFYEID']}','{$arrSetup['stpScenarioID']}') 
 			AND company={$company}
-			AND (pc='{$arrUsrData['usrID']}' OR bdv='{$arrUsrData['usrID']}')
+			AND (pc={$pc} OR bdv={$pc})
 		GROUP BY customer_group_code		
 		ORDER BY YTD DESC
 		LIMIT 50

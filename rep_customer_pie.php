@@ -4,6 +4,8 @@ require ('common/auth.php');
 require ('classes/budget.class.php');
 
 $oBudget = new Budget($budget_scenario);
+$pc = $_GET['pc']?(integer)$$_GET['pc']:$arrUsrData['usrProfitID'];
+
 
 $sql = "SELECT customer_group_code, cntTitle, SUM(".$oBudget->getThisYTDSQL('ytd').") as YTD 
 		FROM reg_master 
@@ -11,7 +13,7 @@ $sql = "SELECT customer_group_code, cntTitle, SUM(".$oBudget->getThisYTDSQL('ytd
 		WHERE account IN ('J00400','J00802') 
 			AND scenario IN ('{$budget_scenario}') 
 			AND company={$company}
-			AND (pc='{$arrUsrData['usrProfitID']}')
+			AND pc={$pc}
 		GROUP BY customer_group_code		
 		ORDER BY YTD DESC
 		";
@@ -31,12 +33,12 @@ if ($yOthers){
 
 $sql = "SELECT ivlGroup, SUM(".$oBudget->getThisYTDSQL('ytd').") as YTD 
 		FROM reg_master 
-		LEFT JOIN common_db.tbl_counterparty ON cntID=customer_group_code
+		LEFT JOIN common_db.tbl_counterparty ON cntID=customer
 		LEFT JOIN common_db.tbl_industry ON cntIndustryID=ivlGUID
 		WHERE account IN ('J00400','J00802') 
 			AND scenario IN ('{$budget_scenario}') 
 			AND company={$company}
-			AND (pc='{$arrUsrData['usrProfitID']}')
+			AND pc={$pc}
 		GROUP BY ivlGroup		
 		ORDER BY YTD DESC
 		";
