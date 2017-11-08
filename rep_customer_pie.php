@@ -4,7 +4,7 @@ require ('common/auth.php');
 require ('classes/budget.class.php');
 
 $oBudget = new Budget($budget_scenario);
-$pc = $_GET['pc']?(integer)$$_GET['pc']:$arrUsrData['usrProfitID'];
+$pc = $_GET['pc']?(integer)$_GET['pc']:$arrUsrData['usrProfitID'];
 
 
 $sql = "SELECT customer_group_code, cntTitle, SUM(".$oBudget->getThisYTDSQL('ytd').") as YTD 
