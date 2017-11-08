@@ -45,13 +45,7 @@ function getCnt($cntID, &$arrCounterparty=Array()){
 
 if(!isset($_GET['pccGUID'])){
 
-	$arrActions[] = Array ('title'=>'By customer','action'=>"?type=customer");
-	$arrActions[] = Array ('title'=>'By activity','action'=>"?type=activity");
-	$arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
-	$arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");	
-	$arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");	
-	$arrActions[] = Array ('title'=>'By BDV dept','action'=>"?type=bdv");	
-
+	include('includes/inc_group_buttons.php');
 	$arrJS[] = 'https://www.google.com/jsapi';
 	$arrJS[]='js/rep_pnl.js';
 	include ('includes/inc-frame_top.php');
