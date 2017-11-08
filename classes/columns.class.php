@@ -203,8 +203,8 @@ class Columns {
 	
 	public function drawChart(){			
 		?>
-		<div id="<?php echo $this->chartID;?>" class="highchart" style="width: 90%; height: 700px;"></div>
-		<div id="drilldown" class="highchart" style="width: 90%; height: 700px;"></div>
+		<div id="<?php echo $this->chartID;?>" class="highchart" style="width: 1000px; height: 700px;"></div>
+		<div id="drilldown" class="highchart" style="width: 1000px; height: 700px;"></div>
 		<div id="toolbar_div"></div>
 		<script>
 			var hs_data = [];
