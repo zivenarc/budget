@@ -690,15 +690,18 @@ class Reports{
 		$empty = 1894;
 		
 		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
-		$sql = "SELECT customer, ".$this->oBudget->getMonthlySumSQL(1,15, $arrRates).", 
+		$sql = "SELECT customer, activity, ".$this->oBudget->getMonthlySumSQL(1,15, $arrRates).", 
 						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates).") as Total,
 						SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as Total_AM 
 		FROM reg_master 
-		{$this->sqlWhere} AND item='".Items::REVENUE."' AND scenario='{$this->oBudget->id}' AND `company`='{$this->company}'
-		GROUP BY customer";
+		{$this->sqlWhere} 
+		AND item='".Items::REVENUE."' 
+		AND scenario='{$this->oBudget->id}' 
+		AND `activity` IN (9,12)
+		GROUP BY customer, activity";
 		$rs = $this->oSQL->q($sql); 
 		while ($rw = $this->oSQL->f($rs)){
-			$arrRevenue[$rw['customer']] = $rw;
+			$arrRevenue[$rw['customer']][$rw['activity']] = $rw;
 		}
 		
 		$sql = "SELECT cntTitle,customer, ".$this->oBudget->getMonthlySumSQL(1,15).", 
@@ -716,6 +719,8 @@ class Reports{
 			<thead>
 				<tr>
 					<th>Customer</th>
+					<th>Storage</th>
+					<th>Handling</th>
 					<th>Revenue per sqm</th>
 					<?php 
 					echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset,12+$this->oBudget->offset); 
@@ -738,7 +743,9 @@ class Reports{
 					<?php
 				};
 				echo "<td class='code-".$rw['customer']."'>",$rw['cntTitle'],'</td>';				
-				echo "<td class='budget-decimal'>",$this->render_ratio($arrRevenue[$rw['customer']]['Total']/10,$rw['Total'],0),'</td>';				
+				echo "<td class='budget-decimal'>",$this->render($arrRevenue[$rw['customer']][12]['Total']),'</td>';				
+				echo "<td class='budget-decimal'>",$this->render($arrRevenue[$rw['customer']][9]['Total']),'</td>';				
+				echo "<td class='budget-decimal'>",$this->render_ratio(($arrRevenue[$rw['customer']][12]['Total']+$arrRevenue[$rw['customer']][9]['Total'])/10,$rw['Total'],0),'</td>';				
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
@@ -772,7 +779,7 @@ class Reports{
 					$arrTotal[$quarter]+=$arrQuarter[$quarter];
 				}				
 							
-				$arrTotal['Q5']+=$arrQuarter['Q5'];
+				// $arrTotal['Q5']+=$arrQuarter['Q5'];
 				
 				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total']/12,0,'.',','),'</td>';				
 				echo "</tr>\r\n";				
@@ -781,7 +788,7 @@ class Reports{
 			</tbody>
 			<tfoot>
 				<tr class='budget-subtotal'>
-					<td colspan='2'>Total space</td>
+					<td colspan='4'>Total space</td>
 					<?php
 					for ($m=1;$m<=12;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
@@ -798,7 +805,7 @@ class Reports{
 					?>
 				</tr>
 				<tr class='budget-subtotal budget-ratio'>
-					<td colspan="2">Utilization, %</td>
+					<td colspan="4">Utilization, %</td>
 					<?php
 					for ($m=1;$m<=12;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
