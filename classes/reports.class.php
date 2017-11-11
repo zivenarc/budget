@@ -690,10 +690,11 @@ class Reports{
 		$empty = 1894;
 		
 		$arrRates = $this->oBudget->getMonthlyRates($this->Currency);
-		$sql = "SELECT customer, activity, ".$this->oBudget->getMonthlySumSQL(1,15, $arrRates).", 
+		$sql = "SELECT customer, activity, cntTitle, ".$this->oBudget->getMonthlySumSQL(1,15, $arrRates).", 
 						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates).") as Total,
 						SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates).") as Total_AM 
 		FROM reg_master 
+		LEFT JOIN vw_customer ON cntID=customer
 		{$this->sqlWhere} 
 		AND item='".Items::REVENUE."' 
 		AND scenario='{$this->oBudget->id}' 
@@ -702,6 +703,7 @@ class Reports{
 		$rs = $this->oSQL->q($sql); 
 		while ($rw = $this->oSQL->f($rs)){
 			$arrRevenue[$rw['customer']][$rw['activity']] = $rw;
+			$arrCustomer[$rw['customer']] = $rw['cntTitle'];
 		}
 		
 		$sql = "SELECT cntTitle,customer, ".$this->oBudget->getMonthlySumSQL(1,15).", 
@@ -712,6 +714,11 @@ class Reports{
 				{$this->sqlWhere} AND posted=1 AND item='".Items::WH_RENT."' AND scenario='{$this->oBudget->id}' AND `company`='{$this->company}'
 				GROUP BY customer";
 		$rs = $this->oSQL->q($sql); 
+		while ($rw=$this->oSQL->f($rs)){
+			$arrRent[$rw['customer']] = $rw;
+			$arrCustomer[$rw['customer']] = $rw['cntTitle'];
+		}
+		
 		$tableID = "kpi_".md5($sql);
 			?>
 			<h2>WH utilization, m<sup>2</sup></h2>
@@ -733,39 +740,34 @@ class Reports{
 			</thead>			
 			<tbody>
 			<?php			
-			while ($rw=$this->oSQL->f($rs)){				
+			foreach($arrCustomer as $customer=>$title){				
 				?>
 				<tr class='graph'>
 				<?php
-				if ($rw['prtGHQ']!=$prtGHQ){
-					?>
-					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
-					<?php
-				};
-				echo "<td class='code-".$rw['customer']."'>",$rw['cntTitle'],'</td>';				
-				echo "<td class='budget-decimal'>",$this->render($arrRevenue[$rw['customer']][12]['Total']),'</td>';				
-				echo "<td class='budget-decimal'>",$this->render($arrRevenue[$rw['customer']][9]['Total']),'</td>';				
-				echo "<td class='budget-decimal'>",$this->render_ratio(($arrRevenue[$rw['customer']][12]['Total']+$arrRevenue[$rw['customer']][9]['Total'])/10,$rw['Total'],0),'</td>';				
+				echo "<td class='code-".$customer."'>",$title,'</td>';				
+				echo "<td class='budget-decimal'>",$this->render($arrRevenue[$customer][12]['Total']),'</td>';				
+				echo "<td class='budget-decimal'>",$this->render($arrRevenue[$customer][9]['Total']),'</td>';				
+				echo "<td class='budget-decimal'>",$this->render_ratio(($arrRevenue[$customer][12]['Total']+$arrRevenue[$customer][9]['Total'])/10,$arrRent[$customer]['Total'],0),'</td>';				
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
-					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($rw[$month]),'</td>';
-					$arrTotal[$month]+=$rw[$month];
-					if ($rw['customer']!=$empty){
-						$arrUtil[$month]+=$rw[$month];
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($arrRent[$customer][$month]),'</td>';
+					$arrTotal[$month]+=$arrRent[$customer][$month];
+					if ($customer!=$empty){
+						$arrUtil[$month]+=$arrRent[$customer][$month];
 					}	
 					
 				}
 				$arrTotal['Total']+=$rw['Total'];
 				$arrTotal['Total_AM']+=$rw['Total_AM'];
-				if ($rw['customer']!=$empty){
-						$arrUtil['Total']+=$rw['Total'];
-						$arrUtil['Total_AM']+=$rw['Total_AM'];
+				if ($customer!=$empty){
+						$arrUtil['Total']+=$arrRent[$customer]['Total'];
+						$arrUtil['Total_AM']+=$arrRent[$customer]['Total_AM'];
 				}
 				
-				$arrQuarter = $this->_getQuarterTotals($rw,'average');
+				$arrQuarter = $this->_getQuarterTotals($arrRent[$customer],'average');
 				
-				if ($rw['customer']!=$empty){
+				if ($customer!=$empty){
 						$arrUtil['Q1']+=$arrQuarter['Q1'];
 						$arrUtil['Q2']+=$arrQuarter['Q2'];
 						$arrUtil['Q3']+=$arrQuarter['Q3'];
@@ -781,7 +783,7 @@ class Reports{
 							
 				// $arrTotal['Q5']+=$arrQuarter['Q5'];
 				
-				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total']/12,0,'.',','),'</td>';				
+				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($arrRent[$customer]['Total']/12,0,'.',','),'</td>';				
 				echo "</tr>\r\n";				
 			}
 			?>
