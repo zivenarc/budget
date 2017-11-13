@@ -33,9 +33,8 @@ if ($_GET['tab']){
 	switch($_GET['tab']){
 		case 'kpi':
 			require_once ('classes/reports.class.php');
-			$sqlWhere = "WHERE source='".$oDocument->GUID."'";
-			$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id));
-			$oReport->salesByActivity($sqlWhere);
+			$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id,'filter'=>Array('source'=>$oDocument->GUID)));
+			$oReport->salesByActivity();
 			die();
 			break;
 		case 'financials':
