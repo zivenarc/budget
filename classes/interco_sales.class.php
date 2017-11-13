@@ -373,7 +373,8 @@ class Interco_sales extends Document{
 						$master_row->account = $account;
 						$master_row->item = $activity->item_cost;
 						
-						$rate = ($record->buying_rate==0?$record->selling_rate*$settings[strtolower($record->selling_curr)]:$record->buying_rate*$settings[strtolower($record->buying_curr)]);
+						// $rate = ($record->buying_rate==0?$record->selling_rate*$settings[strtolower($record->selling_curr)]:$record->buying_rate*$settings[strtolower($record->buying_curr)]);
+						$rate = $record->selling_rate*$settings[strtolower($record->selling_curr)];
 						
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
