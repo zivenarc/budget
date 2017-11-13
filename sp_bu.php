@@ -23,7 +23,7 @@ if (isset($_GET['tab'])){
 		WHERE vw_journal.scenario='{$_GET['tab']}' 
 		{$sqlWhere}
 		GROUP BY vw_journal.guid
-		ORDER BY vw_journal.edit_date ASC";	
+		ORDER BY vw_journal.deleted ASC, vw_journal.table, vw_journal.id";	
 
 		$rs =$oSQL->q($sql);
 		while ($rw=$oSQL->f($rs)){
