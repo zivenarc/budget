@@ -477,7 +477,7 @@ class Reports{
 					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
 					<?php
 				};
-				echo "<td><a href='javascript:getCustomerKPI({prtGHQ:'{$rw['prtGHQ']}',route:{$rw['route']} ,freehand:true});'>",$rw['rteTitle'],'</a></td>';								
+				echo "<td><a href='javascript:getCustomerKPI({prtGHQ:\'{$rw['prtGHQ']}\',route:{$rw['route']} ,freehand:true});'>",$rw['rteTitle'],'</a></td>';								
 				
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
