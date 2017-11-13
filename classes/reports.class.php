@@ -853,6 +853,7 @@ class Reports{
 				<th>Sales</th>
 				<th>Sal.dept</th>
 				<?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset,max(12+$this->oBudget->offset,$this->oBudget->length)); ?>
+				<th class='budget-ytd'>Total</th>
 			</tr>
 		</thead>
 		<?php
@@ -870,14 +871,17 @@ class Reports{
 				<td><?php echo $rw['usrTitle'];?></td>
 				<td><?php echo $rw['bdvTitle'];?></td>
 				<?php
+					$rowTotal = 0;
 					for($m=1+$this->oBudget->offset;$m<=max(12+$this->oBudget->offset,$this->oBudget->length);$m++){
 						$month = $this->oBudget->arrPeriod[$m];
 						$arrTotal[$month] += $rw[$month];
+						$rowTotal += $rw[$month];
 						?>
 						<td class='budget-decimal'><?php self::render($rw[$month]);?></td>
 						<?php
 					}
 				?>
+				<td class='budget-ytd budget-decimal'><?php self::render($rowTotal);?></td>
 			</tr>
 			<?php
 			$i++;
@@ -894,6 +898,7 @@ class Reports{
 						<?php
 					}
 				?>
+				<td class='budget-ytd budget-decimal'><?php self::render(array_sum($arrTotal));?></td>
 			</tr>
 		</tfoot>
 		</table>
@@ -921,7 +926,9 @@ class Reports{
 					<th>Customer</th>
 					<th>Activity</th>					
 					<th>Product</th>
+					<th>KPI</th>
 					<?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset,max(12+$this->oBudget->offset,$this->oBudget->length)); ?>
+					<th class="budget-ytd">Total</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -934,15 +941,19 @@ class Reports{
 					<td><?php echo $rw['Customer_name'];?></td>
 					<td><?php echo $rw['Activity_title'];?></td>
 					<td><?php echo $rw['Product_title'];?></td>					
+					<td><?php echo $rw['kpi']?"&#10004;":"&nbsp;";?></td>					
 					<?php
+						$rowTotal = 0;
 						for($m=1+$this->oBudget->offset;$m<=max(12+$this->oBudget->offset,$this->oBudget->length);$m++){
 							$month = $this->oBudget->arrPeriod[$m];
 							$arrTotal[$month] += $rw[$month];
+							$rowTotal += $rw[$month];
 							?>
-							<td class='budget-decimal'><?php self::render($rw[$month]);?></td>
+							<td class='budget-decimal <?php echo $m<=$this->oBudget->cm?'budget-inactive':'';?>'><?php self::render($rw[$month]);?></td>
 							<?php
 						}
 					?>
+					<td class="budget-ytd budget-decimal"><?php self::render($rowTotal);?></td>
 				</tr>
 				<?php
 				$i++;
@@ -950,6 +961,9 @@ class Reports{
 			?>
 			</tbody>
 			</table>
+			<ul class='link-footer'>
+				<li><a href='javascript:SelectContent("sales_<?php echo $source;?>");'>Select table</a></li>
+			</ul>
 			<?php
 		}
 		?>
