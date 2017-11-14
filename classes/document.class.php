@@ -330,6 +330,7 @@ class Document extends easyForm{
 		$sql[] = "UPDATE `{$this->table}` 
 			SET `{$this->prefix}FlagPosted`=0, `{$this->prefix}EditBy`='{$arrUsrData['usrID']}', `{$this->prefix}EditDate`=NOW() 
 			WHERE `{$this->prefix}ID`={$this->ID} LIMIT 1;";
+		$sql[] = "UPDATE `{$this->register}` SET posted=0 WHERE source='{$this->GUID}';";
 		$sql[] = $this->getActionSQL('unpost');
 		$success = $this->doSQL($sql);
 		return($success);
