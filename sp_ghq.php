@@ -32,22 +32,24 @@ $endMonth = isset($_GET['mthEnd'])?$_GET['mthEnd']:12+$oBudget->offset;
 $colspan = $endMonth - $startMonth + 3;
 
 
-// $sql = "SELECT pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)." 
-		// FROM reg_profit_ghq 
-		// WHERE scenario='$budget_scenario' AND company='{$company}'
-		// GROUP BY prtGHQ, pc";
-// $rs = $oSQL->q($sql);
-// if(!$oSQL->n($rs)){
-	// die("<div class='error'>No base for cost distribution. Prepare the <a href='rep_ratios.php?budget_scenario={$budget_scenario}&DataAction=update'>revenue register</a> first</div>");
-// }
+$sql = "SELECT account, pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)." 
+		FROM vw_master
+		WHERE scenario='{$budget_scenario}' AND company='{$company}'
+		AND account IN ('5999CO','5999BD')
+		AND pccFlagProd=1
+		GROUP BY prtGHQ, account";
+$rs = $oSQL->q($sql);
+if(!$oSQL->n($rs)){
+	die("<div class='error'>No base for cost distribution. Prepare the <a href='rep_ratios.php?budget_scenario={$budget_scenario}&DataAction=update'>revenue register</a> first</div>");
+}
 
 while ($rw = $oSQL->f($rs)){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
-		$arrPC[$rw['pc']][$rw['prtGHQ']][$month] += $rw[$month];
-		$arrSubtotal[$rw['pc']][$month] += $rw[$month];
-		$arrGHQSubtotal[$rw['prtGHQ']][$month] += $rw[$month];
-		$arrRevenue[$month] += $rw[$month];
+		// $arrPC[$rw['pc']][$rw['prtGHQ']][$month] += $rw[$month];
+		// $arrSubtotal[$rw['pc']][$month] += $rw[$month];
+		$arrGHQSubtotal[$rw['account']][$rw['prtGHQ']][$month] += $rw[$month];
+		$arrCost[$rw['account']][$month] += $rw[$month];
 	}
 }
 
@@ -60,7 +62,7 @@ while ($rw = $oSQL->f($rs)){
 	// }
 // }
 
-// echo '<pre>';print_r($arrRatio);echo '</pre>';
+// echo '<pre>';print_r($arrCost);echo '</pre>';
 
 $sqlFields = "account, title, prtGHQ, pc, pccFlagProd, Profit, 
 				SUM(".$oBudget->getYTDSQL($startMonth,$endMonth, $arrRates).") as Total, 				
@@ -151,6 +153,33 @@ foreach ($arrAccounts as $reportKey=>$settings){
 			
 				}
 			} else {
+				
+				for($m=$startMonth;$m<=$endMonth;$m++){
+					$month = $oBudget->arrPeriod[$m];
+					if($settings['breakdown']){
+						
+						$accKey = getAccountAlias($rw['account']);
+						switch((integer)$rw['pc']){
+							case 9:
+							case 130:
+								$corpKey = '5999BD';
+								$bdKey = $reportKey;
+								break;
+							default:
+								$bdKey = "Corporate costs";
+								$corpKey = '5999CO';
+								break;
+						}
+						
+						
+						foreach($arrGHQSubtotal[$corpKey] as $ghq=>$data){
+							if ($arrCost[$corpKey][$month]){
+								$arrBreakDown[$bdKey][$accKey][$ghq] += $rw[$month]*$data[$month]/$arrCost[$corpKey][$month];
+							}
+						}
+					}	
+				}
+				
 				$arrGrandTotal[$reportKey]['monthly'][$month] += $rw[$month];
 			}
 			
@@ -375,13 +404,17 @@ for ($m=$startMonth;$m<=$endMonth;$m++){
 <ul class='link-footer'>
 	<li><a href='javascript:SelectContent("report");'>Select all</a></li>
 </ul>
+<?php
+echo '<pre>';print_r($arrGHQSubtotal);echo '</pre>';
 
+?>
 <h2>Activity ratios</h2>
 <table class='budget' style='width:auto;'>
 <thead>
 <tr>
+<th>Type</th>
 <?php
-foreach($arrGHQSubtotal as $ghq=>$revenue){
+foreach($arrReport as $ghq=>$values){
 	echo '<th>',($ghq?$ghq:'[None]'),'</th>';
 }
 ?>
@@ -389,16 +422,22 @@ foreach($arrGHQSubtotal as $ghq=>$revenue){
 </tr>
 </thead>
 <tbody>
-<tr>
 <?php
-	foreach($arrGHQSubtotal as $ghq=>$revenue){
-		?>
-		<td><?php Reports::render_ratio(array_sum($revenue),array_sum($arrRevenue));?></td>
+	foreach($arrGHQSubtotal as $account=>$data){
+?>
+	<tr>
+		<td><?php echo $account;?></td>
 		<?php
+		foreach ($arrReport as $ghq=>$values) {
+		?>
+		<td><?php Reports::render_ratio(array_sum($data[$ghq]),array_sum($arrCost[$account]));?></td>
+		<?php
+		}
+	?>
+	</tr>
+	<?php
 	}
 ?>
-<td>100</td>
-</tr>
 </tbody>
 </table>
 
@@ -495,35 +534,9 @@ function distribute($reportKey, $sql){
 		} else {
 			$key = $reportKey;
 		}
-	
-		switch($rw['account']){
-			case 'J00801':
-				$accKey = 'Labor costs';
-				break;
-			case 'J0080W':
-				$accKey = 'Warehouse costs';
-				break;
-			case 'J00806':
-			case '512000':
-				$accKey = 'Depreciation';
-				break;
-			case '502000':
-			case '505000':
-			case '506000':
-				$accKey = 'Personal expenses';
-				break;
-			case '514000':
-			case '515000':
-			case '519000':
-			case '525000':
-				$accKey = 'Office cost';
-				break;
+		
+		$accKey = getAccountAlias($rw['account']);
 			
-			default:
-				$accKey = 'Other costs';
-				break;			
-		}
-	
 		for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 			if ($rw[$month]!=0){
