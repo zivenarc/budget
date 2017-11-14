@@ -405,7 +405,7 @@ for ($m=$startMonth;$m<=$endMonth;$m++){
 	<li><a href='javascript:SelectContent("report");'>Select all</a></li>
 </ul>
 <?php
-echo '<pre>';print_r($arrGHQSubtotal);echo '</pre>';
+// echo '<pre>';print_r($arrGHQSubtotal);echo '</pre>';
 
 ?>
 <h2>Activity ratios</h2>
