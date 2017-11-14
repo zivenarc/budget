@@ -153,9 +153,6 @@ foreach ($arrAccounts as $reportKey=>$settings){
 				$arrBreakDown[$reportKey][$accKey][$rw['prtGHQ']] += $rw[$month];
 			}
 		}
-		
-
-		
 	}
 }
 
