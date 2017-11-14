@@ -143,18 +143,23 @@ foreach ($arrAccounts as $reportKey=>$settings){
 						$arrGrandTotal[$settings['subtotal'][$i]]['monthly'][$month] += $rw[$month];
 					};
 					$arrGrandTotal[$reportKey]['monthly'][$month] += $rw[$month];
+				
+					if($settings['breakdown']){
+						$accKey = getAccountAlias($rw['account']);
+						$arrBreakDown[$reportKey][$accKey][$rw['prtGHQ']] += $rw[$month];
+					}		
+			
 				}
 			} else {
 				$arrGrandTotal[$reportKey]['monthly'][$month] += $rw[$month];
 			}
 			
-			if($settings['breakdown']){
-				$accKey = getAccountAlias($rw['account']);
-				$arrBreakDown[$reportKey][$accKey][$rw['prtGHQ']] += $rw[$month];
-			}
+
 		}
 	}
 }
+
+// echo '<pre>';print_r($arrBreakDown);echo '</pre>';
 
 $reportKey = 'Extraordinary income';
 $sql = "SELECT $sqlFields FROM vw_master 
@@ -463,7 +468,7 @@ foreach ($arrBreakDown as $group=>$accounts){
 	<ul class='link-footer'>
 		<li><a href='javascript:SelectContent("<?php echo $strTableID;?>");'>Select table</a></li>
 	</ul>
-	<?
+	<?php
 }
 
 include ('includes/inc-frame_bottom.php');
