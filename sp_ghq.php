@@ -591,9 +591,12 @@ function getAccountAlias($account){
 			case '525000':
 				$accKey = 'Office cost';
 				break;
+			case '527000':
+				$accKey = 'MSF';
+				break;
 			case '5999CO':
 			case '5999BD':
-				return (false);
+				$accKey = 'Int.distr';
 				break;
 			default:
 				$accKey = 'Other costs';
