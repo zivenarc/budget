@@ -94,6 +94,7 @@ class Product{
 		$this->id = $id;
 		$this->name = $params['prdTitle'];
 		$this->activity = $params['prdCategoryID'];
+		$this->activity_cost = $params['prdCostID'];
 		$this->unit = $params['prtUnit'];
 	}
 	
