@@ -420,6 +420,7 @@ class Depreciation extends Document{
 		GLOBAL $Activities;
 		GLOBAL $YACT;
 		GLOBAL $Items;
+		GLOBAL $ProfitCenters;
 		
 		$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new Master($this->scenario, $this->GUID, $this->company);
@@ -427,15 +428,15 @@ class Depreciation extends Document{
 			if(is_array($this->records[$this->gridName])){
 				
 				$residual_value = Array();
+				$oPC = $ProfitCenters->getByCode($this->profit);
 				
 				foreach($this->records[$this->gridName] as $id=>$record){
 
 						$master_row = $oMaster->add_master(); //-----------------------Depreciation
 						$master_row->profit = $this->profit;
-						$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 						$master_row->customer = $record->customer;										
 						$master_row->particulars = $record->particulars;										
-						$master_row->part_type = 'FIX';	
+						$master_row->part_type = 'FIX';				
 						
 						if ($record->duration) {
 							$monthly_depr = $record->value_start/$record->duration;
@@ -472,16 +473,19 @@ class Depreciation extends Document{
 							}
 							
 						}				
-															
+						
+						if($record->activity){
+							$master_row->activity = $record->activity;
+						} else {
+							$oMaster->distribute_activity($master_row,$oPC->activity);
+						}									
 						//echo '<pre>';print_r($master_row);echo '</pre>';
 	
 				}
 												
 				$master_row = $oMaster->add_master();//------------------------ Property tax
 				$master_row->profit = $this->profit;
-				$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 				$master_row->customer = $record->customer;										
-				
 				$item = $Items->getById(Items::PROPERTY_TAX);
 				$master_row->account = $item->getYACT($master_row->profit);
 				$master_row->item = Items::PROPERTY_TAX;
@@ -490,11 +494,16 @@ class Depreciation extends Document{
 					$month = $this->budget->arrPeriod[$m];
 					$master_row->{$month} = -self::PROPERTY_TAX*$record->{$month}*$residual_value[$m]/12;
 				}
+				if($record->activity){
+					$master_row->activity = $record->activity;
+				} else {
+					$oMaster->distribute_activity($master_row,$oPC->activity);
+				}
+				
 				
 				if ($this->disposal_date){
-					$master_row = $oMaster->add_master();//------------------------ Property tax
+					$master_row = $oMaster->add_master();//------------------------ GAIN 
 					$master_row->profit = $this->profit;
-					$master_row->activity = $record->activity?$record->activity:$this->pc->activity;
 					$master_row->customer = $record->customer;										
 					
 					$month = $this->budget->arrPeriod[$disposal_month];
@@ -508,6 +517,11 @@ class Depreciation extends Document{
 							
 					$master_row->{$month} = $this->disposal_value - $residual_value[$disposal_month];
 					
+					if($record->activity){
+						$master_row->activity = $record->activity;
+					} else {
+						$oMaster->distribute_activity($master_row,$oPC->activity);
+					}
 				}
 				
 				$oMaster->save();
