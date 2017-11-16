@@ -27,16 +27,7 @@ class Products extends Reference{
 	}
 	
 	public function getStructuredRef($prdIdxLeft, $prdIdxRight){
-		// $sql = "SELECT PRD.prdID, PRD.prdFlagDeleted, CONCAT(prtGHQ, '| ',PRD.prdTitleLocal) as prdTitleLocal, PRD_P.prdTitleLocal as prdParentTitle
-					// FROM vw_product PRD 
-					// INNER JOIN vw_product PRD_P ON PRD_P.prdIdxLeft<=PRD.prdIdxLeft 
-						// AND PRD_P.prdIdxRight>=PRD.prdIdxRight AND PRD_P.prdParentID >0 
-					// LEFT JOIN common_db.tbl_product_type ON PRD.prdCategoryID=prtID
-					// WHERE PRD.prdIdxLeft BETWEEN  '{$prdIdxLeft}' AND '{$prdIdxRight}'
-						// ##AND PRD.prdFlagFolder=0
-					// GROUP BY PRD.prdID
-					// ORDER BY prtGHQ, PRD.prdIdxLeft, PRD.prdIdxRight, PRD.prdTitleLocal
-				// ";
+
 		$sql = "SELECT prdID, prdFlagDeleted, CONCAT_WS('|',prdGDS,prdTitleLocal) as prdTitleLocal, prtGHQ as parent_code, prtGHQ as parent_title
 			FROM vw_product			
 			LEFT JOIN common_db.tbl_product_type ON prdCategoryID=prtID
@@ -50,19 +41,6 @@ class Products extends Reference{
 		$group = '';		
 		
 		while ($rw=$this->oSQL->f($rs)){
-			 		
-			// if ($group!='' && $group<>$rw['parent_code'] && $flagGroupOpen[$group]){
-				// $arrRes['##optgroupclose##'.$group] = '';
-				// $flagGroupOpen[$group] = false;
-			// }
-			
-			// if ($rw['prdFlagFolder']){
-				// $arrRes['##optgroupopen##'.$rw['parent_code']] = $rw['parent_title'];
-				// $flagGroupOpen[$rw['parent_code']] = true;
-			// } else {
-				// $arrRes[$rw['prdID']] = mb_strlen($rw['prdTitleLocal'],'UTF-8')>200?mb_substr($rw['prdTitleLocal'],0,200,'UTF-8').'[...]':$rw['prdTitleLocal'];
-				// $group = $rw['parent_code'];
-			// }
 			
 			$group = strlen($rw['parent_title'])?$rw['parent_title']:'Undefined froup';
 			

@@ -187,6 +187,7 @@ class Interco_sales extends Document{
 		GLOBAL $arrUsrData;
 		GLOBAL $Activities;
 		GLOBAL $YACT;
+		GLOBAL $Products;
 		
 		parent::save($mode);
 		
@@ -266,6 +267,8 @@ class Interco_sales extends Document{
 			
 			if(is_array($this->records[$this->gridName])){
 				foreach($this->records[$this->gridName] as $id=>$record){
+					$oProduct = $Products->getByCode($record->product);
+					// echo 'Product:'.$record->product.'<pre>';print_r($oProduct);echo '</pre>';
 					//-------------------------------------- Income for supplier --------------------------------------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
@@ -291,10 +294,10 @@ class Interco_sales extends Document{
 					//-------------------------------------- Intercompany cost for department --------------------------------------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->customer;
-					$master_row->activity = $record->activity;
+					$master_row->activity = $oProduct->activity_cost;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $Activities->getByCode($record->activity);
+					$activity = $Activities->getByCode($master_row->activity);
 					switch ($this->type) {
 						case 'DC':			
 							$master_row->account = 'J00802';
@@ -344,13 +347,13 @@ class Interco_sales extends Document{
 						$master_row->{$month} = -($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
 					
-					//-------------------------------------- Elimination of revenue --------------------------------------------------
+					//-------------------------------------- Elimination of cost --------------------------------------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = 99;
-					$master_row->activity = $record->activity;
+					$master_row->activity = $oProduct->activity_cost;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $Activities->getByCode($record->activity);
+					$activity = $Activities->getByCode($master_row->activity);
 					$account = 'J00802';
 					
 					$master_row->account = $account;
@@ -364,10 +367,10 @@ class Interco_sales extends Document{
 					
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $this->customer;
-						$master_row->activity = $record->activity;
+						$master_row->activity = $oProduct->activity_cost;
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $this->getSales($master_row->customer);
-						$activity = $Activities->getByCode($record->activity);
+						$activity = $Activities->getByCode($master_row->activity);
 						$account = 'J00802';
 									
 						$master_row->account = $account;
