@@ -372,8 +372,8 @@ if(!isset($_GET['prtGHQ'])){
 	?>
 	<style>
 	.blurry {
-	   color: transparent;
-	   text-shadow: 0 0 5px rgba(0,0,0,0.5);
+	   color: transparent !important;
+	   text-shadow: 0 0 6px rgba(0,0,0,0.5);
 	}
 	</style>
 	<table class="budget" id='headcount'>
