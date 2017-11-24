@@ -7,7 +7,15 @@ require ('classes/item.class.php');
 require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
-$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$reference));
+$arrItems[] = Items::IT_EQUIPMENT;
+$arrItems[] = Items::INTERNET;
+$arrItems[] = Items::IT_COSTS;
+$arrItems[] = Items::IT_SUPPORT;
+$arrItems[] = Items::SATELLITE;
+$arrItems[] = Items::ONEASS;
+$arrItems[] = Items::RHQ_IT_COST;
+
+$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$reference,'filter'=>Array('item'=>$arrItems)));
 $oBudget = new Budget($budget_scenario);
 $arrJS[]='js/rep_pnl.js';
 
@@ -17,13 +25,7 @@ echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 include ('includes/inc_report_selectors.php');
 // include ('includes/inc_report_buttons.php');
 
-$arrItems[] = Items::IT_EQUIPMENT;
-$arrItems[] = Items::INTERNET;
-$arrItems[] = Items::IT_COSTS;
-$arrItems[] = Items::IT_SUPPORT;
-$arrItems[] = Items::SATELLITE;
-$arrItems[] = Items::ONEASS;
-$arrItems[] = Items::RHQ_IT_COST;
+
 
 $strItems = "'".implode("','",$arrItems)."'";
 
