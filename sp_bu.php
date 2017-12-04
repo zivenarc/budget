@@ -55,7 +55,7 @@ if (isset($_GET['tab'])){
 		<span><a href='sp_my.php?ownerID=MYSELF'>See my own docs</a></span>
 	</nav>
 	<?php
-	echo Budget::getScenarioTabs(true);
+	echo Budget::getScenarioTabs();
 	
 	include ('includes/inc-frame_bottom.php');
 }
