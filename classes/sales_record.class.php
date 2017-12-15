@@ -44,11 +44,11 @@ class sales_record extends table_record{
 			return ($res);
 		}
 		
-		GLOBAL $Products;
+		GLOBAL $oProducts;
 		
 			$arrRes = $this->getMonthlySQL();		
 			
-			$oProduct = $Products->getByCode($this->product);
+			$oProduct = $oProducts->getByCode($this->product);
 			
 			$arrRes[] = "`company`='{$this->company}'";
 			$arrRes[] = "`pc`=".$this->profit;
