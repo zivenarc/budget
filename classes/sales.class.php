@@ -7,10 +7,10 @@ include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
 include_once ('classes/yact_coa.class.php');
 
-$Products = new Products ();
-$Activities = new Activities ();
-$YACT = new YACT_COA();
-$Items = new Items();
+$oProducts = new Products ();
+$oActivities = new Activities ();
+$oYACT = new YACT_COA();
+$oItems = new Items();
 
 class Sales extends Document{
 	
@@ -209,7 +209,7 @@ class Sales extends Document{
 	//==========================================Definition of document GRID ===================================================
 	public function defineGrid(){
 		
-		GLOBAL $Products;
+		GLOBAL $oProducts;
 	
 		if (!$this->data[self::Prefix.'CustomerID']){
 			$this->grid->Columns[] = parent::getCustomerEG();
@@ -418,8 +418,7 @@ class Sales extends Document{
 						$row->pod = $this->pod;						
 						$row->route = $this->route;	
 						$row->gbr = $this->gbr?1:0;						
-						$row->freehand = ($row->activity==48 || $row->activity==63 || $row->activity==46 || $row->activity==47 || $row->activity==52 || $row->activity==58) 
-							&& $this->business_owner==self::PB_Ourselves;				
+						$row->freehand = in_array($row->activity,Array(48,63,46,47,52,58)) && $this->business_owner==self::PB_Ourselves;				
 						for ($m=1;$m<=15;$m++){							
 							$month = $this->budget->arrPeriod[$m];	
 							$row->{$month} = (integer)$_POST[strtolower($month)][$id];
@@ -469,9 +468,9 @@ class Sales extends Document{
 	
 	function post(){
 	
-		GLOBAL $Activities;
-		GLOBAL $YACT;
-		GLOBAL $Items;
+		GLOBAL $oActivities;
+		GLOBAL $oYACT;
+		GLOBAL $oItems;
 		GLOBAL $oBudget;
 		
 		$dateProjectBridge = strtotime('1 April 2016');				
@@ -490,36 +489,32 @@ class Sales extends Document{
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $record->sales;				
 					
-					$activity = $Activities->getByCode($record->activity);
+					$activity = $oActivities->getByCode($record->activity);
 					$account = $activity->YACT;
 					
 					$master_row->account = $account;
 					$master_row->item = $activity->item_income;
 					for($m=1;$m<=15;$m++){
-						// $month = date('M',mktime(0,0,0,$m,15));
-						
 						$month = $this->budget->arrPeriod[$m];	
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
 						
 						//------Update for Project bridge since 1st April 2016-----------
 						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 						if ($current_month_start>=$dateProjectBridge && $this->job_owner!=self::PB_Ourselves){							
-							if ($record->hbl){
-							// if ($record->activity==48 || $record->activity==63){
-							// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
-								
+							if ($record->hbl){							
 								if (!isset($freight_r_row)){
 									$freight_r_row = $oMaster->add_master();
 								}
-															
 								$freight_r_row->item = $activity->item_cost;
 								$freight_r_row->account = 'J00802';
 								$freight_r_row->profit = $this->profit;
-								$freight_r_row->activity = $Activities::OFIGB;
+								$freight_r_row->activity = $oActivities::OFIGB;
 								$freight_r_row->customer = $record->customer;				
 								$freight_r_row->sales = $record->sales;	
 								$freight_r_row->{$month} -= ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
 								//$master_row->{$month} = 0;
+								
+								
 								
 							} else{
 								// leave it alone
@@ -535,7 +530,7 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $Activities->getByCode($record->activity);
+						$activity = $oActivities->getByCode($record->activity);
 						$account = 'J00802';
 						
 						$master_row->account = $account;
@@ -549,16 +544,13 @@ class Sales extends Document{
 							$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 							if ($current_month_start>=$dateProjectBridge && $this->job_owner!=self::PB_Ourselves){
 								if ($record->hbl){
-								// if ($record->activity==48 || $record->activity==63){
-								// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
 									if (!isset($freight_c_row)){
 										$freight_c_row = $oMaster->add_master();
-									}
-																
+									}					
 									$freight_c_row->item = $activity->item_cost;
 									$freight_c_row->account = 'J00802';
 									$freight_c_row->profit = $this->profit;
-									$freight_c_row->activity = $Activities::OFIGB;
+									$freight_c_row->activity = $oActivities::OFIGB;
 									$freight_c_row->customer = $record->customer;				
 									$freight_c_row->sales = $record->sales;	
 									$freight_c_row->{$month} += ($record->{$month})*$record->buying_rate*$this->settings[strtolower($record->buying_curr)];
@@ -572,8 +564,6 @@ class Sales extends Document{
 					}
 					
 					if ($record->hbl){
-					// if ($record->product==Product::OFT_Import || $record->product==Product::OFT_Export){
-					// if ($record->activity==48 || $record->activity==63){
 					
 						$flagProjectBridge = true;
 					
@@ -583,16 +573,14 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $Activities->getByCode($record->activity);
+						$activity = $oActivities->getByCode($record->activity);
 						$account = $activity->YACT;
 						
-						//$master_row->item = Items::PROFIT_SHARE;
-						$item = $Items->getById(Items::PROFIT_SHARE);
+						$item = $oItems->getById(Items::PROFIT_SHARE);
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item->id;
 						
 						for($m=1;$m<=15;$m++){
-							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
 							$master_row->{$month} = -($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)]-$record->buying_rate*$this->settings[strtolower($record->buying_curr)])/2;
 							//------Update for Project bridge since 1st April 2016-----------
@@ -616,117 +604,195 @@ class Sales extends Document{
 							$SCC = $arrRoute['rteSC_OFF'];
 						}
 						
-						//------- Sales commission receivable ----------
-						if ($this->job_owner!=self::PB_Ourselves && $this->business_owner==self::PB_Ourselves){
-							$master_row = $oMaster->add_master();
-							$master_row->profit = $this->profit;
-							$master_row->activity = $Activities::OFICOM;
-							$master_row->customer = $record->customer;				
-							$master_row->sales = $record->sales;
-							
-							$activity = $Activities->getByCode($Activities::OFICOM);
-							$account = $activity->YACT;
-							
-							//$master_row->item = Items::PROFIT_SHARE;
-							$item = $Items->getById(Items::REVENUE);
-							$master_row->account = $item->getYACT($master_row->profit);
-							$master_row->item = $item->id;
-							
+						if($this->settings['PS_Scheme']=='PS2018'){
+							$arrProfit = Array();
 							for($m=1;$m<=15;$m++){
-								// $month = date('M',mktime(0,0,0,$m,15));
-								$month = $this->budget->arrPeriod[$m];									
-								//------Update for Project bridge since 1st April 2016-----------
-								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-								if ($current_month_start>=$dateProjectBridge){										
-									$master_row->{$month} = ($this->arrTEU[$month])*$SCC*$this->settings['usd'];
-								} else {
-									$master_row->{$month} = 0;	// do not calculate Profit share						
-								}
+								$month = $this->budget->arrPeriod[$m];	
+								$arrGP[$month] = ($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)] - $record->buying_rate*$this->settings[strtolower($record->buying_curr)]);
 							}
-						} elseif ($this->job_owner==self::PB_Ourselves && $this->business_owner!=self::PB_Ourselves) {
-							$master_row = $oMaster->add_master();
-							$master_row->profit = $this->profit;
-							$master_row->activity = $record->activity;
-							$master_row->customer = $record->customer;				
-							$master_row->sales = $record->sales;
-							
-							$activity = $Activities->getByCode($record->activity);
-							$account = $activity->YACT;
-							
-							//$master_row->item = Items::PROFIT_SHARE;
-							$item = $Items->getById(Items::DIRECT_COSTS);
-							$master_row->account = $item->getYACT($master_row->profit);
-							$master_row->item = $item->id;
-							
-							for($m=1;$m<=15;$m++){
-								// $month = date('M',mktime(0,0,0,$m,15));
-								$month = $this->budget->arrPeriod[$m];									
-								//------Update for Project bridge since 1st April 2016-----------
-								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-								if ($current_month_start>=$dateProjectBridge){										
-									$master_row->{$month} = -($this->arrTEU[$month])*$arrRoute['rteSC_OFF']*$this->settings['usd'];
-								} else {
-									$master_row->{$month} = 0;	// do not calculate Profit share						
+							//Profit share for 2018
+							if($this->job_owner!=self::PB_Ourselves){ //Import commissions
+								if($this->business_owner==self::PB_Ourselves){ 
+									$master_row = $oMaster->add_master();	
+									$master_row->profit = $this->profit;
+									$master_row->activity = $record->activity;
+									$master_row->customer = $record->customer;				
+									$master_row->sales = $record->sales;
+									$activity = $oActivities->getByCode($record->activity);
+									$account = $activity->YACT;
+									$item = $oItems->getById(Items::PROFIT_SHARE);
+									$master_row->account = 'J00400';
+									$master_row->item = $item->id;
+									for($m=1;$m<=15;$m++){
+										$month = $this->budget->arrPeriod[$m];
+										$master_row->{$month} = 0.4 * $arrGP[$month];
+									}	
 								}
-							}
+								if($this->destination_agent==self::PB_Ourselves){
+									$master_row = $oMaster->add_master();	
+									$master_row->profit = $this->profit;
+									$master_row->activity = $record->activity;
+									$master_row->customer = $record->customer;				
+									$master_row->sales = $record->sales;
+									$activity = $oActivities->getByCode($record->activity);
+									$account = $activity->YACT;
+									$item = $oItems->getById(Items::PROFIT_SHARE);
+									$master_row->account = 'J00400';
+									$master_row->item = $item->id;
+									for($m=1;$m<=15;$m++){
+										$month = $this->budget->arrPeriod[$m];
+										$master_row->{$month} = 0.2 * $arrGP[$month];
+									}	
+								}
+							}else{ //export commissions
+								if($this->business_owner!=self::PB_Ourselves){ 
+									$master_row = $oMaster->add_master();	
+									$master_row->profit = $this->profit;
+									$master_row->activity = $record->activity;
+									$master_row->customer = $record->customer;				
+									$master_row->sales = $record->sales;
+									$activity = $oActivities->getByCode($record->activity);
+									$account = $activity->YACT;
+									$item = $oItems->getById(Items::PROFIT_SHARE);
+									$master_row->account = $item->getYACT($master_row->profit);
+									$master_row->item = $item->id;
+									for($m=1;$m<=15;$m++){
+										$month = $this->budget->arrPeriod[$m];
+										$master_row->{$month} = -0.4 * $arrGP[$month];
+									}	
+								}
+								if($this->destination_agent!=self::PB_Ourselves){ 
+									$master_row = $oMaster->add_master();	
+									$master_row->profit = $this->profit;
+									$master_row->activity = $record->activity;
+									$master_row->customer = $record->customer;				
+									$master_row->sales = $record->sales;
+									$activity = $oActivities->getByCode($record->activity);
+									$account = $activity->YACT;
+									$item = $oItems->getById(Items::PROFIT_SHARE);
+									$master_row->account = $item->getYACT($master_row->profit);
+									$master_row->item = $item->id;
+									for($m=1;$m<=15;$m++){
+										$month = $this->budget->arrPeriod[$m];
+										$master_row->{$month} = -0.2 * $arrGP[$month];
+									}
+								}
+							}								
+								
 						} else {
-							// no SSC in our books
-						}
-						//------- Destination handling charge
-						if ($this->job_owner!=self::PB_Ourselves && $this->destination_agent==self::PB_Ourselves && !$this->gbr){
-							$master_row = $oMaster->add_master();
-							$master_row->profit = $this->profit;
-							$master_row->activity = $Activities::OFICOM;
-							$master_row->customer = $record->customer;				
-							$master_row->sales = $record->sales;
-							
-							$activity = $Activities->getByCode($Activities::OFICOM);
-							$account = $activity->YACT;
-							
-							//$master_row->item = Items::PROFIT_SHARE;
-							$item = $Items->getById(Items::REVENUE);
-							$master_row->account = $item->getYACT($master_row->profit);
-							$master_row->item = $item->id;
-							
-							for($m=1;$m<=15;$m++){
-								// $month = date('M',mktime(0,0,0,$m,15));
-								$month = $this->budget->arrPeriod[$m];									
-								//------Update for Project bridge since 1st April 2016-----------
-								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-								if ($current_month_start>=$dateProjectBridge){										
-									$master_row->{$month} = ($this->arrTEU[$month])*6*$this->settings['usd'];
-								} else {
-									$master_row->{$month} = 0;	// do not calculate Profit share						
+						
+							//------- Sales commission receivable ----------
+							if ($this->job_owner!=self::PB_Ourselves && $this->business_owner==self::PB_Ourselves){
+								$master_row = $oMaster->add_master();
+								$master_row->profit = $this->profit;
+								$master_row->activity = $oActivities::OFICOM;
+								$master_row->customer = $record->customer;				
+								$master_row->sales = $record->sales;
+								
+								$activity = $oActivities->getByCode($oActivities::OFICOM);
+								$account = $activity->YACT;
+								
+								//$master_row->item = Items::PROFIT_SHARE;
+								$item = $oItems->getById(Items::REVENUE);
+								$master_row->account = $item->getYACT($master_row->profit);
+								$master_row->item = $item->id;
+								
+								for($m=1;$m<=15;$m++){
+									// $month = date('M',mktime(0,0,0,$m,15));
+									$month = $this->budget->arrPeriod[$m];									
+									//------Update for Project bridge since 1st April 2016-----------
+									$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
+									if ($current_month_start>=$dateProjectBridge){										
+										$master_row->{$month} = ($this->arrTEU[$month])*$SCC*$this->settings['usd'];
+									} else {
+										$master_row->{$month} = 0;	// do not calculate Profit share						
+									}
 								}
-							}
-						} elseif ($this->job_owner==self::PB_Ourselves && $this->destination_agent!=self::PB_Ourselves) {
-							$master_row = $oMaster->add_master();
-							$master_row->profit = $this->profit;
-							$master_row->activity = $record->activity;
-							$master_row->customer = $record->customer;				
-							$master_row->sales = $record->sales;
-							
-							$activity = $Activities->getByCode($record->activity);
-							$account = $activity->YACT;
-							
-							//$master_row->item = Items::PROFIT_SHARE;
-							$item = $Items->getById(Items::DIRECT_COSTS);
-							$master_row->account = $item->getYACT($master_row->profit);
-							$master_row->item = $item->id;
-							
-							for($m=1;$m<=15;$m++){
-								// $month = date('M',mktime(0,0,0,$m,15));
-								$month = $this->budget->arrPeriod[$m];									
-								//------Update for Project bridge since 1st April 2016-----------
-								$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
-								if ($current_month_start>=$dateProjectBridge){										
-									$master_row->{$month} = -($this->arrTEU[$month])*6*$this->settings['usd'];
-								} else {
-									$master_row->{$month} = 0;	// do not calculate Profit share						
+							} elseif ($this->job_owner==self::PB_Ourselves && $this->business_owner!=self::PB_Ourselves) {
+								$master_row = $oMaster->add_master();
+								$master_row->profit = $this->profit;
+								$master_row->activity = $record->activity;
+								$master_row->customer = $record->customer;				
+								$master_row->sales = $record->sales;
+								
+								$activity = $oActivities->getByCode($record->activity);
+								$account = $activity->YACT;
+								
+								//$master_row->item = Items::PROFIT_SHARE;
+								$item = $oItems->getById(Items::DIRECT_COSTS);
+								$master_row->account = $item->getYACT($master_row->profit);
+								$master_row->item = $item->id;
+								
+								for($m=1;$m<=15;$m++){
+									// $month = date('M',mktime(0,0,0,$m,15));
+									$month = $this->budget->arrPeriod[$m];									
+									//------Update for Project bridge since 1st April 2016-----------
+									$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
+									if ($current_month_start>=$dateProjectBridge){										
+										$master_row->{$month} = -($this->arrTEU[$month])*$arrRoute['rteSC_OFF']*$this->settings['usd'];
+									} else {
+										$master_row->{$month} = 0;	// do not calculate Profit share						
+									}
 								}
+							} else {
+								// no SSC in our books
 							}
-						} else {
-							// no DHC in our books
+							//------- Destination handling charge
+							if ($this->job_owner!=self::PB_Ourselves && $this->destination_agent==self::PB_Ourselves && !$this->gbr){
+								$master_row = $oMaster->add_master();
+								$master_row->profit = $this->profit;
+								$master_row->activity = $oActivities::OFICOM;
+								$master_row->customer = $record->customer;				
+								$master_row->sales = $record->sales;
+								
+								$activity = $oActivities->getByCode($oActivities::OFICOM);
+								$account = $activity->YACT;
+								
+								//$master_row->item = Items::PROFIT_SHARE;
+								$item = $oItems->getById(Items::REVENUE);
+								$master_row->account = $item->getYACT($master_row->profit);
+								$master_row->item = $item->id;
+								
+								for($m=1;$m<=15;$m++){
+									// $month = date('M',mktime(0,0,0,$m,15));
+									$month = $this->budget->arrPeriod[$m];									
+									//------Update for Project bridge since 1st April 2016-----------
+									$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
+									if ($current_month_start>=$dateProjectBridge){										
+										$master_row->{$month} = ($this->arrTEU[$month])*6*$this->settings['usd'];
+									} else {
+										$master_row->{$month} = 0;	// do not calculate Profit share						
+									}
+								}
+							} elseif ($this->job_owner==self::PB_Ourselves && $this->destination_agent!=self::PB_Ourselves) {
+								$master_row = $oMaster->add_master();
+								$master_row->profit = $this->profit;
+								$master_row->activity = $record->activity;
+								$master_row->customer = $record->customer;				
+								$master_row->sales = $record->sales;
+								
+								$activity = $oActivities->getByCode($record->activity);
+								$account = $activity->YACT;
+								
+								//$master_row->item = Items::PROFIT_SHARE;
+								$item = $oItems->getById(Items::DIRECT_COSTS);
+								$master_row->account = $item->getYACT($master_row->profit);
+								$master_row->item = $item->id;
+								
+								for($m=1;$m<=15;$m++){
+									// $month = date('M',mktime(0,0,0,$m,15));
+									$month = $this->budget->arrPeriod[$m];									
+									//------Update for Project bridge since 1st April 2016-----------
+									$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
+									if ($current_month_start>=$dateProjectBridge){										
+										$master_row->{$month} = -($this->arrTEU[$month])*6*$this->settings['usd'];
+									} else {
+										$master_row->{$month} = 0;	// do not calculate Profit share						
+									}
+								}
+							} else {
+								// no DHC in our books
+							}
 						}
 					}
 					
@@ -739,11 +805,11 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $Activities->getByCode($record->activity);
+						$activity = $oActivities->getByCode($record->activity);
 						$account = $activity->YACT;
 						
 						//$master_row->item = Items::PROFIT_SHARE;
-						$item = $Items->getById(Items::INTERCOMPANY_COSTS);
+						$item = $oItems->getById(Items::INTERCOMPANY_COSTS);
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item->id;
 						
@@ -760,11 +826,11 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $Activities->getByCode($record->activity);
+						$activity = $oActivities->getByCode($record->activity);
 						$account = $activity->YACT;
 						
 						//$master_row->item = Items::PROFIT_SHARE;
-						$item = $Items->getById(Items::INTERCOMPANY_COSTS);
+						$item = $oItems->getById(Items::INTERCOMPANY_COSTS);
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item->id;
 						
@@ -781,11 +847,11 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $Activities->getByCode($record->activity);
+						$activity = $oActivities->getByCode($record->activity);
 						$account = $activity->YACT;
 						
 						//$master_row->item = Items::PROFIT_SHARE;
-						$item = $Items->getById(Items::INTERCOMPANY_REVENUE);
+						$item = $oItems->getById(Items::INTERCOMPANY_REVENUE);
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item->id;
 						
@@ -802,11 +868,11 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $Activities->getByCode($record->activity);
+						$activity = $oActivities->getByCode($record->activity);
 						$account = $activity->YACT;
 						
 						//$master_row->item = Items::PROFIT_SHARE;
-						$item = $Items->getById(Items::INTERCOMPANY_REVENUE);
+						$item = $oItems->getById(Items::INTERCOMPANY_REVENUE);
 						$master_row->account = $item->getYACT($master_row->profit);
 						$master_row->item = $item->id;
 						
@@ -831,6 +897,79 @@ class Sales extends Document{
 				
 				$this->markPosted();				
 			}		
+	}
+	
+	function calc_commission(){
+		
+		if(!$this->flagPosted) return (false);
+		
+		if(is_array($this->records[$this->gridName])){
+			foreach($this->records[$this->gridName] as $id=>$record){
+				if ($record->hbl){
+						if($this->gbr){
+							$SCC = $this->gbr;
+						} else {
+							$sql = "SELECT * FROM tbl_route WHERE rteID=".(integer)$this->route;
+							$rs = $this->oSQL->q($sql);
+							$arrRoute = $this->oSQL->f($rs);
+							$SCC_OFF = $arrRoute['rteSC_OFF'];
+							$SCC_AFF = $arrRoute['rteSC_AFF'];
+						}
+						
+						//------- Sales commission receivable ----------
+						if ($this->job_owner!=self::PB_Ourselves && $this->business_owner==self::PB_Ourselves){
+							$amountOFF = 0;$amountAFF=0;
+							for($m=1;$m<=15;$m++){
+								$month = $this->budget->arrPeriod[$m];									
+								$amountOFF += ($this->arrTEU[$month])*$SCC_OFF*$this->settings['usd'];
+								$amountAFF += ($this->arrKgs[$month])*$SCC_AFF*$this->settings['jpy'];
+							}
+							if($amountOFF) $arrComm[] = Array('product'=>'OFI','charge'=>'SCC','type'=>'revenue','amount'=>$amountOFF);
+							if($amountAFF) $arrComm[] = Array('product'=>'AFI','charge'=>'SCC','type'=>'revenue','amount'=>$amountAFF);
+							
+						} elseif ($this->job_owner==self::PB_Ourselves && $this->business_owner!=self::PB_Ourselves) {
+							$amountOFF = 0;$amountAFF=0;
+							for($m=1;$m<=15;$m++){
+								$month = $this->budget->arrPeriod[$m];									
+								$amountOFF += -($this->arrTEU[$month])*$arrRoute['rteSC_OFF']*$this->settings['usd'];
+								$amountAFF += -($this->arrKgs[$month])*$arrRoute['rteSC_AFF']*$this->settings['jpy'];
+							}
+							if($amountOFF) $arrComm[] = Array('product'=>'OFE','charge'=>'SCC','type'=>'cost','amount'=>$amountOFF);
+							if($amountAFF) $arrComm[] = Array('product'=>'AFE','charge'=>'SCC','type'=>'cost','amount'=>$amountAFF);
+						} 
+						
+						//------- Destination handling charge
+						if ($this->job_owner!=self::PB_Ourselves && $this->destination_agent==self::PB_Ourselves && !$this->gbr){
+							$amountOFF = 0;$amountAFF=0;
+							for($m=1;$m<=15;$m++){
+								$month = $this->budget->arrPeriod[$m];																
+								$amountOFF += ($this->arrTEU[$month])*6*$this->settings['usd'];
+								$amountAFF += 750*$this->settings['jpy'];
+							}
+							if($amountOFF) $arrComm[] = Array('product'=>'OFI','charge'=>'DHC','type'=>'revenue','amount'=>$amountOFF);
+							if($amountAFF) $arrComm[] = Array('product'=>'AFI','charge'=>'DHC','type'=>'revenue','amount'=>$amountAFF);
+							
+						} elseif ($this->job_owner==self::PB_Ourselves && $this->destination_agent!=self::PB_Ourselves) {
+							$amountOFF = 0;$amountAFF=0;
+							for($m=1;$m<=15;$m++){
+								$month = $this->budget->arrPeriod[$m];															
+								$amountOFF += -($this->arrTEU[$month])*6*$this->settings['usd'];
+								$amountAFF += -750*$this->settings['jpy'];
+							}
+							if($amountOFF) $arrComm[] = Array('product'=>'OFE','charge'=>'DHC','type'=>'cost','amount'=>$amountOFF);
+							if($amountAFF) $arrComm[] = Array('product'=>'AFE','charge'=>'DHC','type'=>'cost','amount'=>$amountAFF);
+						} else {
+							// no DHC in our books
+						}
+				}
+			}
+		}
+		
+		return($arrComm);
+		
+		for($i=0;$i<count($arrComm);$i++){
+			
+		}
 	}
 	
 }
