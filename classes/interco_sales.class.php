@@ -6,8 +6,8 @@ include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
 include_once ('classes/yact_coa.class.php');
 
-$Products = new Products ();
-$Activities = new Activities ();
+$oProducts = new Products ();
+$oActivities = new Activities ();
 $YACT = new YACT_COA();
 
 class Interco_sales extends Document{
@@ -185,9 +185,9 @@ class Interco_sales extends Document{
 	public function save($mode='update'){
 		
 		GLOBAL $arrUsrData;
-		GLOBAL $Activities;
+		GLOBAL $oActivities;
 		GLOBAL $YACT;
-		GLOBAL $Products;
+		GLOBAL $oProducts;
 		
 		parent::save($mode);
 		
@@ -267,7 +267,7 @@ class Interco_sales extends Document{
 			
 			if(is_array($this->records[$this->gridName])){
 				foreach($this->records[$this->gridName] as $id=>$record){
-					$oProduct = $Products->getByCode($record->product);
+					$oProduct = $oProducts->getByCode($record->product);
 					// echo 'Product:'.$record->product.'<pre>';print_r($oProduct);echo '</pre>';
 					//-------------------------------------- Income for supplier --------------------------------------------------
 					$master_row = $oMaster->add_master();
@@ -275,7 +275,7 @@ class Interco_sales extends Document{
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;	
 					$master_row->sales = $this->getSales($master_row->customer);					
-					$activity = $Activities->getByCode($record->activity);
+					$activity = $oActivities->getByCode($record->activity);
 					switch ($this->type) {
 						case 'DC':
 							$master_row->account = 'J00400';
@@ -297,7 +297,7 @@ class Interco_sales extends Document{
 					$master_row->activity = $oProduct->activity_cost;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $Activities->getByCode($master_row->activity);
+					$activity = $oActivities->getByCode($master_row->activity);
 					switch ($this->type) {
 						case 'DC':			
 							$master_row->account = 'J00802';
@@ -320,7 +320,7 @@ class Interco_sales extends Document{
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $Activities->getByCode($record->activity);
+					$activity = $oActivities->getByCode($record->activity);
 					$master_row->account = 'J00802';
 					$master_row->item = $activity->item_cost;
 
@@ -337,7 +337,7 @@ class Interco_sales extends Document{
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $Activities->getByCode($record->activity);
+					$activity = $oActivities->getByCode($record->activity);
 					$account = 'J00400';
 					
 					$master_row->account = $account;
@@ -353,7 +353,7 @@ class Interco_sales extends Document{
 					$master_row->activity = $oProduct->activity_cost;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $Activities->getByCode($master_row->activity);
+					$activity = $oActivities->getByCode($master_row->activity);
 					$account = 'J00802';
 					
 					$master_row->account = $account;
@@ -370,7 +370,7 @@ class Interco_sales extends Document{
 						$master_row->activity = $oProduct->activity_cost;
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $this->getSales($master_row->customer);
-						$activity = $Activities->getByCode($master_row->activity);
+						$activity = $oActivities->getByCode($master_row->activity);
 						$account = 'J00802';
 									
 						$master_row->account = $account;
