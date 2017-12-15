@@ -505,14 +505,14 @@ class Document extends easyForm{
 	
 	protected function getProductEG(){
 	
-		GLOBAL $Products;
+		GLOBAL $oProducts;
 		
 		$res = Array(
 			'title'=>'Product'
 			,'field'=>'product'
 			,'type'=>'combobox'
 			,'width'=>'100px'
-			,'source'=>$Products->getStructuredRef($this->data["prdIdxLeft"],$this->data["prdIdxRight"])
+			,'source'=>$oProducts->getStructuredRef($this->data["prdIdxLeft"],$this->data["prdIdxRight"])
 			,'sql'=>"vw_product_select"      							
 			, 'mandatory' => true
 			, 'disabled'=>!$this->flagUpdate
