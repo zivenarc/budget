@@ -93,7 +93,7 @@ if ($_GET['tab']){
 	$data = Array();
 	$arrActivity = Array(48);
 	$sql = "SELECT source FROM reg_sales 
-			WHERE scenario='{$_GET['tab']}' AND activity IN(".implode(',',$arrActivity).") AND jo=723
+			WHERE scenario='{$_GET['tab']}' AND activity IN(".implode(',',$arrActivity).") AND jo=714
 			GROUP BY source
 			";
 	$rs =$oSQL->q($sql);
