@@ -61,7 +61,7 @@ if ($_GET['tab']){
 	}
 	
 	$data = Array();
-	$arrActivity = Array(48);
+	$arrActivity = Array(46,48);
 	$sql = "SELECT source FROM reg_sales 
 			WHERE scenario='{$_GET['tab']}' AND activity IN(".implode(',',$arrActivity).") 
 			GROUP BY source
@@ -91,7 +91,7 @@ if ($_GET['tab']){
 	}
 	
 	$data = Array();
-	$arrActivity = Array(48);
+	$arrActivity = Array(46,48);
 	$sql = "SELECT source FROM reg_sales 
 			WHERE scenario='{$_GET['tab']}' AND activity IN(".implode(',',$arrActivity).") AND jo=714
 			GROUP BY source
