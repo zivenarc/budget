@@ -3427,8 +3427,9 @@ class Reports{
 		// ob_flush();
 		
 		$strTbody = ob_get_clean();
-		
+		$id = md5(time());
 		?>
+			<div id="<?php echo $id;?>">
 			<table id='sources' class='log'>
 				<thead>
 					<tr>
@@ -3457,6 +3458,8 @@ class Reports{
 					<?php echo $strTbody; ?>
 				</tbody>
 			</table>
+			</div>
+			<button onclick="SelectContent('<?php echo $id;?>');">Select table</button>
 		<?php
 	}
 	
