@@ -43,4 +43,11 @@ if ($_GET['pccGUID']=='all'){
 	// $sqlWhere = "WHERE pc in (".implode(',',$arrPC).")";
 
 $filter['pc'] = $arrPC;
+
+
+
+
+
+
+
 ?>

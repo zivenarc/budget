@@ -107,4 +107,22 @@ $arrUsrData["pagTitle$strLocal"] .= ': '.$curTitle;
 if ($denominator!=1) {
 	$arrUsrData["pagTitle$strLocal"] .= ' x'.$denominator;
 }
+
+//------------------------------------ Activity filter ------------------------------------------//
+
+if (isset($_GET['activity'])) {
+	$activity = $_GET['activity'];
+} elseif (isset($_COOKIE['activity'])) {
+	$activity = $_COOKIE['activity'];
+} else {
+	$activity = 'all'; 
+}
+
+SetCookie('activity',$activity,0,'/budget/');
+
+if($activity=='all'){
+	unset($filter['activity']);
+} else {
+	$filter['activity'] = $activity;
+}
 ?>

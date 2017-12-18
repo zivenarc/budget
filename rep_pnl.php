@@ -31,7 +31,7 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc_report_buttons.php');
 	
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator,'reference'=>$reference,'filter'=>$filter));
-	
+	// echo '<pre>';print_r($filter);echo '</pre>';
 	$oReport->periodicPnL($type);
 }
 

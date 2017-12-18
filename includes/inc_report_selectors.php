@@ -1,3 +1,49 @@
+<?php
+$sql = "SELECT prtID, prtTitleLocal as prtTitle,prtGHQ FROM vw_product_type WHERE prtGHQ<>'' ORDER BY prtGHQ, prtTitle";
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	$arrPRT[$rw['prtID']] = $rw;
+}
+
+?>
+<div id="activity_list" style='display:none;'>
+<?php
+$prtGHQ = null;
+$fieldsetOpen = 0;
+foreach($arrPRT as $key=>$data){
+	if($data['prtGHQ']!=$prtGHQ){
+		if($fieldsetOpen){
+			echo "</fieldset>";
+		}
+			echo "<fieldset><legend>{$data['prtGHQ']}</legend>";
+			$fieldsetOpen = 1;
+	}
+	echo "<button onclick='javascript:location.search=\"activity={$data['prtID']}\"'>{$data['prtTitle']}</button>";
+	$prtGHQ = $data['prtGHQ'];
+}
+if($fieldsetOpen){
+			echo "</fieldset>";
+}
+if($activity!='all'){
+	$strSubtitle .= "Filter: ".$arrPRT[$activity]['prtGHQ']." :: ".$arrPRT[$activity]['prtTitle'];
+}
+?>
+<button  onclick='javascript:location.search="activity=all"'>Reset activity filter</button>
+</div>
+<script>
+function showActivityList(){
+	$('#activity_list').dialog(
+		{
+			title:'Activity filter',
+			modal: true,
+			width: '70%'
+		}
+	);
+}
+</script>
+<?php
+echo $strSubtitle?"<h2>{$strSubtitle}</h2>":'';
+?>
 <div id="report_selectors">
 	<form>
 	<table>
