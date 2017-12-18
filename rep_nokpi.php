@@ -61,6 +61,36 @@ if ($_GET['tab']){
 	}
 	
 	$data = Array();
+	$arrActivity = Array(48);
+	$sql = "SELECT source FROM reg_sales 
+			WHERE scenario='{$_GET['tab']}' AND activity IN(".implode(',',$arrActivity).") 
+			GROUP BY source
+			HAVING SUM(hbl)=0";
+	$rs =$oSQL->q($sql);
+	if ($oSQL->n($rs)){
+	$arrSource = Array();
+		while ($rw=$oSQL->f($rs)){
+			$arrSource[] = "'".$rw['source']."'";
+		}	
+		$sql = "SELECT *, edit_date as timestamp FROM vw_journal 				
+			WHERE scenario='{$_GET['tab']}' 
+				AND guid IN (".implode(",",$arrSource).")
+			GROUP BY guid
+			ORDER BY responsible, timestamp DESC";	
+
+			$rs =$oSQL->q($sql);
+			while ($rw=$oSQL->f($rs)){
+				$data[] = $rw;
+			}
+			?>
+			<!--<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>-->			
+			<h3>No scope set for Profit share</h3>
+			<?php
+			Reports::getJournalEntries($data);
+
+	}
+	
+	$data = Array();
 	$sql = "SELECT source FROM reg_master 
 			LEFT JOIN vw_product_type ON prtID=activity
 			WHERE scenario='{$_GET['tab']}' AND account='J00400' AND source NOT IN ('Actual','Estimate')
