@@ -3427,7 +3427,7 @@ class Reports{
 		// ob_flush();
 		
 		$strTbody = ob_get_clean();
-		$id = md5($data);
+		$id = md5(implode('#',$data));
 		?>
 			<div id="<?php echo $id;?>">
 			<table id='sources' class='log'>
