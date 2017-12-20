@@ -478,9 +478,11 @@ class Reports{
 			<?php			
 			$arrSubtotal = Array();
 			while ($rw=$this->oSQL->f($rs)){				
+				if($rw['freehand']){
 				?>
 				<tr class='graph'>
 				<?php
+				}
 				if ($rw['prtGHQ']!=$prtGHQ){
 					?>
 					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
@@ -492,7 +494,9 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
-					echo "<td class='budget-decimal budget-monthly budget-$month ".($m==$this->oBudget->cm?'budget-current':'')."'>",self::render($rw[$month]),'</td>';
+					if($rw['freehand']) { 
+						echo "<td class='budget-decimal budget-monthly budget-$month ".($m==$this->oBudget->cm?'budget-current':'')."'>",self::render($rw[$month]),'</td>';
+					}
 					$arrTotal[$month]+=$rw[$month]*$rw['freehand'];
 					$arrSubtotal[$rw['prtGHQ']][$month]+=$rw[$month]*$rw['freehand'];
 					$arrSubtotalAll[$rw['prtGHQ']][$month]+=$rw[$month];
@@ -505,15 +509,19 @@ class Reports{
 				
 				for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 					$quarter = 'Q'.$q;
-					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
+					if($rw['freehand']) {
+						echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
+					}
 					$arrTotal[$quarter]+=$arrQuarter[$quarter]*$rw['freehand'];
 					$arrSubtotal[$rw['prtGHQ']][$quarter]+=$arrQuarter[$quarter]*$rw['freehand'];
 					$arrSubtotalAll[$rw['prtGHQ']][$quarter]+=$arrQuarter[$quarter];
 				}				
-									
-				echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';								
-				echo "</tr>\r\n";	
-
+				
+				if($rw['freehand']) {
+					echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';								
+					echo "</tr>\r\n";	
+				}
+				
 				$prtGHQ = $rw['prtGHQ'];
 			}
 			?>
