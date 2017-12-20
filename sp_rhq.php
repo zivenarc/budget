@@ -51,7 +51,7 @@ foreach($arrPC as $pc=>$arrGhq){
 
 // echo '<pre>';print_r($arrRatio);echo '</pre>';
 
-$sqlFields = "prtGHQ, pc, SUM(Total) as Total, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates);
+$sqlFields = "prtGHQ, pc, SUM(Total) as Total, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates).", ".$oBudget->getThisYTDSQL()." as YTD";
 
 $arrFilter = Array(
 	Items::REVENUE,
@@ -289,6 +289,7 @@ for ($i=0;$i<count($arrSubreport);$i++){
 	for($m=$startMonth;$m<=$endMonth;$m++){
 		$month = $oBudget->arrPeriod[$m];
 		$arrReport[$activity][$arrSubreport[$i]['reportKey']][$month] += $arrSubreport[$i]['positive']?$rw[$month]:-$rw[$month];		
+		$arrReport[$activity][$arrSubreport[$i]['reportKey']]['YTD'] += $arrSubreport[$i]['positive']?$rw['YTD']:-$rw['YTD'];		
 		$arrGrandTotal[$arrSubreport[$i]['reportKey']][$month] += $rw[$month];
 	}
 }
