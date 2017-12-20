@@ -77,7 +77,8 @@ $sqlWhere = "WHERE scenario='{$budget_scenario}'
 			
 $arrRevenueFilter = Array(
 	Items::REVENUE,
-	Items::INTERCOMPANY_REVENUE
+	Items::INTERCOMPANY_REVENUE,
+	Items::PROFIT_SHARE
 );
 
 

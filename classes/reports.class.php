@@ -19,6 +19,7 @@ class Reports{
 	const GOP_FILTER = "AND account LIKE 'J%' ";
 	const RFC_FILTER = "AND account LIKE 'J%' AND account NOT IN ('J00400', 'J00802') ";
 	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';
+	const PROFIT_SHARE_ITEM = 'fd09fb23-efd0-11e3-926a-00155d010e0b';
 	const SALARY_THRESHOLD = 10000;
 	const ACTUAL_DATA_FILTER = "`source` IN ('Actual','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Correction')";
 	
@@ -3529,7 +3530,7 @@ class Reports{
 		}
 		
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND pccFlagProd=1 AND (item = '".self::REVENUE_ITEM."')", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND pccFlagProd=1 AND (item IN ('".self::REVENUE_ITEM."','".self::PROFIT_SHARE_ITEM."')", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
