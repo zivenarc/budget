@@ -81,6 +81,7 @@ class Product{
 class Activities extends Reference{
 		
 		const OFIGB = 74;
+		const AFIGB = 90;
 		const OFICOM = 72;
 		const TABLE = 'vw_product_type';
 	

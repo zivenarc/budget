@@ -508,7 +508,7 @@ class Sales extends Document{
 								$freight_r_row->item = $activity->item_cost;
 								$freight_r_row->account = 'J00802';
 								$freight_r_row->profit = $this->profit;
-								$freight_r_row->activity = $oActivities::OFIGB;
+								$freight_r_row->activity = in_array($record->activity,Array(46))?$oActivities::AFIGB:$oActivities::OFIGB;
 								$freight_r_row->customer = $record->customer;				
 								$freight_r_row->sales = $record->sales;	
 								$freight_r_row->{$month} -= ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
@@ -550,7 +550,7 @@ class Sales extends Document{
 									$freight_c_row->item = $activity->item_cost;
 									$freight_c_row->account = 'J00802';
 									$freight_c_row->profit = $this->profit;
-									$freight_c_row->activity = $oActivities::OFIGB;
+									$freight_c_row->activity = in_array($record->activity,Array(46))?$oActivities::AFIGB:$oActivities::OFIGB;
 									$freight_c_row->customer = $record->customer;				
 									$freight_c_row->sales = $record->sales;	
 									$freight_c_row->{$month} += ($record->{$month})*$record->buying_rate*$this->settings[strtolower($record->buying_curr)];
