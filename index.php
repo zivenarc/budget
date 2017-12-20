@@ -63,22 +63,21 @@ if($oBudget->flagUpdate){
 		echo "<div class='warning'>You have {$rw['nCount']} <a href='sp_my.php?ownerID={$arrUsrData['usrID']}#{$oBudget->id}'>unposted documents</a> in [{$oBudget->title}]</div>";
 	}
 	
-	?>
-	<nav><span><?php echo $oBudget->title;?>: </span>
-		<?php 
-			$strQuery = $strBaseQuery."&budget_scenario=".$oBudget->id."&reference=".$oBudget->reference_scenario->id."#".$arrUsrData['PCC']['pccGUID'];
-		?>
-		<a href="rep_summary.php?<?php echo $strQuery;?>">Summary</a>|
-		<a href="rep_monthly.php?<?php echo $strQuery;?>">Monthly report</a>|
-		<a href="rep_pnl.php?<?php echo $strQuery;?>">Full-year estimate</a>|
-		<a href="rep_totals.php?<?php echo $strQuery;?>">Results per BU</a>|
-		<a href="rep_waterfall.php?<?php echo $strQuery;?>">Waterfall</a>|
-		<a href="rep_graphs.php?<?php echo $strQuery;?>">Charts</a>
-	</nav>
-	<?php
+	
 }
-
 ?>
+<nav><span><?php echo $oBudget->title;?>: </span>
+	<?php 
+		$strQuery = $strBaseQuery."&budget_scenario=".$oBudget->id."&reference=".$oBudget->reference_scenario->id."#".$arrUsrData['PCC']['pccGUID'];
+	?>
+	<a href="rep_summary.php?<?php echo $strQuery;?>">Summary</a>|
+	<a href="rep_sales_kpi.php?<?php echo $strQuery;?>">Sales KPI</a>|
+	<a href="rep_pnl.php?<?php echo $strQuery;?>">Full-year estimate</a>|
+	<a href="rep_totals.php?<?php echo $strQuery;?>">Results per BU</a>|
+	<a href="rep_waterfall.php?<?php echo $strQuery;?>">Waterfall</a>|
+	<a href="rep_graphs.php?<?php echo $strQuery;?>">Charts</a>
+</nav>
+
 <nav><span><?php echo $oActual->title;?> vs <?php echo $oActual->reference_scenario->title;?>:</span>
 	<?php 
 		$strQuery = $strBaseQuery."&budget_scenario=".$oActual->id."&reference=".$oActual->reference_scenario->id."#".$arrUsrData['PCC']['pccGUID'];
