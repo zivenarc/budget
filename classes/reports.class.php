@@ -488,9 +488,11 @@ class Reports{
 					<tr><th colspan="20"><?php echo $rw['prtGHQ'];?></th></tr>
 					<?php
 				};
-				?>
-				<td><a href="javascript:getCustomerKPI({prtGHQ:'<?php echo $rw['prtGHQ'];?>',route:<?php echo $rw['route'];?> ,freehand:true});"><?php echo $rw['rteTitle'];?></a></td>								
-				<?php
+				if($rw['freehand']) {
+					?>
+					<td><a href="javascript:getCustomerKPI({prtGHQ:'<?php echo $rw['prtGHQ'];?>',route:<?php echo $rw['route'];?> ,freehand:true});"><?php echo $rw['rteTitle'];?></a></td>								
+					<?php
+				}
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
