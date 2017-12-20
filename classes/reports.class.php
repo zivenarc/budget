@@ -3530,7 +3530,7 @@ class Reports{
 		}
 		
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND pccFlagProd=1 AND (item IN ('".self::REVENUE_ITEM."','".self::PROFIT_SHARE_ITEM."')", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND pccFlagProd=1 AND (item IN ('".self::REVENUE_ITEM."','".self::PROFIT_SHARE_ITEM."'))", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
