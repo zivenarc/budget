@@ -406,6 +406,10 @@ class Reports{
 	
 	function iffByRoute($type='OFF'){
 		
+		
+		$this->oSQL->q("UPDATE reg_sales, tbl_sales SET bo=IFNULL(salBO,0),jo=salJO, posted=salFlagPosted WHERE source=salGUID");
+		$this->oSQL->q("UPDATE reg_sales SET freehand = IF( bo =714, 1, 0 )");
+		
 		switch ($type){
 			case 'OFF':
 				$activity_filter = Array(48,63,52,58);
