@@ -3542,6 +3542,7 @@ class Reports{
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00802')) AND pccFlagProd=1 AND item<>'".self::REVENUE_ITEM."'", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
+		// echo '<pre>',$sqlOps,'</pre>';
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Direct costs";
 			$rw['title'] = "Subcontractor costs, except import freight";

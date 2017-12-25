@@ -83,6 +83,9 @@ class Activities extends Reference{
 		const OFIGB = 74;
 		const AFIGB = 90;
 		const OFICOM = 72;
+		const AFICOM = 92;
+		const OFECOM = 91;
+		const AFECOM = 93;
 		const TABLE = 'vw_product_type';
 	
 	function __construct(){
