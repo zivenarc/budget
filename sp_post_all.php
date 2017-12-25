@@ -1,5 +1,5 @@
 <?php
-$flagNoAuth =true;
+// $flagNoAuth =true;
 require ('common/auth.php');
 
 if ($_GET['tab']){
