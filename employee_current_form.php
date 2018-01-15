@@ -52,7 +52,7 @@ if ($_GET['tab']){
 	switch($_GET['tab']){
 		case 'kpi':
 			require_once ('classes/reports.class.php');
-			$sqlWhere = "WHERE source IN ('".$oDocument->GUID."','Actual')";
+			$sqlWhere = "WHERE pc = '{$oDocument->profit}' AND scenario='{$oDocument->budget->id}'";
 			$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id));
 			$oReport->headcountByJob($sqlWhere);
 			die();
