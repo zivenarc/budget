@@ -125,7 +125,11 @@ class Document extends easyForm{
 				$this->_updateSpecificFields();
 				break;
 			case 'delete':
-				$this->delete();
+				if ($this->flagPosted){
+					return (false);
+				} else {
+					$this->delete();
+				}
 				break;
 			case 'restore':
 				$this->restore();

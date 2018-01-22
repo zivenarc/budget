@@ -60,6 +60,37 @@ if(!isset($_GET['prtGHQ'])){
 	
 	// echo '<pre>',$sqlActual,'</pre>';
 	
+	$settings['revcus'] = Array('title'=>"Revenue by customer, ".$period_title,
+						'sqlBase' => "SELECT customer_group_code as optValue, 
+											customer_group_title as optText,  
+											{$sqlActual} as Actual, 
+											0 as Budget, 
+											{$sqlActual} as Diff
+									FROM vw_master 
+									{$sqlWhere}
+										AND  scenario='{$oBudget->id}' AND item='".Reports::REVENUE_ITEM."'
+									GROUP BY customer_group_code
+									UNION ALL
+									SELECT customer_group_code as optValue, 
+											customer_group_title as optText,  
+									0 as Actual, 
+									{$sqlBudget}  as Budget, 
+									-{$sqlBudget} as Diff
+									FROM vw_master 
+									{$sqlWhere}
+										AND scenario='{$oReference->id}' 
+										AND source<>'Estimate' 
+										AND item='".Reports::REVENUE_ITEM."'							
+									GROUP BY customer_group_code",
+							'tolerance'=>0.05,
+							'denominator'=>$denominator,
+							'actual_title'=>$oBudget->title,
+							'budget_title'=>$oReference->title,
+							'limit'=>10);	
+	
+	$oWF = new Waterfall($settings['revcus']);
+	$oWF->draw();
+	
 	$settings['gpcus'] = Array('title'=>"GP by customer, ".$period_title,
 						'sqlBase' => "SELECT customer_group_code as optValue, 
 											customer_group_title as optText,  
