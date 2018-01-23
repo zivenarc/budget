@@ -130,7 +130,7 @@ foreach($arrReport as $key=>$values){
 			
 foreach ($arrAccounts as $reportKey=>$settings){
 	$sql = $settings['sql'];
-	// echo '<pre>',$sql,'</pre>';
+	 // echo '<pre>',$sql,'</pre>';
 	if(strlen($sql)){
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){
@@ -399,6 +399,18 @@ for ($m=$startMonth;$m<=$endMonth;$m++){
 ?>
 	<td class="budget-decimal budget-ytd"><?php Reports::render(array_sum($arrControl),0);?></td>
 </tr>
+<tr class="">
+<td>Diff</td>
+<?php
+for ($m=$startMonth;$m<=$endMonth;$m++){
+				$month = $oBudget->arrPeriod[$m];
+				?>
+				<td class="budget-decimal"><?php Reports::render($arrControl[$month]-$arrGrandTotal[$item]['monthly'][$month],0);?></td>
+				<?php
+}
+?>
+	<td class="budget-decimal budget-ytd"><?php Reports::render(array_sum($arrControl)-array_sum($arrGrandTotal[$item]['monthly']),0);?></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -419,7 +431,7 @@ foreach($arrReport as $ghq=>$values){
 	echo '<th>',($ghq?$ghq:'[None]'),'</th>';
 }
 ?>
-	<th>Total</th>
+	<th class="budget-ytd">Total</th>
 </tr>
 </thead>
 <tbody>
@@ -430,11 +442,13 @@ foreach($arrReport as $ghq=>$values){
 		<td><?php echo $account;?></td>
 		<?php
 		foreach ($arrReport as $ghq=>$values) {
+			$arrSubtotal[$account] += array_sum($data[$ghq])/array_sum($arrCost[$account]);
 		?>
 		<td><?php Reports::render_ratio(array_sum($data[$ghq]),array_sum($arrCost[$account]));?></td>
 		<?php
 		}
 	?>
+		<td class="budget-ytd"><?php Reports::render($arrSubtotal[$account]*100,1);?></td>
 	</tr>
 	<?php
 	}
@@ -452,6 +466,7 @@ foreach ($arrBreakDown as $group=>$accounts){
 	$strTableID = urlencode($group);
 	?>
 	<table class='budget' id='<?php echo $strTableID;?>'>
+	<caption><?php echo $group,", ",$oBudget->title;?></caption>
 	<thead>
 		<tr>
 			<th>Activity</th>
@@ -460,7 +475,7 @@ foreach ($arrBreakDown as $group=>$accounts){
 				echo '<th>',$account,'</th>';
 			}
 			?>
-			<th>Total</th>
+			<th class="budget-ytd">Total</th>
 			<th>Control</th>
 		</tr>
 	</thead>
@@ -470,7 +485,7 @@ foreach ($arrBreakDown as $group=>$accounts){
 				$rowTotal = 0;
 				?>
 				<tr>
-				<th><?php echo ($ghq?$ghq:'[None]');?></th>
+				<td><?php echo ($ghq?$ghq:'[None]');?></td>
 				<?php				
 				foreach ($accounts as $account=>$products){					
 					$rowTotal += $products[$ghq];
@@ -483,7 +498,7 @@ foreach ($arrBreakDown as $group=>$accounts){
 				$nControlTotal += is_array($arrReport[$ghq][$group])?array_sum($arrReport[$ghq][$group]):0;
 				
 				echo '<td class="budget-ytd budget-decimal">',Reports::render(-$rowTotal),'</td>';
-				echo '<td class="budget-ytd budget-decimal">',is_array($arrReport[$ghq][$group])?Reports::render(-array_sum($arrReport[$ghq][$group])):'n/a','</td>';
+				echo '<td class="budget-decimal">',is_array($arrReport[$ghq][$group])?Reports::render(-array_sum($arrReport[$ghq][$group])):'n/a','</td>';
 				?>
 				</tr>
 				<?php
