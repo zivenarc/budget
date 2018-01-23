@@ -1474,8 +1474,10 @@ class Reports{
 		ob_flush();
 	}
 	
-	public function periodicGraph($sqlWhere){
+	public function periodicGraph(){
 					
+		$sqlWhere = $this->sqlWhere;
+		
 		$strFields = $this->_getPeriodicFields();		
 		
 		if ($this->YACT){
@@ -1494,9 +1496,7 @@ class Reports{
 		$arrRates_that = $this->oReference->getMonthlyRates($this->Currency);
 		
 		ob_start();
-		
-		$arrGraph[] = Array('Period','Gross revenue','GP','Budget GP','Staff costs','OP','Budget OP');
-		
+			
 		$sqlSelect = $this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset,max($this->oBudget->length,12+$this->oBudget->offset),$arrRates_this, $this->Denominator).", ".
 				"SUM(".$this->oBudget->getYTDSQL(1,3,$arrRates_this, $this->Denominator).") as Q1, ".
 				"SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates_this, $this->Denominator).") as Total_AM";
@@ -1595,7 +1595,7 @@ class Reports{
 		for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 			$period = $this->oBudget->arrPeriod[$m];
 		
-			$arrGraph[] = Array($period,(double)$rwGR[$period],(double)$rwGP[$period], (double)$rwBGP[$period], -(double)$rwSC[$period], (double)$rwOP[$period], (double)$rwBOP[$period]);
+			// $arrGraph[] = Array($period,(double)$rwGR[$period],(double)$rwGP[$period], (double)$rwBGP[$period], -(double)$rwSC[$period], (double)$rwOP[$period], (double)$rwBOP[$period]);
 			$arrHighCharts['xAxis']['categories'][] = $period;
 			$arrHighChartsAFF['xAxis']['categories'][] = $period;
 			$arrHighChartsOFF['xAxis']['categories'][] = $period;
@@ -1609,12 +1609,12 @@ class Reports{
 						
 		}
 		$arrHighCharts['series']=Array(
-									Array('name'=>'Gross revenue','data'=>$arrHSSeries[0])
-									,Array('name'=>"Gross profit, {$this->oBudget->title}",'data'=>$arrHSSeries[1])
+									// Array('name'=>'Gross revenue','data'=>$arrHSSeries[0])
+									Array('name'=>"Gross profit, {$this->oBudget->title}",'data'=>$arrHSSeries[1])
 									,Array('name'=>"Gross profit, {$this->oReference->title}",'data'=>$arrHSSeries[2])
-									,Array('name'=>'Staff costs','data'=>$arrHSSeries[3])
-									,Array('name'=>"OP, {$this->oBudget->title}",'data'=>$arrHSSeries[4])
-									,Array('name'=>"OP, {$this->oReference->title}",'data'=>$arrHSSeries[5])
+									// ,Array('name'=>'Staff costs','data'=>$arrHSSeries[3])
+									// ,Array('name'=>"OP, {$this->oBudget->title}",'data'=>$arrHSSeries[4])
+									// ,Array('name'=>"OP, {$this->oReference->title}",'data'=>$arrHSSeries[5])
 								);
 								
 		$arrHighChartsAFF['series'] = Array(
@@ -3672,8 +3672,9 @@ class Reports{
 				$this->echoBudgetItemString($rw);
 			}
 			
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE 'SZ%')", $sql);
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." ", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			// echo '<pre>',$sqlOps,'</pre>';
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
 				$rw['Budget item'] = "Profit before tax";

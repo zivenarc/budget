@@ -1,7 +1,9 @@
 <?php
 require ('common/auth.php');
 include ('classes/budget.class.php');
-
+$arrJS[] = 'js/journal.js';
+$arrJS[] = 'js/budget_setup.js';
+		
 if ($_GET['option']=='full'){
 	include ('includes/inc-frame_top.php');
 	$sql = "SELECT * FROM tbl_scenario ORDER BY scnDateStart";
@@ -203,8 +205,6 @@ $oBudget = new Budget($_GET['tab']);
 	</table>
 	<?php
 	} else {
-		$arrJS[] = 'js/journal.js';
-		$arrJS[] = 'js/budget_setup.js';
 		include ('includes/inc-frame_top.php');
 		echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
 		Budget::getScenarioTabs();
