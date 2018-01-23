@@ -1,6 +1,6 @@
 <?php
-//$flagNoAuth = true;
-//$usrID = 'zhuravlev';
+// $flagNoAuth = true;
+// $usrID = 'zhuravlev';
 $itemGUID = $_GET['guid'];
 $limit = (integer)$_GET['limit'];
 

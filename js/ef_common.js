@@ -57,10 +57,10 @@ $(document).ready(function(){
 		
 		MsgShow();
 		
-		if (typeof(itemGUID)!='undefined'){
-			loadEventLog(itemGUID);
-			loadFileList(itemGUID);
-			loadStickers(itemGUID);
+		if (typeof(doc.GUID)!='undefined'){
+			// loadEventLog(doc.GUID);
+			// loadFileList(doc.GUID);
+			loadStickers(doc.GUID);
 		}
 		
 		initCheckboxes();
@@ -343,10 +343,10 @@ function updateEntity(responseText, statusText, xhr){
 		itemID=$('#'+prefix+'ID').val();
 	}
 	
-	if (typeof(itemGUID)!='undefined'){
-		loadEventLog(itemGUID);
-		loadFileList(itemGUID);
-		//loadStickers(itemGUID);
+	if (typeof(doc.GUID)!='undefined'){
+		loadEventLog(doc.GUID);
+		// loadFileList(doc.GUID);
+		loadStickers(doc.GUID);
 	}
 }
 
@@ -420,12 +420,12 @@ function assign(){ //====================== Переведен на UI =========
 								return false;
 							}
 							
-							$.post("sp_inform.php",{ID:itemID, message:message.val(), recipient:addr.val(), recipient_cc: addrCc.val(), entity: entity}, function(data){
+							$.post("sp_inform.php",{ID:doc.ID, message:message.val(), recipient:addr.val(), recipient_cc: addrCc.val(), table: doc.table}, function(data){
 								if(data.status=='success'){
 									$("#sysmsg").text((strLocal?'Сообщение отправлено по адресу ':'Message sent to')+data.to);
 									MsgShow();									
 								} else {
-									$('#error_log').append($('<div>',{'class':'error',html:data.errorText}));
+									$('#timestamp').append($('<div>',{'class':'error',html:data.errorText}));
 								}
 								getSticker(data).prependTo($('#sticky_notes')).fadeIn();
 							});
@@ -562,25 +562,25 @@ function getCompanyData(id, target){
 }
 
 function fadePDF(direction){
-	direction = direction || 'out';
-	if ($.browser.webkit) return(false);
-	switch (direction){
-		case 'out':
-			$('iframe').each(function(i){
-				isrc[i] = $(this).attr('src');
-				$(this).attr('src','about:blank');
-			});
-		break;
-		case 'in':
+	// direction = direction || 'out';
+	// if ($.browser.webkit) return(false);
+	// switch (direction){
+		// case 'out':
+			// $('iframe').each(function(i){
+				// isrc[i] = $(this).attr('src');
+				// $(this).attr('src','about:blank');
+			// });
+		// break;
+		// case 'in':
 			
-			$('iframe').each(function(i){
-				$(this).attr('src',isrc[i]);
-			});
-		break;
-		default:
+			// $('iframe').each(function(i){
+				// $(this).attr('src',isrc[i]);
+			// });
+		// break;
+		// default:
 			return (false);
-		break;
-	};
+		// break;
+	// };
 }
 
 function easyValidate($form){

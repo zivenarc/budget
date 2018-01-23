@@ -123,3 +123,23 @@ for($i=0;$i<count($arrWarning);$i++){
 	</div>
 </div>
 
+<div id="sticky_notes"></div>
+
+<!-------------- Container for messages-------------------->
+<div id='sendTo' style='display:none;'><form id='send_form'>
+<div><label for="input_recipient">To: </label>
+	<input type="hidden" id="recipient" name="recipient" value="" >
+	<input id="input_recipient" type="text" class="autocomplete" style="width:270px;" 
+		data-autocomplete='{"table":"stbl_user","prefix":"usr"}'>
+<div id='recipient_details'></div>
+</div>
+<div><label for="input_recipient_cc">Cc: </label><input type="hidden" id="recipient_cc" name="recipient_cc" value="" ><input id="input_recipient_cc" type="text" class="autocomplete" style="width:270px;" data-autocomplete='{"table":"stbl_user","prefix":"usr"}'>
+<div id='recipient_cc_details'></div>
+</div>
+<hr/>
+<div>
+<label for="message"><?php echo $strLocal?"Текст сообщения":"Message text";?></label><br/>
+<textarea rows="10" style="width:350px" name="message" id="message"></textarea>
+</div></form>
+</div>
+
