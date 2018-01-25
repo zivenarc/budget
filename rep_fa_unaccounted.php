@@ -54,7 +54,7 @@ if(isset($_GET['tab'])){
 	$rs =$oSQL->q($sql);
 	while ($rw=$oSQL->f($rs)){
 		// print_r($rw);
-		echo "<li>[{$rw['fixID']}] {$rw["fixTitle"]}, {$rw["fixProfit"]} registered in {$rw["depProfit"]}
+		echo "<li>[{$rw['fixID']}] {$rw["fixTitle"]}, <strong>{$rw["fixProfit"]}</strong> registered in <strong>{$rw["depProfit"]}</strong>
 			<div><small>".$rw['fixDeprStart']." &ndash; ".$rw['fixDeprEnd']."</small></div>
 			</li>";
 	}

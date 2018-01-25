@@ -39,14 +39,14 @@ if(!isset($_GET['prtGHQ'])){
 	<?php
 	}
 	
-	if(strpos($oBudget->type,"Budget")===false){
-		$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
-		$oReport->shortMonthlyReport();	
-	}
 	
 	$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
-	$oReport->shortMonthlyReport('fye');	
-	
+	if(strpos($oBudget->type,"Budget")!==false){
+		$oReport->shortMonthlyReport('budget');	
+	} else {	
+		$oReport->shortMonthlyReport('cm');
+		$oReport->shortMonthlyReport('fye');	
+	}
 	
 	
 	?>	
