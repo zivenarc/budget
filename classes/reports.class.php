@@ -3782,6 +3782,4 @@ class Reports{
 	}
 	
 }
-
 ?>
-

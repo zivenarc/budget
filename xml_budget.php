@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $flagNoAuth = true;
 define ("CRLF","\r\n");
 define ("TAB","\t");
