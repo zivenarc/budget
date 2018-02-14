@@ -3,7 +3,7 @@
 require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
-
+require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
 
 session_start();
@@ -117,6 +117,35 @@ if(!isset($_GET['pccGUID'])){
 		$oReport->salesByActivity($sqlWhere);
 		
 		
+		
+	}
+	
+	if (strpos($oBudget->type,'Budget')===false && count($arrCounterparty['codes'])>1){
+		
+		//echo '<pre>';print_r($arrCounterparty['codes']);echo '</pre>';
+		
+		$sqlActual = "SUM(".$oBudget->getThisYTDSQL('nm',$arrActualRates).")";
+		$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('cm',$arrActualRates).")";
+		$settings['nextGP'] = Array('title'=>"GP by customer, next month changes",
+							'sqlBase' => "SELECT  customer as optValue, 
+												customer_name as optText,  
+												{$sqlActual} as Actual, 
+												{$sqlBudget} as Budget, 
+												({$sqlActual}-{$sqlBudget}) as Diff
+										FROM vw_master 
+										{$oReport->sqlWhere}
+											AND  scenario='{$oBudget->id}' 
+											AND account IN ('J00400', 'J00802')
+											##AND customer IN (".implode($arrCounterparty['codes']).")
+										GROUP BY customer",
+								'denominator'=>$denominator,
+								'budget_title'=>'This month',
+								'actual_title'=>'Next month',
+								'tolerance'=>0.05,
+								'limit'=>10);	
+		
+		$oWF = new Waterfall($settings['nextGP']);
+		$oWF->draw();
 	}
 	// $oReport->periodicPnL($sqlWhere,Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity'));	
 	
