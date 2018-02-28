@@ -67,28 +67,31 @@ $oBudget = new Budget($_GET['tab']);
 		echo json_encode($res);
 		die();
 	}
-
-	switch ($_POST['DataAction']){
-		case 'readonly':
-			$oBudget->readOnly(true);
-			break;
-		case 'readwrite':
-			$oBudget->readOnly(false);
-			break;
-		case 'archive':
-			$oBudget->archive(true);
-			break;
-		case 'unarchive':
-			$oBudget->archive(false);
-			break;	
-		case 'default':
-			$oBudget->setAsDefault(false);
-			break;	
-		default:
-			//do nothing
-			break;
-	};
-
+	if(isset($_POST['DataAction'])){
+		switch ($_POST['DataAction']){
+			case 'readonly':
+				$oBudget->readOnly(true);
+				break;
+			case 'readwrite':
+				$oBudget->readOnly(false);
+				break;
+			case 'archive':
+				$oBudget->archive(true);
+				break;
+			case 'unarchive':
+				$oBudget->archive(false);
+				break;	
+			case 'default':
+				$oBudget->setAsDefault(false);
+				break;	
+			default:
+				//do nothing
+				break;
+		};
+		header('Content-type:application/json');
+		echo json_encode(get_object_vars($oBudget));
+		die();
+	}
 	$oBudget->getSettings();
 	$arrData = $oBudget->extendedSettings;
 
@@ -110,8 +113,8 @@ $oBudget = new Budget($_GET['tab']);
 		<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->reference_scenario->id)); ?>
 	</td>
 	<td>
-	<label for="scnFlagReadOnly">Read-only</label><input type='checkbox' <?php echo $oBudget->flagUpdate?"":"checked";?> name='scnFlagReadOnly' id='scnFlagReadOnly'>
-	<label for="scnFlagArchive">Archived</label><input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> name='scnFlagArchive' id='scnFlagArchive'>
+	<label for="scnFlagReadOnly|<?php echo $oBudget->id;?>">Read-only</label><input type='checkbox' <?php echo $oBudget->flagUpdate?"":"checked";?> class='scnFlagReadOnly' id='scnFlagReadOnly|<?php echo $oBudget->id;?>'>
+	<label for="scnFlagArchive|<?php echo $oBudget->id;?>">Archived</label><input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> class='scnFlagArchive' id='scnFlagArchive|<?php echo $oBudget->id;?>'>
 	<?php
 	if ($oBudget->id==$arrSetup['stpScenarioID']){
 	?>
@@ -123,7 +126,7 @@ $oBudget = new Budget($_GET['tab']);
 	<?php
 	} else {
 	?>
-	<span><button id='default'>Set as default</button></span>
+	<span><button class='default' id='default|<?php echo $oBudget->id;?>'>Set as default</button></span>
 
 	<?php
 	}

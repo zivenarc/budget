@@ -208,3 +208,9 @@ background-position:left -7597px;
 td.budget-current{
 	border-right: 2px solid #06183D;
 }
+.budget-readonly{
+	background-image:url(/common/images/icons/lock.png);
+	padding-left: 20px !important;
+	background-repeat:no-repeat;
+	background-position: left center;
+}

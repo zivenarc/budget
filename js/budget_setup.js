@@ -18,21 +18,25 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 				$('button',ui.panel).button();
 				$('input:checkbox',ui.panel).button();
 				var url = ui.tab.find('a').attr('href');
-				$('#scnFlagReadOnly',ui.panel).change(function(){
+				$('.scnFlagReadOnly',ui.panel).change(function(){
 					if($(this).prop('checked')){
-						$.post(url,{DataAction:'readonly'});
+						$.post(url,{DataAction:'readonly'}, function(data){
+							updateTab(ui, data)
+						});
 					} else {
-						$.post(url,{DataAction:'readwrite'});
+						$.post(url,{DataAction:'readwrite'}, function(data){
+							updateTab(ui, data)
+						});
 					}
 				});
-				$('#scnFlagArchive',ui.panel).change(function(){					
+				$('.scnFlagArchive',ui.panel).change(function(){					
 					if($(this).prop('checked')){
 						$.post(url,{DataAction:'archive'});
 					} else {
 						$.post(url,{DataAction:'unarchive'});
 					}
 				});
-				$('#default', ui.panel).click(function(){
+				$('.default', ui.panel).click(function(){
 					$.post(url,{DataAction:'default'}, function (data){
 						console.log(data);
 					});
@@ -53,3 +57,12 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 $(document).ready(function(){
 		$('#tabs').tabs(tabs_options);
 });
+
+function  updateTab(ui, data) {
+	// console.log(data);
+	if(data.flagUpdate){
+		ui.tab.find('a').removeClass('budget-readonly');
+	} else {
+		ui.tab.find('a').addClass('budget-readonly');
+	}
+}

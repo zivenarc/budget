@@ -467,7 +467,7 @@ class Budget{
 			$sql = "SELECT * FROM tbl_scenario WHERE scnFlagDeleted=0 AND scnFlagArchive=0 ".($flagWrite?" AND scnFlagReadOnly=0":"");			
 			$rs = $oSQL->q($sql);
 			while ($rw=$oSQL->f($rs)){
-				echo "<li><a href='",$_SERVER['PHP_SELF'],"?tab=",$rw['scnID'],"'>",($rw['scnFlagReadOnly']?'<img src="../common/images/icons/lock.png"/>':''),$rw['scnTitle'],"</a></li>\r\n";
+				echo "<li><a class='",($rw['scnFlagReadOnly']?'budget-readonly':''),"' href='",$_SERVER['PHP_SELF'],"?tab=",$rw['scnID'],"'>",$rw['scnTitle'],"</a></li>\r\n";
 			}
 			// echo "<li><a href='",$_SERVER['PHP_SELF'],"?tab=all'>All</a></li>\r\n";
 			?>
@@ -704,7 +704,7 @@ class Budget{
 	function readOnly($flag = true){
 		
 		GLOBAL $arrUsrData;
-		
+		$this->flagUpdate = !$flag;
 		$sql = "UPDATE tbl_scenario SET scnFlagReadOnly=".(integer)$flag.", scnEditBy='{$arrUsrData['usrID']}', scnEditDate=NOW() WHERE scnID='{$this->id}'";
 		$this->oSQL->q($sql);
 	
@@ -713,7 +713,7 @@ class Budget{
 	function archive($flag = true){
 		
 		GLOBAL $arrUsrData;
-		
+		$this->flagArchive = $flag;
 		$sql[] = "UPDATE tbl_scenario SET scnFlagArchive=".(integer)$flag.", scnEditBy='{$arrUsrData['usrID']}', scnEditDate=NOW() WHERE scnID='{$this->id}'";
 		
 		if ($flag){
