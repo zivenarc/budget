@@ -254,6 +254,7 @@ echo '<p>',$oBudget->timestamp,'</p>';
 		color: blue;
 		border-bottom: 1px dashed blue;
 		margin-bottom: 5px;
+		cursor: pointer;
 	}
 </style>
 <script>
@@ -521,7 +522,7 @@ foreach ($arrBreakDown as $group=>$accounts){
 	</tbody>
 	</table>
 	<ul class='link-footer'>
-		<li><a href='javascript:SelectContent("<?php echo $strTableID;?>");'>Select table</a></li>
+		<li><a href='javascript:SelectContent("<?php echo $strTableID;?>");'>Copy table</a></li>
 	</ul>
 	<?php
 }

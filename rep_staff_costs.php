@@ -202,7 +202,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 			</tbody>
 			</table>
 			<nav>
-				<li><a href="javascript:SelectContent('<?php echo $tableID;?>');">Select table</a></li>
+				<li><a href="javascript:SelectContent('<?php echo $tableID;?>');">Copy table</a></li>
 			</nav>
 			<div style='display:none;'><pre><?php echo $sql;?></pre></div>
 <?php

@@ -50,7 +50,7 @@ if(!isset($_GET['tab'])){
 	Reports::masterByCustomerEst($sqlWhere." AND scenario='$budget_scenario'");
 	?>
 		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("report_<?php echo $_GET['tab'];?>");'>Select table</a></li>
+			<li><a href='javascript:SelectContent("report_<?php echo $_GET['tab'];?>");'>Copy table</a></li>
 		</ul>
 	<?php
 }

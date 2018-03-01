@@ -264,7 +264,7 @@ class Reports{
 		</tfoot>
 		</table>
 		<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
 		</ul>
 		<?php
 	}
@@ -386,7 +386,7 @@ class Reports{
 			</tbody>
 			</table>
 			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
 			</ul>
 			<?php
 			
@@ -593,7 +593,7 @@ class Reports{
 			</tfoot>
 			</table>
 			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
 			</ul>
 		<?php
 		
@@ -742,7 +742,7 @@ class Reports{
 			</tfoot>
 			</table>
 			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
 			</ul>
 		<?php
 		
@@ -819,7 +819,7 @@ class Reports{
 		</tfoot>
 		</table>
 		<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $source;?>");'>Select table</a></li>
+				<li><a href='javascript:SelectContent("<?php echo $source;?>");'>Copy table</a></li>
 		</ul>		
 		<?php
 		if ($docClass=='Interco_sales' || $docClass=='Sales'){
@@ -878,7 +878,7 @@ class Reports{
 			</tbody>
 			</table>
 			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("sales_<?php echo $source;?>");'>Select table</a></li>
+				<li><a href='javascript:SelectContent("sales_<?php echo $source;?>");'>Copy table</a></li>
 			</ul>
 			<?php
 		}
@@ -989,7 +989,7 @@ class Reports{
 			</tfoot>
 			</table>
 			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
 			</ul>			
 			<?php
 			ob_flush();
@@ -1268,7 +1268,7 @@ class Reports{
 			</tbody>
 			</table>
 			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
 			</ul>
 			<?php
 			ob_flush();
@@ -1347,7 +1347,7 @@ class Reports{
 			</tbody>
 			</table>
 			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
 			</ul>
 			<?php			
 			ob_flush();
@@ -1400,7 +1400,7 @@ class Reports{
 		</tfoot>
 		</table>
 		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
+			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Copy table</a></li>
 		</ul>
 		<?php			
 		ob_flush();
@@ -1468,7 +1468,7 @@ class Reports{
 		</tbody>
 		</table>
 		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
+			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Copy table</a></li>
 		</ul>
 		<?php			
 		ob_flush();
@@ -1823,7 +1823,7 @@ class Reports{
 		</tr>
 		</table>
 		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
+			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Copy table</a></li>
 		</ul>
 		<div id='graph_<?php echo $this->ID;?>'>Line chart loading...</div>
 		<div id='aff_<?php echo $this->ID;?>'>AFF chart loading...</div>
@@ -1959,7 +1959,7 @@ class Reports{
 			</tbody>
 			</table>
 			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
 			</ul>
 			<?php			
 			ob_flush();
@@ -2079,7 +2079,7 @@ class Reports{
 			</tbody>
 			</table>
 			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
 			</ul>
 			<?php			
 			ob_flush();
@@ -2385,7 +2385,7 @@ class Reports{
 		</tbody>
 		</table>
 		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
+			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Copy table</a></li>
 		</ul>
 		<?php
 
@@ -2984,7 +2984,7 @@ class Reports{
 			</tfoot>
 			</table>
 			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
 			</ul>
 			<?php
 		} else {
@@ -3374,7 +3374,7 @@ class Reports{
 				</tbody>
 			</table>
 			</div>
-			<button onclick="SelectContent('<?php echo $id;?>');">Select table</button>
+			<button onclick="SelectContent('<?php echo $id;?>');">Copy table</button>
 		<?php
 	}
 	
@@ -3742,7 +3742,7 @@ class Reports{
 		</tbody>
 		</table>
 		<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Select table</a></li>
+				<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Copy table</a></li>
 		</ul>
 		<?php
 		// $this->oSQL->showProfileInfo();

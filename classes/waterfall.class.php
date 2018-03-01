@@ -222,7 +222,7 @@ class Waterfall {
 		?>
 		</tbody>
 		</table>		
-		<button onclick="javascript:SelectContent('table_<?php echo $this->chartID;?>');">Select table</button>				
+		<button onclick="javascript:SelectContent('table_<?php echo $this->chartID;?>');">Copy table</button>				
 		<?php
 	}
 	

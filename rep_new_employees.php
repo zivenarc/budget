@@ -104,7 +104,7 @@ echo '</tr>';
 </tbody>
 </table>
 	<ul class='link-footer'>
-		<li><a href='javascript:SelectContent("report");'>Select table</a></li>
+		<li><a href='javascript:SelectContent("report");'>Copy table</a></li>
 	</ul>
 <?php	
 
@@ -200,7 +200,7 @@ echo '</tr>';
 </tbody>
 </table>
 	<ul class='link-footer'>
-		<li><a href='javascript:SelectContent("per_product");'>Select table</a></li>
+		<li><a href='javascript:SelectContent("per_product");'>Copy table</a></li>
 	</ul>
 <?php
 
@@ -258,7 +258,7 @@ foreach($arrReport as $group=>$arrItem){
 </tbody>
 </table>
 	<ul class='link-footer'>
-		<li><a href='javascript:SelectContent("per_month");'>Select table</a></li>
+		<li><a href='javascript:SelectContent("per_month");'>Copy table</a></li>
 	</ul>
 <?php
 include ('includes/inc-frame_bottom.php');

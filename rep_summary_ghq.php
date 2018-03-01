@@ -383,7 +383,7 @@ if(!isset($_GET['prtGHQ'])){
 	</tfoot>
 	</table>
 	<ul class='link-footer'>
-		<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Select table</a></li>
+		<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
 	</ul>	
 	<?php
 	

@@ -198,6 +198,10 @@ foreach($arrProfit as $pc=>$flag){
 foreach ($arrGP as $customer=>$data){
 	renderDataByPC($data, $arrProfit, $customer);	
 }
-
-
+?>
+</tfoot>
+</table>
+<button onclick='SelectContent("report");'>Copy table</button>
+<?php
+include ('includes/inc-frame_bottom.php');
 ?>

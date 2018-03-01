@@ -112,7 +112,7 @@ for($i=0;$i<count($arrWarning);$i++){
 			<?php if ($oDocument->flagUpdate) { ?>
 			<li><a href="javascript:$('#<?php echo $oDocument->gridName;?>').eiseGrid('addRow');">Add row</a></li>
 			<?php } ?>
-			<li><a href='javascript:SelectContent("<?php echo $oDocument->gridName;?>");'>Select table</a></li>
+			<li><a href='javascript:SelectContent("<?php echo $oDocument->gridName;?>");'>Copy table</a></li>
 		</ul>
 	</div>
 	<div id='tabs-kpi'>

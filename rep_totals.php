@@ -560,7 +560,7 @@ if(is_array($arrGP)){
 </tfoot>
 </table>
 	<ul class='link-footer'>
-		<li><a href='javascript:SelectContent("report");'>Select table</a></li>
+		<li><a href='javascript:SelectContent("report");'>Copy table</a></li>
 	</ul>
 <?php
 include ('includes/inc-frame_bottom.php');

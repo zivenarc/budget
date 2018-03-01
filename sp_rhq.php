@@ -366,7 +366,7 @@ echo '<td class="budget-decimal budget-ytd">',number_format(array_sum($arrNRBT),
 </table>
 
 <ul class='link-footer'>
-	<li><a href='javascript:SelectContent("report");'>Select table</a></li>
+	<li><a href='javascript:SelectContent("report");'>Copy table</a></li>
 </ul>
 
 
@@ -433,7 +433,7 @@ $rs = $oSQL->q($sql);
 	</tfoot>
 </table>
 <ul class='link-footer'>
-	<li><a href='javascript:SelectContent("corporate_costs");'>Select table</a></li>
+	<li><a href='javascript:SelectContent("corporate_costs");'>Copy table</a></li>
 </ul>
 
 <h2>Activity ratios</h2>

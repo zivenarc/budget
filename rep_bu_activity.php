@@ -459,7 +459,7 @@ if(isset($_GET['pccGUID'])){
 	</tfoot>
 	</table>
 		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("report_<?php echo $_GET['pccGUID'];?>");'>Select table</a></li>
+			<li><a href='javascript:SelectContent("report_<?php echo $_GET['pccGUID'];?>");'>Copy table</a></li>
 		</ul>
 	<?php
 
