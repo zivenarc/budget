@@ -41,7 +41,7 @@ class Document extends easyForm{
 						'flagKeepLastRow' => false
 						, 'arrPermissions' => Array("FlagWrite" => $this->flagUpdate)
 						, 'flagStandAlone' => true
-						, 'controlBarButtons' => "add|delete"
+						, 'controlBarButtons' => "add|delete|excel"
 						)
 				);
 				
