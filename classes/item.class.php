@@ -57,6 +57,7 @@ class Items extends Reference{
 	const INSURANCE = 'f0b14b46-f52b-11de-95b2-00188bc729d2';
 	
 	const PROFIT_SHARE = 'fd09fb23-efd0-11e3-926a-00155d010e0b';
+	const PROFIT_SHARE_COST = '3b5e3faa-e586-11e7-9065-00155d010e2c';
 	
 	const GAIN_ON_SALE = 'ac7d2f1e-63f0-11df-9a0b-005056930d2f';	
 	
