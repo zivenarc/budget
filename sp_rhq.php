@@ -131,6 +131,8 @@ while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
+	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] += $rw['YTD'];
+	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] += $rw['Total'];
 	$arrGrandTotal[$reportKey]['YTD'] += $rw['YTD'];
 	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
 }
@@ -155,6 +157,8 @@ while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
+	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] += $rw['YTD'];
+	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] += $rw['Total'];
 	$arrGrandTotal[$reportKey]['YTD'] += $rw['YTD'];
 	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
 }
@@ -171,6 +175,8 @@ while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
+	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
+	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
 }
 $reportKey = '<i>Other costs</i>';
 $sql = "SELECT $sqlFields FROM vw_master 
@@ -184,6 +190,8 @@ while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
+	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
+	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
 }
 
 $reportKey = 'RFC: Labor costs';
@@ -199,6 +207,8 @@ while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
+	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
+	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
 	$arrGrandTotal[$reportKey]['YTD'] += $rw['YTD'];
 	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
 }
@@ -217,6 +227,8 @@ while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
+	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
+	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
 	$arrGrandTotal[$reportKey]['YTD'] += $rw['YTD'];
 	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
 }
@@ -235,6 +247,8 @@ while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
+	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
+	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
 	$arrGrandTotal[$reportKey]['YTD'] += $rw['YTD'];
 	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
 }
@@ -252,6 +266,8 @@ while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		$arrGrandTotal[$reportKey][$month] += $rw[$month];
 	}
+	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
+	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
 	$arrGrandTotal[$reportKey]['YTD'] += $rw['YTD'];
 	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
 }
