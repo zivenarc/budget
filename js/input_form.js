@@ -427,7 +427,7 @@ function fillReviewedSalary(){
 				$salary = $('td.headcount_salary input',$tr);
 				if(data[guid]!=undefined){
 					$salary.val(parseFloat(data[guid].salary)).css({color:'blue'});
-					$tr.find('input[name="review_date[]"]').val(data[guid].reviewDate).parent('td').css({color:'blue'});
+					$tr.find('input[name="review_date[]"]').val(data[guid].reviewDate).parent('td').text(data[guid].reviewDate).css({color:'blue'});
 					var $inpUpdated = $tr.find("input[name='inp_"+doc.gridName+"_updated[]']").val(1);
 				}
 			});
