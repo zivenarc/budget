@@ -414,3 +414,26 @@ function init_productProperties(){
 		// })
     // }
 }
+
+function fillReviewedSalary(){
+	if (doc.flagUpdate) {
+	// if (true) {
+		$.post(location.href,{DataAction:'salary'}, function(data){
+			console.table(data);
+			$('td.headcount_particulars').each(function(){
+				$tr = $(this).parent('tr');
+				guid = $(this).find('input[name="particulars[]"]').val();
+				// console.log(guid);
+				$salary = $('td.headcount_salary input',$tr);
+				if(data[guid]!=undefined){
+					$salary.val(parseFloat(data[guid].salary)).css({color:'blue'});
+					$tr.find('input[name="review_date[]"]').val(data[guid].reviewDate).parent('td').css({color:'blue'});
+					var $inpUpdated = $tr.find("input[name='inp_"+doc.gridName+"_updated[]']").val(1);
+				}
+			});
+		});
+	} else {
+			console.log('This document is read-only');
+			return (false);
+	}
+}
