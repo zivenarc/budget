@@ -61,7 +61,8 @@ class Depreciation extends Document{
 		parent::refresh($sql);
 		
 		$this->pc = $ProfitCenters->getByCode($this->profit);
-		$this->disposal_date = strtotime($this->data[$this->prefix."DisposalDate"]);
+		// $this->disposal_date = strtotime($this->data[$this->prefix."DisposalDate"]);
+		$this->disposal_date = new DateTime($this->data[$this->prefix."DisposalDate"]);
 		$this->disposal_value = $this->data[$this->prefix."DisposalValue"];
 		
 		if($this->GUID){
@@ -452,11 +453,14 @@ class Depreciation extends Document{
 						$master_row->item = $record->item;
 						
 						if ($this->disposal_date){
-							$disposal_month = date('Ym', $this->disposal_date) - date('Y01',$this->budget->date_start)+1;
+							// $disposal_month = date('Ym', $this->disposal_date) - date('Y01',$this->budget->date_start)+1;
+							$start = new DateTime($this->budget->year."-01-01");
+							$diff = $this->disposal_date->diff($start);
+							$disposal_month = $diff->m+$diff->y*12;
 						} else {
 							$disposal_month = 15;
 						}
-						
+												
 						for($m=1;$m <= $disposal_month;$m++){
 							$month = $this->budget->arrPeriod[$m];
 							$master_row->{$month} = -$record->{$month}*$monthly_depr;
