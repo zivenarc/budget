@@ -579,6 +579,91 @@ class Document extends easyForm{
 		$res = strtoupper($this->oSQL->get_data($rs));
 		return($res);
 	}
+	
+	function copy($scenario){
+		
+		$prefix=$this->prefix;
+		
+		$arrFields = Array();
+		$sqlFields = "SHOW COLUMNS FROM `{$this->table}`";
+		$rs = $this->oSQL->q($sqlFields);
+		while ($rw=$this->oSQL->f($rs)){
+			$arrFields[$rw['Field']] = $rw;
+			
+		}
+		
+		$arrRegFields = Array();
+		$sqlFields = "SHOW COLUMNS FROM `{$this->register}`";
+			$rs = $this->oSQL->q($sqlFields);
+			while ($rw=$this->oSQL->f($rs)){
+				//echo '<pre>';print_r($rw);echo '</pre>';
+				$arrRegFields[] = $rw['Field'];
+		}
+		
+		$sqlDoc = "SELECT * FROM `{$this->table}` WHERE `{$prefix}ID`='{$this->ID}' LIMIT 1";
+		$rs = $this->oSQL->q($sqlDoc);
+		
+		$sql = Array();
+		
+		while ($rw=$this->oSQL->f($rs)){
+			
+			$arrSet = Array();
+			$new_guid = $this->oSQL->get_new_guid();
+			$strSQL = "INSERT INTO `{$this->table}` SET ";
+			foreach ($arrFields as $field=>$fieldData){
+				switch ($field){
+					case $prefix."ID":
+						$arrSet[] = "`{$field}`=NULL";
+						break;
+					case $prefix."GUID":
+						$arrSet[] = "`{$field}`='{$new_guid}'";
+						break;
+					case $prefix."Scenario":
+						$arrSet[] = "`{$field}`='{$scenario}'";
+						break;
+					case $prefix."FlagPosted":
+						$arrSet[] = "`{$field}`=0";
+						break;					
+					case $prefix."InsertDate":
+					case $prefix."EditDate":
+						$arrSet[] = "`{$field}`=NOW()";
+						break;
+					case $prefix."CopyOf":
+					$arrSet[] = "`{$field}`='{$this->ID}'";
+						break;
+					default:									
+						if ($fieldData['Null']=='YES' && !$rw[$field]){
+							$arrSet[] = "`{$field}`=NULL";						
+						} else {
+							if (strpos($fieldData['Type'],'int') === false){
+								$arrSet[] = "`{$field}`=".$this->oSQL->e($rw[$field]);
+							} else {
+								$arrSet[] = "`{$field}`=".(integer)$rw[$field];
+							}
+						}
+				}		
+			}
+			$strSQL .= implode(", ",$arrSet); 
+			
+			$sql[] = $strSQL;
+			
+			
+			//-------------Copy register lines--------------------------------//		
+			$strFields = "`".implode("`, `",$arrRegFields)."`";
+			
+			$strSQL = "INSERT INTO `{$this->register}` ({$strFields}) \r\n\tSELECT ";
+			$array_search = Array ('`id`','`source`','`scenario`','`posted`');
+			$array_replace = Array ("NULL","'{$new_guid}'","'{$scenario}'",0);
+			$strSQL .= str_replace($array_search,$array_replace,$strFields);
+			$strSQL .= " \r\n\tFROM `{$this->register}` WHERE `source`='{$this->GUID}';";
+			$sql[] = $strSQL;
+		}
+		// echo '<pre>';print_r($sql);echo '</pre>';
+		$this->doSQL($sql);
+		
+	$rs = $this->oSQL->q("SELECT `{$prefix}ID` FROM `{$this->table}` WHERE `{$prefix}CopyOf`= '{$this->ID}' ORDER BY `{$prefix}ID` DESC LIMIT 1");
+	return($this->oSQL->get_data($rs));
+	}
 }
 
 ?>

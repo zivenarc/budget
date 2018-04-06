@@ -6,6 +6,12 @@ if($_GET['DataAction']=='master'){
 	die();
 }
 
+if($_GET['DataAction']=='copy'){
+	$newid = $oDocument->copy($_GET['new_scenario']);
+	redirect($_SERVER['PHP_SELF']."?".$oDocument->prefix."ID=".$newid);
+	die();
+}
+
 echo '<h1>';
 if ($oDocument->ID){
 	echo $oDocument->budget->title,' :: ';
