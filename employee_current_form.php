@@ -30,12 +30,12 @@ if ($_POST['DataAction']){
 	
 	if($_POST['DataAction']=='salary'){
 	
-		$sql = "SELECT empGUID1C, empTitleLocal, bnsReviewedSalary as salary, DATE_FORMAT(DATE_ADD(bpdDateEnd, INTERVAL 1 DAY),'%d.%m.%Y') as reviewDate
+		$sql = "SELECT empGUID1C, empTitleLocal, IF(bnsStateID=2270,bnsApprovedSalary,bnsReviewedSalary) as salary, bnsSkill+bnsQuality as bonus, DATE_FORMAT(DATE_ADD(bpdDateEnd, INTERVAL 1 DAY),'%d.%m.%Y') as reviewDate
 				FROM treasury.tbl_bonus 
 				LEFT JOIN common_db.tbl_employee ON bnsEmployeeID=empID
 				LEFT JOIN treasury.tbl_bonus_period ON bpdID=bnsPeriodID
 				WHERE bnsPeriodID=(SELECT MAX(bpdID) FROM treasury.tbl_bonus_period WHERE bpdFlagSalaryReview=1)
-				AND bnsStateID<2280
+				AND bnsStateID BETWEEN 2240 AND 2279
 				AND empProfitID='{$oDocument->profit}'";
 				
 		$rs = $oSQL->q($sql);
