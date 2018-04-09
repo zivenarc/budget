@@ -43,7 +43,7 @@ foreach($arrPeriodType as $id=>$title){
 
 $sqlActual = "SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates).")";
 $sqlBudget = "SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")";
-echo '<pre>';print_r($sqlActual);echo '</pre>';
+// echo '<pre>';print_r($sqlActual);echo '</pre>';
 $settings['gpcus'] = Array('title'=>"GP by customer",
 					'sqlBase' => "SELECT customer_group_code as optValue, 
 											customer_group_title as optText,
@@ -64,7 +64,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								GROUP BY customer_group_code",
 						'tolerance'=>0.05,
 						'limit'=>10);
-echo '<pre>';print_r($settings);echo '</pre>';
+// echo '<pre>';print_r($settings);echo '</pre>';
 $settings['gpsal'] = Array('title'=>"GP by sales",
 					'sqlBase' => "SELECT sales as optValue, 
 										usrTitle as optText, 
