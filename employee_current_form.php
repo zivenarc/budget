@@ -35,7 +35,7 @@ if ($_POST['DataAction']){
 				LEFT JOIN common_db.tbl_employee ON bnsEmployeeID=empID
 				LEFT JOIN treasury.tbl_bonus_period ON bpdID=bnsPeriodID
 				WHERE bnsPeriodID=(SELECT MAX(bpdID) FROM treasury.tbl_bonus_period WHERE bpdFlagSalaryReview=1)
-				AND bnsStateID BETWEEN 2240 AND 2279"
+				AND bnsStateID BETWEEN 2240 AND 2279";
 				// AND empProfitID='{$oDocument->profit}'";
 				
 		$rs = $oSQL->q($sql);
