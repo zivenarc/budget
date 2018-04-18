@@ -46,7 +46,7 @@ function getCnt($cntID, &$arrCounterparty=Array()){
 if(!isset($_GET['pccGUID'])){
 
 	include('includes/inc_group_buttons.php');
-	$arrJS[] = 'https://www.google.com/jsapi';
+	// $arrJS[] = 'https://www.google.com/jsapi';
 	$arrJS[]='js/rep_pnl.js';
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$oBudget->title,' :: ',$arrUsrData["pagTitle$strLocal"],'</h1>';
