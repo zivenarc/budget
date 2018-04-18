@@ -20,9 +20,9 @@ include ('includes/inc_report_pcfilter.php');
 $arrCounterparty = getCnt($cntID);
 
 function getCnt($cntID, &$arrCounterparty=Array()){
-	GLOBAL $oSQL;
+	GLOBAL $oSQL, $strLocal;
 	
-	$sql = "SELECT cntID, cntTitle$strLocal as cntTitle, cntUserID, usrTitle$strLocal as Sales, cntFlagFolder
+	$sql = "SELECT cntID, cntTitle$strLocal as cntTitle, cntUserID, usrTitle$strLocal as Sales, cntFlagFolder, cntCode1C
 		FROM common_db.tbl_counterparty 
 		LEFT JOIN stbl_user ON usrID=cntUserID
 		WHERE (cntID={$cntID} AND cntFlagFolder=0)
@@ -56,7 +56,7 @@ if(!isset($_GET['pccGUID'])){
 			echo '<h4>',($sales?$sales:"Unassigned"),'</h4>';
 			echo '<div>';
 			foreach ($customers as $id=>$data){
-				echo "<span class='".($data['cntFlagFolder']?'folder-open':'')."'>";
+				echo "<span title='{$data['cntCode1C']}' class='".($data['cntFlagFolder']?'folder-open':'')."'>";
 				if ($id==$cntID){
 					echo $data["cntTitle"];
 				} else {
