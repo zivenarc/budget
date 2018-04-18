@@ -1,5 +1,5 @@
 <?php
-$flagNoAuth = true;
+// $flagNoAuth = true;
 // $_DEBUG = true;
 include('common/auth.php');
 require ('classes/budget.class.php');
