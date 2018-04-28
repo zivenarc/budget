@@ -136,6 +136,16 @@ class Depreciation extends Document{
 		);
 		
 		$this->grid->Columns[] = Array(
+			'title'=>'Location'
+			,'field'=>'location'
+			,'type'=>'combobox'
+			,'width'=>'70px'							
+			,'sql'=>"SELECT locID as optValue, locTitle as optText FROM vw_location"
+			,'default'=>$this->pc->location
+			, 'disabled'=>true
+		);
+		
+		$this->grid->Columns[] = Array(
 			'title'=>'Item'
 			,'field'=>'item'
 			,'type'=>'combobox'
