@@ -569,6 +569,7 @@ class Depreciation extends Document{
 			$row = $this->add_record();
 			$row->flagUpdated = true;				
 			$row->profit = $this->profit;
+			$row->location = $rw['fixLocationID'];
 			$row->particulars = $rw['fixGUID'];				
 			$row->item = $rw['itmGUID'];				
 			$row->duration = $rw['fixDeprDuration'];				
