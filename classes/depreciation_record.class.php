@@ -13,6 +13,7 @@ class depreciation_record extends table_record{
 			$this->particulars = $data['particulars'];
 			$this->item = $data['item'];
 			$this->profit = $data['profit'];
+			$this->location = $data['location'];
 			$this->activity = $data['activity'];
 			$this->customer = $data['customer'];
 			$this->comment = $data['comment'];
@@ -45,6 +46,7 @@ class depreciation_record extends table_record{
 			
 			$arrRes[] = "`company`='{$this->company}'";
 			$arrRes[] = "`pc`=".(integer)$this->profit;
+			$arrRes[] = "`location`=".(integer)$this->location;
 			$arrRes[] = "`source`='".$this->source."'";
 			$arrRes[] = "`scenario`='".$this->scenario."'";
 			//$arrRes[] = "`customer`='".$this->customer."'";

@@ -181,7 +181,7 @@ class Depreciation extends Document{
 		
 		
 		$this->grid->Columns[] =Array(
-			'title'=>'Value '.$this->budget->arrPeriod[1+$this->budget->offset]
+			'title'=>'Value '.$this->budget->arrPeriod[$this->budget->nm]
 			,'field'=>'value_primo'
 			,'type'=>'money'
 			,'disabled'=>true
@@ -394,6 +394,7 @@ class Depreciation extends Document{
 			$row->flagUpdated = true;				
 			$row->replace = true;				
 			$row->profit = $this->profit;
+			$row->location = $rw['fixLocationID'];
 			$row->particulars = $rw['fixGUID'];				
 			$row->item = $rw['itmGUID'];				
 			$row->duration = $rw['fixDeprDuration'];				
