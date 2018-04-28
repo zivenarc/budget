@@ -55,7 +55,9 @@ td.sales_YTD{
 th.sales_product, th.interco_sales_product{
 	min-width:40em;
 }
-.sales_product div{
+.sales_product div, 
+.depreciation_particulars div, 
+.interco_sales_product div{
 	display: contents;
 }
 td.sales_customer, td.interco_sales_customer{
