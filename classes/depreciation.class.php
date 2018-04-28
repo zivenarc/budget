@@ -122,6 +122,7 @@ class Depreciation extends Document{
 				,'field'=>'particulars'
 				,'type'=>'combobox'
 				,'arrValues'=>$FixedAssets->getStructuredRef()
+				,'width'=>'auto'
 				, 'mandatory' => true
 				, 'disabled'=>true
 			);		
@@ -218,6 +219,7 @@ class Depreciation extends Document{
 			'title'=>'Duration'
 			,'field'=>'duration'
 			,'type'=>'int'
+			,'width'=>'auto'
 			,'mandatory'=>true
 			
 		);
