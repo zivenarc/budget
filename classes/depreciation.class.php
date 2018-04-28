@@ -558,13 +558,17 @@ class Depreciation extends Document{
 		$dateBudgetStart = date('Y-m-d',$this->budget->date_start);
 		$dateBudgetEnd = date('Y-m-d h:i:s',$this->budget->date_end);
 		
-		$sql = "SELECT *, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart)) AS months,
+		$sql = "SELECT vw_fixed_assets.*, 
+				PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart)) AS months,
 				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetStart}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValuePrimo,
-				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetEnd}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValueUltimo
-				FROM vw_fixed_assets 
-				LEFT JOIN vw_item ON itmID=fixItemID
-				WHERE fixProfitID=".$this->profit." AND DATEDIFF(fixDeprEnd,'{$dateBudgetStart}')>0 AND fixFlagDeleted=0
-				ORDER BY fixItemID";//die($sql);
+				fixValueStart*(1-PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM '{$dateBudgetEnd}'), EXTRACT(YEAR_MONTH FROM fixDeprStart))/fixDeprDuration) as fixValueUltimo,
+				itmGUID,
+				empTitleLocal
+					FROM vw_fixed_assets 
+					LEFT JOIN vw_item ON itmID=fixItemID
+					LEFT JOIN common_db.tbl_employee EMP ON EMP.empGUID1C=fixEmployeeGUID
+					WHERE fixProfitID=".$this->profit." AND DATEDIFF(fixDeprEnd,'{$dateBudgetStart}')>0 AND fixFlagDeleted=0
+					ORDER BY fixParentID";//die($sql);
 		$rs = $this->oSQL->q($sql);
 		while ($rw=$this->oSQL->f($rs)){
 			
@@ -582,7 +586,7 @@ class Depreciation extends Document{
 			$row->value_primo = (double)$rw['fixValuePrimo'];				
 			$row->value_ultimo = max(0,(double)$rw['fixValueUltimo']);				
 			
-			$arrDescr = null;
+			$arrDescr = Array($rw['empTitleLocal']);
 			if ($rw['fixPlateNo']) $arrDescr[] = $rw['fixPlateNo'];
 			if ($rw['fixVIN']) $arrDescr[] = $rw['fixVIN'];
 			if (is_array($arrDescr)) $row->comment = implode('|',$arrDescr);				
