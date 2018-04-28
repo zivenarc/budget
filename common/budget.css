@@ -59,14 +59,11 @@ th.sales_product, th.interco_sales_product{
 .depreciation_particulars div, 
 .interco_sales_product div{
 	display: contents;
+	white-space: normal !important;
+	width: 40em !important;
 }
 td.sales_customer, td.interco_sales_customer{
 	min-width:18em;
-}
-
-.interco_sales_product div, .sales_product div{
-	width: 40em !important;
-	white-space: normal !important;
 }
 
 td.costs_supplier{
