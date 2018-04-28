@@ -278,7 +278,8 @@ class Depreciation extends Document{
 				if ($row){
 					if ($arrUpdated[$id]){				
 						$row->flagUpdated = true;				
-						$row->profit = $this->profit;
+						$row->profit = $this->profit;						
+						$row->location = $_POST['location'][$id];						
 						$row->item = $_POST['item'][$id];						
 						$row->particulars = $_POST['particulars'][$id];									
 						$row->count = $_POST['count'][$id];									
