@@ -47,3 +47,12 @@ function initRouteDialog(data){
 						}
 					});
 }
+
+function ownership(){
+	$.post(location.href,{DataAction:'ownership'},function(data){
+		console.log(data);
+		if (data.status=='success'){
+			location.reload();
+		}
+	});
+}

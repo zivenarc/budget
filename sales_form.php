@@ -14,8 +14,27 @@ $oDocument->defineEF();
 $oDocument->defineGrid();
 
 
+
 if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
+	if($_POST['DataAction']=='ownership'){
+		$sql = Array();
+		$sql[] = "UPDATE tbl_sales SET salUserID='{$arrUsrData['usrID']}' WHERE salGUID='{$oDocument->GUID}';";
+		$sql[] = "UPDATE reg_sales SET sales='{$arrUsrData['usrID']}', bdv='{$arrUsrData['usrProfitID']}' WHERE source='{$oDocument->GUID}'";
+		$sql[] = "UPDATE reg_master SET sales='{$arrUsrData['usrID']}', bdv='{$arrUsrData['usrProfitID']}' WHERE source='{$oDocument->GUID}'";
+		$success = true;
+		for ($i=0;$i<count($sql);$i++){
+			$success &= $oSQL->q($sql[$i]);
+		}
+		header('Content-type:application/json;');
+		if ($success) {
+			echo json_encode(Array('status'=>'success','user'=>$arrUsrData['usrID']));
+		} else {
+			echo json_encode(Array('status'=>'error'));
+		}
+		die();
+	}
+	 
 	if($_POST['DataAction']=='route'){
 		
 		$sql = "SELECT ref_route.*, POL.cntTitle as polTitle, POD.cntTitle as podTitle 
@@ -53,6 +72,7 @@ if ($_POST['DataAction']){
 		die();
 	}
 	
+
 	if($_POST['DataAction']=='fill_estimate'){
 		
 		$sql = "SELECT prtGHQ,prtTitle, activity,account, ".$oDocument->budget->getMonthlySumSQL(1,15, null, 1000)." 
@@ -199,7 +219,9 @@ if ($oDocument->customer && $oDocument->flagUpdate ){
 	$arrActions[] = Array ('title'=>'Fill grid','action'=>'javascript:fillGrid();','class'=>'brick');
 	$arrActions[] = Array ('title'=>'Estimate','action'=>"javascript:fillGrid('_estimate');",'class'=>'brick');
 }
-
+if($oDocument->GUID){
+	$arrActions[] = Array ('title'=>'Take ownership','action'=>"javascript:ownership();",'class'=>'user');
+}
 //============================== Main form definition ==============================
 
 $oDocument->fillGrid();
