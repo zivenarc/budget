@@ -72,7 +72,7 @@ if(!isset($_GET['pccGUID'])){
 									FROM vw_master 
 									{$oReport->sqlWhere}
 										AND  scenario='{$oBudget->id}' 
-										AND account IN ('J00400', 'J00802')
+										".Reports::GP_FILTER."
 									GROUP BY customer_group_code
 									UNION ALL
 									SELECT  customer_group_code as optValue, 
@@ -84,7 +84,7 @@ if(!isset($_GET['pccGUID'])){
 									{$oReport->sqlWhere}
 										AND scenario='{$oReference->id}'
 										AND source<>'Estimate' 
-										AND account IN ('J00400', 'J00802')										
+										".Reports::GP_FILTER."									
 									GROUP BY customer_group_code",
 							'denominator'=>$denominator,
 							'actual_title'=>$oBudget->title,
@@ -139,7 +139,7 @@ if(!isset($_GET['pccGUID'])){
 										FROM vw_master 
 										{$oReport->sqlWhere}
 											AND  scenario='{$oBudget->id}' 
-											AND account IN ('J00400', 'J00802')
+											".Reports::GP_FILTER."
 										GROUP BY customer_group_code",
 								'denominator'=>$denominator,
 								'budget_title'=>'This month',
