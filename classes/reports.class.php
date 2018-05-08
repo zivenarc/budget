@@ -3578,7 +3578,7 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::GOP_FILTER." AND pccFlagProd=1)", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::GOP_FILTER." AND pccFlagProd=1", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
