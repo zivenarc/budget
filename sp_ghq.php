@@ -90,7 +90,7 @@ $arrAccounts = Array(
 							GROUP by {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
 		'Direct costs'=>Array('negative'=>true, 'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere}  
-									".Reports::DIRECT_COSTS_FILTER."	
+									".Reports::DIRECT_COST_FILTER."	
 									AND pccFlagProd=1'
 								GROUP BY {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
 		'Gross profit'=>Array('class'=>'budget-subtotal'),
