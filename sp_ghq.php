@@ -86,16 +86,18 @@ $arrRevenueFilter = Array(
 $arrAccounts = Array(
 		'Revenue'=>Array('sql'=>"SELECT $sqlFields FROM vw_master 
 							{$sqlWhere} 
-								AND item in ('".implode("','",$arrRevenueFilter)."') 			
+								".Reports::REVENUE_FILTER."			
 							GROUP by {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
 		'Direct costs'=>Array('negative'=>true, 'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere}  
-									AND account IN ('J00802') AND pccFlagProd=1 AND item<>'".Reports::REVENUE_ITEM."'
+									".Reports::DIRECT_COSTS_FILTER."	
+									AND pccFlagProd=1'
 								GROUP BY {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
 		'Gross profit'=>Array('class'=>'budget-subtotal'),
 		'Reclassified fixed costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
 									{$sqlWhere} 
-										AND account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W') AND pccFlagProd=1			
+									".Reports::RFC_FILTER." 
+									AND pccFlagProd=1			
 									GROUP by {$sqlGroupBy}
 									ORDER by account",'subtotal'=>Array('Gross operating profit','Net operating profit','PBT')),
 		'Gross operating profit'=>Array('class'=>'budget-subtotal'),
