@@ -86,12 +86,12 @@ $arrRevenueFilter = Array(
 $arrAccounts = Array(
 		'Revenue'=>Array('sql'=>"SELECT $sqlFields FROM vw_master 
 							{$sqlWhere} 
-								".Reports::REVENUE_FILTER."			
+							".Reports::REVENUE_FILTER."			
 							GROUP by {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
 		'Direct costs'=>Array('negative'=>true, 'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere}  
-									".Reports::DIRECT_COST_FILTER."	
-									AND pccFlagProd=1'
+								".Reports::DIRECT_COST_FILTER."	
+								AND pccFlagProd=1
 								GROUP BY {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
 		'Gross profit'=>Array('class'=>'budget-subtotal'),
 		'Reclassified fixed costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
