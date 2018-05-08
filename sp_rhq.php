@@ -52,74 +52,10 @@ foreach($arrPC as $pc=>$arrGhq){
 
 // echo '<pre>';print_r($arrRatio);echo '</pre>';
 
-$sqlFields = "account, title, prtGHQ, pc, SUM(Total_AM) as Total, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates).", SUM(".$oBudget->getThisYTDSQL().") as YTD";
+$sqlFields = "account, Title, prtGHQ, pc, SUM(Total_AM) as Total, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates).", SUM(".$oBudget->getThisYTDSQL().") as YTD";
 $sqlWhere = "scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate'";
 
 
-$arrFilter = Array(
-	Items::REVENUE,
-	Items::INTERCOMPANY_REVENUE
-);
-$reportKey = '<i>Revenue correction</i>';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE {$sqlWhere} AND item in ('".implode("','",$arrFilter)."') AND account='J00802'
-		GROUP by prtGHQ"; 
-// echo '<pre>',$sql,'</pre>';
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-			$month = $oBudget->arrPeriod[$m];
-		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
-	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
-}
-
-$arrFreightFilter = Array(45,46,47,48,52,58);
-
-$arrFilter = Array(
-	Items::REVENUE,
-	Items::INTERCOMPANY_REVENUE
-);
-$reportKey = '<i>Freight revenue</i>';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE {$sqlWhere} AND item in ('".implode("','",$arrFilter)."') AND activity in (".implode(",",$arrFreightFilter).")
-		GROUP by prtGHQ"; 
-// echo '<pre>',$sql,'</pre>';
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-			$month = $oBudget->arrPeriod[$m];
-		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] += $rw['YTD'];
-	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] += $rw['Total'];
-}
-
-$reportKey = '<i>Other revenue</i>';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE {$sqlWhere} AND item in ('".implode("','",$arrFilter)."') AND activity not in (".implode(",",$arrFreightFilter).")
-		GROUP by prtGHQ"; 
-// echo '<pre>',$sql,'</pre>';
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-			$month = $oBudget->arrPeriod[$m];
-		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
-		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] += $rw['YTD'];
-	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] += $rw['Total'];
-}
-
-$arrFilter = Array(
-	Items::REVENUE,
-	Items::INTERCOMPANY_REVENUE,
-	Items::PROFIT_SHARE
-);
-$reportKey = 'Revenue';
 $sql = "SELECT $sqlFields FROM vw_master 
 		WHERE {$sqlWhere} 
 		".Reports::REVENUE_FILTER."		
@@ -127,6 +63,7 @@ $sql = "SELECT $sqlFields FROM vw_master
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
+	$reportKey = 'Revenue::'.$rw['account']."::".$rw['Title'];
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] += $rw[$month];
@@ -139,21 +76,13 @@ while ($rw = $oSQL->f($rs)){
 }
 
 
-$arrFilter = Array(
-	Items::DIRECT_COSTS,
-	Items::INTERCOMPANY_COSTS,
-	//Items::CY_RENT,
-	//Items::WH_RENT,
-	Items::KAIZEN,
-	Items::PROFIT_SHARE_COST
-);
-$reportKey = 'Direct costs';
 $sql = "SELECT $sqlFields FROM vw_master 
 		WHERE {$sqlWhere} 
 		".Reports::DIRECT_COST_FILTER."	
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
+	$reportKey = 'COS::'.$rw['account']."::".$rw['Title'];
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
@@ -165,34 +94,6 @@ while ($rw = $oSQL->f($rs)){
 	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
 }
 
-// $reportKey = '<i>thereof: Freight costs</i>';
-// $sql = "SELECT $sqlFields FROM vw_master 
-		// WHERE {$sqlWhere} AND item in ('".implode("','",$arrFilter)."') AND activity in (".implode(",",$arrFreightFilter).")
-		// GROUP by prtGHQ"; 
-// $rs = $oSQL->q($sql);
-// while ($rw = $oSQL->f($rs)){
-	// for($m=$startMonth;$m<=$endMonth;$m++){
-			// $month = $oBudget->arrPeriod[$m];
-		// $arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
-	// }
-	// $arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
-	// $arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
-// }
-// $reportKey = '<i>Other costs</i>';
-// $sql = "SELECT $sqlFields FROM vw_master 
-		// WHERE {$sqlWhere} AND item in ('".implode("','",$arrFilter)."') AND activity not in (".implode(",",$arrFreightFilter).")
-		// GROUP by prtGHQ"; 
-// $rs = $oSQL->q($sql);
-// while ($rw = $oSQL->f($rs)){
-	// for($m=$startMonth;$m<=$endMonth;$m++){
-			// $month = $oBudget->arrPeriod[$m];
-		// $arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
-	// }
-	// $arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
-	// $arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
-// }
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
 		WHERE {$sqlWhere} 
@@ -203,7 +104,49 @@ $sql = "SELECT $sqlFields FROM vw_master
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	$reportKey = $rw['account']."::".$rw['title'];
+	$reportKey = $rw['account']."::".$rw['Title'];
+	for($m=$startMonth;$m<=$endMonth;$m++){
+			$month = $oBudget->arrPeriod[$m];
+		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
+		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+	}
+	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
+	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
+	$arrGrandTotal[$reportKey]['YTD'] += $rw['YTD'];
+	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
+}
+
+$sql = "SELECT $sqlFields FROM vw_master 
+		LEFT JOIN vw_yact YACT ON yctID=account
+		WHERE {$sqlWhere} 
+		".Reports::SGA_FILTER."		
+		GROUP by pc, prtGHQ, account
+		ORDER BY account";
+// echo '<pre>',$sql,'</pre>';
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	$reportKey = $rw['account']."::".$rw['Title'];
+	for($m=$startMonth;$m<=$endMonth;$m++){
+			$month = $oBudget->arrPeriod[$m];
+		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
+		$arrGrandTotal[$reportKey][$month] += $rw[$month];
+	}
+	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
+	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
+	$arrGrandTotal[$reportKey]['YTD'] += $rw['YTD'];
+	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
+}
+
+$sql = "SELECT $sqlFields FROM vw_master 
+		LEFT JOIN vw_yact YACT ON yctID=account
+		WHERE {$sqlWhere} 
+		".Reports::CORP_FILTER."		
+		GROUP by pc, prtGHQ, account
+		ORDER BY account";
+// echo '<pre>',$sql,'</pre>';
+$rs = $oSQL->q($sql);
+while ($rw = $oSQL->f($rs)){
+	$reportKey = $rw['account']."::".$rw['Title'];
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
@@ -217,39 +160,6 @@ while ($rw = $oSQL->f($rs)){
 
 /////////////////////// SG&A costs //////////////////////////////// 
 $arrSubreport = Array(
-					Array('reportKey' => 'SGA:Sales commission',
-								'sql' => "SELECT $sqlFields FROM vw_master 		
-							WHERE {$sqlWhere}
-								AND account='523000' AND (pccFLagProd = 1 OR pc IN (9,130))
-							GROUP by pc, prtGHQ"),
-					Array('reportKey' => 'SGA:Personnel costs',
-								'sql' => "SELECT $sqlFields FROM vw_master 
-										LEFT JOIN vw_yact YACT ON yctID=account		
-										WHERE {$sqlWhere}
-											AND YACT.yctParentID IN ('59900P') AND (pccFLagProd = 1 OR pc IN (9,130))
-										GROUP by pc, prtGHQ"),
-					Array('reportKey' => 'SGA:Other',
-								'sql' => "SELECT $sqlFields FROM vw_master 
-										LEFT JOIN vw_yact YACT ON yctID=account		
-										WHERE {$sqlWhere} 
-											AND YACT.yctParentID IN ('59900S') AND (pccFLagProd = 1 OR pc IN (9,130))
-										GROUP by pc, prtGHQ"),
-					Array('reportKey' => 'Corporate costs: personnel',
-								'sql' => "SELECT $sqlFields FROM vw_master 
-										LEFT JOIN vw_yact YACT ON yctID=account
-										WHERE {$sqlWhere}
-											AND YACT.yctParentID IN ('59900P')  AND (pccFLagProd = 0 AND pc NOT IN(9,130))
-										GROUP by pc, prtGHQ"),
-					Array('reportKey' => 'Corporate costs: other',
-								'sql' => "SELECT $sqlFields FROM vw_master 
-										LEFT JOIN vw_yact YACT ON yctID=account
-										WHERE {$sqlWhere} 
-											AND YACT.yctParentID IN ('59900S')  AND (pccFLagProd = 0 AND pc NOT IN(9,130))
-										GROUP by pc, prtGHQ"),
-					Array('reportKey' => 'MSF',
-								'sql' => "SELECT $sqlFields FROM vw_master 
-										WHERE {$sqlWhere} AND account='527000' 
-										GROUP by pc, prtGHQ"),
 					Array('reportKey' => 'Non-operating income',
 								'sql' => "SELECT $sqlFields FROM vw_master 
 										WHERE {$sqlWhere} AND account LIKE '60%' AND account<>'607000' and pccFlagProd=1

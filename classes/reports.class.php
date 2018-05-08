@@ -20,6 +20,8 @@ class Reports{
 	const GP_FILTER = "AND account IN ('J00400', 'J00802','J45010','J40010') ";
 	const GOP_FILTER = "AND account LIKE 'J%' ";
 	const RFC_FILTER = "AND (account LIKE 'J%' AND account NOT IN ('J00400', 'J00802','J45010','J40010')) ";
+	const SGA_FILTER = "AND (account LIKE '5%' AND account NOT IN ('5999CO','5999BD')) AND (pccFLagProd = 1 OR pc IN (9,130))";
+	const CORP_FILTER = "AND account IN ('5999CO')";
 	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';
 	const PROFIT_SHARE_ITEM = 'fd09fb23-efd0-11e3-926a-00155d010e0b';
 	const SALARY_THRESHOLD = 10000;
