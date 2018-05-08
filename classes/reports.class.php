@@ -24,6 +24,7 @@ class Reports{
 	const PROFIT_SHARE_ITEM = 'fd09fb23-efd0-11e3-926a-00155d010e0b';
 	const SALARY_THRESHOLD = 10000;
 	const ACTUAL_DATA_FILTER = "`source` IN ('Actual','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Correction')";
+	const GROSS_REVENUE_ITEMS = Array('cdce3c68-c8da-4655-879e-cd8ec5d98d95','17ae174f-48e3-11e1-b30e-005056930d2f','dea4c740-5201-11e8-a94c-000d3ab6a5d8','f5a44e49-5201-11e8-a94c-000d3ab6a5d8');
 	
 	function __construct($params){
 		
@@ -3523,7 +3524,7 @@ class Reports{
 		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
 		
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account = 'J00400') AND pccFlagProd=1", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND item IN('".implode("','",self::GROSS_REVENUE_ITEMS)."') AND pccFlagProd=1", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
