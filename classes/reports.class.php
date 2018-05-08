@@ -15,9 +15,11 @@ class Reports{
 	const CNT_GROUP_EXEMPTION = 723;
 	const OP_FILTER = "AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%') AND pccFlagProd=1 ";	
 	const SC_FILTER = "AND group_code=95";
-	const GP_FILTER = "AND account IN ('J00400', 'J00802') ";
+	const REVENUE_FILTER = "AND account IN ('J00400','J40010') ";
+	const DIRECT_COST_FILTER = "AND account IN ('J00802','J45010')";
+	const GP_FILTER = "AND account IN ('J00400', 'J00802','J45010','J40010') ";
 	const GOP_FILTER = "AND account LIKE 'J%' ";
-	const RFC_FILTER = "AND account LIKE 'J%' AND account NOT IN ('J00400', 'J00802') ";
+	const RFC_FILTER = "AND (account LIKE 'J%' AND account NOT IN ('J00400', 'J00802','J45010','J40010'))";
 	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';
 	const PROFIT_SHARE_ITEM = 'fd09fb23-efd0-11e3-926a-00155d010e0b';
 	const SALARY_THRESHOLD = 10000;
@@ -3530,7 +3532,7 @@ class Reports{
 		}
 		
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND pccFlagProd=1 AND (item IN ('".self::REVENUE_ITEM."','".self::PROFIT_SHARE_ITEM."'))", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::REVENUE_FILTER, $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
@@ -3539,7 +3541,7 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00802')) AND pccFlagProd=1 AND item<>'".self::REVENUE_ITEM."'", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::DIRECT_COST_FILTER, $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		// echo '<pre>',$sqlOps,'</pre>';
@@ -3549,7 +3551,7 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00400','J00802') AND pccFlagProd=1)", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::GP_FILTER, $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
@@ -3558,7 +3560,7 @@ class Reports{
 		}
 		
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W') AND pccFlagProd=1)", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::RFC_FILTER." AND pccFlagProd=1)", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
@@ -3571,7 +3573,7 @@ class Reports{
 			$this->echoBudgetItemString($rw);
 		}
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('J00400','J00802','J00801','J00803','J00804','J00805','J00806','J00808','J0080W') AND pccFlagProd=1)", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::GOP_FILTER." AND pccFlagProd=1)", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
