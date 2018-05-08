@@ -52,7 +52,7 @@ foreach($arrPC as $pc=>$arrGhq){
 
 // echo '<pre>';print_r($arrRatio);echo '</pre>';
 
-$sqlFields = "prtGHQ, pc, SUM(Total_AM) as Total, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates).", SUM(".$oBudget->getThisYTDSQL().") as YTD";
+$sqlFields = "account, title, prtGHQ, pc, SUM(Total_AM) as Total, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates).", SUM(".$oBudget->getThisYTDSQL().") as YTD";
 $sqlWhere = "scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate'";
 
 
@@ -121,7 +121,8 @@ $arrFilter = Array(
 );
 $reportKey = 'Revenue';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE {$sqlWhere} AND item in ('".implode("','",$arrFilter)."')  AND account IN('J00400','J00802')
+		WHERE {$sqlWhere} 
+		".Reports::REVENUE_FILTER."		
 		GROUP by prtGHQ"; 
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
@@ -148,7 +149,8 @@ $arrFilter = Array(
 );
 $reportKey = 'Direct costs';
 $sql = "SELECT $sqlFields FROM vw_master 
-		WHERE {$sqlWhere} AND item IN ('".implode("','",$arrFilter)."')  AND account IN('J00400','J00802')
+		WHERE {$sqlWhere} 
+		".Reports::DIRECT_COST_FILTER."	
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -163,104 +165,45 @@ while ($rw = $oSQL->f($rs)){
 	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
 }
 
-$reportKey = '<i>thereof: Freight costs</i>';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE {$sqlWhere} AND item in ('".implode("','",$arrFilter)."') AND activity in (".implode(",",$arrFreightFilter).")
-		GROUP by prtGHQ"; 
-// echo '<pre>',$sql,'</pre>';
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-			$month = $oBudget->arrPeriod[$m];
-		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
+// $reportKey = '<i>thereof: Freight costs</i>';
+// $sql = "SELECT $sqlFields FROM vw_master 
+		// WHERE {$sqlWhere} AND item in ('".implode("','",$arrFilter)."') AND activity in (".implode(",",$arrFreightFilter).")
+		// GROUP by prtGHQ"; 
+// $rs = $oSQL->q($sql);
+// while ($rw = $oSQL->f($rs)){
+	// for($m=$startMonth;$m<=$endMonth;$m++){
+			// $month = $oBudget->arrPeriod[$m];
+		// $arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
-	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
-}
-$reportKey = '<i>Other costs</i>';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE {$sqlWhere} AND item in ('".implode("','",$arrFilter)."') AND activity not in (".implode(",",$arrFreightFilter).")
-		GROUP by prtGHQ"; 
-// echo '<pre>',$sql,'</pre>';
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-			$month = $oBudget->arrPeriod[$m];
-		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
+	// }
+	// $arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
+	// $arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
+// }
+// $reportKey = '<i>Other costs</i>';
+// $sql = "SELECT $sqlFields FROM vw_master 
+		// WHERE {$sqlWhere} AND item in ('".implode("','",$arrFilter)."') AND activity not in (".implode(",",$arrFreightFilter).")
+		// GROUP by prtGHQ"; 
+// $rs = $oSQL->q($sql);
+// while ($rw = $oSQL->f($rs)){
+	// for($m=$startMonth;$m<=$endMonth;$m++){
+			// $month = $oBudget->arrPeriod[$m];
+		// $arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
 		// $arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
-	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
-}
-
-$reportKey = 'RFC: Labor costs';
+	// }
+	// $arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
+	// $arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
+// }
 $sql = "SELECT $sqlFields FROM vw_master 
 		LEFT JOIN vw_yact YACT ON yctID=account
-		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='J' AND pccFLagProd = 1
-		WHERE {$sqlWhere} AND account IN('J00801') AND pccFLagProd = 1
-		GROUP by pc, prtGHQ";
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-			$month = $oBudget->arrPeriod[$m];
-		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
-	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
-	$arrGrandTotal[$reportKey]['YTD'] += $rw['YTD'];
-	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
-}
-
-
-$reportKey = 'RFC: Warehouse costs';
-$sql = "SELECT $sqlFields FROM vw_master 
-		LEFT JOIN vw_yact YACT ON yctID=account
-		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND YACT.yctParentID IN ('59900P') AND LEFT(yctID,1)='J' AND pccFLagProd = 1
-		WHERE {$sqlWhere} AND account IN('J0080W') AND pccFLagProd = 1
-		GROUP by pc, prtGHQ";
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-			$month = $oBudget->arrPeriod[$m];
-		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
-	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
-	$arrGrandTotal[$reportKey]['YTD'] += $rw['YTD'];
-	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
-}
-
-$reportKey = 'RFC: Depreciation';
-$sql = "SELECT $sqlFields FROM vw_master 
-		LEFT JOIN vw_yact YACT ON yctID=account
-		##WHERE scenario='$budget_scenario' AND source<>'Estimate' AND account IN ('512000','J00806') AND pccFLagProd = 1
-		WHERE {$sqlWhere} AND account IN ('J00806') AND pccFLagProd = 1
-		GROUP by pc, prtGHQ";
+		WHERE {$sqlWhere} 
+		".Reports::RFC_FILTER."
+		AND pccFLagProd = 1
+		GROUP by pc, prtGHQ, account
+		ORDER BY account";
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
-	for($m=$startMonth;$m<=$endMonth;$m++){
-			$month = $oBudget->arrPeriod[$m];
-		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
-		$arrGrandTotal[$reportKey][$month] += $rw[$month];
-	}
-	$arrReport[$rw['prtGHQ']][$reportKey]['YTD'] -= $rw['YTD'];
-	$arrReport[$rw['prtGHQ']][$reportKey]['Total'] -= $rw['Total'];
-	$arrGrandTotal[$reportKey]['YTD'] += $rw['YTD'];
-	$arrGrandTotal[$reportKey]['Total'] += $rw['Total'];
-}
-
-$reportKey = 'RFC: Other';
-$sql = "SELECT $sqlFields FROM vw_master 
-		LEFT JOIN vw_yact YACT ON yctID=account
-		WHERE {$sqlWhere} AND (YACT.yctParentID IN ('SZ0040') AND account NOT IN ('J00806','J00801','J0080W')) AND pccFLagProd = 1
-		GROUP by pc, prtGHQ";
-// echo '<pre>',$sql,'</pre>';
-$rs = $oSQL->q($sql);
-while ($rw = $oSQL->f($rs)){
+	$reportKey = $rw['account']."::".$rw['title'];
 	for($m=$startMonth;$m<=$endMonth;$m++){
 			$month = $oBudget->arrPeriod[$m];
 		$arrReport[$rw['prtGHQ']][$reportKey][$month] -= $rw[$month];
