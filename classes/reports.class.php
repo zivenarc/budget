@@ -3562,7 +3562,12 @@ class Reports{
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::RFC_FILTER." AND pccFlagProd=1)", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
-		$rs = $this->oSQL->q($sqlOps);
+		try {
+			$rs = $this->oSQL->q($sqlOps);
+		} catch (Exception $e) {
+			echo $e;
+			echo '<pre>',$sqlOps,'</pre>';
+		}
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Reclassified fixed costs";
 			$rw['title'] = "Direct production costs: labor, rent, fuel, depreciation";
