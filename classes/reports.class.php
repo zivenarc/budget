@@ -3560,7 +3560,7 @@ class Reports{
 		}
 		
 		
-		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::RFC_FILTER." AND pccFlagProd=1)", $sql);
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::RFC_FILTER." AND pccFlagProd=1", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		try {
 			$rs = $this->oSQL->q($sqlOps);
