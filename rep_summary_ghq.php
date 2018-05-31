@@ -282,7 +282,7 @@ if(!isset($_GET['prtGHQ'])){
 					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
 				GROUP BY customer_group_code
 				ORDER BY GP DESC
-				LIMIT 10";
+				LIMIT 15";
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['optText']]['GP'] = $rw['GP'];
@@ -294,7 +294,7 @@ if(!isset($_GET['prtGHQ'])){
 						{$sqlActual} as Revenue
 				FROM vw_master 				
 				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' AND account IN ('J00400')
+					AND  scenario='{$oBudget->id}' ".Reports::GROSS_REVENUE_FILTER."
 					AND  customer_group_code IN (".implode(',',$arrCGFilter).")
 				GROUP BY customer_group_code
 				";
@@ -341,7 +341,7 @@ if(!isset($_GET['prtGHQ'])){
 	$sql = "SELECT {$sqlActual} as Revenue 
 					FROM vw_master 
 					{$sqlWhere}
-					AND  scenario='{$oBudget->id}' AND account IN ('J00400')";
+					AND  scenario='{$oBudget->id}' ".Reports::GROSS_REVENUE_FILTER;
 					
 	// echo '<pre>',$sql,'</pre>';
 	

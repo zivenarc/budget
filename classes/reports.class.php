@@ -27,6 +27,7 @@ class Reports{
 	const SALARY_THRESHOLD = 10000;
 	const ACTUAL_DATA_FILTER = "`source` IN ('Actual','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Correction')";
 	const GROSS_REVENUE_ITEMS = Array('cdce3c68-c8da-4655-879e-cd8ec5d98d95','17ae174f-48e3-11e1-b30e-005056930d2f','dea4c740-5201-11e8-a94c-000d3ab6a5d8','f5a44e49-5201-11e8-a94c-000d3ab6a5d8');
+	const GROSS_REVENUE_FILTER = " AND `item` IN ('cdce3c68-c8da-4655-879e-cd8ec5d98d95','17ae174f-48e3-11e1-b30e-005056930d2f','dea4c740-5201-11e8-a94c-000d3ab6a5d8','f5a44e49-5201-11e8-a94c-000d3ab6a5d8')":;
 	
 	function __construct($params){
 		
