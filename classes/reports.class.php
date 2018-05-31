@@ -19,15 +19,15 @@ class Reports{
 	const DIRECT_COST_FILTER = "AND account IN ('J00802','J45010') ";
 	const GP_FILTER = "AND account IN ('J00400', 'J00802','J45010','J40010') ";
 	const GOP_FILTER = "AND account LIKE 'J%' ";
-	const RFC_FILTER = "AND (account LIKE 'J%' AND account NOT IN ('J00400', 'J00802','J45010','J40010')) ";
-	const SGA_FILTER = "AND (account LIKE '5%' AND account NOT IN ('5999CO','5999BD')) AND (pccFLagProd = 1 OR pc IN (9,130))";
+	const RFC_FILTER = "AND (account LIKE 'J%' AND account NOT IN ('J00400', 'J00802','J45010','J40010'))\r\n";
+	const SGA_FILTER = "AND (account LIKE '5%' AND account NOT IN ('5999CO','5999BD')) AND (pccFLagProd = 1 OR pc IN (9,130))\r\n";
 	const CORP_FILTER = "AND account IN ('5999CO')";
 	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';
 	const PROFIT_SHARE_ITEM = 'fd09fb23-efd0-11e3-926a-00155d010e0b';
 	const SALARY_THRESHOLD = 10000;
-	const ACTUAL_DATA_FILTER = "`source` IN ('Actual','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Correction')";
+	const ACTUAL_DATA_FILTER = "`source` IN ('Actual','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Correction')\r\n";
 	const GROSS_REVENUE_ITEMS = Array('cdce3c68-c8da-4655-879e-cd8ec5d98d95','17ae174f-48e3-11e1-b30e-005056930d2f','dea4c740-5201-11e8-a94c-000d3ab6a5d8','f5a44e49-5201-11e8-a94c-000d3ab6a5d8');
-	const GROSS_REVENUE_FILTER = " AND `item` IN ('cdce3c68-c8da-4655-879e-cd8ec5d98d95','17ae174f-48e3-11e1-b30e-005056930d2f','dea4c740-5201-11e8-a94c-000d3ab6a5d8','f5a44e49-5201-11e8-a94c-000d3ab6a5d8')":;
+	const GROSS_REVENUE_FILTER = " AND `item` IN ('cdce3c68-c8da-4655-879e-cd8ec5d98d95','17ae174f-48e3-11e1-b30e-005056930d2f','dea4c740-5201-11e8-a94c-000d3ab6a5d8','f5a44e49-5201-11e8-a94c-000d3ab6a5d8')\r\n";
 	
 	function __construct($params){
 		
