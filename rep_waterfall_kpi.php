@@ -157,9 +157,12 @@ if (isset($_REQUEST['pccGUID'])){
 	<script>
 		var requestOptions = {tabKey:'pccGUID',tabValue:'<?php echo $_REQUEST['pccGUID'];?>'};
 	</script>
+	<div>
 	<?php
 	$oWF->draw();
-	
+	?>
+	</div>
+	<?php
 } else {					
 	$arrJS[] = 'js/rep_pnl.js';					
 	require ('includes/inc-frame_top.php');

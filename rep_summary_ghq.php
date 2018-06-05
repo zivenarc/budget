@@ -279,7 +279,7 @@ if(!isset($_GET['prtGHQ'])){
 						{$sqlActual} as GP
 				FROM vw_master 				
 				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
+					AND  scenario='{$oBudget->id}' ".Reports::GP_FILTER."
 				GROUP BY customer_group_code
 				ORDER BY GP DESC
 				LIMIT 15";
@@ -332,7 +332,7 @@ if(!isset($_GET['prtGHQ'])){
 	$sql = "SELECT {$sqlActual} as GP 
 					FROM vw_master 
 					{$sqlWhere}
-					AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')";
+					AND  scenario='{$oBudget->id}' ".Reports::GP_FILTER;
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
 	$arrReportOther['GP'] = $rw['GP'];
