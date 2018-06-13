@@ -181,7 +181,9 @@ class Document extends easyForm{
 			'title'=>'Scenario'
 			,'field'=>$this->prefix.'Scenario'
 			,'type'=>'combobox'
-			,'sql'=>'SELECT scnID as optValue, scnTitle as optText FROM tbl_scenario '.($this->flagUpdate?" WHERE scnFlagReadOnly=0":"")
+			,'sql'=>"SELECT scnID as optValue, scnTitle as optText FROM tbl_scenario 
+					WHERE scnFlagReadOnly=0
+					OR scnID='".$this->scenario."'"
 			,'default'=>$budget_scenario	
 			,'disabled'=>!$this->flagUpdate
 		);
