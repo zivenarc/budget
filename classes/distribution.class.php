@@ -67,15 +67,17 @@ class Distribution extends Document{
 					,'field'=>$this->prefix.'ItemGUID'
 					,'type'=>'combobox'
 					// ,'sql'=>$Items->getStructuredRef()
+					,'default'=>""
 					,'sql'=>"SELECT itmGUID as optValue, itmTitle as optText FROM vw_item"
 					, 'mandatory' => false
 					, 'disabled'=>!$this->flagUpdate
 				);
 
 		$this->Columns[] = Array(
-			'title'=>'Item'
+			'title'=>'YACT Account'
 			,'field'=>$this->prefix.'YACT'
 			,'type'=>'combobox'
+			,'default'=>""
 			// ,'sql'=>$Items->getStructuredRef()
 			,'sql'=>"SELECT yctID as optValue, CONCAT(yctID,' | ',yctTitle) as optText FROM vw_rfc"
 			, 'mandatory' => false
