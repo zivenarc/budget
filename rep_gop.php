@@ -1,8 +1,8 @@
 <?php
-$flagNoAuth = true;
+//$flagNoAuth = true;
 require ('common/auth.php');
-require ('classes/budget.class.php');
-require ('classes/reports.class.php');
+require_once ('classes/budget.class.php');
+require_once ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
 $arrActions[] = Array('title'=>'Current month','action'=>'?period_type=cm');
