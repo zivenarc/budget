@@ -3792,5 +3792,79 @@ class Reports{
 		return($cusGroup);
 	}
 	
+	function GOP(){
+		$strFields = $this->_getMRFields();
+		$sql = "SELECT customer, Customer_name, account, Title, {$strFields['actual']}
+				FROM vw_master
+				{$this->sqlWhere}
+				AND scenario='{$this->oBudget->id}'
+				".self::GOP_FILTER."
+				GROUP by customer, account
+				ORDER BY account, customer";
+			
+		
+		// echo '<pre>',$sql,'</pre>';
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+				$arrReport[$rw['customer']][$rw['account']] += $rw['FYE_A'];
+				$arrAccount[$rw['account']] = $rw['Title'];
+				$arrCustomer[$rw['customer']] = $rw['Customer_name'];
+				$arrTotal[$rw['account']] += $rw['FYE_A'];
+		}
+
+		?>
+		<table class='budget' id='<?php echo $this->ID;?>'>
+			<caption>
+			<?php echo $this->caption;?>
+			</caption>
+			<thead>
+				<tr>
+					<th>Customer</th>
+					<?php
+					foreach ($arrAccount as $id=>$title){
+						?>
+						<th><?php echo $id,'<br/>','<small>',$title,'</small>';?></th>
+						<?php
+					}	
+					?>
+					<th class='budget-ytd'>Gross Operating Profit</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ($arrReport as $customer=>$data){
+					?>
+					<tr>
+						<td><?php echo $arrCustomer[$customer];?></td>
+						<?php
+						foreach ($arrAccount as $id=>$title){
+						?>
+						<td class='budget-decimal'><?php $this->render($data[$id]);?></td>
+						<?php
+						}
+						?>
+						<td class='budget-decimal budget-ytd'><?php $this->render(array_sum($data));?></td>
+					</tr>
+					<?php
+				}
+				?>
+			</tbody>
+			<tfoot>
+				<tr class='budget-subtotal'>
+					<td>Total</td>
+					<?php
+						foreach ($arrAccount as $id=>$title){
+						?>
+						<td class='budget-decimal'><?php $this->render($arrTotal[$id]);?></td>
+						<?php
+						}
+						?>
+					<td class='budget-decimal budget-ytd'><?php $this->render(array_sum($arrTotal));?></td>
+				</tr>
+			</tfoot>
+		</table>
+		<button onclick="SelectContent('<?php echo $this->ID;?>');">Copy table</button>
+		<?php
+		
+	}
 }
 ?>
