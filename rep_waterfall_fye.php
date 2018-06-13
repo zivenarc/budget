@@ -112,7 +112,7 @@ if(!isset($_GET['pccGUID'])){
 					{$sqlActual} as Diff
 			FROM vw_master 
 			{$sqlWhere}
-				AND  scenario='{$oBudget->id}' AND company='{$company}' AND account IN ('J00400', 'J00802')
+				AND  scenario='{$oBudget->id}' AND company='{$company}' ".Reports::GP_FILTER."
 			GROUP BY customer_group_code
 			UNION ALL
 			SELECT  customer_group_code as optValue, 
@@ -124,7 +124,7 @@ if(!isset($_GET['pccGUID'])){
 			{$sqlWhere}
 				AND scenario='{$oReference->id}' AND company='{$company}' 
 				AND source<>'Estimate' 
-				AND account IN ('J00400', 'J00802')										
+				".Reports::GP_FILTER."								
 			GROUP BY customer_group_code";
 	
 	$oWF->processSQL($sqlBase,$limit,'GP');
