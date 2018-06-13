@@ -68,9 +68,19 @@ class Distribution extends Document{
 					,'type'=>'combobox'
 					// ,'sql'=>$Items->getStructuredRef()
 					,'sql'=>"SELECT itmGUID as optValue, itmTitle as optText FROM vw_item"
-					, 'mandatory' => true
+					, 'mandatory' => false
 					, 'disabled'=>!$this->flagUpdate
 				);
+
+		$this->Columns[] = Array(
+			'title'=>'Item'
+			,'field'=>$this->prefix.'YACT'
+			,'type'=>'combobox'
+			// ,'sql'=>$Items->getStructuredRef()
+			,'sql'=>"SELECT yctID as optValue, CONCAT(yctID,' | ',yctTitle) as optText FROM vw_rfc"
+			, 'mandatory' => false
+			, 'disabled'=>!$this->flagUpdate
+		);
 				
 		$this->Columns[] = Array(
 					'title'=>'Activity'
@@ -143,6 +153,7 @@ class Distribution extends Document{
 		if($mode=='update' || $mode=='post'){						
 			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
 			$this->item = isset($_POST[$this->prefix.'ItemGUID'])?$_POST[$this->prefix.'ItemGUID']:$this->item;
+			$this->yact = isset($_POST[$this->prefix.'YACT'])?$_POST[$this->prefix.'YACT']:$this->yact;
 			$this->activity = isset($_POST[$this->prefix.'ActivityID'])?$_POST[$this->prefix.'ActivityID']:$this->activity;
 			$this->total = isset($_POST[$this->prefix.'Total'])?$_POST[$this->prefix.'Total']:$this->rate;
 		}
@@ -266,27 +277,32 @@ class Distribution extends Document{
 			// print_r($this->subtotal);
 			if(is_array($this->records[$this->gridName])){
 				
-				$sql = "SELECT * FROM vw_item WHERE itmGUID='{$this->item}'";
-				$rs = $this->oSQL->q($sql);
-				$rw = $this->oSQL->f($rs);
-				if ($rw['itmFlagFolder']){
-					$sql = "SELECT * FROM vw_item WHERE itmParentID={$rw['itmID']}";
-					$rs = $this->oSQL->q($sql);
-					while ($rw = $this->oSQL->f($rs)){
-						$arrItemFilter[] = $rw['itmGUID'];
-					}
-					$strItemFilter = implode("','",$arrItemFilter);
+				if($this->yact){
+					$sqlFilter = " AND account='{$this->yact}' ";
 				} else {
-					$strItemFilter = $this->item;
+					$sql = "SELECT * FROM vw_item WHERE itmGUID='{$this->item}'";
+					$rs = $this->oSQL->q($sql);
+					$rw = $this->oSQL->f($rs);
+					if ($rw['itmFlagFolder']){
+						$sql = "SELECT * FROM vw_item WHERE itmParentID={$rw['itmID']}";
+						$rs = $this->oSQL->q($sql);
+						while ($rw = $this->oSQL->f($rs)){
+							$arrItemFilter[] = $rw['itmGUID'];
+						}
+						$strItemFilter = implode("','",$arrItemFilter);
+					} else {
+						$strItemFilter = $this->item;
+					}
+					$sqlFilter = " AND item IN ('{$strItemFilter}') ";
 				}
-				
-				$sql = "SELECT activity, item, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_master
+				$sql = "SELECT account, activity, item, ".$this->budget->getMonthlySumSQL(1,15)." 
+						FROM reg_master
 						WHERE scenario='{$this->scenario}'
 							AND pc='{$this->profit}'
-							AND item IN ('{$strItemFilter}')
+							{$sqlFilter}
 							AND IFNULL(customer,".self::EMPTY_CUSTOMER.")=".self::EMPTY_CUSTOMER."
 							".($this->activity?" AND activity={$this->activity}":"")."
-						GROUP BY item, activity;";
+						GROUP BY account, item, activity;";
 				$this->log($sql);
 				$rs = $this->oSQL->q($sql);
 				while ($total = $this->oSQL->f($rs)){				
@@ -298,7 +314,7 @@ class Distribution extends Document{
 							$master_row->customer = $record->customer;					
 							$master_row->sales = $this->getSales($record->customer);					
 							$item = $Items->getById($total['item']);
-							$master_row->account = $item->getYACT($this->profit);
+							$master_row->account = $total['account'];
 							$master_row->item = $total['item'];
 							for($m=1;$m<=15;$m++){
 								$month = $this->budget->arrPeriod[$m];
@@ -316,7 +332,7 @@ class Distribution extends Document{
 					$master_row->customer = self::EMPTY_CUSTOMER;	
 					$master_row->sales = $this->getSales($master_row->customer);					
 					$item = $Items->getById($total['item']);
-					$master_row->account = $item->getYACT($this->profit);
+					$master_row->account = $total['account'];
 					$master_row->item = $total['item'];
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
