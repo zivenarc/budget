@@ -22,7 +22,9 @@ class Distribution extends Document{
 		$this->table = 'tbl_rent';
 		$this->prefix = 'rnt';
 		
-		parent::__construct($id);	
+		parent::__construct($id);
+
+		$this->flagUpdate = true;
 
 	}
 	public function refresh($id){
@@ -67,7 +69,8 @@ class Distribution extends Document{
 					,'field'=>$this->prefix.'ItemGUID'
 					,'type'=>'combobox'
 					// ,'sql'=>$Items->getStructuredRef()
-					,'default'=>""
+					,'defaultValue'=>""
+					,'defaultText'=>"---Any---"
 					,'sql'=>"SELECT itmGUID as optValue, itmTitle as optText FROM vw_item"
 					, 'mandatory' => false
 					, 'disabled'=>!$this->flagUpdate
@@ -77,7 +80,8 @@ class Distribution extends Document{
 			'title'=>'YACT Account'
 			,'field'=>$this->prefix.'YACT'
 			,'type'=>'combobox'
-			,'default'=>""
+			,'defaultValue'=>""
+			,'defaultText'=>"---Any---"
 			// ,'sql'=>$Items->getStructuredRef()
 			,'sql'=>"SELECT yctID as optValue, CONCAT(yctID,' | ',yctTitle) as optText FROM vw_rfc"
 			, 'mandatory' => false
@@ -279,7 +283,7 @@ class Distribution extends Document{
 			// print_r($this->subtotal);
 			if(is_array($this->records[$this->gridName])){
 				
-				if($this->yact){
+				if($this->yact!=''){
 					$sqlFilter = " AND account='{$this->yact}' ";
 				} else {
 					$sql = "SELECT * FROM vw_item WHERE itmGUID='{$this->item}'";
@@ -302,9 +306,9 @@ class Distribution extends Document{
 						WHERE scenario='{$this->scenario}'
 							AND pc='{$this->profit}'
 							{$sqlFilter}
-							AND IFNULL(customer,".self::EMPTY_CUSTOMER.")=".self::EMPTY_CUSTOMER."
+							AND (IFNULL(customer,".self::EMPTY_CUSTOMER.")=".self::EMPTY_CUSTOMER." OR customer=0)
 							".($this->activity?" AND activity={$this->activity}":"")."
-						GROUP BY account, item, activity;";
+						GROUP BY account, item, activity;"; 
 				$this->log($sql);
 				$rs = $this->oSQL->q($sql);
 				while ($total = $this->oSQL->f($rs)){				
@@ -320,7 +324,9 @@ class Distribution extends Document{
 							$master_row->item = $total['item'];
 							for($m=1;$m<=15;$m++){
 								$month = $this->budget->arrPeriod[$m];
-								$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]*$total[$month];
+								if ($this->subtotal[strtolower($month)]){
+									$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]*$total[$month];
+								}
 							}				
 													
 							

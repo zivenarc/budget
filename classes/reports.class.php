@@ -3806,12 +3806,13 @@ class Reports{
 		// echo '<pre>',$sql,'</pre>';
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
+				$arrSort[$rw['customer']] += $rw['FYE_A'];
 				$arrReport[$rw['customer']][$rw['account']] += $rw['FYE_A'];
 				$arrAccount[$rw['account']] = $rw['Title'];
 				$arrCustomer[$rw['customer']] = $rw['Customer_name'];
 				$arrTotal[$rw['account']] += $rw['FYE_A'];
 		}
-
+		arsort($arrSort);
 		?>
 		<table class='budget' id='<?php echo $this->ID;?>'>
 			<caption>
@@ -3831,18 +3832,18 @@ class Reports{
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ($arrReport as $customer=>$data){
+				<?php foreach ($arrSort as $customer=>$GOP){
 					?>
 					<tr>
 						<td><?php echo $arrCustomer[$customer];?></td>
 						<?php
-						foreach ($arrAccount as $id=>$title){
+						foreach ($arrAccount as $account=>$title){
 						?>
-						<td class='budget-decimal'><?php $this->render($data[$id]);?></td>
+						<td class='budget-decimal'><?php $this->render($arrReport[$customer][$account]);?></td>
 						<?php
 						}
 						?>
-						<td class='budget-decimal budget-ytd'><?php $this->render(array_sum($data));?></td>
+						<td class='budget-decimal budget-ytd'><?php $this->render(array_sum($arrReport[$customer]));?></td>
 					</tr>
 					<?php
 				}
