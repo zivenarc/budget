@@ -361,7 +361,7 @@ class Indirect_costs extends Document{
 					LEFT JOIN vw_customer ON customer=cntID
 					WHERE scenario='".$oBudget->id."' 
 						AND company='{$this->company}' 
-						".Reports::RVENUE_FILTER." 
+						".Reports::REVENUE_FILTER." 
 						AND source<>'estimate' 
 					GROUP BY pc, activity";
 				break;
