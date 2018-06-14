@@ -7,6 +7,8 @@ include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
 include_once ('classes/profit.class.php');
 
+
+
 //$Activities = new Activities ();
 $YACT = new YACT_COA();
 $Items = new Items();
@@ -323,6 +325,8 @@ class Indirect_costs extends Document{
 	
 	public function fill_general_costs($oBudget,$type='all',$params=Array()){
 		
+		include_once ('classes/reports.class.php');
+		
 		if (is_array($this->records[$this->gridName])){
 			foreach($this->records[$this->gridName] as $id=>$record){
 				$record->flagDeleted = true;
@@ -355,7 +359,10 @@ class Indirect_costs extends Document{
 			case 'revenue':
 				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_master 
 					LEFT JOIN vw_customer ON customer=cntID
-					WHERE scenario='".$oBudget->id."' AND company='{$this->company}' AND item='".Items::REVENUE."' AND source<>'estimate' 
+					WHERE scenario='".$oBudget->id."' 
+						AND company='{$this->company}' 
+						".Reports::RVENUE_FILTER." 
+						AND source<>'estimate' 
 					GROUP BY pc, activity";
 				break;
 			case 'kaizen':
