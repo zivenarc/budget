@@ -105,14 +105,15 @@ if(!isset($_GET['pccGUID'])){
 	$limit = 3;
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL('roy',$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('roy',$arrBudgetRates).")";
-	$sqlBase = "SELECT  customer_group_code as optValue, 
+	$sqlBase = "SELECT customer_group_code as optValue, 
 					customer_group_title as optText,  
 					{$sqlActual} as Actual, 
 					0 as Budget, 
 					{$sqlActual} as Diff
 			FROM vw_master 
 			{$sqlWhere}
-				AND  scenario='{$oBudget->id}' AND company='{$company}' ".Reports::GP_FILTER."
+				AND  scenario='{$oBudget->id}' AND company='{$company}' 
+				".Reports::GP_FILTER."
 			GROUP BY customer_group_code
 			UNION ALL
 			SELECT  customer_group_code as optValue, 
@@ -126,7 +127,7 @@ if(!isset($_GET['pccGUID'])){
 				AND source<>'Estimate' 
 				".Reports::GP_FILTER."								
 			GROUP BY customer_group_code";
-	
+	echo "<pre>",$sqlBase,"</pre>";
 	$oWF->processSQL($sqlBase,$limit,'GP');
 	
 	$sqlBase="SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 

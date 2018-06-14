@@ -1,5 +1,5 @@
 <?php
-if($oDocument->flagUpdate){
+if($oDocument->flagUpdate || $oDocument->budget->flagUpdate){
 	if ($oDocument->flagPosted){
 		$arrActions[] = Array('title'=>'Unpost','class'=>'reject', 'action'=>'javascript:budget_save(\'unpost\');');
 	} elseif ($oDocument->GUID) {
