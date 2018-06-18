@@ -909,6 +909,7 @@ class Headcount extends Document{
 		
 		$sql = "SELECT empID, empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,funMobile,funFuel,funFlagSGA, empStartDate,empEndDate,
 						empSalary
+						,empFTE
 						,empSalaryRevision
 						,IF(empMonthly=0,funBonus,empMonthly) as empMonthly
 						,(SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
