@@ -628,7 +628,7 @@ class Sales extends Document{
 									$master_row->sales = $record->sales;
 									$activity = $oActivities->getByCode($record->activity);
 									$account = $activity->YACT;
-									$item = $oItems->getById(Items::PROFIT_SHARE);
+									$item = $oItems->getById(Items::PROFIT_SHARE_COST);
 									$master_row->account = 'J00400';
 									$master_row->item = $item->id;
 									for($m=1;$m<=15;$m++){
@@ -644,7 +644,7 @@ class Sales extends Document{
 									$master_row->sales = $record->sales;
 									$activity = $oActivities->getByCode($record->activity);
 									$account = $activity->YACT;
-									$item = $oItems->getById(Items::PROFIT_SHARE);
+									$item = $oItems->getById(Items::PROFIT_SHARE_COST);
 									$master_row->account = 'J00400';
 									$master_row->item = $item->id;
 									for($m=1;$m<=15;$m++){
@@ -652,7 +652,7 @@ class Sales extends Document{
 										$master_row->{$month} = 0.2 * $arrGP[$month];
 									}	
 								}
-							}else{ //export commissions
+							} else { //export commissions
 								if($this->business_owner!=self::PB_Ourselves){ 
 									$master_row = $oMaster->add_master();	
 									$master_row->profit = $this->profit;
@@ -661,7 +661,7 @@ class Sales extends Document{
 									$master_row->sales = $record->sales;
 									$activity = $oActivities->getByCode($record->activity);
 									$account = $activity->YACT;
-									$item = $oItems->getById(Items::PROFIT_SHARE);
+									$item = $oItems->getById(Items::PROFIT_SHARE_COST);
 									$master_row->account = 'J00802';
 									$master_row->item = $item->id;
 									for($m=1;$m<=15;$m++){
@@ -677,7 +677,7 @@ class Sales extends Document{
 									$master_row->sales = $record->sales;
 									$activity = $oActivities->getByCode($record->activity);
 									$account = $activity->YACT;
-									$item = $oItems->getById(Items::PROFIT_SHARE);
+									$item = $oItems->getById(Items::PROFIT_SHARE_COST);
 									$master_row->account = 'J00802';
 									$master_row->item = $item->id;
 									for($m=1;$m<=15;$m++){
