@@ -490,10 +490,11 @@ class Sales extends Document{
 					$master_row->sales = $record->sales;				
 					
 					$activity = $oActivities->getByCode($record->activity);
-					$account = $activity->YACT;
-					
-					$master_row->account = $account;
 					$master_row->item = $activity->item_income;
+					
+					$account = $activity->YACT;
+					$master_row->account = $account;
+					
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];	
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
@@ -505,8 +506,9 @@ class Sales extends Document{
 								if (!isset($freight_r_row)){
 									$freight_r_row = $oMaster->add_master();
 								}
-								$freight_r_row->item = $activity->item_cost;
-								$freight_r_row->account = 'J00802';
+								// $freight_r_row->item = $activity->item_cost;
+								$freight_r_row->item = $oItems::PROFIT_SHARE_COST;
+								$freight_r_row->account = 'J00400';
 								$freight_r_row->profit = $this->profit;
 								$freight_r_row->activity = in_array($record->activity,Array(46))?$oActivities::AFIGB:$oActivities::OFIGB;
 								$freight_r_row->customer = $record->customer;				
@@ -531,10 +533,14 @@ class Sales extends Document{
 						$master_row->sales = $record->sales;
 						
 						$activity = $oActivities->getByCode($record->activity);
-						$account = 'J00802';
-						
-						$master_row->account = $account;
 						$master_row->item = $activity->item_cost;
+						
+						$item = $Items->getById($master_row->item);
+						$master_row->account = $item->YACT;
+						
+						// $account = 'J00802';
+						// $master_row->account = $account;
+						
 						for($m=1;$m<=15;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $this->budget->arrPeriod[$m];	
@@ -548,7 +554,8 @@ class Sales extends Document{
 										$freight_c_row = $oMaster->add_master();
 									}					
 									$freight_c_row->item = $activity->item_cost;
-									$freight_c_row->account = 'J00802';
+									$freight_c_row->item =  $oItems::PROFIT_SHARE_COST;
+									$freight_c_row->account = 'J00400';
 									$freight_c_row->profit = $this->profit;
 									$freight_c_row->activity = in_array($record->activity,Array(46))?$oActivities::AFIGB:$oActivities::OFIGB;
 									$freight_c_row->customer = $record->customer;				
