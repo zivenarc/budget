@@ -662,7 +662,7 @@ class Sales extends Document{
 									$activity = $oActivities->getByCode($record->activity);
 									$account = $activity->YACT;
 									$item = $oItems->getById(Items::PROFIT_SHARE_COST);
-									$master_row->account = 'J00802';
+									$master_row->account = '523000';
 									$master_row->item = $item->id;
 									for($m=1;$m<=15;$m++){
 										$month = $this->budget->arrPeriod[$m];
