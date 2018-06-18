@@ -535,7 +535,7 @@ class Sales extends Document{
 						$activity = $oActivities->getByCode($record->activity);
 						$master_row->item = $activity->item_cost;
 						
-						$item = $Items->getById($master_row->item);
+						$item = $oItems->getById($master_row->item);
 						$master_row->account = $item->YACT;
 						
 						// $account = 'J00802';
