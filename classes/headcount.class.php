@@ -880,19 +880,27 @@ class Headcount extends Document{
 			$this->comment = "Actual turnover for last year - {$turnover}%";
 		}
 		
-		$sql = "SELECT DISTINCT(vacEmployeeID) as vacEmployeeID FROM treasury.tbl_vacation WHERE vacVactypeID IN (4,5) AND vacDateStart<'{$dateBudgetEnd}' AND vacDateEnd>'{$dateBudgetStart}'";
+		
+		
+		$arrMaternity = Array();
+		$sql = "SELECT DISTINCT(vacEmployeeID) as empID FROM treasury.tbl_vacation WHERE vacVactypeID IN (4,5) AND vacDateStart<'{$dateBudgetEnd}' AND vacDateEnd>'{$dateBudgetStart}'";
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
-			$arrMaternity[] = $rw['vacEmployeeID'];
+			$arrMaternity[] = $rw['empID'];
 		}
-		if (is_array($arrMaternity)){
-			$strMaternity = implode(',',$arrMaternity);
-		} else {
-			$strMaternity = 'NULL';
+		$sql = "SELECT DISTINCT(sklEmployeeID) as empID FROM treasury.tbl_sickleave WHERE DATEDIFF(sklDateEnd, sklDateStart)>=139 AND sklDateStart<'{$dateBudgetEnd}' AND sklDateEnd>'{$dateBudgetStart}'";
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			$arrMaternity[] = $rw['empID'];
 		}
+		// if (is_array($arrMaternity)){
+			// $strMaternity = implode(',',$arrMaternity);
+		// } else {
+			// $strMaternity = 'NULL';
+		// }
 		
-		$sql = "SELECT empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,funMobile,funFuel,funFlagSGA, empStartDate,empEndDate,
-						IF(empID IN ({$strMaternity}),0,empSalary) as empSalary
+		$sql = "SELECT empID, empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,funMobile,funFuel,funFlagSGA, empStartDate,empEndDate,
+						empSalary
 						,empSalaryRevision
 						,IF(empMonthly=0,funBonus,empMonthly) as empMonthly
 						,(SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
@@ -921,7 +929,7 @@ class Headcount extends Document{
 			$row->sga = $rw['funFlagSGA'];				
 			$row->location = $rw['empLocationID'];			
 			$row->activity = $rw['empProductTypeID'];//?$rw['empProductTypeID']:$this->pc->activity;			
-			$row->salary = $rw['empSalary'];
+			$row->salary = in_array($rw['empID'],$arrMaternity)? 0 : $rw['empSalary'];
 			$row->review_date = strtotime($rw['empSalaryRevision']);
 			$row->monthly_bonus = $rw['empMonthly'];
 			$row->insurance = $rw['insurance'];
@@ -932,7 +940,7 @@ class Headcount extends Document{
 			
 			for ($m=1;$m<=15;$m++){
 				$month = $this->budget->arrPeriod[$m];
-				$row->{$month} = $row->getFTE($m, $oBudget->year);						
+				$row->{$month} = $rw['empFTE']*$row->getFTE($m, $oBudget->year);						
 			}
 		}	
 	}
