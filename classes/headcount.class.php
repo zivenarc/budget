@@ -883,13 +883,19 @@ class Headcount extends Document{
 		
 		
 		$arrMaternity = Array();
-		$sql = "SELECT DISTINCT(vacEmployeeID) as empID, empTitle FROM treasury.tbl_vacation WHERE vacVactypeID IN (4,5) AND vacDateStart<'{$dateBudgetEnd}' AND vacDateEnd>'{$dateBudgetStart}'";
+		$sql = "SELECT DISTINCT(vacEmployeeID) as empID, empTitle 
+					FROM treasury.tbl_vacation 
+					LEFT JOIN common_db.tbl_employee ON empID=vacEmployeeID
+					WHERE vacVactypeID IN (4,5) AND vacDateStart<'{$dateBudgetEnd}' AND vacDateEnd>'{$dateBudgetStart}'";
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
 			$arrMaternity[] = $rw['empID'];
 			$this->comment .= "/r/n".$rw['empTitle']." on maternity leave";
 		}
-		$sql = "SELECT DISTINCT(sklEmployeeID) as empID, empTitle FROM treasury.tbl_sickleave WHERE DATEDIFF(sklDateEnd, sklDateStart)>=139 AND sklDateStart<'{$dateBudgetEnd}' AND sklDateEnd>'{$dateBudgetStart}'";
+		$sql = "SELECT DISTINCT(sklEmployeeID) as empID, empTitle 
+					FROM treasury.tbl_sickleave
+					LEFT JOIN common_db.tbl_employee ON empID=sklEmployeeID
+					WHERE DATEDIFF(sklDateEnd, sklDateStart)>=139 AND sklDateStart<'{$dateBudgetEnd}' AND sklDateEnd>'{$dateBudgetStart}'";
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
 			$arrMaternity[] = $rw['empID'];
