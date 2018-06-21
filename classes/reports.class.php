@@ -3125,24 +3125,24 @@ class Reports{
 		switch($this->structure){
 			case 'monthly':
 			?>
-				<td class='budget-decimal budget-quarterly'><?php self::render($data['CM_A'],0);?></td>
-				<td class='budget-decimal'><?php self::render($data['CM_B'],0);?></td>
-				<td class='budget-decimal'><?php self::render($data['CM_A']-$data['CM_B'],0);?></td>
-				<td class='budget-decimal'><em><?php self::render_ratio($data['CM_A'],$data['CM_B'],0);?></em></td>
+				<td class='budget-decimal budget-quarterly <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['CM_A'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['CM_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['CM_A']-$data['CM_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><em><?php self::render_ratio($data['CM_A'],$data['CM_B'],0);?></em></td>
 				<?php
 				if (!($this->oBudget->cm % 3)){
 				?>
-				<td class='budget-decimal budget-quarterly'><?php self::render($data['Q_A'],0);?></td>
-				<td class='budget-decimal'><?php self::render($data['Q_B'],0);?></td>
-				<td class='budget-decimal'><?php self::render($data['Q_A']-$data['Q_B'],0);?></td>
-				<td class='budget-decimal'><em><?php self::render_ratio($data['Q_A'],$data['Q_B'],0);?></em></td>
+				<td class='budget-decimal budget-quarterly <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q_A'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q_A']-$data['Q_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><em><?php self::render_ratio($data['Q_A'],$data['Q_B'],0);?></em></td>
 				<?php
 				}
 				?>	
-				<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
-				<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
-				<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
-				<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B'],0);?></em></td>
+				<td class='budget-decimal budget-ytd <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_A'],0);?></td>
+				<td class='budget-decimal  <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B'],0);?></em></td>
 				
 				<td class='budget-decimal budget-quarterly'><?php self::render($data['NM_A'],0);?></td>
 				<td class='budget-decimal'><?php self::render($data['NM_B'],0);?></td>
@@ -3160,10 +3160,10 @@ class Reports{
 				break;
 			case 'forecast':
 				?>		
-				<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
-				<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
-				<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
-				<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B'],0);?></em></td>
+				<td class='budget-decimal budget-ytd <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_A'],0);?></td>
+				<td class='budget-decimal  <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B'],0);?></em></td>
 				
 				<td class='budget-decimal budget-quarterly'><?php self::render($data['ROY_A'],0);?></td>
 				<td class='budget-decimal'><?php self::render($data['ROY_B'],0);?></td>
@@ -3191,7 +3191,7 @@ class Reports{
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class='budget-decimal budget-monthly budget-<?php echo $month;?>'><?php self::render($data[$month],0);?></td>
+					<td class='budget-decimal budget-monthly budget-<?php echo $month;?> <?php echo !$this->oBudget->flagPublic && $m<=$this->oBudget->cm?"budget-cloak":"";?>'><?php self::render($data[$month],0);?></td>
 					<?php
 				}
 					
@@ -3228,10 +3228,10 @@ class Reports{
 					if (strpos($this->oBudget->type,'FYE')!== false || strpos($this->oBudget->type,'Actual')!==false){ 
 					?>					
 						<!--Data for YTD actual-->
-						<td class='budget-decimal budget-ytd'><?php self::render($data['YTD_A'],0);?></td>
+						<td class='budget-decimal budget-ytd <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_A'],0);?></td>
 						<td class='budget-decimal'><?php self::render($data['YTD_B'],0);?></td>
-						<td class='budget-decimal'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
-						<td class='budget-decimal'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B'],0);?></em></td>
+						<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
+						<td class='budget-decimal  <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B'],0);?></em></td>
 						<!--Data for rest-of-year-->
 						<td class='budget-decimal budget-ytd'><?php self::render($data['ROY_A'],0);?></td>
 						<td class='budget-decimal'><?php self::render($data['ROY_B'],0);?></td>

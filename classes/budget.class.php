@@ -51,6 +51,7 @@ class Budget{
 		
 		$this->flagUpdate = !$rw['scnFlagReadOnly'];
 		$this->flagArchive = (integer)$rw['scnFlagArchive'];
+		$this->flagPublic = (integer)$rw['scnFlagPublic'];
 		
 		$this->checksum = $rw['scnChecksum'];
 		

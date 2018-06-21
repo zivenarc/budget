@@ -213,3 +213,7 @@ td.budget-current{
 	background-repeat:no-repeat;
 	background-position: left center;
 }
+.budget-cloak {
+   color: transparent !important;
+   text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
