@@ -1978,7 +1978,7 @@ class Reports{
 			// $strAccountGroup = "yact_group";
 			// $strAccountCode = "account";
 			$this->strGPFilter = "yact_group_code IN ('449000','499000')"; 
-			$sqlLevel2Default = "`title` as `level2_title`, `yact_group`, `account` as `level2_code`,";
+			$sqlLevel2Default = "`title` as `level2_title`, `yact_group` as 'Group', `account` as `level2_code`,";
 		} else {
 			// $strAccountTitle = "Budget item";
 			// $strAccountGroup = "Group";
