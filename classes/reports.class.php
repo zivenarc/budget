@@ -2019,6 +2019,11 @@ class Reports{
 				$res['sql'] = "bu_group_title as 'Level1_title', bu_group as 'level1_code', `customer_group_title` as `level2_title`, `Group`, `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
 				$res['title'] = 'BU Group';
 				break;
+			case 'ghq_group':
+				// $sqlMeasure = "bu_group_title as 'Level1_title', bu_group as 'level1_code', `Budget item`, `Group`, `item`,`itmOrder`,";				
+				$res['sql'] = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', `Activity_title` as `level2_title`, `Group`, `activity` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
+				$res['title'] = 'Product Group';
+				break;				
 			case 'iv':
 				$res['sql'] = "ivlGroup as 'Level1_title', ivlGroup as 'level1_code', `customer_group_title` as `level2_title`, `Group`, `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
 				$res['title'] = 'Industry vertical';
