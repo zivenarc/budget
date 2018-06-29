@@ -1978,7 +1978,7 @@ class Reports{
 			// $strAccountGroup = "yact_group";
 			// $strAccountCode = "account";
 			$this->strGPFilter = "yact_group_code IN ('449000','499000')"; 
-			$sqlLevel2Default = "`title` as `level2_title`, `yact_group` as 'Group', `account` as `level2_code`, `account` as itmOrder";
+			$sqlLevel2Default = "`title` as `level2_title`, `yact_group` as 'Group', `account` as `level2_code`, `account` as itmOrder, ";
 		} else {
 			// $strAccountTitle = "Budget item";
 			// $strAccountGroup = "Group";
@@ -2015,15 +2015,15 @@ class Reports{
 				$res['title'] = 'Business unit';
 				break;
 			case 'bu_group':				
-				$res['sql'] = "bu_group_title as 'Level1_title', bu_group as 'level1_code', `customer_group_title` as `level2_title`, `".$this->YACT?'yact_group':'Group'."`, `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
+				$res['sql'] = "bu_group_title as 'Level1_title', bu_group as 'level1_code', `customer_group_title` as `level2_title`, `".$this->YACT?'yact_group':'Group'."` as 'Group', `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
 				$res['title'] = 'BU Group';
 				break;
 			case 'ghq_group':				
-				$res['sql'] = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', `Activity_title` as `level2_title`, `".$this->YACT?'yact_group':'Group'."`, `activity` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
+				$res['sql'] = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', `Activity_title` as `level2_title`, `".$this->YACT?'yact_group':'Group'."` as 'Group', `activity` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
 				$res['title'] = 'Product Group';
 				break;				
 			case 'iv':
-				$res['sql'] = "ivlGroup as 'Level1_title', ivlGroup as 'level1_code', `customer_group_title` as `level2_title`, `".$this->YACT?'yact_group':'Group'."`, `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
+				$res['sql'] = "ivlGroup as 'Level1_title', ivlGroup as 'level1_code', `customer_group_title` as `level2_title`, `".$this->YACT?'yact_group':'Group'."` as 'Group', `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
 				$res['title'] = 'Industry vertical';
 				break;
 			case 'ghq':
