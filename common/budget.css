@@ -17,13 +17,15 @@
 	border: 1px solid white;
 	color: white;
 }
-
 .budget th a:link{
 	color:#FF6D10;
 }
-
 .budget-decimal{
 	text-align:right;
+}
+.budget-cloak {
+   color: transparent !important;
+   text-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
 .budget-negative{
 	color:red;
@@ -212,8 +214,4 @@ td.budget-current{
 	padding-left: 20px !important;
 	background-repeat:no-repeat;
 	background-position: left center;
-}
-.budget-cloak {
-   color: transparent !important;
-   text-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
