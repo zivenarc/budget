@@ -59,7 +59,8 @@ $sqlWhere = "scenario='$budget_scenario' AND company='{$company}' AND source<>'E
 $sql = "SELECT $sqlFields FROM vw_master 
 		WHERE {$sqlWhere} 
 		".Reports::REVENUE_FILTER."		
-		GROUP by prtGHQ"; 
+		GROUP by prtGHQ, account
+		ORDER BY account"; 
 // echo '<pre>',$sql,'</pre>';
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -79,7 +80,8 @@ while ($rw = $oSQL->f($rs)){
 $sql = "SELECT $sqlFields FROM vw_master 
 		WHERE {$sqlWhere} 
 		".Reports::DIRECT_COST_FILTER."	
-		GROUP by pc, prtGHQ";
+		GROUP by pc, prtGHQ, account
+		ORDER BY account";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
 	$reportKey = 'COS::'.$rw['account']."::".$rw['Title'];
