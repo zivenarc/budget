@@ -2023,7 +2023,7 @@ class Reports{
 				$res['title'] = 'Product Group';
 				break;				
 			case 'iv':
-				$res['sql'] = "ivlGroup as 'Level1_title', ivlGroup as 'level1_code', `customer_group_title` as `level2_title`, `".($this->YACT?'yact_group':'Group)'."` as 'Group', `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
+				$res['sql'] = "ivlGroup as 'Level1_title', ivlGroup as 'level1_code', `customer_group_title` as `level2_title`, `".($this->YACT?'yact_group':'Group')."` as 'Group', `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
 				$res['title'] = 'Industry vertical';
 				break;
 			case 'ghq':
