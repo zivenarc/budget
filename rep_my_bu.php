@@ -70,7 +70,7 @@ if(!isset($_GET['pccGUID'])){
 	
 	$filter['bdv'] = $bdv;
 	
-	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
+	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter, 'yact'=>false));
 	
 	if (strpos($oBudget->type,'Budget')===false){
 		$oReport->monthlyReport($type);
