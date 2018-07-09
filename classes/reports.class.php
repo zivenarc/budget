@@ -1936,13 +1936,13 @@ class Reports{
 		
 		ob_start();
 		
-		$sql = "SELECT {$arrMeasure['sql']}
+		$sql = "SELECT {$arrMeasure['sql']},
 					{$strFields['actual']}
 			FROM `vw_master`			
 			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND Group_code=".self::GP_CODE." 
 			{$sqlGroup}	
 			UNION ALL
-				SELECT {$arrMeasure['sql']}
+				SELECT {$arrMeasure['sql']},
 				{$strFields['budget']}
 			FROM `vw_master`				
 			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND Group_code=".self::GP_CODE."  
