@@ -12,9 +12,9 @@ class Budget{
 		global $oSQL;
 		$this->oSQL = $oSQL;
 		
-		$sql = "SELECT * FROM `tbl_scenario` 
-				LEFT JOIN stbl_user ON usrID=scnEditBy
-				LEFT JOIN vw_journal ON guid=scnLastSource
+		$sql = "SELECT * FROM `budget`.`tbl_scenario` 
+				LEFT JOIN `budget`.stbl_user ON usrID=scnEditBy
+				LEFT JOIN `budget`.vw_journal ON guid=scnLastSource
 				WHERE scnID='$scenario'";
 		$rs = $this->oSQL->q($sql);
 		$rw = $this->oSQL->f($rs);
@@ -70,8 +70,8 @@ class Budget{
 		if (!$scenario) $scenario = $this->id;
 		if (!$oSQL) $oSQL = $this->oSQL;
 		
-		$sql = "SELECT SCV.*, VAR.* FROM tbl_scenario_variable SCV
-					JOIN tbl_variable VAR ON varID=scvVariableID
+		$sql = "SELECT SCV.*, VAR.* FROM `budget`.`tbl_scenario_variable` SCV
+					JOIN `budget`.`tbl_variable` VAR ON varID=scvVariableID
 					WHERE scvScenarioID='".$scenario."'";
 					
 			// echo '<pre>',$sql,'</pre>';
@@ -132,6 +132,9 @@ class Budget{
 				break;
 			case 'cm':
 				return($this->getYTDSQL($nCurrent,$nCurrent,$arrRates));
+				break;
+			case 'cq':				
+				return($this->getYTDSQL($nCurrent-2,$nCurrent,$arrRates));
 				break;
 			case 'nm':
 				return($this->getYTDSQL($nm,$nm,$arrRates));
