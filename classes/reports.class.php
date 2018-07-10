@@ -1907,7 +1907,7 @@ class Reports{
 		
 		// GLOBAL $budget_scenario;
 		// $oBudget = new Budget($budget_scenario);
-		if($this->oBudget->cm % 3 && $this->oBudget->nm % 3){
+		if(($this->oBudget->cm % 3 && $this->oBudget->nm % 3) || $this->oBudget->cm==6){
 			$this->colspan = 14;
 		} else {
 			$this->colspan = 18;
@@ -3133,7 +3133,7 @@ class Reports{
 				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['CM_A']-$data['CM_B'],0);?></td>
 				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><em><?php self::render_ratio($data['CM_A'],$data['CM_B'],0);?></em></td>
 				<?php
-				if (!($this->oBudget->cm % 3)){
+				if (!($this->oBudget->cm % 3) && $this->oBudget->cm>6){
 				?>
 				<td class='budget-decimal budget-quarterly <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q_A'],0);?></td>
 				<td class='budget-decimal <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q_B'],0);?></td>
@@ -3452,7 +3452,7 @@ class Reports{
 		
 		$sqlWhere = $this->sqlWhere;
 
-		if($this->oBudget->cm % 3 && $this->oBudget->nm % 3){
+	if(($this->oBudget->cm % 3 && $this->oBudget->nm % 3) || $this->oBudget->cm==6){
 			$this->colspan = 14;
 		} else {
 			$this->colspan = 18;

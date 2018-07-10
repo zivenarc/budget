@@ -218,7 +218,7 @@ class Budget{
 				ob_start();
 				?>
 					<th colspan="4">Current month (<?php echo date('M',$this->date_start-1);?>)</th>
-					<?php if (!($this->cm % 3)){ ?>
+					<?php if (!($this->cm % 3) && $this->cm>6){ ?>
 					<th colspan="4">Current quarter</th>
 					<?php } ?>
 					<th colspan="4">YTD</th>				
@@ -232,7 +232,7 @@ class Budget{
 					<th>Budget</th>
 					<th>Diff</th>
 					<th>%</th>
-					<?php if (!($this->cm % 3)){ ?>
+					<?php if (!($this->cm % 3) && $this->cm>6 ){ ?>
 					<th class='budget-quarterly'>Actual</th>
 					<th>Budget</th>
 					<th>Diff</th>
