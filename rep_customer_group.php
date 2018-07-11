@@ -1,7 +1,7 @@
 <?php
 // $flagNoAuth = true;
 require ('common/auth.php');
-require ('classes/budget.class.php');
+require ('classes/reports.class.php');
 
 $oBudget = new Budget($budget_scenario);
 $pc = $_GET['pc']?(integer)$_GET['pc']:$arrUsrData['usrProfitID'];
@@ -9,10 +9,11 @@ $pc = $_GET['pc']?(integer)$_GET['pc']:$arrUsrData['usrProfitID'];
 $sql = "SELECT customer_group_code, cntTitle, SUM(".$oBudget->getThisYTDSQL('ytd').") as YTD 
 		FROM reg_master 
 		LEFT JOIN common_db.tbl_counterparty ON cntID=customer_group_code
-		WHERE account IN ('J00400','J00802') 
-			AND scenario IN ('{$arrSetup['stpFYEID']}','{$arrSetup['stpScenarioID']}') 
+		WHERE 
+			scenario IN ('{$arrSetup['stpFYEID']}','{$arrSetup['stpScenarioID']}') 
 			AND company={$company}
 			AND (pc={$pc} OR bdv={$pc})
+			".Reports::GOP_FILTER."
 		GROUP BY customer_group_code		
 		ORDER BY YTD DESC
 		LIMIT 50

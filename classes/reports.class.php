@@ -3802,7 +3802,7 @@ class Reports{
 		return($cusGroup);
 	}
 	
-	function GOP(){
+	function GOP($period_type){
 		$strFields = $this->_getMRFields();
 		$sql = "SELECT customer, Customer_name, account, Title, {$strFields['actual']}
 				FROM vw_master
@@ -3812,15 +3812,28 @@ class Reports{
 				GROUP by customer, account
 				ORDER BY account, customer";
 			
+		switch($period_type){
+			case 'budget':
+			case 'fye':
+				$field = "FYE_A";
+				break;
+			case 'cm':
+				$field = "CM_A";
+				break;
+			case 'ytd':
+			default:
+				$field = "YTD_A";
+				break;
+		}
 		
 		// echo '<pre>',$sql,'</pre>';
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
-				$arrSort[$rw['customer']] += $rw['FYE_A'];
-				$arrReport[$rw['customer']][$rw['account']] += $rw['FYE_A'];
+				$arrSort[$rw['customer']] += $rw[$field];
+				$arrReport[$rw['customer']][$rw['account']] += $rw[$field];
 				$arrAccount[$rw['account']] = $rw['Title'];
 				$arrCustomer[$rw['customer']] = $rw['Customer_name'];
-				$arrTotal[$rw['account']] += $rw['FYE_A'];
+				$arrTotal[$rw['account']] += $rw[$field];
 		}
 		arsort($arrSort);
 		?>
