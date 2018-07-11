@@ -3901,9 +3901,9 @@ class Reports{
 		$arrReport = Array();
 		$arrTotal = Array();
 		while ($rw = $this->oSQL->f($rs)){
-				$arrReport[$rw['customer']][$rw['Group_code']] += $rw['FYE_A'];
+				$arrReport[$rw['customer']][$rw['Group_code']] += $rw[$field];
 				$arrGroup[$rw['Group_code']] = $rw['Group'];
-				$arrTotal[$rw['Group_code']] += $rw['FYE_A'];
+				$arrTotal[$rw['Group_code']] += $rw[$field];
 		}
 		?>
 		<h3>Functional breakdown</h3>
