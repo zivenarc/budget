@@ -3567,6 +3567,13 @@ class Reports{
 		}
 		
 		
+		//-------Reclassified fixed costs --------------------------------------------------------------
+		$arrYCT = Array();
+		$_rs = $this->oSQL->q("SELECT yctID FROM vw_yact WHERE yctID LIKE 'J%' AND yctID NOT IN ('J00400', 'J00802','J45010','J40010')");
+		while ($rw = $this->oSQL->f($_rs)){
+				$arrYCT[] = $rw['yctID'];
+		}
+		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::RFC_FILTER." AND pccFlagProd=1", $sql);
 		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 		try {
@@ -3579,7 +3586,7 @@ class Reports{
 			$rw['Budget item'] = "Reclassified fixed costs";
 			$rw['title'] = "Direct production costs: labor, rent, fuel, depreciation";
 			$metadata = Array('filter'=>$this->filter, 'DataAction'=>'budget_item');
-			$metadata['filter']['account'] = Array('J00801','J00803','J00804','J00805','J00806','J00808','J0080W');
+			$metadata['filter']['account'] = $arrYCT;
 			$metadata['title'] = $rw['Budget item'];
 			$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
 			$this->echoBudgetItemString($rw);
