@@ -64,6 +64,28 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								GROUP BY customer_group_code",
 						'tolerance'=>0.05,
 						'limit'=>10);
+
+$settings['gopcus'] = Array('title'=>"GOP by customer",
+					'sqlBase' => "SELECT customer_group_code as optValue, 
+											customer_group_title as optText,
+										{$sqlActual} as Actual, 
+										0 as Budget, 
+										{$sqlActual} as Diff
+								FROM vw_master 								
+								WHERE scenario='{$actual}' ".Reports::GOP_FILTER." AND company='{$company}'
+								GROUP BY customer_group_code
+								UNION ALL
+								SELECT customer_group_code as optValue, 
+											customer_group_title as optText, 
+											0 as Actual, 
+								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+								FROM vw_master 								
+								WHERE
+								scenario='{$budget}' AND source<>'Estimate' ".Reports::GOP_FILTER." AND company='{$company}'
+								GROUP BY customer_group_code",
+						'tolerance'=>0.05,
+						'limit'=>10);
+						
 // echo '<pre>';print_r($settings);echo '</pre>';
 $settings['gpsal'] = Array('title'=>"GP by sales",
 					'sqlBase' => "SELECT sales as optValue, 
