@@ -165,6 +165,28 @@ $settings['gopbu'] = Array('title'=>"GOP by business unit",
 			'tolerance'=>0.001
 			);
 			
+$settings['oopbu'] = Array('title'=>"Own OP by business unit",
+'sqlBase' => "SELECT pc as optValue, 
+					Profit as optText, 
+					{$sqlActual} as Actual, 
+					0 as Budget, 
+					{$sqlActual} as Diff
+			FROM vw_master 			
+			WHERE scenario='{$actual}' 
+				AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND account NOT LIKE '5999%' AND pccFlagProd=1) 
+				AND company='{$company}'
+			GROUP BY pc
+			UNION ALL
+			SELECT pc, Profit, 0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+			FROM vw_master 			
+			WHERE
+			scenario='{$budget}' AND source<>'Estimate' 
+				AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND account NOT LIKE '5999%' AND pccFlagProd=1) 
+				AND company='{$company}'
+			GROUP BY pc",
+			'tolerance'=>0.001
+			);
+
 			
 $settings['scbu'] = Array('title'=>"Staff cost by business unit",
 'sqlBase' => "SELECT pc as optValue, 
