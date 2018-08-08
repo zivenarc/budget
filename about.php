@@ -86,7 +86,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer, current month",
 								FROM vw_master 
 								WHERE scenario='{$oBudget->id}'  AND company='{$company}'
 									".Reports::GP_FILTER."
-									{$sqlActivityFilter}
+									--{$sqlActivityFilter}
 								GROUP BY customer_group_code
 								UNION ALL
 								SELECT customer_group_code as optValue, 
@@ -97,7 +97,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer, current month",
 								WHERE scenario='{$oReference->id}'  AND company='{$company}'
 									AND source<>'Estimate' 
 									".Reports::GP_FILTER."
-									{$sqlActivityFilter}
+									--{$sqlActivityFilter}
 								GROUP BY customer_group_code",
 						'tolerance'=>0.05,
 						'denominator'=>$denominator,
