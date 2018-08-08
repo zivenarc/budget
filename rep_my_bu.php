@@ -1,21 +1,20 @@
 <?php
-// $flagNoAuth = true;
-// $arrUsrData['usrID'] = 'ZHAROVA';
-
 require ('common/auth.php');
-
+require_once ('classes/budget.class.php');
+require_once ('classes/reports.class.php');
+require_once ('classes/waterfall.class.php');
 
 $bdv = isset($_GET['bdv'])?$_GET['bdv']:($_COOKIE['bdv']?$_COOKIE['bdv']:$arrUsrData['usrProfitID']);
 if ($_GET['bdv']=='MYSELF'){
 	$bdv = $arrUsrData['usrProfitID'];
 }
 SetCookie('bdv',$bdv,0);
+$sqlWhere = "WHERE bdv = ".$oSQL->e($bdv);
 
-require ('classes/budget.class.php');
-require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
+$oReference = new Budget($reference);
 
 include ('includes/inc_report_pcfilter.php');
 
@@ -26,8 +25,8 @@ include('includes/inc_group_buttons.php');
 
 $sql = "SELECT * FROM common_db.tbl_profit WHERE pccID=".$oSQL->e($bdv);
 $rs = $oSQL->q($sql);
-$rw = $oSQL->f($rs);
-$arrUsrData["pagTitle$strLocal"] = 'Sales by '.($rw['pccTitle']?$rw['pccTitle']:'<Unknown>');
+$arrBDV = $oSQL->f($rs);
+$arrUsrData["pagTitle$strLocal"] = 'Sales by '.($arrBDV['pccTitle']?$arrBDV['pccTitle']:'<Unknown>');
 
 $arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>'');
 $strQuery = http_build_query($arrDefaultParams);
@@ -56,11 +55,54 @@ if(!isset($_GET['pccGUID'])){
 		}		
 		?>
 	</ul>
+	
+	<div id='waterfall'>
+	<?php
+	$period_type = 'cm';
+
+	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
+	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
+	
+	$settings['gpcus'] = Array('title'=>"GP by customer sold by {$arrBDV['pccTitle']}, current month",
+						'actual_title'=>$oBudget->title,
+						'budget_title'=>$oReference->title,
+						'sqlBase' => "SELECT customer_group_code as optValue, 
+												customer_group_title as optText,  
+											{$sqlActual} as Actual, 
+											0 as Budget, 
+											{$sqlActual} as Diff
+									FROM vw_master 
+									{$sqlWhere}
+										AND scenario='{$oBudget->id}'  
+										AND company='{$company}'
+										".Reports::GP_FILTER."										
+									GROUP BY customer_group_code
+									UNION ALL
+									SELECT customer_group_code as optValue, 
+												customer_group_title as optText,  
+												0 as Actual, 
+									{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+									FROM vw_master 
+									{$sqlWhere} 
+										AND scenario='{$oReference->id}'  
+										AND company='{$company}'
+										AND source<>'Estimate' 
+										".Reports::GP_FILTER."										
+									GROUP BY customer_group_code",
+							'tolerance'=>0.05,
+							'denominator'=>$denominator,
+							'limit'=>10);	
+
+	$oWF = new Waterfall($settings['gpcus']);
+
+	$oWF->draw();
+	?>
+	</div>
+	
 	<?php
 	include ('includes/inc-frame_bottom.php');
 
 } else {
-	$sqlWhere = "WHERE bdv = ".$oSQL->e($bdv);
 
 	if ($_GET['pccGUID']=='all'){
 		
