@@ -1,7 +1,6 @@
 <?php
 // $flagNoAuth = true;
 require ('common/auth.php');
-require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
@@ -127,7 +126,7 @@ if(!isset($_GET['pccGUID'])){
 				AND source<>'Estimate' 
 				".Reports::GP_FILTER."								
 			GROUP BY customer_group_code";
-	echo "<pre>",$sqlBase,"</pre>";
+	// echo "<pre>",$sqlBase,"</pre>";
 	$oWF->processSQL($sqlBase,$limit,'GP');
 	
 	$sqlBase="SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
