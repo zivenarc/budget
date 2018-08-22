@@ -6,19 +6,29 @@ require ('classes/reports.class.php');
 require ('classes/item.class.php');
 
 include ('includes/inc_rep_activity.php');
+include ('includes/inc_report_settings.php');
+include ('includes/inc_total_functions.php');
 
 $mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1+$oBudget->offset;
 $mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12+$oBudget->offset;
 
 include ('includes/inc-frame_top.php');
-echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
-echo '<h2>',$subtitle,'</h2>';
+?>
+<h1><?php echo $arrUsrData["pagTitle$strLocal"];?></h1>
+<?php
+include ('includes/inc_report_selectors.php');
+
+if ($mthStart!=1 || $mthEnd!=12){
+	if ($mthStart==$mthEnd){
+		$periodTitle = date('F',mktime(0,0,0,$mthStart)).' only';
+	} else {
+		$periodTitle = 'Period: '.date('M',mktime(0,0,0,$mthStart))." &ndash; ". date('M',mktime(0,0,0,$mthEnd));
+	}
+	echo '<h2>',$periodTitle,'</h2>';
+}
+
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
-
-?>
-<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?></div>
-<?php
 
 if(true || !isset($_GET['ghq'])){
 ?>
@@ -30,7 +40,7 @@ if(true || !isset($_GET['ghq'])){
 			while ($rw = $oSQL->f($rs)){
 				?>
 				<li><a href="<?php echo $_SERVER['PHP_SELF'],"?budget_scenario={$budget_scenario}&ghq=",urlencode($rw['prtGHQ']);?>"><?php echo $rw['prtGHQ']?$rw['prtGHQ']:"[None]";?></a></li>
-				<?
+				<?php
 			}
 		?>
 		</ul>
@@ -101,8 +111,23 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthSt
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 	$keyProfit = $rw['Profit'];//Budget::getProfitAlias($rw);
-	$arrOpIncome[$keyProfit] += $rw['Total'];	
-	$arrOpIncomeEstimate += $rw['Estimate'];	
+	$arrOpIncome['this'][$keyProfit] += $rw['Total'];	
+	$arrOpIncome['last'][$keyProfit] += $rw['Estimate'];	
+}
+
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total, SUM(estimate)/$denominator as Estimate
+		FROM reg_master
+		LEFT JOIN vw_profit ON pccID=pc
+		WHERE scenario='$budget_scenario' and active=1 AND company='{$company}'
+			".Reports::GOP_FILTER."
+		{$sqlActivityFilter}
+		GROUP BY Profit
+		ORDER BY pccFlagProd,Profit";
+$rs = $oSQL->q($sql);
+while ($rw=$oSQL->f($rs)){
+	$keyProfit = $rw['Profit'];//Budget::getProfitAlias($rw);
+	$arrGOP['this'][$keyProfit] += $rw['Total'];	
+	$arrGOP['last'][$keyProfit] += $rw['Estimate'];	
 }
 
 $sql = "SELECT prtTitle, unit, pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total
@@ -180,10 +205,10 @@ foreach($arrReport as $group=>$arrItem){
 			<td>GP, %</td>
 			<?php
 			foreach($arrProfit as $pc=>$flag){
-			?>
-			<td class='budget-decimal'><?php Reports::render_ratio($arrTotal[$group][$pc],$arrRevenue[$pc]);?></td>
-			<?php
-		}
+				?>
+				<td class='budget-decimal'><?php Reports::render_ratio($arrTotal[$group][$pc],$arrRevenue[$pc]);?></td>
+				<?php
+			}
 		?>
 		<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrTotal[$group]),array_sum($arrRevenue));?></td>
 		<td class='budget-decimal'><?php Reports::render_ratio(array_sum($arrEstimate[$group]),$arrRevenueEst);?></td>				
@@ -292,25 +317,16 @@ foreach($arrProfit as $pc=>$flag){
 ?>
 	<td class='budget-decimal budget-ytd'><?php Reports::render(100,1);?></td>	
 </tr>
-<tr>
-	<td>Operating income</td>
 <?php
-foreach($arrProfit as $pc=>$flag){
-	?>
-	<td class='budget-decimal'><?php Reports::render($arrOpIncome[$pc]);?></td>
-	<?php
-}
+renderDataByPC($arrGOP, $arrProfit, "Gross Operating Profit","budget-subtotal");
+renderDataByPC($arrOpIncome, $arrProfit, "Operating income","budget-subtotal");
 ?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrOpIncome));?></td>
-	<td class='budget-decimal'><?php Reports::render($arrOpIncomeEstimate);?></td>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrOpIncome)-$arrOpIncomeEstimate);?></td>
-</tr>
 <tr class="budget-ratio">
 	<td>%of total</td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
-	<td class='budget-decimal'><?php Reports::render($arrOpIncome[$pc]/array_sum($arrOpIncome)*100,1);?></td>
+	<td class='budget-decimal'><?php Reports::render($arrOpIncome[$pc]/array_sum($arrOpIncome['this'])*100,1);?></td>
 	<?php
 }
 ?>
@@ -321,24 +337,24 @@ foreach($arrProfit as $pc=>$flag){
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
-	<td class='budget-decimal'><?php Reports::render_ratio($arrOpIncome[$pc],$arrGrossRevenue[$pc]);?></td>
+	<td class='budget-decimal'><?php Reports::render_ratio($arrOpIncome['this'][$pc],$arrGrossRevenue[$pc]);?></td>
 	<?php
 }
 ?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOpIncome),array_sum($arrGrossRevenue));?></td>	
-	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio($arrOpIncomeEstimate,$arrGrossRevenueEstimate);?></td>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrOpIncome)/array_sum($arrGrossRevenue)*100-$arrOpIncomeEstimate/$arrGrossRevenueEstimate*100,1);?></td>
+	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOpIncome['this']),array_sum($arrGrossRevenue));?></td>	
+	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio($arrOpIncome['last'],$arrGrossRevenueEstimate);?></td>
+	<td class='budget-decimal'><?php Reports::render(array_sum($arrOpIncome['this'])/array_sum($arrGrossRevenue)*100-$arrOpIncome['last']/$arrGrossRevenueEstimate*100,1);?></td>
 </tr>
 <tr>
 	<td>OI per headcount</td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
-	<td class='budget-decimal'><?php Reports::render_ratio($arrOpIncome[$pc]/100,$arrHeadcount['FTE'][$pc],0);?></td>
+	<td class='budget-decimal'><?php Reports::render_ratio($arrOpIncome['this'][$pc]/100,$arrHeadcount['FTE'][$pc],0);?></td>
 	<?php
 }
 ?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOpIncome)/100,array_sum($arrHeadcount['FTE']),0);?></td>
+	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOpIncome['this'])/100,array_sum($arrHeadcount['FTE']),0);?></td>
 </tr>
 <tr><th colspan="<?php echo count($arrProfit)+4;?>">KPI</th></td>
 <?php foreach ($arrKPI as $kpi=>$values){ ?>
@@ -355,11 +371,13 @@ foreach($arrProfit as $pc=>$flag){
 	<td class='budget-decimal'><?php echo 'n/a';?></td>
 	<td class='budget-decimal'><?php echo 'n/a';?></td>
 </tr>
-<?php } ?>
+<?php 
+} 
+?>
 </tfoot>
 </table>
 	<ul class='link-footer'>
-		<li><a href='javascript:SelectContent("report");'>Select table</a></li>
+		<li><a href='javascript:SelectContent("report");'>Copy table</a></li>
 	</ul>
 <?php
 include ('includes/inc-frame_bottom.php');
