@@ -401,6 +401,7 @@ class MSF extends Document{
 							AND posted=1 
 							AND pc<>'{$this->profit}'
 							AND pccFlagProd=1
+							AND company='{$this->company}'
 						GROUP BY pc"; 
 			break;
 			case 'sales':
@@ -411,6 +412,7 @@ class MSF extends Document{
 							AND pc<>'{$this->profit}'
 							AND pccFlagProd=1 AND pc<>99
 							AND account='J00400'
+							AND company='{$this->company}'
 						GROUP BY pc"; 
 			break;
 			case 'net_sales':
@@ -422,6 +424,7 @@ class MSF extends Document{
 							AND pccFlagProd=1 AND pc<>99
 							AND company='{$company}'
 							AND item='".self::REVENUE_ITEM."'
+							AND company='{$this->company}'
 						GROUP BY pc"; 
 			break;
 			case 'users':
@@ -430,6 +433,7 @@ class MSF extends Document{
 					WHERE scenario='".$oBudget->id."' 
 						AND posted=1 AND wc=1 AND salary>10000
 						AND pccFlagProd=1 AND pc<>99
+						AND company='{$this->company}'
 						GROUP BY pc";
 				break;
 			default:
