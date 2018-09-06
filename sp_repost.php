@@ -6,6 +6,8 @@ if ($_GET['tab']){
 	
 	?>
 <button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
+<button onclick="select_posted('<?php echo $_GET['tab']; ?>');">Select posted</button>
+<button onclick="select_unposted('<?php echo $_GET['tab']; ?>');">Select unposted</button>
 <div/>
 
 	<?php

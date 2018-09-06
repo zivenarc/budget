@@ -37,6 +37,30 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 				}				
 			};
 
+function select_posted(tab){
+	var table = $('#div_'+tab).find('table');
+	var arrCB = table.find('tr input:checkbox');
+	arrCB.each(function(){
+		$(this).prop('checked','');
+		var tr = $(this).parents('tr');
+		if(tr.hasClass('journal-posted')){	
+			$(this).prop('checked','checked');
+		}
+	})
+}
+
+function select_unposted(tab){
+	var table = $('#div_'+tab).find('table');
+	var arrCB = table.find('tr input:checkbox');
+	arrCB.each(function(){
+		$(this).prop('checked','');
+		var tr = $(this).parents('tr');
+		if(!tr.hasClass('journal-posted')){	
+			$(this).prop('checked','checked');
+		}
+	})
+}
+			
 function spinner_div(){
 	var res = $('<div>',{'class':'spinner',html:'Connecting...'});
 	return (res);
