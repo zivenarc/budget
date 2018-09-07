@@ -213,7 +213,7 @@ class MSF extends Document{
 					//-------------- Get activity distribution for every PC ---------------
 					$sql = "SELECT pc, activity, ".$this->budget->getMonthlySumSQL(1,15)."
 							FROM reg_master							
-							WHERE account='J00400'
+							WHERE account IN ('J00400','J40010')
 							AND scenario =  '{$this->scenario}' AND company='{$this->company}' AND source NOT IN ('Estimate')
 							GROUP BY pc, activity";
 					$rs = $this->oSQL->q($sql);
