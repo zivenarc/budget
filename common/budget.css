@@ -27,9 +27,16 @@
    color: transparent !important;
    text-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
+
 .budget-negative{
 	color:red;
 }
+
+.budget-cloak .budget-negative{
+   color: transparent !important;
+   text-shadow: 0 0 5px rgba(255,0,0,0.5);
+}
+
 td.budget-ytd{
 	background-color:#7CC7F3 !important;
 	font-weight:bold;
