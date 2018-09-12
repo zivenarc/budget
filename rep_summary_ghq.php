@@ -1,5 +1,6 @@
 <?php
 // $flagNoAuth = true;
+set_time_limit(60);
 require ('common/auth.php');
 require ('classes/budget.class.php');
 require ('classes/reports.class.php');
@@ -260,33 +261,61 @@ if(!isset($_GET['prtGHQ'])){
 		?>
 		<tr class="<?php echo $strClass;?>">
 			<td><?php echo $strTitle;?></td>
-			<td class="budget-decimal"><?php Reports::render($data['KPI'],0,'.',',');?></td>
+			<td><?php echo $data['ivlTitle'];?></td>			
 			<td class="budget-decimal"><?php Reports::render($data['Revenue'],0,'.',',');?></td>
-			<td class="budget-decimal"><?php Reports::render($data['GP'],0,'.',',');?></td>
-			<td class="budget-decimal"><?php Reports::render_ratio($data['GP'],$data['Revenue'],0);?>%</td>
-			<td class="budget-decimal"><?php Reports::render_ratio($data['GP'],$data['KPI']*100,2);?></td>
-			<td class="budget-decimal"><?php Reports::render_ratio($data['GP'],$arrTotal['GP'],0);?>%</td>
+			<td class="budget-decimal"><?php Reports::render($data['GOP'],0,'.',',');?></td>
+			<td class="budget-decimal"><?php Reports::render($data['KPI'],0,'.',',');?></td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['Revenue'],0);?>%</td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['KPI']*100,0);?></td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$arrTotal['GP'],0);?>%</td>
 		</tr>
 		<?php
 	}
 	
-	$period_type = 'fye'; $period_title = "Full year";
+	if(strpos($oBudget->type,'Budget')!==false){
+		$period_type = 'fye'; $period_title = "Full year";
+	} else {
+		$period_type = 'ytd'; $period_title = "YTD";
+	}
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	
 	$sql = "SELECT customer_group_code as optValue, 
 						customer_group_title as optText,  
-						{$sqlActual} as GP
-				FROM vw_master 				
+						ivlTitle,
+						{$sqlActual} as GOP
+				FROM vw_master 	
 				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' ".Reports::GP_FILTER."
-				GROUP BY customer_group_code
-				ORDER BY GP DESC
-				LIMIT 15";
+					AND  scenario='{$oBudget->id}' ".Reports::GOP_FILTER."
+					AND IFNULL(customer_group_code,0)<>0
+				GROUP BY customer_group_code				
+				ORDER BY GOP DESC
+				LIMIT 10";
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
-		$arrReport[$rw['optText']]['GP'] = $rw['GP'];
+		$arrReport[$rw['optText']]['GOP'] = $rw['GOP'];
+		$arrReport[$rw['optText']]['ivlTitle'] = $rw['ivlTitle'];
 		$arrCGFilter[] = $rw['optValue'];
+		$arrCG['top'][] = $rw['optValue'];
+	}
+	
+	$sql = "SELECT customer_group_code as optValue, 
+						customer_group_title as optText,
+						ivlTitle,						
+						{$sqlActual} as GOP
+				FROM vw_master 				
+				{$sqlWhere}
+					AND  scenario='{$oBudget->id}' ".Reports::GOP_FILTER."
+					AND IFNULL(customer_group_code,0)<>0
+				GROUP BY customer_group_code
+				ORDER BY GOP ASC
+				LIMIT 10";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrReport[$rw['optText']]['GOP'] = $rw['GOP'];
+		$arrReport[$rw['optText']]['ivlTitle'] = $rw['ivlTitle'];
+		$arrCGFilter[] = $rw['optValue'];
+		$arrCG['bottom'][] = $rw['optValue'];
 	}
 	
 	$sql = "SELECT customer_group_code as optValue, 
@@ -294,7 +323,7 @@ if(!isset($_GET['prtGHQ'])){
 						{$sqlActual} as Revenue
 				FROM vw_master 				
 				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' ".Reports::GROSS_REVENUE_FILTER."
+					AND  scenario='{$oBudget->id}' ".Reports::REVENUE_FILTER."
 					AND  customer_group_code IN (".implode(',',$arrCGFilter).")
 				GROUP BY customer_group_code
 				";
@@ -309,7 +338,7 @@ if(!isset($_GET['prtGHQ'])){
 						unit
 				FROM vw_sales 				
 				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' AND unit IN ('Kgs','TEU')
+					AND  scenario='{$oBudget->id}' AND unit IN ('Kgs','TEU','Trips')
 					AND  customer_group_code IN (".implode(',',$arrCGFilter).")
 				GROUP BY customer_group_code
 				";
@@ -322,26 +351,26 @@ if(!isset($_GET['prtGHQ'])){
 						unit
 				FROM vw_sales 				
 				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' AND unit IN ('Kgs','TEU')									
+					AND  scenario='{$oBudget->id}' AND unit IN ('Kgs','TEU','Trips')									
 				";
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
 	$arrReportOther['KPI'] = $rw['KPI'];
 	$arrReportTotal['KPI'] = $rw['KPI'];
 	
-	$sql = "SELECT {$sqlActual} as GP 
+	$sql = "SELECT {$sqlActual} as GOP 
 					FROM vw_master 
 					{$sqlWhere}
-					AND  scenario='{$oBudget->id}' ".Reports::GP_FILTER;
+					AND  scenario='{$oBudget->id}' ".Reports::GOP_FILTER;
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
-	$arrReportOther['GP'] = $rw['GP'];
-	$arrReportTotal['GP'] = $rw['GP'];
+	$arrReportOther['GOP'] = $rw['GOP'];
+	$arrReportTotal['GOP'] = $rw['GOP'];
 	
 	$sql = "SELECT {$sqlActual} as Revenue 
 					FROM vw_master 
 					{$sqlWhere}
-					AND  scenario='{$oBudget->id}' ".Reports::GROSS_REVENUE_FILTER;
+					AND  scenario='{$oBudget->id}' ".Reports::REVENUE_FILTER;
 					
 	// echo '<pre>',$sql,'</pre>';
 	
@@ -353,13 +382,14 @@ if(!isset($_GET['prtGHQ'])){
 	$tableID = "top_".md5(time());
 	?>
 	<table class="budget" id="<?php echo $tableID;?>">
-		<caption>Top 10 customers, <?php echo urldecode($_GET['prtGHQ']);?></caption>
+		<caption>Top 10 and bottom 5 customers, <?php echo urldecode($_GET['prtGHQ']), ", ", $period_title;?></caption>
 	<thead>	
 		<tr>
 			<th>Customer</th>
-			<th>Volume</th>
+			<th>Vertical</th>			
 			<th>Gross Revenue</th>
-			<th>GP</th>
+			<th>GOP</th>
+			<th>Volume</th>
 			<th>Profitability</th>
 			<th>per unit</th>
 			<th>% of total</th>
@@ -370,7 +400,7 @@ if(!isset($_GET['prtGHQ'])){
 	foreach ($arrReport as $customer=>$values){
 		_renderTopCustomerLine($values, $arrReportTotal, $customer);	
 		$arrReportOther['Revenue'] -=  $values['Revenue'];
-		$arrReportOther['GP'] -=  $values['GP'];
+		$arrReportOther['GOP'] -=  $values['GOP'];
 		$arrReportOther['KPI'] -=  $values['KPI'];
 	}
 		_renderTopCustomerLine($arrReportOther, $arrReportTotal, "Others");

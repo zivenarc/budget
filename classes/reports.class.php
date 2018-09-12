@@ -3511,7 +3511,7 @@ class Reports{
 		$sql = self::_unionMRQueries($sql,'','', $this->columns);
 		
 		//$tableID = "SUMMARY_".md5($sql);
-		
+		// die( $sql);
 		if (!$rs = $this->oSQL->q($sql)){
 				echo "<div class='error'>SQL error:</div>";
 				echo "<pre>$sql</pre>";
