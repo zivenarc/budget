@@ -290,32 +290,12 @@ if(!isset($_GET['prtGHQ'])){
 					AND IFNULL(customer_group_code,0)<>0
 				GROUP BY customer_group_code				
 				ORDER BY GOP DESC
-				LIMIT 10";
+				";
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['optText']]['GOP'] = $rw['GOP'];
 		$arrReport[$rw['optText']]['ivlTitle'] = $rw['ivlTitle'];
-		$arrCGFilter[] = $rw['optValue'];
-		$arrCG['top'][] = $rw['optValue'];
-	}
-	
-	$sql = "SELECT customer_group_code as optValue, 
-						customer_group_title as optText,
-						ivlTitle,						
-						{$sqlActual} as GOP
-				FROM vw_master 				
-				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' ".Reports::GOP_FILTER."
-					AND IFNULL(customer_group_code,0)<>0
-				GROUP BY customer_group_code
-				ORDER BY GOP ASC
-				LIMIT 10";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		$arrReport[$rw['optText']]['GOP'] = $rw['GOP'];
-		$arrReport[$rw['optText']]['ivlTitle'] = $rw['ivlTitle'];
-		$arrCGFilter[] = $rw['optValue'];
-		$arrCG['bottom'][] = $rw['optValue'];
+		$arrCGFilter[] = $rw['optValue'];	
 	}
 	
 	$sql = "SELECT customer_group_code as optValue, 
@@ -397,12 +377,30 @@ if(!isset($_GET['prtGHQ'])){
 	</thead>
 	<tbody>
 	<?php
+	
 	foreach ($arrReport as $customer=>$values){
+		if($values['Revenue']){
+			$arrFilteredReport[$customer] = $values;
+		}
+	}
+	
+	$arrTop = array_slice($arrFilteredReport,1,10, true);
+	$arrBottom = array_slice($arrFilteredReport,-1,min(5,count($arrFilteredReport)-10), true);
+	
+	foreach ($arrTop as $customer=>$values){
 		_renderTopCustomerLine($values, $arrReportTotal, $customer);	
 		$arrReportOther['Revenue'] -=  $values['Revenue'];
 		$arrReportOther['GOP'] -=  $values['GOP'];
 		$arrReportOther['KPI'] -=  $values['KPI'];
 	}
+	
+	foreach ($arrBottom as $customer=>$values){
+		_renderTopCustomerLine($values, $arrReportTotal, $customer);	
+		$arrReportOther['Revenue'] -=  $values['Revenue'];
+		$arrReportOther['GOP'] -=  $values['GOP'];
+		$arrReportOther['KPI'] -=  $values['KPI'];
+	}
+	
 		_renderTopCustomerLine($arrReportOther, $arrReportTotal, "Others");
 	?>
 	</tbody>
