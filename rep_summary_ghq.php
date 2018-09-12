@@ -143,7 +143,7 @@ if(!isset($_GET['prtGHQ'])){
 									{$sqlWhere}
 										AND scenario='{$oReference->id}' 
 										AND source<>'Estimate' 						
-										AND ".Reports::RFC_FILTER."
+										".Reports::RFC_FILTER."
 									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
 							'tolerance'=>0.05,
 							'denominator'=>$denominator,
