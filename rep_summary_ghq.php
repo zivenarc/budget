@@ -304,7 +304,7 @@ if(!isset($_GET['prtGHQ'])){
 				FROM vw_master 				
 				{$sqlWhere}
 					AND  scenario='{$oBudget->id}' ".Reports::REVENUE_FILTER."
-					AND  customer_group_code IN (".implode(',',$arrCGFilter).")
+					##AND  customer_group_code IN (".implode(',',$arrCGFilter).")
 				GROUP BY customer_group_code
 				";
 	$rs = $oSQL->q($sql);
@@ -319,7 +319,7 @@ if(!isset($_GET['prtGHQ'])){
 				FROM vw_sales 				
 				{$sqlWhere}
 					AND  scenario='{$oBudget->id}' AND unit IN ('Kgs','TEU','Trips')
-					AND  customer_group_code IN (".implode(',',$arrCGFilter).")
+					##AND  customer_group_code IN (".implode(',',$arrCGFilter).")
 				GROUP BY customer_group_code
 				";
 	$rs = $oSQL->q($sql);
@@ -352,8 +352,6 @@ if(!isset($_GET['prtGHQ'])){
 					{$sqlWhere}
 					AND  scenario='{$oBudget->id}' ".Reports::REVENUE_FILTER;
 					
-	// echo '<pre>',$sql,'</pre>';
-	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
 	$arrReportOther['Revenue'] = $rw['Revenue'];
@@ -379,13 +377,16 @@ if(!isset($_GET['prtGHQ'])){
 	<?php
 	
 	foreach ($arrReport as $customer=>$values){
-		if($values['Revenue']){
+		if($values['Revenue']>0 && $customer!=''){
 			$arrFilteredReport[$customer] = $values;
 		}
 	}
 	
-	$arrTop = array_slice($arrFilteredReport,1,10, true);
-	$arrBottom = array_slice($arrFilteredReport,-1,min(5,count($arrFilteredReport)-10), true);
+	$arrTop = array_slice($arrFilteredReport,0,10, true);
+	$arrBottom = array_slice($arrFilteredReport,-5,5, true);
+	// $arrBottom = array_slice($arrFilteredReport,-1,min(5,count($arrFilteredReport)-10), true);
+	
+	
 	
 	foreach ($arrTop as $customer=>$values){
 		_renderTopCustomerLine($values, $arrReportTotal, $customer);	
@@ -410,8 +411,7 @@ if(!isset($_GET['prtGHQ'])){
 	?>	
 	</tfoot>
 	</table>
-	<ul class='link-footer'>
-		<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
+	<button onlick="SelectContent("<?php echo $tableID;?>")">Copy table</button>
 	</ul>	
 	<?php
 	
