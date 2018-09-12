@@ -132,7 +132,7 @@ if(!isset($_GET['prtGHQ'])){
 									FROM vw_master 
 									{$sqlWhere}
 										AND  scenario='{$oBudget->id}' 
-										AND (account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W')) 									
+										".Reports::RFC_FILTER."
 									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)
 									UNION ALL
 									SELECT IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
@@ -143,7 +143,7 @@ if(!isset($_GET['prtGHQ'])){
 									{$sqlWhere}
 										AND scenario='{$oReference->id}' 
 										AND source<>'Estimate' 						
-										AND (account IN ('J00801','J00803','J00804','J00805','J00806','J00808','J0080W')) 	
+										AND ".Reports::RFC_FILTER."
 									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
 							'tolerance'=>0.05,
 							'denominator'=>$denominator,
