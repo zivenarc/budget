@@ -411,8 +411,7 @@ if(!isset($_GET['prtGHQ'])){
 	?>	
 	</tfoot>
 	</table>
-	<button onclick="javascript:SelectContent("<?php echo $tableID;?>");">Copy table</button>
-	</ul>	
+	<button onclick="SelectContent("<?php echo $tableID;?>");">Copy table</button>
 	<?php
 	
 	
@@ -429,12 +428,6 @@ if(!isset($_GET['prtGHQ'])){
 			ORDER BY funRHQ, pc,funTitle, empTitleLocal";
 	$rs = $oSQL->q($sql);
 	?>
-	<style>
-	.blurry {
-	   color: transparent !important;
-	   text-shadow: 0 0 6px rgba(0,0,0,0.5);
-	}
-	</style>
 	<table class="budget" id='headcount'>
 	<caption>Employees</caption>
 	<thead>
@@ -460,8 +453,8 @@ if(!isset($_GET['prtGHQ'])){
 			<td><?php echo $rw['funRHQ'],' | ',$rw['funTitleLocal'];?></td>			
 			<td><?php echo $rw['pccTitle'];?></td>
 			<td><?php echo $rw['prtTitleLocal'];?></td>
-			<td class='budget-decimal blurry' ><?php echo Reports::render($rw['salary']);?></td>
-			<td class='budget-decimal blurry' ><?php echo Reports::render($rw['monthly_bonus']);?></td>
+			<td class='budget-decimal budget-cloak' ><?php echo Reports::render($rw['salary']);?></td>
+			<td class='budget-decimal budget-cloak' ><?php echo Reports::render($rw['monthly_bonus']);?></td>
 			<?php
 			$totalPayroll += $rw['salary'];
 			$totalMB += $rw['monthly_bonus'];
@@ -500,6 +493,4 @@ if(!isset($_GET['prtGHQ'])){
 	</table>
 	<?php
 }
-
-
 ?>
