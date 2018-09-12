@@ -411,7 +411,7 @@ if(!isset($_GET['prtGHQ'])){
 	?>	
 	</tfoot>
 	</table>
-	<button onlick="SelectContent("<?php echo $tableID;?>")">Copy table</button>
+	<button onclick="javascript:SelectContent("<?php echo $tableID;?>");">Copy table</button>
 	</ul>	
 	<?php
 	
