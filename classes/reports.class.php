@@ -510,12 +510,12 @@ class Reports{
 					if($rw['freehand']) { 
 						echo "<td class='budget-decimal budget-monthly budget-$month ".($m==$this->oBudget->cm?'budget-current':'')."'>",self::render($rw[$month]),'</td>';
 					}
-					$arrTotal[$month]+=$rw[$month]*$rw['freehand'];
-					$arrSubtotal[$rw['prtGHQ']][$month]+=$rw[$month]*$rw['freehand'];
+					$arrTotal[$rw['freehand']][$month]+=$rw[$month];
+					$arrSubtotal[$rw['prtGHQ']][$rw['freehand']][$month]+=$rw[$month];
 					$arrSubtotalAll[$rw['prtGHQ']][$month]+=$rw[$month];
 				};
-				$arrTotal['Total']+=$rw['Total']*$rw['freehand'];				
-				$arrSubtotal[$rw['prtGHQ']]['Total']+=$rw['Total']*$rw['freehand'];				
+				$arrTotal[$rw['freehand']]['Total']+=$rw['Total'];				
+				$arrSubtotal[$rw['prtGHQ']][$rw['freehand']]['Total']+=$rw['Total'];				
 				$arrSubtotalAll[$rw['prtGHQ']]['Total']+=$rw['Total'];				
 				
 				$arrQuarter = $this->_getQuarterTotals($rw);
@@ -523,15 +523,15 @@ class Reports{
 				for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 					$quarter = 'Q'.$q;
 					if($rw['freehand']) {
-						echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",number_format($arrQuarter[$quarter],0,'.',','),'</td>';
+						echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($arrQuarter[$quarter]),'</td>';
 					}
-					$arrTotal[$quarter]+=$arrQuarter[$quarter]*$rw['freehand'];
-					$arrSubtotal[$rw['prtGHQ']][$quarter]+=$arrQuarter[$quarter]*$rw['freehand'];
+					$arrTotal[$rw['freehand']][$quarter]+=$arrQuarter[$quarter];
+					$arrSubtotal[$rw['prtGHQ']][$rw['freehand']][$quarter]+=$arrQuarter[$quarter];
 					$arrSubtotalAll[$rw['prtGHQ']][$quarter]+=$arrQuarter[$quarter];
 				}				
 				
 				if($rw['freehand']) {
-					echo '<td class=\'budget-decimal budget-ytd\'>',number_format($rw['Total'],0,'.',','),'</td>';								
+					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($rw['Total']),'</td>';								
 					echo "</tr>\r\n";	
 				}
 				
@@ -543,20 +543,37 @@ class Reports{
 				<?php foreach ($arrSubtotal as $prtGHQ=>$data){
 					?>
 					<tr class='budget-subtotal'>
-					<td>Total <?php echo $prtGHQ;?></td>
+					<td>Total <?php echo $prtGHQ;?> freehand</td>
 					<?php
 						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 						// $month = $this->oBudget->arrPeriod[$m];
 						$month = $this->oBudget->arrPeriod[$m];
-						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($data[$month]),'</td>';
+						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($data[1][$month]),'</td>';
 		
 						}
 						for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 						$quarter = 'Q'.$q;
-						echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($data[$quarter]),'</td>';
+						echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($data[1][$quarter]),'</td>';
 
 						}	
-						echo '<td class=\'budget-decimal budget-ytd\'>',self::render($data['Total']),'</td>';					
+						echo '<td class=\'budget-decimal budget-ytd\'>',self::render($data[1]['Total']),'</td>';					
+					?>
+					</tr>
+					<tr class='budget-subtotal'>
+					<td>Total <?php echo $prtGHQ;?> NBO</td>
+					<?php
+						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+						// $month = $this->oBudget->arrPeriod[$m];
+						$month = $this->oBudget->arrPeriod[$m];
+						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($data[0][$month]),'</td>';
+		
+						}
+						for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
+						$quarter = 'Q'.$q;
+						echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($data[0][$quarter]),'</td>';
+
+						}	
+						echo '<td class=\'budget-decimal budget-ytd\'>',self::render($data[0]['Total']),'</td>';					
 					?>
 					</tr>
 					<tr class='budget-ratio'>
@@ -565,15 +582,15 @@ class Reports{
 						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 						// $month = $this->oBudget->arrPeriod[$m];
 						$month = $this->oBudget->arrPeriod[$m];
-						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render_ratio($data[$month],$arrSubtotalAll[$prtGHQ][$month]),'</td>';
+						echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render_ratio($data[1][$month],$arrSubtotalAll[$prtGHQ][$month]),'</td>';
 		
 						}
 						for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 						$quarter = 'Q'.$q;
-						echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render_ratio($data[$quarter],$arrSubtotalAll[$prtGHQ][$quarter]),'</td>';
+						echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render_ratio($data[1][$quarter],$arrSubtotalAll[$prtGHQ][$quarter]),'</td>';
 
 						}	
-						echo '<td class=\'budget-decimal budget-ytd\'>',self::render_ratio($data['Total'],$arrSubtotalAll[$prtGHQ]['Total']),'</td>';					
+						echo '<td class=\'budget-decimal budget-ytd\'>',self::render_ratio($data[1]['Total'],$arrSubtotalAll[$prtGHQ]['Total']),'</td>';					
 					?>
 					</tr>
 					<?php
@@ -585,22 +602,20 @@ class Reports{
 					for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					// $month = $this->oBudget->arrPeriod[$m];
 					$month = $this->oBudget->arrPeriod[$m];
-					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($arrTotal[$month]),'</td>';
+					echo "<td class='budget-decimal budget-monthly budget-$month'>",self::render($arrTotal[1][$month]),'</td>';
 	
 					}
 					for ($q=1+$this->oBudget->offset/3;$q<=4+$this->oBudget->offset/3;$q++){		
 					$quarter = 'Q'.$q;
-					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($arrTotal[$quarter]),'</td>';
+					echo "<td class='budget-decimal budget-quarterly budget-$quarter'>",self::render($arrTotal[1][$quarter]),'</td>';
 
 					}	
-					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal['Total']),'</td>';					
+					echo '<td class=\'budget-decimal budget-ytd\'>',self::render($arrTotal[1]['Total']),'</td>';					
 					?>
 				</tr>
 			</tfoot>
 			</table>
-			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
-			</ul>
+			<button onclick="javascript:SelectContent('<?php echo $tableID;?>');">Copy table</button>			
 		<?php
 		
 	}
