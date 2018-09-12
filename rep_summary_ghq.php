@@ -100,7 +100,8 @@ if(!isset($_GET['prtGHQ'])){
 											{$sqlActual} as Diff
 									FROM vw_master 
 									{$sqlWhere}
-										AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
+										AND  scenario='{$oBudget->id}' 
+										".Reports::GP_FILTER."
 									GROUP BY customer_group_code
 									UNION ALL
 									SELECT customer_group_code as optValue, 
@@ -112,7 +113,7 @@ if(!isset($_GET['prtGHQ'])){
 									{$sqlWhere}
 										AND scenario='{$oReference->id}' 
 										AND source<>'Estimate' 
-										AND account IN ('J00400', 'J00802')										
+										".Reports::GP_FILTER."										
 									GROUP BY customer_group_code",
 							'tolerance'=>0.05,
 							'denominator'=>$denominator,
