@@ -391,8 +391,8 @@ if(!isset($_GET['prtGHQ'])){
 		}
 	}
 	
-	$arrTop = array_slice($arrFilteredReport,0,10, true);
-	$arrBottom = array_slice($arrFilteredReport,-5,5, true);
+	$arrTop = array_slice($arrFilteredReport,0,11, true);
+	$arrBottom = array_slice($arrFilteredReport,-6,6, true);
 	// $arrBottom = array_slice($arrFilteredReport,-1,min(5,count($arrFilteredReport)-10), true);
 	
 	
