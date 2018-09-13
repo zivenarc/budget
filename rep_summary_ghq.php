@@ -7,6 +7,11 @@ require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
 include ('includes/inc_report_ghqfilter.php');
+
+$arrActions[] = Array('title'=>'Current month','action'=>'?period_type=cm');
+$arrActions[] = Array('title'=>'YTD','action'=>'?period_type=ytd');
+$arrActions[] = Array('title'=>'ROY','action'=>'?period_type=roy');
+$arrActions[] = Array('title'=>'FYE','action'=>'?period_type=fye');
 	
 	$oBudget = new Budget($budget_scenario);
 	$oReference = new Budget($reference);
@@ -54,7 +59,9 @@ if(!isset($_GET['prtGHQ'])){
 	<div>
 	<?php
 	// die();
-	$period_type = 'roy'; $period_title = "Rest-of-year";
+	// $period_type = 'roy'; $period_title = "Rest-of-year";
+	$period_type = $_GET['period_type']?$_GET['period_type']:'ytd';
+	$period_title = strtoupper($period_type);
 	
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
