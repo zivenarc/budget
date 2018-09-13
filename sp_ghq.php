@@ -23,10 +23,12 @@ while ($rw = $oSQL->f($rs)){
 }
 
 // $startMonth = date('n',$oBudget->date_start);
-$arrActions[] = Array('title'=>'Jan-Mar', 'action'=>'?mthStart=1&mthEnd=3');
-$arrActions[] = Array('title'=>'Jan-Dec', 'action'=>'?mthStart=1&mthEnd=12');
-$arrActions[] = Array('title'=>'Apr-Mar', 'action'=>'?mthStart=4&mthEnd=15');
-$arrActions[] = Array('title'=>'Jan-Mar', 'action'=>'?mthStart=1&mthEnd=15');
+$arrActions[] = Array('title'=>'YTD', 'action'=>"?mthStart=".($oBudget->offset+1)."&mthEnd={$oBudget->cm}");
+$arrActions[] = Array('title'=>'FYE', 'action'=>"?mthStart=".($oBudget->offset+1)."&mthEnd=".($oBudget->offset+12));
+// $arrActions[] = Array('title'=>'Jan-Mar', 'action'=>'?mthStart=1&mthEnd=3');
+// $arrActions[] = Array('title'=>'Jan-Dec', 'action'=>'?mthStart=1&mthEnd=12');
+// $arrActions[] = Array('title'=>'Apr-Mar', 'action'=>'?mthStart=4&mthEnd=15');
+// $arrActions[] = Array('title'=>'Jan-Mar', 'action'=>'?mthStart=1&mthEnd=15');
 $startMonth = isset($_GET['mthStart'])?$_GET['mthStart']:1+$oBudget->offset;
 $endMonth = isset($_GET['mthEnd'])?$_GET['mthEnd']:12+$oBudget->offset;
 $colspan = $endMonth - $startMonth + 3;
