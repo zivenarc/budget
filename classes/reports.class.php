@@ -444,7 +444,7 @@ class Reports{
 							{$this->sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER."
 							AND activity IN (".implode(',',$activity_filter).")
 							AND `company`='{$this->company}'
-							GROUP BY activity, route, unit, source
+							GROUP BY activity, route, unit, source, freehand
 							UNION ALL
 						SELECT activity, route, source, ".str_repeat("0, ",$this->oBudget->cm).$this->oBudget->getMonthlySumSQL($this->oBudget->cm+1,15).", freehand
 						FROM `reg_sales` 										
