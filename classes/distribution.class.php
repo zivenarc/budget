@@ -267,7 +267,7 @@ class Distribution extends Document{
 		$row = $this->add_record();
 		$row->flagUpdated = true;				
 		$row->unit = 'sqm';
-		$row->customer = EMPTY_CUSTOMER;
+		$row->customer = self::EMPTY_CUSTOMER;
 		$row->set_months($arrSum);
 		
 	}
