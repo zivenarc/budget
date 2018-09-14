@@ -323,7 +323,7 @@ class Document extends easyForm{
 							FROM reg_master 
 							WHERE account NOT LIKE 'SZ%' 
 							GROUP BY source) Budget 
-			SET `{$this->prefix}Amount`=`Budget`.`Total`
+			SET `{$this->prefix}Amount`=IFNULL(`Budget`.`Total`,0)
 			WHERE `{$this->prefix}ID`={$this->ID} AND `{$this->prefix}GUID`=`Budget`.`source`;";
 		$sql[] = "UPDATE `{$this->register}` SET posted=1 WHERE source='{$this->GUID}';";
 		$sql[]=$this->getActionSQL('post', $this->postComment);

@@ -28,7 +28,7 @@ include ('includes/inc-frame_top.php');
 if ($_POST['filter']['freehand']){
 	?><h3>Freehand</h3><?php
 }
-$oReport->salesByCustomer($strPCFilter.' '.$sqlWhere);
+$oReport->salesByCustomer('pc');
 ?>
 </div>
 <?php

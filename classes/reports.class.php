@@ -269,10 +269,8 @@ class Reports{
 		
 		</tfoot>
 		</table>
-		<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
-		</ul>
 		<?php
+		$this->_echoButtonCopyTable($tableID);
 	}
 	
 	public function salesByActivity(){
@@ -390,11 +388,9 @@ class Reports{
 			}
 			?>
 			</tbody>
-			</table>
-			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
-			</ul>
+			</table>			
 			<?php
+			$this->_echoButtonCopyTable($tableID);
 			
 			if ($flagShowOFFReport) {
 				$this->iffByRoute('OFF');
@@ -614,9 +610,9 @@ class Reports{
 					?>
 				</tr>
 			</tfoot>
-			</table>
-			<button onclick="javascript:SelectContent('<?php echo $tableID;?>');">Copy table</button>			
+			</table>			
 		<?php
+		$this->_echoButtonCopyTable($tableID);
 		
 	}
 	
@@ -762,11 +758,8 @@ class Reports{
 				</tr>
 			</tfoot>
 			</table>
-			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
-			</ul>
 		<?php
-		
+		$this->_echoButtonCopyTable($tableID);
 	}
 	
 	public function masterDocument($source, $docClass=''){
@@ -839,10 +832,9 @@ class Reports{
 			</tr>
 		</tfoot>
 		</table>
-		<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $source;?>");'>Copy table</a></li>
-		</ul>		
 		<?php
+		$this->_echoButtonCopyTable($source);
+		
 		if ($docClass=='Interco_sales' || $docClass=='Sales'){
 			$sql = "SELECT reg_sales.*, tbl_profit.pccTitle as Profit, tbl_counterparty.cntTitle as Customer_name, tbl_product.prdTitle as Product_title, tbl_product_type.prtGHQ as Activity_title
 					FROM reg_sales 
@@ -898,32 +890,33 @@ class Reports{
 			?>
 			</tbody>
 			</table>
-			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("sales_<?php echo $source;?>");'>Copy table</a></li>
-			</ul>
 			<?php
+			$this->_echoButtonCopyTable('sales_'.$source);
 		}
 		?>
 		</div>
 		<?php
 	}
 	
-	public function salesByCustomer(){
+	public function salesByCustomer($groupOption='pc'){
+		
+		$arrOptions['pc']=Array('key'=>'pc','title'=>'pccTitle');
+		$arrOptions['sales']=Array('key'=>'sales','title'=>'usrTitle', 'href'=>'rep_my.php?ownerID=');
 		
 		ob_start();
-			$sql = "SELECT unit, cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL(1,15).", 
+			$sql = "SELECT unit, CUS.cntTitle as 'Customer', ".$this->oBudget->getMonthlySumSQL(1,15).", 
 							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset).") as Total, 
-							usrTitle as responsible, 
-							sales,
+							`{$arrOptions[$groupOption]['title']}` as groupTitle, 
+							`{$arrOptions[$groupOption]['key']}`  as groupKey,
 							freehand
 					FROM `reg_sales`
-					LEFT JOIN vw_customer ON customer=cntID					
+					LEFT JOIN common_db.tbl_counterparty CUS ON customer=CUS.cntID					
 					LEFT JOIN vw_profit ON pc=pccID	
 					LEFT JOIN stbl_user ON sales=usrID
 					## LEFT JOIN tbl_sales ON salGUID=source
 					{$this->sqlWhere} AND posted=1 AND scenario='{$this->oBudget->id}' and kpi=1 
-					GROUP BY sales, `reg_sales`.`customer`, unit, freehand
-					ORDER BY sales, Total DESC"; 
+					GROUP BY `{$arrOptions[$groupOption]['key']}`, `reg_sales`.`customer`, unit, freehand
+					ORDER BY `{$arrOptions[$groupOption]['key']}`, Total DESC"; 
 			// echo '<pre>',$sql,'</pre>';
 			$rs = $this->oSQL->q($sql);
 			if (!$this->oSQL->num_rows($rs)){
@@ -944,12 +937,12 @@ class Reports{
 			</thead>			
 			<tbody>
 			<?php
-			$responsible = null;
+			$currentGroup = null;
 			while ($rw=$this->oSQL->f($rs)){
-				if ($rw['responsible']!=$responsible){
+				if ($rw['groupTitle']!=$currentGroup){
 					?>
 					<tr>
-						<th colspan="21">By <a target="sales_report" href="rep_my.php?ownerID=<?php echo $rw['sales'];?>"><?php echo $rw['responsible'];?></a></th>
+						<th colspan="21">By <?php echo $rw['groupTitle'];?></th>
 					</tr>
 					<?php 
 				}				
@@ -978,7 +971,7 @@ class Reports{
 				<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']);?></td>				
 				</tr>
 				<?php
-				$responsible = $rw['responsible'];
+				$currentGroup = $rw['groupTitle'];
 			}
 			?>
 			</tbody>
@@ -1009,10 +1002,8 @@ class Reports{
 				?>
 			</tfoot>
 			</table>
-			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
-			</ul>			
 			<?php
+			$this->_echoButtonCopyTable($tableID);
 			ob_flush();
 	}
 	
@@ -1287,11 +1278,9 @@ class Reports{
 				
 			?>
 			</tbody>
-			</table>
-			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
-			</ul>
+			</table>			
 			<?php
+			$this->_echoButtonCopyTable($tableID);
 			ob_flush();
 	}
 	
@@ -1367,10 +1356,8 @@ class Reports{
 			?>
 			</tbody>
 			</table>
-			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
-			</ul>
-			<?php			
+			<?php		
+			$this->_echoButtonCopyTable($tableID);
 			ob_flush();
 		
 		
@@ -1420,10 +1407,8 @@ class Reports{
 		?>
 		</tfoot>
 		</table>
-		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Copy table</a></li>
-		</ul>
 		<?php			
+		$this->_echoButtonCopyTable($this->ID);
 		ob_flush();
 		
 	}
@@ -1488,10 +1473,8 @@ class Reports{
 		?>
 		</tbody>
 		</table>
-		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Copy table</a></li>
-		</ul>
-		<?php			
+		<?php
+		$this->_echoButtonCopyTable($this->ID);		
 		ob_flush();
 	}
 	
@@ -1843,9 +1826,10 @@ class Reports{
 		?>
 		</tr>
 		</table>
-		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Copy table</a></li>
-		</ul>
+		<?php
+		$this->_echoButtonCopyTable($this->ID);
+		?>
+		
 		<div id='graph_<?php echo $this->ID;?>'>Line chart loading...</div>
 		<div id='aff_<?php echo $this->ID;?>'>AFF chart loading...</div>
 		<div id='off_<?php echo $this->ID;?>'>OFF chart loading...</div>
@@ -1978,11 +1962,9 @@ class Reports{
 			self::_noFirstLevelMonthly($this->currency, $options);
 			?>
 			</tbody>
-			</table>
-			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
-			</ul>
-			<?php			
+			</table>			
+			<?php		
+			$this->_echoButtonCopyTable($tableID);
 			ob_flush();
 	}
 	
@@ -2101,11 +2083,9 @@ class Reports{
 			// self::_noFirstLevelMonthly($this->currency);
 			?>
 			</tbody>
-			</table>
-			<ul class='link-footer'>
-					<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
-			</ul>
+			</table>			
 			<?php			
+			$this->_echoButtonCopyTable($tableID);
 			ob_flush();
 	}
 	
@@ -2408,11 +2388,9 @@ class Reports{
 		?>
 		</tbody>
 		</table>
-		<ul class='link-footer'>
-			<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Copy table</a></li>
-		</ul>
 		<?php
-
+		$this->_echoButtonCopyTable($this->ID);
+		
 		return ($arrGrandTotal);
 	}
 	
@@ -3006,11 +2984,9 @@ class Reports{
 				$this->echoBudgetItemString($arrSubtotal, 'budget-subtotal');
 			?>
 			</tfoot>
-			</table>
-			<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $tableID;?>");'>Copy table</a></li>
-			</ul>
+			</table>			
 			<?php
+			$this->_echoButtonCopyTable($tableID);
 		} else {
 			echo '<h3>No records found</h3>';
 			echo '<pre>',$sql,'</pre>';
@@ -3396,10 +3372,10 @@ class Reports{
 				<tbody>
 					<?php echo $strTbody; ?>
 				</tbody>
-			</table>
-			</div>
-			<button onclick="SelectContent('<?php echo $id;?>');">Copy table</button>
+			</table>			
+			</div>			
 		<?php
+		$this->_echoButtonCopyTable($id);
 	}
 	
 	function render($number, $decimals=0, $dec_separator='.',$thousand_separator=',',$negative='budget-negative'){
@@ -3777,10 +3753,8 @@ class Reports{
 		?>
 		</tbody>
 		</table>
-		<ul class='link-footer'>
-				<li><a href='javascript:SelectContent("<?php echo $this->ID;?>");'>Copy table</a></li>
-		</ul>
 		<?php
+		$this->_echoButtonCopyTable($this->ID);
 		// $this->oSQL->showProfileInfo();
 	}
 	
@@ -3901,9 +3875,10 @@ class Reports{
 					<td class='budget-decimal budget-ytd'><?php $this->render(array_sum($arrTotal));?></td>
 				</tr>
 			</tfoot>
-		</table>
-		<button onclick="SelectContent('<?php echo $this->ID;?>');">Copy table</button>
+		</table>		
 		<?php
+		$this->_echoButtonCopyTable($this->ID);
+		
 		$sql = "SELECT customer, Customer_name, Group_code, `Group`, {$strFields['actual']}
 				FROM vw_master
 				{$this->sqlWhere}
@@ -3970,8 +3945,14 @@ class Reports{
 					<td class='budget-decimal budget-ytd'><?php $this->render(array_sum($arrTotal));?></td>
 				</tr>
 			</tfoot>
-		</table>
-		<button onclick="SelectContent('<?php echo $this->ID;?>_items');">Copy table</button>
+		</table>		
+		<?php
+		$this->_echoButtonCopyTable($this->ID.'_items');
+	}
+	
+	function _echoButtonCopyTable($id){
+		?>
+		<button onclick="SelectContent('<?php echo $id;?>');">Copy table</button>
 		<?php
 	}
 }
