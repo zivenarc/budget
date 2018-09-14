@@ -238,12 +238,12 @@ class Distribution extends Document{
 		
 		switch ($type) {
 			case 'sqm':
-				$sql = "SELECT unit, customer, ".str_replace('SUM','MAX',$this->budget->getMonthlySumSQL())." 
+				$sql = "SELECT unit, customer, ".$this->budget->getMonthlySumSQL()." 
 						FROM reg_sales
 						WHERE scenario='".$this->budget->id."' 
 							AND active=1 
 							AND pc='{$this->profit}'
-							AND unit='sqm'
+							AND activity=12
 						GROUP BY customer"; 
 			break;
 			default:
