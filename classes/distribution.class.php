@@ -136,7 +136,7 @@ class Distribution extends Document{
 		);
 		
 		
-		$this->setMonthlyEG('int');
+		$this->setMonthlyEG('int', false);
 		
 		$this->grid->Columns[] =Array(
 			'title'=>'Average'
@@ -245,6 +245,12 @@ class Distribution extends Document{
 							AND pc='{$this->profit}'
 							AND activity=12
 						GROUP BY customer"; 
+				
+				$row = $this->add_record();
+				$row->flagUpdated = true;				
+				$row->unit = 'sqm';
+				$row->customer = self::EMPTY_CUSTOMER;
+				$row->set_months($arrSum);
 			break;
 			default:
 				return (false);
@@ -264,11 +270,6 @@ class Distribution extends Document{
 				$arrSum[$month] = $this->total - $arrSubtotal[$month];
 			}
 		}
-		$row = $this->add_record();
-		$row->flagUpdated = true;				
-		$row->unit = 'sqm';
-		$row->customer = self::EMPTY_CUSTOMER;
-		$row->set_months($arrSum);
 		
 	}
 	
@@ -323,7 +324,7 @@ class Distribution extends Document{
 							$item = $Items->getById($total['item']);
 							$master_row->account = $total['account'];
 							$master_row->item = $total['item'];
-							for($m=1;$m<=15;$m++){
+							for($m=$this->budget->nm;$m<=15;$m++){
 								$month = $this->budget->arrPeriod[$m];
 								if ($this->subtotal[strtolower($month)]){
 									$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]*$total[$month];
@@ -343,7 +344,7 @@ class Distribution extends Document{
 					$item = $Items->getById($total['item']);
 					$master_row->account = $total['account'];
 					$master_row->item = $total['item'];
-					for($m=1;$m<=15;$m++){
+					for($m=$m=$this->budget->nm;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -$total[$month];
 					}
