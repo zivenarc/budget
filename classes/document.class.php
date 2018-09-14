@@ -334,7 +334,7 @@ class Document extends easyForm{
 	protected function unmarkPosted(){
 		GLOBAL $arrUsrData;
 		$sql[] = "UPDATE `{$this->table}` 
-			SET `{$this->prefix}FlagPosted`=0, `{$this->prefix}EditBy`='{$arrUsrData['usrID']}', `{$this->prefix}EditDate`=NOW() 
+			SET `{$this->prefix}FlagPosted`=0, `{$this->prefix}EditBy`='{$arrUsrData['usrID']}', `{$this->prefix}EditDate`=NOW() , `{$this->prefix}Amount`=0
 			WHERE `{$this->prefix}ID`={$this->ID} LIMIT 1;";
 		$sql[] = "UPDATE `{$this->register}` SET posted=0 WHERE source='{$this->GUID}';";
 		$sql[] = $this->getActionSQL('unpost');

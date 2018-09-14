@@ -238,7 +238,7 @@ class Distribution extends Document{
 		
 		switch ($type) {
 			case 'sqm':
-				$sql = "SELECT unit, customer, ".$this->budget->getMonthlySumSQL()." 
+				$sql = "SELECT 'sqm' as unit, customer, ".$this->budget->getMonthlySumSQL()." 
 						FROM reg_sales
 						WHERE scenario='".$this->budget->id."' 
 							AND active=1 
@@ -267,7 +267,7 @@ class Distribution extends Document{
 		$row = $this->add_record();
 		$row->flagUpdated = true;				
 		$row->unit = 'sqm';
-		$row->customer = 0;
+		$row->customer = EMPTY_CUSTOMER;
 		$row->set_months($arrSum);
 		
 	}
