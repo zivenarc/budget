@@ -36,7 +36,7 @@ class Budget{
 			$this->cm=15;
 			$this->nm = 4;
 		} elseif ($this->type=='Budget_AM'){
-			$this->cm=15;
+			$this->cm=3;
 			$this->nm=4;
 		} else {
 			$this->cm = date('n',$this->date_start-1)+12*(date('Y',$this->date_start-1)-$this->year); 

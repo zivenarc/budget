@@ -32,9 +32,58 @@ if ($_GET['tab']){
 	switch($_GET['tab']){
 		case 'kpi':
 			require_once ('classes/reports.class.php');
-			$sqlWhere = "WHERE source='".$oDocument->GUID."'";
-			$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id));
-			$oReport->costsBySupplier($sqlWhere);
+			$sql = "SELECT pccTitle, wc, SUM(".$oDocument->budget->getThisYTDSQL('roy').")/".($oDocument->budget->offset+12-$oDocument->budget->cm)."  as FTE
+					FROM `reg_headcount`
+					LEFT JOIN common_db.tbl_profit ON pccID=pc
+					WHERE scenario='{$oDocument->budget->id}' AND location='{$oDocument->location}'
+					AND salary>10000 AND posted=1
+					GROUP BY pc, wc
+					ORDER BY FTE DESC";
+			
+			$rs = $oSQL->q($sql);
+			while ($rw = $oSQL->f($rs)){
+				$arrReport[$rw['pccTitle']][$rw['wc']] = $rw['FTE'];
+				$arrTotal[$rw['wc']] +=$rw['FTE'];
+			}
+			if (is_array($arrReport)){
+				?>
+				<div id='distribution_table'>
+				<table class="budget">
+				<thead>
+				<tr>
+					<th>BU</th>
+					<th>White</th>
+					<th>Blue</th>
+					<th class="budget-ytd">Total</th>
+				</thead>
+				<tbody>
+				<?php
+				foreach($arrReport as $pc=>$data){
+					?>
+					<tr>
+						<td><?php echo $pc;?></td>
+						<td class='budget-decimal'><?php Reports::render($data[1],1);?></td>
+						<td class='budget-decimal'><?php Reports::render($data[0],1);?></td>
+						<td class="budget-decimal budget-ytd"><?php Reports::render(array_sum($data),1);?></td>
+					</tr>
+					<?php
+				}
+				?>
+				</tbody>
+				<tfoot>
+					<tr class="budget-subtotal">
+						<td>Total</td>
+						<td class='budget-decimal'><?php Reports::render($arrTotal[1],1);?></td>
+						<td class='budget-decimal'><?php Reports::render($arrTotalata[0],1);?></td>
+						<td class="budget-decimal budget-ytd"><?php Reports::render(array_sum($arrTotal),1);?></td>
+					</tr>
+				</tfoot>
+				</table>
+				</div>
+				<div id='distribution_chart'>
+				</div>
+				<?php
+			}
 			die();
 			break;
 		case 'financials':
@@ -61,6 +110,9 @@ $oDocument->fillGrid($oDocument->grid);
 
 require ('includes/inc-frame_top.php');
 require ('includes/inc_document_header.php');
+
+
+
 ?>
 <script>
 

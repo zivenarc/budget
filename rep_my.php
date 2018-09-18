@@ -34,6 +34,29 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
+	?>
+	<div id='warnings'>
+	<?php
+		$sql = "SELECT DISTINCT salID FROM `tbl_sales`, `reg_sales`
+					WHERE unit IN ('TEU','Kgs')
+					AND source=salGUID
+					AND kpi=1 AND hbl=1 and salFlagDeleted=0
+					AND salScenario='{$budget_scenario}'
+					AND salUserID='{$ownerID}'
+					AND salDA=salJO";
+		$rs = $oSQL->q($sql);
+		if($oSQL->n($rs)){
+			while ($rw = $oSQL->f($rs)){
+				$arrErrDocs[] = "<a target='_sales' href='sales_form.php?salID={$rw['salID']}'>{$rw['salID']}</a>";
+			}
+			?>
+			<div class='error'>Job owner and Destination agent are the same, Profit share may be calculated incorrectly: <?php echo implode(', ',$arrErrDocs);?></div>
+			<?php
+		}
+		
+	?>
+	</div>
+	<?php
 	include ('includes/inc_report_selectors.php');
 	
 	Budget::getProfitTabs('reg_sales', false, Array('sales'=>$ownerID));
