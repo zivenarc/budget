@@ -4,6 +4,10 @@ require ('common/auth.php');
 include ('classes/location_costs.class.php');
 $arrJS[] = 'js/input_form.js';
 
+$arrJS[]="https://code.highcharts.com/highcharts.js";
+$arrJS[]="https://code.highcharts.com/highcharts-more.js";
+$arrJS[]="https://code.highcharts.com/modules/exporting.js";
+
 $lcoID=$_GET['lcoID']?$_GET['lcoID']:$_POST['lcoID'];
 
 $oBudget = new Budget($budget_scenario);
@@ -31,6 +35,7 @@ if ($_POST['DataAction']){
 if ($_GET['tab']){
 	switch($_GET['tab']){
 		case 'kpi':
+		
 			require_once ('classes/reports.class.php');
 			$sql = "SELECT pccTitle, wc, SUM(".$oDocument->budget->getThisYTDSQL('roy').")/".($oDocument->budget->offset+12-$oDocument->budget->cm)."  as FTE
 					FROM `reg_headcount`
@@ -39,19 +44,20 @@ if ($_GET['tab']){
 					AND salary>10000 AND posted=1
 					GROUP BY pc, wc
 					ORDER BY FTE DESC";
-			
+			// echo '<pre>',$sql,'</pre>';
 			$rs = $oSQL->q($sql);
 			while ($rw = $oSQL->f($rs)){
 				$arrReport[$rw['pccTitle']][$rw['wc']] = $rw['FTE'];
-				$arrTotal[$rw['wc']] +=$rw['FTE'];
+				$arrTotal[$rw['wc']] +=$rw['FTE'];				
 			}
 			if (is_array($arrReport)){
 				?>
+				<table><tr><td>
 				<div id='distribution_table'>
 				<table class="budget">
 				<thead>
 				<tr>
-					<th>BU</th>
+					<th>Business unit</th>
 					<th>White</th>
 					<th>Blue</th>
 					<th class="budget-ytd">Total</th>
@@ -59,6 +65,7 @@ if ($_GET['tab']){
 				<tbody>
 				<?php
 				foreach($arrReport as $pc=>$data){
+					$arrPie[] = Array('name'=>$pc,'y'=>array_sum($data));
 					?>
 					<tr>
 						<td><?php echo $pc;?></td>
@@ -80,8 +87,45 @@ if ($_GET['tab']){
 				</tfoot>
 				</table>
 				</div>
+				</td>
+				<td>
 				<div id='distribution_chart'>
 				</div>
+				</td></tr></table>
+				<script type="text/javascript">
+					Highcharts.chart('distribution_chart', {
+						chart: {
+							plotBackgroundColor: null,
+							plotBorderWidth: null,
+							plotShadow: false,
+							type: 'pie'
+						},
+						title: {
+							text: 'Location headcount'
+						},
+						tooltip: {
+							pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+						},
+						plotOptions: {
+							pie: {
+								allowPointSelect: true,
+								cursor: 'pointer',
+								dataLabels: {
+									enabled: true,
+									format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+									style: {
+										color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+									}
+								}
+							}
+						},
+						series: [{
+							name: 'Business unit',
+							colorByPoint: true,
+							data: <?php echo json_encode($arrPie);?>
+						}]
+					});
+				</script>
 				<?php
 			}
 			die();
