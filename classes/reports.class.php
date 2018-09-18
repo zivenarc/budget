@@ -3375,7 +3375,7 @@ class Reports{
 			</table>			
 			</div>			
 		<?php
-		$this->_echoButtonCopyTable($id);
+		self::_echoButtonCopyTable($id);
 	}
 	
 	function render($number, $decimals=0, $dec_separator='.',$thousand_separator=',',$negative='budget-negative'){
