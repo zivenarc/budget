@@ -8,29 +8,9 @@ class sales_record extends table_record{
 		parent::__construct($session, $scenario, $company, $id, $data);
 		
 		if (count($data)){
-			
 			foreach($data as $key=>$value){
 				$this->{$key} = $value;
-			}
-			
-			// $this->product = $data['product'];						
-			// $this->activity = $data['activity'];
-			// $this->customer = $data['customer'];
-			// $this->comment = $data['comment'];
-			// $this->unit = $data['unit'];
-			// $this->selling_curr = $data['selling_curr'];
-			// $this->buying_curr = $data['buying_curr'];
-			// $this->selling_rate = $data['selling_rate'];
-			// $this->buying_rate= $data['buying_rate'];	
-			// $this->formula= $data['formula'];	
-			// $this->kpi= $data['kpi'];	
-			// $this->sales= $data['sales'];	
-			// $this->route= $data['route'];	
-			// $this->hbl= $data['hbl'];	
-			// $this->bo= $data['bo'];	
-			// $this->jo= $data['jo'];	
-			// $this->pol= $data['pol'];	
-			// $this->pod= $data['pod'];	
+			}		
 		}		
 		return (true);
 	}	
@@ -62,7 +42,7 @@ class sales_record extends table_record{
 			$arrRes[] = "`selling_curr`='".$this->selling_curr."'";
 			$arrRes[] = "`buying_rate`=".(double)$this->buying_rate;
 			$arrRes[] = "`buying_curr`='".$this->buying_curr."'";
-			$arrRes[] = "`activity`=".($this->product?(integer)$oProduct->activity:$this->activity);
+			$arrRes[] = "`activity`=".(integer)$this->activity;
 			$arrRes[] = "`unit`='".$oProduct->unit."'";
 			$arrRes[] = "`formula`=".$oSQL->e($this->formula);
 			$arrRes[] = "`sales`=".$oSQL->e($this->sales);

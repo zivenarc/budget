@@ -28,6 +28,7 @@ class Reports{
 	const ACTUAL_DATA_FILTER = "`source` IN ('Actual','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Correction')\r\n";
 	const GROSS_REVENUE_ITEMS = Array('cdce3c68-c8da-4655-879e-cd8ec5d98d95','17ae174f-48e3-11e1-b30e-005056930d2f','dea4c740-5201-11e8-a94c-000d3ab6a5d8','f5a44e49-5201-11e8-a94c-000d3ab6a5d8');
 	const GROSS_REVENUE_FILTER = " AND `item` IN ('cdce3c68-c8da-4655-879e-cd8ec5d98d95','17ae174f-48e3-11e1-b30e-005056930d2f','dea4c740-5201-11e8-a94c-000d3ab6a5d8','f5a44e49-5201-11e8-a94c-000d3ab6a5d8')\r\n";
+	const OWN_OPERATING_PROFIT = " AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND account NOT LIKE '5999%' AND pccFlagProd=1)\r\n";
 	
 	function __construct($params){
 		
@@ -2644,8 +2645,9 @@ class Reports{
 			$arrOther[] = Array('title'=>'Gross revenue','sqlWhere'=>" AND (account = 'J00400')");
 					
 			if (!(isset($this->filter['customer']) || isset($this->filter['sales']) || isset($this->filter['bdv']))){
-				$arrOther[] = Array('title'=>'Gross operatng profit','sqlWhere'=>" AND (account LIKE 'J%')");
+				$arrOther[] = Array('title'=>'Gross operatng profit','sqlWhere'=>self::GOP_FILTER);
 				$arrOther[] = Array('title'=>'Net operatng profit','sqlWhere'=>" AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')");	
+				$arrOther[] = Array('title'=>'Own operatng profit','sqlWhere'=>self::OWN_OPERATING_PROFIT);	
 			}
 			
 			if (!(isset($this->filter['customer']) || isset($this->filter['sales']) )){
@@ -3633,7 +3635,8 @@ class Reports{
 				$this->echoBudgetItemString($rw, 'budget-subtotal');
 			}
 			
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND account NOT LIKE '5999%' AND pccFlagProd=1)", $sql);
+			// $sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND account NOT LIKE '5999%' AND pccFlagProd=1)", $sql);
+			$sqlOps = str_replace($sqlWhere, $sqlWhere.self::OWN_OPERATING_PROFIT, $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){

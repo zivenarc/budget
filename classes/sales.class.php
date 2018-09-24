@@ -92,15 +92,15 @@ class Sales extends Document{
 			,'mandatory'=>true
 		);
 		
-		$this->Columns[] = Array(
-			'title'=>'Product folder'
-			,'field'=>self::Prefix.'ProductFolderID'
-			,'type'=>'combobox'
-			,'sql'=>'vw_folder'
-			,'prefix'=>'prd'
-			,'default'=>22
-			,'disabled'=>!$this->flagUpdate
-		);
+		// $this->Columns[] = Array(
+			// 'title'=>'Product folder'
+			// ,'field'=>self::Prefix.'ProductFolderID'
+			// ,'type'=>'combobox'
+			// ,'sql'=>'vw_folder'
+			// ,'prefix'=>'prd'
+			// ,'default'=>22
+			// ,'disabled'=>!$this->flagUpdate
+		// );
 		
 		$this->Columns[] = $this->getResponsibleEF();
 		
@@ -215,15 +215,16 @@ class Sales extends Document{
 			$this->grid->Columns[] = parent::getCustomerEG();
 		}
 		
-		$this->grid->Columns[] = Array(
-			'title'=>'Code'
-			,'field'=>'prdExternalID'
-			,'width'=>'60px'
-			,'type'=>'text'
-			,'disabled'=>true
-		);
+		// $this->grid->Columns[] = Array(
+			// 'title'=>'Code'
+			// ,'field'=>'prdExternalID'
+			// ,'width'=>'60px'
+			// ,'type'=>'text'
+			// ,'disabled'=>true
+		// );
 		
-		$this->grid->Columns[] = parent::getProductEG();
+		// $this->grid->Columns[] = parent::getProductEG();
+		$this->grid->Columns[] = parent::getActivityEG();
 		
 		$this->grid->Columns[] = Array(
 			'title'=>'Description'
@@ -285,7 +286,7 @@ class Sales extends Document{
 			$this->setMonthlyEG('int');
 			
 		} else {
-			$this->grid->Columns[] = parent::getActivityEG();
+			//$this->grid->Columns[] = parent::getActivityEG();
 		}
 		
 		$this->grid->Columns[] =Array(
@@ -302,7 +303,8 @@ class Sales extends Document{
 	}
 	
 	public function fillGrid(){
-		parent::fillGrid($this->grid,Array('prdExternalID'),'reg_sales LEFT JOIN vw_product ON prdID=product');
+		// parent::fillGrid($this->grid,Array('prdExternalID'),'reg_sales LEFT JOIN vw_product ON prdID=product');
+		parent::fillGrid($this->grid,Array('prtGHQ'),'reg_sales LEFT JOIN vw_product_type ON prtID=activity');
 	}
 	
 	
@@ -316,7 +318,7 @@ class Sales extends Document{
 		//echo '<pre>';print_r($_POST);die('</pre>');
 		if ($mode=='update' || $mode=='post'){
 			$this->profit = isset($_POST[$this->prefix.'ProfitID'])?$_POST[$this->prefix.'ProfitID']:$this->profit;
-			$this->product_folder = isset($_POST[$this->prefix.'ProductFolderID'])?$_POST[$this->prefix.'ProductFolderID']:$this->product_folder;			
+			// $this->product_folder = isset($_POST[$this->prefix.'ProductFolderID'])?$_POST[$this->prefix.'ProductFolderID']:$this->product_folder;			
 			$this->customer = isset($_POST[$this->prefix.'CustomerID'])?$_POST[$this->prefix.'CustomerID']:$this->customer;
 			$this->sales = isset($_POST[$this->prefix.'UserID'])?$_POST[$this->prefix.'UserID']:$this->sales;
 			$this->route = isset($_POST[$this->prefix.'Route'])?$_POST[$this->prefix.'Route']:$this->route;
@@ -400,7 +402,7 @@ class Sales extends Document{
 					if ($arrUpdated[$id]){				
 						$row->flagUpdated = true;
 						$row->profit = $this->profit;						
-						$row->product = $_POST['product'][$id];				
+						// $row->product = $_POST['product'][$id];				
 						$row->activity = $_POST['activity'][$id];				
 						$row->customer = isset($_POST['customer'][$id])?$_POST['customer'][$id]:$this->customer;					
 						$row->comment = $_POST['comment'][$id];				
@@ -906,6 +908,13 @@ class Sales extends Document{
 							SET `{$this->prefix}Revenue`=`Budget`.`Total`
 							WHERE `{$this->prefix}ID`={$this->ID} 
 							AND `{$this->prefix}GUID`=`Budget`.`source`;");
+				
+				$this->doSQL("UPDATE tbl_sales
+								SET salKg=(SELECT SUM(".$this->budget->getYTDSQL($this->budget->cm, max($this->budget->length,12+$this->budget->offset)).") FROM reg_sales
+										   WHERE source=salGUID AND activity IN (46,47) and kpi=1),
+									salTEU=(SELECT SUM(".$this->budget->getYTDSQL($this->budget->cm, max($this->budget->length,12+$this->budget->offset)).") FROM reg_sales
+										   WHERE source=salGUID AND activity IN (48,58,63,52) and kpi=1)
+								WHERE `{$this->prefix}ID`={$this->ID}");
 				
 				$this->markPosted();				
 			}		
