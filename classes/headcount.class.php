@@ -947,7 +947,7 @@ class Headcount extends Document{
 			$row->start_date = strtotime($rw['empStartDate']);
 			$row->end_date = strtotime($rw['empEndDate']);
 			
-			for ($m=1;$m<=15;$m++){
+			for ($m=$this->budget->nm;$m<=15;$m++){
 				$month = $this->budget->arrPeriod[$m];
 				$row->{$month} = $rw['empFTE']*$row->getFTE($m, $oBudget->year);						
 			}
