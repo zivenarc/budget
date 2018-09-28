@@ -20,7 +20,7 @@ class Reports{
 	const GP_FILTER = "AND account IN ('J00400', 'J00802','J45010','J40010') ";
 	const GOP_FILTER = "AND account LIKE 'J%' ";
 	const RFC_FILTER = "AND (account LIKE 'J%' AND account NOT IN ('J00400', 'J00802','J45010','J40010'))\r\n";
-	const SGA_FILTER = "AND (account LIKE '5%' AND account NOT IN ('5999CO','5999BD')) AND (pccFLagProd = 1 OR pc IN (9,130))\r\n";
+	const SGA_FILTER = "AND (account LIKE '5%' AND account NOT IN ('5999CO','5999BD','527000')) AND (pccFLagProd = 1 OR pc IN (9,130))\r\n";
 	const CORP_FILTER = "AND account IN ('5999CO')";
 	const MSF_FILTER = "AND account IN ('527000')";
 	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';

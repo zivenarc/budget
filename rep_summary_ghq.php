@@ -54,7 +54,6 @@ if(!isset($_GET['prtGHQ'])){
 		$oReport->shortMonthlyReport('fye');	
 	}
 	
-	
 	?>	
 	<div>
 	<?php
@@ -426,13 +425,16 @@ if(!isset($_GET['prtGHQ'])){
 	
 	
 	//==================== Staff ==========================/
+	
 	$sql = "SELECT pccTitle, salary, monthly_bonus, empTitleLocal, funTitleLocal, prtTitleLocal,funFlagWC,funRHQ,".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset)." 
 			FROM reg_headcount 
 			LEFT JOIN vw_product_type ON prtID=activity
 			LEFT JOIN common_db.tbl_employee ON empGUID1C=particulars
 			LEFT JOIN common_db.tbl_function ON function=funGUID
 			LEFT JOIN common_db.tbl_profit ON pc=pccID
-			WHERE activity IN (".implode(',',$arrProducts['id']).") AND scenario='{$budget_scenario}' AND salary>".Reports::SALARY_THRESHOLD."
+			{$oReport->sqlWhere} 
+				AND scenario='{$budget_scenario}' 
+				AND salary>".Reports::SALARY_THRESHOLD."
 			GROUP BY particulars, function, pc
 			ORDER BY funRHQ, pc,funTitle, empTitleLocal";
 	$rs = $oSQL->q($sql);

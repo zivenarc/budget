@@ -86,7 +86,7 @@ $arrRevenueFilter = Array(
 
 
 $arrAccounts = Array(
-		'Revenue'=>Array('sql'=>"SELECT $sqlFields FROM vw_master 
+		'Revenue'=>Array('sql'=>"SELECT {$sqlFields} FROM vw_master 
 							{$sqlWhere} 
 							".Reports::REVENUE_FILTER."			
 							GROUP by {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
@@ -103,22 +103,27 @@ $arrAccounts = Array(
 									GROUP by {$sqlGroupBy}
 									ORDER by account",'subtotal'=>Array('Gross operating profit','Net operating profit','PBT')),
 		'Gross operating profit'=>Array('class'=>'budget-subtotal'),
-		'General costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT $sqlFields FROM vw_master 
+		'General costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere}  
-									AND account LIKE '5%' AND account<>'5999CO'			
+									".Reports::SGA_FILTER."		
 								GROUP by {$sqlGroupBy}
 								ORDER BY account",'subtotal'=>Array('Net operating profit','PBT')),
-		'Corporate costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT $sqlFields FROM vw_master 
+		'Corporate costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere} 
-									AND account='5999CO'  			
+									".Reports::CORP_FILTER."	 			
+								GROUP by {$sqlGroupBy}
+								ORDER BY account",'subtotal'=>Array('Net operating profit','PBT')),
+		'MSF'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
+								{$sqlWhere} 
+									".Reports::MSF_FILTER."	 			
 								GROUP by {$sqlGroupBy}
 								ORDER BY account",'subtotal'=>Array('Net operating profit','PBT')),
 		'Net operating profit'=>Array('class'=>'budget-subtotal'),
-		'Non-operating income'=>Array('sql'=>"SELECT $sqlFields FROM vw_master 
+		'Non-operating income'=>Array('sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere} 
 									AND (account like '60%') AND account<>'607000'			
 								GROUP by pc, prtGHQ",'subtotal'=>Array('PBT')),
-		'Non-operating costs'=>Array('negative'=>true,'sql'=>"SELECT $sqlFields FROM vw_master 
+		'Non-operating costs'=>Array('negative'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere} 
 									AND (account like '65%' or account like '66%')			
 								GROUP by pc, prtGHQ",'subtotal'=>Array('PBT')),
@@ -196,8 +201,8 @@ foreach ($arrAccounts as $reportKey=>$settings){
 // echo '<pre>';print_r($arrBreakDown);echo '</pre>';
 
 $reportKey = 'Extraordinary income';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account like '70%')
+$sql = "SELECT {$sqlFields} FROM vw_master 
+		WHERE scenario='{$budget_scenario}' AND company='{$company}' AND source<>'Estimate' AND (account like '70%')
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -210,8 +215,8 @@ while ($rw = $oSQL->f($rs)){
 
 
 $reportKey = 'Extraordinary costs';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND (account like '75%' or account like '76%') 
+$sql = "SELECT {$sqlFields} FROM vw_master 
+		WHERE scenario='{$budget_scenario}' AND company='{$company}' AND source<>'Estimate' AND (account like '75%' or account like '76%') 
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 $rs = $oSQL->q($sql);
@@ -224,8 +229,9 @@ while ($rw = $oSQL->f($rs)){
 }
 
 $reportKey = 'NO YACT';
-$sql = "SELECT $sqlFields FROM vw_master 
-		WHERE scenario='$budget_scenario' AND company='{$company}' AND source<>'Estimate' AND IFNULL(account,'') LIKE '' 
+$sql = "SELECT {$sqlFields} 
+		FROM vw_master 
+		WHERE scenario='{$budget_scenario}' AND company='{$company}' AND source<>'Estimate' AND IFNULL(account,'') LIKE '' 
 		GROUP by pc, prtGHQ";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
@@ -238,7 +244,7 @@ while ($rw = $oSQL->f($rs)){
 // echo '<pre>';print_r($arrReport);echo '</pre>';
 
 $reportKey = 'Control PBT';
-$sql = "SELECT $sqlFields FROM vw_master 
+$sql = "SELECT {$sqlFields} FROM vw_master 
 		{$sqlWhere} AND account NOT LIKE 'SZ%'";
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){
