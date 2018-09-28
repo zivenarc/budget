@@ -3596,7 +3596,7 @@ class Reports{
 		
 		// if (!($this->filter['activity'])){
 			$arrYCT = Array();
-			$_rs = $this->oSQL->q("SELECT yctID FROM vw_yact WHERE yctID LIKE '5%' AND yctID<>'5999CO'");
+			$_rs = $this->oSQL->q("SELECT yctID FROM vw_yact WHERE yctID LIKE '5%' AND yctID NOT IN('5999CO','527000')");
 			while ($rw = $this->oSQL->f($_rs)){
 					$arrYCT[] = $rw['yctID'];
 			}
