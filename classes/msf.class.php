@@ -257,7 +257,7 @@ class MSF extends Document{
 										$master_row->profit = $record->pc;
 										$master_row->bdv = $this->profit;
 										$master_row->activity = $activity;
-										if (strpos($account,'6')===0){
+										if (strpos($account,'6')===0 || $account=='527000'){
 											$item = $Items->getById($item_code);
 											$master_row->item = $item_code;
 										} else {
