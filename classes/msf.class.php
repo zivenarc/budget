@@ -239,7 +239,7 @@ class MSF extends Document{
 							if ($rw[$month]!=0){
 								$arrAccounts[$rw['account']][$rw['item']][$month] += $rw[$month];
 								//----------- Distribute SG&A costs in place ------------------------------
-								if(strpos($rw['account'],'5')===0){
+								if(strpos($rw['account'],'5')===0 && $rw['account']!='527000'){
 									$arrSource[$rw['account']][$rw['activity']][$rw['item']][$month] += $rw[$month];								
 								}
 							}
