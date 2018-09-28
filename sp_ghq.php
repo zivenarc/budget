@@ -105,17 +105,17 @@ $arrAccounts = Array(
 		'Gross operating profit'=>Array('class'=>'budget-subtotal'),
 		'General costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere}  
-									".Reports::SGA_FILTER."		
+								".Reports::SGA_FILTER."		
 								GROUP by {$sqlGroupBy}
 								ORDER BY account",'subtotal'=>Array('Net operating profit','PBT')),
 		'Corporate costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere} 
-									".Reports::CORP_FILTER."	 			
+								".Reports::CORP_FILTER."	 			
 								GROUP by {$sqlGroupBy}
 								ORDER BY account",'subtotal'=>Array('Net operating profit','PBT')),
 		'MSF'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere} 
-									".Reports::MSF_FILTER."	 			
+								".Reports::MSF_FILTER."	 			
 								GROUP by {$sqlGroupBy}
 								ORDER BY account",'subtotal'=>Array('Net operating profit','PBT')),
 		'Net operating profit'=>Array('class'=>'budget-subtotal'),

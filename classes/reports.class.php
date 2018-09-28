@@ -3701,7 +3701,7 @@ class Reports{
 				$this->echoBudgetItemString($rw);
 			}
 			
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." ", $sql);
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND pccFlagProd=1", $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			// echo '<pre>',$sqlOps,'</pre>';
 			$rs = $this->oSQL->q($sqlOps);
