@@ -22,6 +22,7 @@ class Reports{
 	const RFC_FILTER = "AND (account LIKE 'J%' AND account NOT IN ('J00400', 'J00802','J45010','J40010'))\r\n";
 	const SGA_FILTER = "AND (account LIKE '5%' AND account NOT IN ('5999CO','5999BD')) AND (pccFLagProd = 1 OR pc IN (9,130))\r\n";
 	const CORP_FILTER = "AND account IN ('5999CO')";
+	const MSF_FILTER = "AND account IN ('527000')";
 	const REVENUE_ITEM = 'cdce3c68-c8da-4655-879e-cd8ec5d98d95';
 	const PROFIT_SHARE_ITEM = 'fd09fb23-efd0-11e3-926a-00155d010e0b';
 	const SALARY_THRESHOLD = 10000;
@@ -3614,7 +3615,7 @@ class Reports{
 				$this->echoBudgetItemString($rw);
 			}
 			
-			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND account='5999CO'", $sql);
+			$sqlOps = str_replace($sqlWhere, $sqlWhere.self::CORP_FILTER, $sql);
 			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
 			$rs = $this->oSQL->q($sqlOps);
 			while ($rw = $this->oSQL->f($rs)){
@@ -3622,6 +3623,19 @@ class Reports{
 				$rw['title'] = "Costs of headquarters, except BDV";
 				$metadata = Array('filter'=>$this->filter, 'DataAction'=>'budget_item');
 				$metadata['filter']['account'] = '5999CO';
+				$metadata['title'] = $rw['Budget item'];
+				$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
+				$this->echoBudgetItemString($rw);
+			}
+			
+			$sqlOps = str_replace($sqlWhere, $sqlWhere.self::MSF_FILTER, $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "MSF";
+				$rw['title'] = "Costs of regional and global HQ";
+				$metadata = Array('filter'=>$this->filter, 'DataAction'=>'budget_item');
+				$metadata['filter']['account'] = '527000';
 				$metadata['title'] = $rw['Budget item'];
 				$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
 				$this->echoBudgetItemString($rw);
