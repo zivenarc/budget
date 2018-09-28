@@ -294,7 +294,7 @@ class MSF extends Document{
 									$master_row->bdv = $this->profit;									
 									$oProfit = $ProfitCenters->getById($record->pc);
 									$master_row->activity = $oProfit->activity;									
-									if (strpos($account,'6')===0){
+									if (strpos($account,'6')===0 || $account=='527000'){
 										$item = $Items->getById($item_code);
 										$master_row->item = $item_code;
 									} else {
@@ -325,7 +325,7 @@ class MSF extends Document{
 					foreach($arrItems as $item_code=>$item_values){
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $this->profit;
-						if (strpos($account,'6')===0){
+						if (strpos($account,'6')===0 || $account=='527000'){
 							$item = $Items->getById($item_code);
 							$master_row->item = $item_code;
 						} else {
