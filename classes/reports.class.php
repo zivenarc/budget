@@ -44,9 +44,13 @@ class Reports{
 		
 		$this->Currency = $params['currency']?$params['currency']:643;
 		
-		$sql = "SELECT curTitle FROM common_db.tbl_currency WHERE curID={$this->Currency}";
-		$rs = $this->oSQL->q($sql);
-		$this->CurrencyTitle = $this->oSQL->get_data($rs);
+		if($this->Currency=='rhq'){
+			$this->CurrencyTitle = 'RHQ EUR rate';
+		} else {
+			$sql = "SELECT curTitle FROM common_db.tbl_currency WHERE curID={$this->Currency}";
+			$rs = $this->oSQL->q($sql);
+			$this->CurrencyTitle = $this->oSQL->get_data($rs);
+		}
 		
 		$this->Denominator = $params['denominator']?$params['denominator']:1;
 		$this->ID = md5(time());
@@ -3246,7 +3250,7 @@ class Reports{
 		ob_start();
 		static $Level1_title;
 		
-		// echo '<pre>';print_r($data);echo '</pre>';
+		// echo '<pre>';print_r($data);echo '</pre>';die();
 		
 		if (!is_array($data)){
 			return (false);
@@ -3752,14 +3756,23 @@ class Reports{
 				<tr><th colspan="<?php echo $this->colspan;?>">Operational KPIs</th></tr>				
 				<?php		
 				while ($rw = $this->oSQL->f($rs)){			
-					$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
+					$rw['Budget item'] = $rw['prtTitle'];//." ({$rw['unit']})";
+					$rw['Level1_title'] = $rw['unit'];
+					$rw['Level1_code'] = $rw['unit'];
 					$filter = $this->filter;
 					$filter['activity'] = $rw['activity'];
 					$arrMetadata = Array('filter' => $filter, 'DataAction' => 'kpiByCustomer', 'title'=>$rw['prtTitle']);
 					$rw['metadata'] = json_encode($arrMetadata);
 					$rw['href'] = "javascript:getCustomerKPI(".json_encode($arrMetadata).");";
-					$this->echoBudgetItemString($rw);
+					$arrKPIReport[$rw['unit']][$rw['activity']] = $rw;
+					
 				}
+				
+				foreach($arrKPIReport as $unit=>$data){
+					$this->echoBudgetItemString($data);
+				}
+				
+				
 			}
 		// }
 		

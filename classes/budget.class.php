@@ -20,6 +20,7 @@ class Budget{
 		$rw = $this->oSQL->f($rs);
 			
 		$this->arrPeriod = Array(1=>'jan',2=>'feb',3=>'mar',4=>'apr',5=>'may',6=>'jun',7=>'jul',8=>'aug',9=>'sep',10=>'oct',11=>'nov',12=>'dec',13=>'jan_1',14=>'feb_1',15=>'mar_1');
+		$this->arrPeriodTitle = Array(1=>'Jan',2=>'Feb',3=>'Mar',4=>'Apr',5=>'May',6=>'Jun',7=>'Jul',8=>'Aug',9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dec',13=>'Jan\''.$this->year-1999,14=>'Feb\''.$this->year-1999,15=>'Mar\''.$this->year-1999);
 		$this->type = $rw['scnType'];
 		if (strpos($this->type,'AM')){
 			$this->offset = 3;
@@ -576,18 +577,30 @@ class Budget{
 	public function getMonthlyRates($currency=643){		
 		
 		// $this->oSQL->startProfiling();
-		
-		$res = Array('YTD'=>1,'ROY'=>1, 'Total'=>1, 'Estimate'=>1);
+		$keys = Array('YTD','ROY','Total','Estimate');
 		for($m=1;$m<=15;$m++){
 				// $month = date('M',mktime(0,0,0,$m,15));
 				$month = $this->arrPeriod[$m];
-				$res[$month] = 1;
+				$keys[] = $month;
 		}
 		for($m=1;$m<=5;$m++){
 				// $month = date('M',mktime(0,0,0,$m,15));
 				$quarter = 'Q'.$m;
-				$res[$quarter] = 1;
+				$keys[] = $quarter;
 		}
+		$res = array_fill_keys($keys, 1);
+		
+		if ($currency=='rhq'){
+			$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency 
+					WHERE curTitle=scvVariableID AND scvScenarioID='{$this->id}'
+					AND curID=978";
+					$rs = $this->oSQL->q($sql);
+					$rate = $this->oSQL->get_data($rs);
+			$res = array_fill_keys($keys, $rate);
+			return($res);
+		}
+		
+
 		
 		if ($currency==643 || !$currency){
 			return ($res);
@@ -647,6 +660,7 @@ class Budget{
 					while ($rw = $this->oSQL->f($rs)){
 						$month = strtolower($rw['month'].($rw['Year']>$this->year?"_1":""));
 						$res[$month] = $rw['Rate'];
+						$ytd_rate+=$rw['Rate'];
 						$i++;
 					}
 					$res['YTD'] = $ytd_rate/$i;
