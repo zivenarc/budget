@@ -58,12 +58,16 @@ if(!isset($_GET['pccGUID'])){
 	
 	<div id='waterfall'>
 	<?php
-	$period_type = 'cm';
+	if(strpos($oBudget->type,'Budget')!==false){
+		$period_type = 'fye';
+	} else {
+		$period_type = 'cm';
+	}
 
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	
-	$settings['gpcus'] = Array('title'=>"GP by customer sold by {$arrBDV['pccTitle']}, current month",
+	$settings['gpcus'] = Array('title'=>"GP by customer sold by {$arrBDV['pccTitle']}",
 						'actual_title'=>$oBudget->title,
 						'budget_title'=>$oReference->title,
 						'sqlBase' => "SELECT customer_group_code as optValue, 
