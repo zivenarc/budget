@@ -419,13 +419,24 @@ class Document extends easyForm{
 	}
 	
 	protected function getProfitEG(){
-		GLOBAL $arrUsrData;
+		GLOBAL $arrUsrData, $strLocal, $oSQL;
+		
+		$sql = "SELECT PCC.pccID as optValue, PCC.pccTitle{$strLocal} as optText, PCC.pccFlagDeleted as optDeleted,
+					IFNULL(PARENT.pccTitle{$strLocal},'No group') as optParentTitle
+				FROM common_db.tbl_profit PCC
+				LEFT JOIN common_db.tbl_profit PARENT on PARENT.pccCode1C=PCC.pccParentCode1C
+				WHERE PCC.pccFlagFolder=0";
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){
+			$arrProfit[$rw['optParentTitle']][$rw['optValue']] = ($rw['optDeleted']?'<del>':'').$rw['optText'].($rw['optDeleted']?'</del>':'');
+		}
+		
 		$res = Array(
 			'title'=>'Profit center'
 			,'field'=>$this->prefix.'ProfitID'
 			,'type'=>'combobox'
 			,'width'=>'80px'
-			,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit WHERE pccFlagFolder=0'
+			,'sql'=>$arrProfit
 			,'default'=>$arrUsrData['empProfitID']
 			,'disabled'=>!$this->flagUpdate
 		);
@@ -500,7 +511,7 @@ class Document extends easyForm{
 			'title'=>'Activity'
 			,'field'=>$field
 			,'type'=>'combobox'
-			,'width'=>'100px'
+			,'width'=>'280px'
 			,'source'=>Activities::getStructuredRef()
 			,'sql'=>"vw_product_type_select"
 			, 'disabled'=>!$this->flagUpdate

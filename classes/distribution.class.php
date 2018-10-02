@@ -67,11 +67,11 @@ class Distribution extends Document{
 		$this->Columns[] = Array(
 					'title'=>'Item'
 					,'field'=>$this->prefix.'ItemGUID'
-					,'type'=>'combobox'
-					// ,'sql'=>$Items->getStructuredRef()
+					,'type'=>'combobox'					
 					,'defaultValue'=>""
 					,'defaultText'=>"---Any---"
-					,'sql'=>"SELECT itmGUID as optValue, itmTitle as optText FROM vw_item"
+					// ,'sql'=>"SELECT itmGUID as optValue, itmTitle as optText FROM vw_item"
+					,'sql'=>$Items->getStructuredRef()
 					, 'mandatory' => false
 					, 'disabled'=>!$this->flagUpdate
 				);
@@ -92,11 +92,11 @@ class Distribution extends Document{
 					'title'=>'Activity'
 					,'field'=>$this->prefix.'ActivityID'
 					,'type'=>'combobox'
-					,'sql'=>"SELECT prtID as optValue, prtTitle as optText FROM vw_product_type"
-					// ,'sql'=>$Activities->getStructuredRef()
+					// ,'sql'=>"SELECT prtID as optValue, prtTitle as optText FROM vw_product_type"
+					,'sql'=>$Activities->getStructuredRef()
 					, 'mandatory' => true
 					, 'disabled'=>!$this->flagUpdate
-					, 'defaultText'=>"[All]"
+					// , 'defaultText'=>"[All]"
 				);
 		$this->Columns[] =Array(
 					'title'=>'Total'

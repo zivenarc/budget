@@ -106,10 +106,10 @@ class Activities extends Reference{
 		GLOBAL $oSQL, $strLocal;
 		$sql = "SELECT * FROM vw_product_type WHERE prtFlagDeleted=0 ORDER BY prtGHQ";
 		$rs = $oSQL->q($sql);
-		$arrRes['Undefined group'][0] = '[None]';
+		$arrRes['Undefined group'][0] = '[Not selected]';
 		while ($rw=$oSQL->f($rs)){
 			$group = strlen($rw['prtGHQ'])?$rw['prtGHQ']:'Undefined group';
-			$arrRes[$group][$rw['prtID']] = $rw["prtTitle$strLocal"];
+			$arrRes[$group][$rw['prtID']] = "{$rw["prtTitle"]} ({$rw["prtTitleLocal"]})";
 		}
 		
 		return($arrRes);

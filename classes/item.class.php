@@ -80,13 +80,9 @@ class Items extends Reference{
 	
 	public function getStructuredRef(){		
 		$group = '';		
-		foreach ($this->data as $key=>$value){
-			if ($group!=$value[$this->prefix.'ParentID']){
-				$arrRes['##optgroupopen##'.$value[$this->prefix.'ParentID']] = $value[$this->prefix.'ParentTitle'];
-			}
+		foreach ($this->data as $key=>$value){	
 			if ($value[$this->prefix.'ParentID']){
-				$arrRes[$key] = $value[$this->prefix.'Title'];
-				$group = $value[$this->prefix.'ParentID'];
+				$arrRes[$value[$this->prefix.'ParentTitle']][$key] = $value[$this->prefix.'Title'];				
 			}
 			
 		}
