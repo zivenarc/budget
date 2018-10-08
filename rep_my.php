@@ -11,7 +11,6 @@ if ($_GET['ownerID']=='MYSELF'){
 }
 SetCookie('ownerID',$ownerID,0);
 
-require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 

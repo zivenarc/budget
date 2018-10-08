@@ -119,15 +119,14 @@ if ($_POST['DataAction']){
 	
 	if($_POST['DataAction']=='fill'){		
 		
-		$sql = "SELECT jitProductID, jitEstIncomeCurr, COUNT(jitProductID),AVG(jitEstIncome) as IncomeRate,jitEstCostCurr, AVG(jitEstCost) as CostRate FROM nlogjc.tbl_job_item
-				JOIN nlogjc.tbl_job ON jobID=jitJobID
-				JOIN nlogjc.tbl_jobtemplate ON jteGUID=jobTemplateID
-				WHERE jteProductFolderID='".$oDocument->data['salProductFolderID']."' 
-					AND jobCustomerID=".(integer)$oDocument->data['salCustomerID']."
-					AND jobProfitID=".(integer)$oDocument->data['salProfitID']." AND DATEDIFF(NOW(), jobInsertDate)<=365
-				GROUP BY jitProductID, jitQtdIncomeCurr
-				HAVING COUNT(jitProductID)>1
-				ORDER BY	jitProductID, COUNT(jitProductID) DESC";//die($sql);
+		$sql = "SELECT activity, SUM(".$oDocument->budget->getThisYTDSQL().")/{$oDocument->budget->cm} as nVolume, kpi
+				FROM reg_sales
+				WHERE customer=".(integer)$oDocument->customer."
+					AND pc=".(integer)$oDocument->profit."
+					AND source='Actual'
+					AND scenario='{$oDocument->budget->id}'
+				GROUP BY activity, kpi				
+				";//die($sql);
 				
 		$oDocument->fillGridSQL = $sql;
 		
@@ -136,36 +135,15 @@ if ($_POST['DataAction']){
 			$row = $oDocument->add_record();
 			$row->flagUpdated = true;				
 			$row->profit = $oDocument->profit;
-			$row->product = $rw['jitProductID'];				
+			$row->activity = $rw['activity'];				
 			$row->customer = $oDocument->customer;				
 			$row->sales = $oDocument->sales;
-			$row->kpi = 1;
+			$row->kpi = $rw['kpi'];
 			//$row->comment = $_POST['comment'][$id];				
-			$row->selling_rate = (double)$rw['IncomeRate'];				
-			switch($rw['jitEstIncomeCurr']){
-				case 'LOC':
-				case 'none':
-				case '':
-					$selling_curr = 'RUB';
-					break;
-				default:
-					$selling_curr = $rw['jitEstIncomeCurr'];
-					break;
+			for ($m = $oDocument->budget->nm; $m<=15; $m++){
+				$month = $oDocument->budget->arrPeriod[$m];
+				$row->{$month} = $rw['nVolume'];
 			}
-				
-			$row->selling_curr = $selling_curr;				
-			$row->buying_rate = (double)$rw['CostRate'];
-			switch($rw['jitEstCostCurr']){
-				case 'LOC':
-				case 'none':
-				case '':
-					$buying_curr = 'RUB';
-					break;
-				default:
-					$buying_curr = $rw['jitEstCostCurr'];
-					break;
-			}			
-			$row->buying_curr = $buying_curr;	
 		}		
 	}
 	
