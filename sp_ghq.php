@@ -121,7 +121,7 @@ $arrAccounts = Array(
 		'Gross operating profit'=>Array('class'=>'budget-subtotal'),
 		'General costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere}  
-								".Reports::SGA_FILTER."
+								AND (account LIKE '5%' AND account NOT IN ('5999CO','527000'))
 								AND pccFlagProd=1											
 								GROUP by {$sqlGroupBy}
 								ORDER BY account",'subtotal'=>Array('Net operating profit','PBT')),
