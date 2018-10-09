@@ -33,7 +33,6 @@ $startMonth = isset($_GET['mthStart'])?$_GET['mthStart']:1+$oBudget->offset;
 $endMonth = isset($_GET['mthEnd'])?$_GET['mthEnd']:12+$oBudget->offset;
 $colspan = $endMonth - $startMonth + 3;
 
-
 $sql = "SELECT account, pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates)." 
 		FROM vw_master
 		WHERE scenario='{$budget_scenario}' AND company='{$company}'
@@ -76,6 +75,23 @@ $sqlWhere = "WHERE scenario='{$budget_scenario}'
 			AND source<>'Estimate'";
 			// AND pccFlagProd=1 ";
 
+
+//------------------------------------------DEBUG
+if($_GET['DataAction']=='excel'){
+	include ('includes/inc-frame_top.php');
+	$sql = "SELECT {$sqlFields} 
+			FROM vw_master 
+			{$sqlWhere}
+			GROUP BY {$sqlGroupBy}";
+	echo '<h1>Data</h1>';
+	echo '<pre>',$sql,'</pre>';	
+	$rs = $oSQL->q($sql);
+	populate_recordset($rs,'budget','d.m.Y','debug');
+	Reports::_echoButtonCopyTable('debug');
+	include ('includes/inc-frame_bottom.php');
+	die();
+}
+////////////////////////////////////////////////
 			
 $arrRevenueFilter = Array(
 	Items::REVENUE,

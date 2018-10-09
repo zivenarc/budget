@@ -481,18 +481,18 @@ function plFillArray ($arrInput, &$arrOutput, $strTabKey='', $strEntityForm=''){
 	};
 }
 
-function populate_recordset($rs, $class='log', $dateFormat = 'd.m.Y'){
+function populate_recordset($rs, $class='log', $dateFormat = 'd.m.Y', $id=null){
 // Функция выводит простую таблицу на основе рекордсета с минимальным форматированием
 // Аргументы: 	$rs - рекордсет
 //				$class - CSS класс таблицы
 //				$dateFormat - формат даты
 
-GLOBAL $oSQL;
+	GLOBAL $oSQL;
 
 	$flagPrintHeader = true;
 	
-	echo "<table class=\"$class\">\r\n<thead>";
-	while($rw = $oSQL->fetch_array($rs)){
+	echo "<table id='{$id}' class='{$class}'>\r\n<thead>";
+	while($rw = $oSQL->f($rs)){
 	
 		if ($flagPrintHeader){
 			$keys = array_keys($rw);
