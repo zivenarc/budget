@@ -249,7 +249,7 @@ class MSF extends Document{
 					// echo '<pre>';print_r($arrDistribution);echo '</pre>';die();
 					
 					foreach($this->records[$this->gridName] as $id=>$record){
-						if(is_array($arrDistribution[$record->pc])){
+						if(is_array($arrDistribution[$record->pc])){ //////////////////////////////// For Business unit with revenue and activity distribution base
 							foreach ($arrDistribution[$record->pc] as $activity=>$values){
 								foreach ($arrAccounts as $account=>$arrItems){
 									foreach($arrItems as $item_code=>$item_values){									
@@ -258,11 +258,11 @@ class MSF extends Document{
 										$master_row->bdv = $this->profit;
 										$master_row->activity = $activity;
 										if (strpos($account,'6')===0 || $account=='527000'){
-											$item = $Items->getById($item_code);
-											$master_row->item = $item_code;
+											$item = $Items->getById($item_code); 
+											$master_row->item = $item_code; //Distribute non-operating costs and MSF in place
 										} else {
-											$item = $Items->getById($this->item);
-											$master_row->item = $this->item;
+											$item = $Items->getById($this->item); 
+											$master_row->item = $this->item; //Collect all other items into corporate cost total
 										}
 										$master_row->account = $item->getYACT($record->pc);									
 										
@@ -286,7 +286,7 @@ class MSF extends Document{
 									}
 								}
 							}	
-						} else {
+						} else { //////////////////////////////// For Business unit without revenue and activity distribution base
 							foreach ($arrAccounts as $account=>$arrItems){
 								foreach($arrItems as $item_code=>$item_values){									
 									$master_row = $oMaster->add_master();
