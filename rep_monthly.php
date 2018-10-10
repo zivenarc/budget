@@ -57,9 +57,11 @@ switch ($_POST['DataAction']){
 			$oBudget::getProfitTabs('reg_master', true, Array('pccID'=>$arrBus));
 			include ('includes/inc-frame_bottom.php');
 		} else {
-				
-			$oReport->monthlyReport($type);		
-
+			if (strpos($oBudget->type,'Budget')!== false) {
+				$oReport->quarterly($type);
+			} else {	
+				$oReport->monthlyReport($type);		
+			}
 		}
 }
 
