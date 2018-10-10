@@ -2180,6 +2180,45 @@ class Reports{
 			return ($this->_processFLData($rs));
 	}
 	
+	private function _firstLevelQuarterly($sql, $firstLevelTitle){	
+		
+		$tableID = $this->ID?$this->ID:"QR_".md5($sql);
+		
+		$this->colspan = 14;
+		
+		try {
+			$rs = $this->oSQL->q($sql);
+		} catch (Exception $e) {
+				echo "<div class='error'>SQL error:</div>";
+				echo "<pre>",$sql,"</pre>";
+				return (false);
+		};
+			?>
+			<table id='<?php echo $tableID;?>' class='budget'>
+			<caption><?php echo $this->caption;?></caption>
+			<thead>
+				<tr>
+					<th rowspan="2"><?php echo $firstLevelTitle; ?></th>
+					<th rowspan="2">Account</th>					
+					<th colspan="4"><?php echo $this->oReference->year;?></th>
+					<th colspan="4"><?php echo $this->oBudget->year;?></th>
+					<th rowspan="2" class='budget-ytd'><?php echo strpos($this->oBudget->type,'Budget')!==false?'Budget':'FYE';?></th>
+					<th rowspan="2" ><?php echo (strpos($this->oBudget->type,'Budget')!==false)?$this->oReference->id:'Budget';?></th>
+					<th rowspan="2">Diff</th>
+					<th rowspan="2">%</th>
+				</tr>
+				<tr>
+					<?php 						
+						echo $this->oBudget->getTableHeader('quarterly');
+						echo $this->oBudget->getTableHeader('quarterly');
+					?>		
+				</tr>
+			</thead>			
+			<tbody>
+			<?php
+			return ($this->_processFLData($rs));
+	}
+	
 	private function firstLevelReportMR($sql, $firstLevelTitle, $oBudget=null){
 		global $oSQL;				
 		
@@ -2413,11 +2452,17 @@ class Reports{
 					$l1Code = (string)$rw['level1_code'];
 					$arrSubreport[$l1Code][$rw['level2_code']] = Array('Level1_title'=>$rw['Level1_title'],'Budget item'=>$rw['level2_title'],'level1_code'=>$l1Code);
 					
+					foreach($this->columns as $column){
+						$arrSubreport[$l1Code][$rw['level2_code']][$column]+=$rw[$column];	
+					}
+					
+					/*
 					for ($m=1;$m<=15;$m++){						
 						$month = $this->oBudget->arrPeriod[$m];
 						$arrSubreport[$l1Code][$rw['level2_code']][$month]+=$rw[$month];
 						if ($m<=5){
 							$arrSubreport[$l1Code][$rw['level2_code']]['Q'.$m]+=$rw['Q'.$m];
+							$arrSubreport[$l1Code][$rw['level2_code']]['Q'.$m.'_B']+=$rw['Q'.$m.'_B'];
 						};						
 					};
 					
@@ -2440,7 +2485,8 @@ class Reports{
 					$arrSubreport[$l1Code][$rw['level2_code']]['NM_B'] += $rw['NM_B'];
 					$arrSubreport[$l1Code][$rw['level2_code']]['FYE_A'] += $rw['FYE_A'];
 					$arrSubreport[$l1Code][$rw['level2_code']]['FYE_B'] += $rw['FYE_B'];
-
+					*/
+					
 					$arrSort[$l1Code]['value'] += $rw['YTD_A']+$rw['YTD_B']+$rw['Total_AM']+$rw['estimate_AM'];
 					
 					if (!$template) $template = $rw;
@@ -3024,7 +3070,12 @@ class Reports{
 					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, $cm ,$arrRates, $denominator).") as YTD_A, 
 					0 as YTD_B, 
 					SUM(".$this->oBudget->getYTDSQL($nm, 12+$this->oBudget->offset,$arrRates, $denominator).") as ROY_A, 
-					0 as ROY_B";
+					0 as ROY_B,
+					0 as Q1_B,
+					0 as Q2_B,
+					0 as Q3_B,
+					0 as Q4_B,
+					0 as Q5_B";
 		
 		$res['next'] = $res['actual'];
 		
@@ -3041,7 +3092,8 @@ class Reports{
 					0 as YTD_A,
 					SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, $cm ,$arrRates, $denominator).") as YTD_B, 
 					0 as ROY_A,
-					SUM(".$this->oBudget->getYTDSQL($nm,12+$this->oBudget->offset,$arrRates, $denominator).") as ROY_B";
+					SUM(".$this->oBudget->getYTDSQL($nm,12+$this->oBudget->offset,$arrRates, $denominator).") as ROY_B,
+					".$this->oBudget->getQuarterlySumSQL($arrRates, $denominator,'_B')."\r\n ";
 		
 		// echo '<pre>';print_r($arrRates);echo '</pre>';
 		
@@ -3124,6 +3176,22 @@ class Reports{
 		$roy = 0;
 		
 		switch($this->structure){
+			case 'quarterly':			
+				?>
+				<td class='budget-decimal <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q2_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q3_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q4_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q5_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q2'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q3'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q4'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Q5'],0);?></td>
+				<td class='budget-decimal budget-ytd<?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Total_AM'],0);?></td>
+				<td class='budget-decimal budget-ytd<?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['estimate_AM'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['Total_AM']-$data['estimate_AM'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><em><?php self::render_ratio($data['Total_AM'],$data['estimate_AM'],0);?></em></td>
+				<?php
+				break;
 			case 'monthly':
 			?>
 				<td class='budget-decimal budget-quarterly <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['CM_A'],0);?></td>
@@ -3984,6 +4052,67 @@ class Reports{
 		?>
 		<button onclick="SelectContent('<?php echo $id;?>');">Copy table</button>
 		<?php
+	}
+	
+	function quarterly($type='ghq'){
+		
+		$sqlWhere = $this->sqlWhere;
+		
+		$this->structure = 'quarterly';
+		$this->columns = Array('Q2','Q3','Q4','Q5','Q2_B','Q3_B','Q4_B','Q5_B','Total_AM','estimate_AM');
+		$this->sqlSelect = "";
+		
+		foreach($this->columns as $i=>$field){
+			$this->sqlSelect .= ($this->sqlSelect?",\r\n":"")."SUM(`{$field}`) as '{$field}'";
+		}
+		
+		$strFields = $this->_getPeriodicFields();
+		
+		$arrMeasure = $this->_getSQLMeasure($type);
+				
+		// $this->structure = 'monthly';
+		// $strFields = $this->_getPeriodicFields();
+		
+		// $strFields = $this->_getMRFields();
+		$sqlGroup = "GROUP BY Level1_title, level1_code, `level2_title`, `level2_code`, `Group`";
+		$sqlOrder = "ORDER BY `level1_code`, `Group`, `itmOrder` ASC";
+
+		
+		ob_start();
+		
+		$sql = "SELECT {$arrMeasure['sql']}
+					{$strFields['actual']}
+			FROM `vw_master`			
+			{$sqlWhere}  
+				AND scenario='{$strFields['from_a']}' 
+				AND {$this->strGPFilter}
+			{$sqlGroup}	
+			UNION ALL
+				SELECT {$arrMeasure['sql']}
+				{$strFields['budget']}
+			FROM `vw_master`				
+			{$sqlWhere} 
+				AND scenario='{$strFields['from_b']}' 
+				AND {$this->strGPFilter}
+			{$sqlGroup}			
+			";
+		
+		$sql = "SELECT `Level1_title`, `level1_code`, `level2_title`, `Group`, `level2_code`,`itmOrder`,
+					{$this->sqlSelect}
+				FROM ({$sql}) U 
+				{$sqlGroup} 
+				{$sqlOrder}";
+		
+		// echo '<pre>',$sql,'</pre>'; die();
+		$this->_firstLevelQuarterly($sql, $arrMeasure['title'], $this->oBudget);
+		//==========================================================================================================================Non-customer-related data
+		$this->_nofirstLevelPeriodic($sqlWhere);
+		?>
+		</tbody>
+		</table>
+		<?php
+		$this->_echoButtonCopyTable($this->ID);		
+		ob_flush(); 
 	}
 }
 ?>

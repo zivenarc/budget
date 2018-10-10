@@ -108,16 +108,15 @@ if(!isset($_GET['pccGUID'])){
 	?>
 		<div id='graph'/>
 	<?php
-	// if (strpos($oBudget->type,'FYE')!== false){
-	if (false){
+	if (strpos($oBudget->type,'FYE')!== false){
+	// if (false){
 		$oReport->monthlyReport($type);	
+	} elseif (strpos($oBudget->type,'Budget')!== false) {
+		$oReport->quarterly($type);
 	} else {
 		include ('includes/inc_report_buttons.php');
 		$oReport->periodicPnL($type);
 		$oReport->salesByActivity($sqlWhere);
-		
-		
-		
 	}
 	
 	if (strpos($oBudget->type,'Budget')===false && count($arrCounterparty['codes'])>1){

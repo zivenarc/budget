@@ -190,19 +190,19 @@ class Budget{
 		return($res);
 	}
 	
-	public function getQuarterlySumSQL($arrRates = null, $denominator=1){
+	public function getQuarterlySumSQL($arrRates = null, $denominator=1, $suffix=""){
 	
 			$strDenominator = $denominator>1?"/$denominator":"";
 	
 			if(is_array($arrRates)){
-				$arrRes[] = "SUM(`jan`/{$arrRates['jan']}+`feb`/{$arrRates['feb']}+`mar`/{$arrRates['mar']}){$strDenominator} as 'Q1'";
-				$arrRes[] = "SUM(`apr`/{$arrRates['apr']}+`may`/{$arrRates['may']}+`jun`/{$arrRates['jun']}){$strDenominator} as 'Q2'";
-				$arrRes[] = "SUM(`jul`/{$arrRates['jul']}+`aug`/{$arrRates['aug']}+`sep`/{$arrRates['sep']}){$strDenominator} as 'Q3'";
-				$arrRes[] = "SUM(`oct`/{$arrRates['oct']}+`nov`/{$arrRates['nov']}+`dec`/{$arrRates['dec']}){$strDenominator} as 'Q4'";
-				$arrRes[] = "SUM(`jan_1`/{$arrRates['jan_1']}+`feb_1`/{$arrRates['feb_1']}+`mar_1`/{$arrRates['mar_1']}){$strDenominator} as 'Q5'";
+				$arrRes[] = "SUM(`jan`/{$arrRates['jan']}+`feb`/{$arrRates['feb']}+`mar`/{$arrRates['mar']}){$strDenominator} as 'Q1{$suffix}'";
+				$arrRes[] = "SUM(`apr`/{$arrRates['apr']}+`may`/{$arrRates['may']}+`jun`/{$arrRates['jun']}){$strDenominator} as 'Q2{$suffix}'";
+				$arrRes[] = "SUM(`jul`/{$arrRates['jul']}+`aug`/{$arrRates['aug']}+`sep`/{$arrRates['sep']}){$strDenominator} as 'Q3{$suffix}'";
+				$arrRes[] = "SUM(`oct`/{$arrRates['oct']}+`nov`/{$arrRates['nov']}+`dec`/{$arrRates['dec']}){$strDenominator} as 'Q4{$suffix}'";
+				$arrRes[] = "SUM(`jan_1`/{$arrRates['jan_1']}+`feb_1`/{$arrRates['feb_1']}+`mar_1`/{$arrRates['mar_1']}){$strDenominator} as 'Q5{$suffix}'";
 			} else {
 				for($q=1;$q<=5;$q++){			
-					$arrRes[] = "SUM(`Q{$q}`){$strDenominator} as 'Q$q'";
+					$arrRes[] = "SUM(`Q{$q}`){$strDenominator} as 'Q{$q}{$suffix}'";
 				}
 			}
 		$res = implode(',',$arrRes);
