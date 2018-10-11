@@ -182,10 +182,10 @@ if(!isset($_GET['pccGUID'])){
 												".Reports::GP_FILTER."
 											GROUP BY customer_group_code",
 									'denominator'=>$denominator,
-									'budget_title'=>'ROY',
-									'actual_title'=>'YTD',
-									'tolerance'=>0.05,
-									'limit'=>10);	
+									'budget_title'=>'YTD',
+									'actual_title'=>'ROY',
+									'tolerance'=>0.04,
+									'limit'=>12);	
 			
 			$oWF = new Waterfall($settings['ROYYTD']);
 			$oWF->draw();
