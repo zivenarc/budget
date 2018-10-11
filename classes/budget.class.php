@@ -119,47 +119,47 @@ class Budget{
 		return($res);
 	}
 	
-	public function getThisYTDSQL($period_type = 'ytd',$arrRates = null){		
+	public function getThisYTDSQL($period_type = 'ytd',$arrRates = null, $denominator=1){		
 		$cm = $this->cm;
 		$nm = $this->nm;	
 		$nCurrent = $this->cm;	
 		
 		switch ($period_type){
 			case 'ytd':
-				return($this->getYTDSQL(1+$this->offset,$nCurrent,$arrRates));
+				return($this->getYTDSQL(1+$this->offset,$nCurrent,$arrRates,$denominator));
 				break;
 			case 'am':
-				return($this->getYTDSQL(4,15,$arrRates));
+				return($this->getYTDSQL(4,15,$arrRates,$denominator));
 				break;
 			case 'cm':
-				return($this->getYTDSQL($nCurrent,$nCurrent,$arrRates));
+				return($this->getYTDSQL($nCurrent,$nCurrent,$arrRates,$denominator));
 				break;
 			case 'cq':				
-				return($this->getYTDSQL($nCurrent-2,$nCurrent,$arrRates));
+				return($this->getYTDSQL($nCurrent-2,$nCurrent,$arrRates,$denominator));
 				break;
 			case 'nm':
-				return($this->getYTDSQL($nm,$nm,$arrRates));
+				return($this->getYTDSQL($nm,$nm,$arrRates,$denominator));
 				break;
 			case 'roy':
-				return($this->getYTDSQL($nCurrent+1,12+$this->offset,$arrRates));
+				return($this->getYTDSQL($nCurrent+1,12+$this->offset,$arrRates,$denominator));
 				break;
 			case 'q1':
-				return($this->getYTDSQL(1,3,$arrRates));
+				return($this->getYTDSQL(1,3,$arrRates,$denominator));
 				break;
 			case 'q2':
-				return($this->getYTDSQL(4,6,$arrRates));
+				return($this->getYTDSQL(4,6,$arrRates,$denominator));
 				break;	
 			case 'q3':
-				return($this->getYTDSQL(7,9,$arrRates));
+				return($this->getYTDSQL(7,9,$arrRates,$denominator));
 				break;
 			case 'q4':
-				return($this->getYTDSQL(10,12,$arrRates));
+				return($this->getYTDSQL(10,12,$arrRates,$denominator));
 				break;
 			case 'q5':
-				return($this->getYTDSQL(13,15,$arrRates));
+				return($this->getYTDSQL(13,15,$arrRates,$denominator));
 				break;
 			default:
-				return($this->getYTDSQL(1+$this->offset,12+$this->offset,$arrRates));
+				return($this->getYTDSQL(1+$this->offset,12+$this->offset,$arrRates,$denominator));
 				break;
 		}
 		
