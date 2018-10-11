@@ -146,30 +146,6 @@ if(!isset($_GET['pccGUID'])){
 		$oWF = new Waterfall($settings['nextGP']);
 		$oWF->draw();
 		
-		if (strpos($oBudget->type,'Budget')===false && $oBudget->cm<15){
-		$sqlActual = "SUM(".$oBudget->getThisYTDSQL('roy',$arrActualRates,(12+$oBudget->offset-$oBudget->cm)).")";
-		$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates,($oBudget->cm-$oBudget->offset)).")";
-		$settings['nextGP'] = Array('title'=>"GP by customer, ROY vs YTD",
-							'sqlBase' => "SELECT  customer_group_code as optValue, 
-												customer_group_title as optText,  
-												{$sqlActual} as Actual, 
-												{$sqlBudget} as Budget, 
-												({$sqlActual}-{$sqlBudget}) as Diff
-										FROM vw_master 
-										{$oReport->sqlWhere}
-											AND  scenario='{$oBudget->id}' 
-											".Reports::GP_FILTER."
-										GROUP BY customer_group_code",
-								'denominator'=>$denominator,
-								'budget_title'=>'ROY',
-								'actual_title'=>'YTD',
-								'tolerance'=>0.05,
-								'limit'=>10);	
-		
-		$oWF = new Waterfall($settings['nextGP']);
-		$oWF->draw();
-		
-		
 		$settings['nextCosts'] = Array('title'=>"Costs, next month changes",
 							'sqlBase' => "SELECT  IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
 												IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
@@ -190,6 +166,32 @@ if(!isset($_GET['pccGUID'])){
 		
 		$oWF = new Waterfall($settings['nextCosts']);
 		$oWF->draw();
+		
+		if ($oBudget->cm<15){
+			$sqlActual = "SUM(".$oBudget->getThisYTDSQL('roy',$arrActualRates,(12+$oBudget->offset-$oBudget->cm)).")";
+			$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates,($oBudget->cm-$oBudget->offset)).")";
+			$settings['ROYYTD'] = Array('title'=>"GP by customer, ROY vs YTD",
+								'sqlBase' => "SELECT  customer_group_code as optValue, 
+													customer_group_title as optText,  
+													{$sqlActual} as Actual, 
+													{$sqlBudget} as Budget, 
+													({$sqlActual}-{$sqlBudget}) as Diff
+											FROM vw_master 
+											{$oReport->sqlWhere}
+												AND  scenario='{$oBudget->id}' 
+												".Reports::GP_FILTER."
+											GROUP BY customer_group_code",
+									'denominator'=>$denominator,
+									'budget_title'=>'ROY',
+									'actual_title'=>'YTD',
+									'tolerance'=>0.05,
+									'limit'=>10);	
+			
+			$oWF = new Waterfall($settings['ROYYTD']);
+			$oWF->draw();
+		}
+		
+
 	}
 	?>
 	</div>
