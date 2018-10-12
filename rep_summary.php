@@ -182,8 +182,8 @@ if(!isset($_GET['pccGUID'])){
 												".Reports::GP_FILTER."
 											GROUP BY customer_group_code",
 									'denominator'=>$denominator,
-									'budget_title'=>'YTD',
-									'actual_title'=>'ROY',
+									'budget_title'=>'YTD/'.($oBudget->cm-$oBudget->offset),
+									'actual_title'=>'ROY/'.(12+$oBudget->offset-$oBudget->cm),
 									'tolerance'=>0.04,
 									'limit'=>12);	
 			
