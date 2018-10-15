@@ -2773,16 +2773,33 @@ class Reports{
 			if ($oSQL->n($rs)){
 				?>
 				<tr><th colspan="<?php echo $this->colspan;?>">Operational KPIs</th></tr>
-				<?php		
-				while ($rw = $oSQL->f($rs)){			
-					$rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
+				<?php
+				while ($rw = $this->oSQL->f($rs)){			
+					$rw['Budget item'] = $rw['prtTitle'];//." ({$rw['unit']})";
+					$rw['Level1_title'] = $rw['unit'];
+					$rw['Level1_code'] = $rw['unit'];
 					$filter = $this->filter;
 					$filter['activity'] = $rw['activity'];
 					$arrMetadata = Array('filter' => $filter, 'DataAction' => 'kpiByCustomer', 'title'=>$rw['prtTitle']);
 					$rw['metadata'] = json_encode($arrMetadata);
 					$rw['href'] = "javascript:getCustomerKPI(".json_encode($arrMetadata).");";
-					$this->echoBudgetItemString($rw);
+					$arrKPIReport[$rw['unit']][$rw['activity']] = $rw;
+					
 				}
+				
+				foreach($arrKPIReport as $unit=>$data){
+					$this->echoBudgetItemString($data);
+				}
+				
+				// while ($rw = $oSQL->f($rs)){			
+					// $rw['Budget item'] = $rw['prtTitle']." ({$rw['unit']})";
+					// $filter = $this->filter;
+					// $filter['activity'] = $rw['activity'];
+					// $arrMetadata = Array('filter' => $filter, 'DataAction' => 'kpiByCustomer', 'title'=>$rw['prtTitle']);
+					// $rw['metadata'] = json_encode($arrMetadata);
+					// $rw['href'] = "javascript:getCustomerKPI(".json_encode($arrMetadata).");";
+					// $this->echoBudgetItemString($rw);
+				// }
 			}
 		}
 		

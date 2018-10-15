@@ -373,7 +373,7 @@ class Budget{
 			if (!$bu_group){
 				$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle as optText 
 						FROM vw_profit 
-						WHERE pccFlagFolder=1 
+						WHERE pccFlagFolder=1 AND pccFlagDeleted=0
 						ORDER BY pccTitle";
 			} else {
 				$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
