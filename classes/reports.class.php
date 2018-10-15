@@ -1393,7 +1393,7 @@ class Reports{
 		
 	private function _documentPnL($sqlWhere, $params = Array('field_data','field_title','title')){
 		
-		for($m=$this->oBudget->nm;$this->oBudget->offset+12;$m++){
+		for($m=$this->oBudget->nm;$m<=$this->oBudget->offset+12;$m++){
 			$this->columns[] = $this->oBudget->arrPeriod[$m];
 		}
 		
