@@ -1392,7 +1392,13 @@ class Reports{
 	}
 		
 	private function _documentPnL($sqlWhere, $params = Array('field_data','field_title','title')){
-
+		
+		for($m=$this->oBudget->nm;$this->oBudget->offset+12;$m++){
+			$this->columns[] = $this->oBudget->arrPeriod[$m];
+		}
+		
+		$this->columns[] = 'ROY_A';
+		
 		$strFields = $this->_getPeriodicFields();
 		
 		ob_start();
@@ -2730,6 +2736,7 @@ class Reports{
 					$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
 					break;
 				case 'periodic':
+				case 'quarterly':
 				default:
 					$strFieldsKPI = self::_getPeriodicFields(Array('currency'=>643,'denominator'=>1));
 					break;
