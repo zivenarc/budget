@@ -1313,12 +1313,12 @@ class Reports{
 		global $oSQL;
 		
 		ob_start();
-			$sql = "SELECT prtGHQ, account, Title, ".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
+			$sql = "SELECT `Budget item`, item, prtGHQ, account, Title,  
 							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).") as Total 
 			FROM `vw_master`
-			$sqlWhere
-			GROUP BY prtGHQ, account
-			ORDER BY prtGHQ, account			
+			{$sqlWhere}
+			GROUP BY prtGHQ, account, item
+			ORDER BY prtGHQ, account, `Budget item`, item	
 			";
 			$rs = $oSQL->q($sql);
 			$tableID = "YACT_".md5($sql);
@@ -1327,36 +1327,61 @@ class Reports{
 				//echo "<pre>$sql</pre>";
 				return (false);
 			}
+			
+			while ($rw=$oSQL->f($rs)){
+				$arrYACT[$rw['account']] = $rw['Title'];
+				$arrItem[$rw['item']] = $rw['Budget item'];
+				$prtGHQ = strlen($rw['prtGHQ'])?$rw['prtGHQ']:'[None]';
+				$arrGHQ[] = $prtGHQ;
+				$arrReport[$rw['account']][$rw['item']][$prtGHQ] = $rw['Total'];
+			}
+			$arrGHQ = array_unique($arrGHQ);
+			
 			?>
 			<table id='<?php echo $tableID;?>' class='budget'>
-			<caption><?php echo $this->caption;?></caption>
+			<caption>GHQ reporting</caption>
 			<thead>
 				<tr>
-					<th>Activity</th>
 					<th>Account</th>
-					<th>Title</th>
-					<?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?>
+					<?php foreach ($arrGHQ as $prtGHQ){
+							echo "<th>{$prtGHQ}</th>";
+						}
+					?>
 					<th class='budget-ytd'>Total</th>
 				</tr>
 			</thead>			
 			<tbody>
 			<?php			
-			while ($rw=$oSQL->f($rs)){
+			foreach ($arrReport as $yact=>$arrReport_yact){
+				$arrTotal = array();
+				foreach ($arrReport_yact as $item=>$data){
+					
 				?>
 				<tr>
-					<td class='budget-tdh'><?php echo $rw['prtGHQ'];?></td>
-					<td class='budget-tdh'><?php echo $rw['account'];?></td>
-					<td class='budget-tdh'><?php echo $rw['Title'];?></td>
+					<td><?php echo $arrItem[$item];?></td>					
 				<?php
-				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-					// $month = $this->oBudget->arrPeriod[$m];
-					$month = $this->oBudget->arrPeriod[$m];
+					foreach ($arrGHQ as $prtGHQ){
+						$arrTotal[$prtGHQ] += $data[$prtGHQ];
+						?>
+						<td class="budget-decimal"><?php self::render($data[$prtGHQ],0);?></td>
+						<?php
+					}
 					?>
-					<td class="budget-decimal"><?php self::render($rw[$month],0);?></td>
-					<?php
+				<td class="budget-decimal budget-ytd"><?php self::render(array_sum($data),0);?></td>
+				</tr>
+				<?php
 				}
 				?>
-				<td class="budget-decimal budget-ytd"><?php self::render($rw['Total'],0);?></td>
+				<tr class='budget-subtotal'>
+					<td>Subtotal <?php echo $yact," ({$arrYACT[$yact]})";?></td>
+					<?php
+					foreach ($arrGHQ as $prtGHQ){
+						?>
+						<td class="budget-decimal"><?php self::render($arrTotal[$prtGHQ],0);?></td>
+						<?php
+					}?>
+					<td class="budget-decimal budget-ytd"><?php self::render(array_sum($arrTotal),0);?></td>
+				</tr>
 				<?php
 			}
 			?>

@@ -45,6 +45,8 @@ class Sales extends Document{
 		$this->pol = $this->data['salPOL'];
 		$this->pod = $this->data['salPOD'];
 		$this->ghq = $this->data['salGHQ'];
+		$this->new_biz = $this->data['salFlagNew'];
+		
 		
 	}
 	public function refresh($id){
@@ -909,12 +911,13 @@ class Sales extends Document{
 							WHERE `{$this->prefix}ID`={$this->ID} 
 							AND `{$this->prefix}GUID`=`Budget`.`source`;");
 				
+				
 				$this->doSQL("UPDATE tbl_sales
-								SET salKg=(SELECT SUM(".$this->budget->getYTDSQL($this->budget->cm, max($this->budget->length,12+$this->budget->offset)).") FROM reg_sales
-										   WHERE source=salGUID AND activity IN (46,47) and kpi=1),
-									salTEU=(SELECT SUM(".$this->budget->getYTDSQL($this->budget->cm, max($this->budget->length,12+$this->budget->offset)).") FROM reg_sales
-										   WHERE source=salGUID AND activity IN (48,58,63,52) and kpi=1)
-								WHERE `{$this->prefix}ID`={$this->ID}");
+							SET salKg=(SELECT SUM(".$this->budget->getYTDSQL($this->budget->cm, max($this->budget->length,12+$this->budget->offset)).") FROM reg_sales
+									   WHERE source=salGUID AND activity IN (46,47) and kpi=1),
+								salTEU=(SELECT SUM(".$this->budget->getYTDSQL($this->budget->cm, max($this->budget->length,12+$this->budget->offset)).") FROM reg_sales
+									   WHERE source=salGUID AND activity IN (48,58,63,52) and kpi=1)
+							WHERE `{$this->prefix}ID`={$this->ID}");
 				
 				$this->markPosted();				
 			}		

@@ -17,6 +17,24 @@ $oDocument->defineGrid();
 
 if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
+	if($_POST['DataAction']=='new_biz'){
+		$sql = Array();
+		$sql[] = "UPDATE tbl_sales SET salFlagNew=".(integer)$_POST['salFlagNew']." WHERE salGUID='{$oDocument->GUID}';";
+		$sql[] = "UPDATE reg_sales SET new=".(integer)$_POST['salFlagNew']." WHERE source='{$oDocument->GUID}'";
+		$sql[] = "UPDATE reg_master SET new=".(integer)$_POST['salFlagNew']." WHERE source='{$oDocument->GUID}'";
+		$success = true;
+		for ($i=0;$i<count($sql);$i++){
+			$success &= $oSQL->q($sql[$i]);
+		}
+		header('Content-type:application/json;');
+		if ($success) {
+			echo json_encode(Array('status'=>'success','user'=>$arrUsrData['usrID']));
+		} else {
+			echo json_encode(Array('status'=>'error'));
+		}
+		die();
+	}
+	 
 	if($_POST['DataAction']=='ownership'){
 		$sql = Array();
 		$sql[] = "UPDATE tbl_sales SET salUserID='{$arrUsrData['usrID']}' WHERE salGUID='{$oDocument->GUID}';";
@@ -198,7 +216,13 @@ if ($oDocument->customer && $oDocument->flagUpdate ){
 	$arrActions[] = Array ('title'=>'Estimate','action'=>"javascript:fillGrid('_estimate');",'class'=>'brick');
 }
 if($oDocument->GUID){
-	$arrActions[] = Array ('title'=>'Take ownership','action'=>"javascript:ownership();",'class'=>'user');
+	$arrActions[] = Array ('title'=>'Take ownership','action'=>"javascript:ownership();",'class'=>'fa-user');
+	if($oDocument->new_biz){
+		$arrActions[] = Array ('title'=>'Old biz','action'=>"javascript:old_biz();",'class'=>'fa-old');
+		$arrWarning[] = Array('class'=>'good','text'=>"This is a <strong>new business</strong>");
+	} else {
+		$arrActions[] = Array ('title'=>'New biz','action'=>"javascript:new_biz();",'class'=>'fa-new');
+	}	
 }
 //============================== Main form definition ==============================
 

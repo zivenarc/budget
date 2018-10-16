@@ -56,3 +56,21 @@ function ownership(){
 		}
 	});
 }
+
+function new_biz(){
+	$.post(location.href,{DataAction:'new_biz', salFlagNew: 1},function(data){
+		console.log(data);
+		if (data.status=='success'){
+			location.reload();
+		}
+	});
+}
+
+function old_biz(){
+	$.post(location.href,{DataAction:'new_biz', salFlagNew: 0},function(data){
+		console.log(data);
+		if (data.status=='success'){
+			location.reload();
+		}
+	});
+}

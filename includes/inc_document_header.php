@@ -82,7 +82,8 @@ for($i=0;$i<count($arrWarning);$i++){
 <td style='width:400px;'>
 	<div style='text-align:center;'>
 		<textarea id='input_textarea' rows='10' style='width:90%;margin:5px;' placeholder='Paste Excel table here (numbers only)'></textarea>
-		<a class='a-button' href='javascript:parse_textarea();' style='margin:auto;'>Parse into data table</a>
+		<button onclick='parse_textarea();' style='margin:auto;'>Parse into data table</button>
+		<button class='fa-help' onclick='parse_textarea_help();' style='margin:auto;'><i class=' fa fa-question-circle'></i></button>
 	</div>
 </td>
 <?php } ?>
