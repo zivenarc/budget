@@ -7,11 +7,22 @@
 					WHERE scenario='{$_GET['tab']}'
 					GROUP BY responsible
 					ORDER BY nCount DESC";
-			$rs =$oSQL->q($sql);
+			$rs = $oSQL->q($sql);
+			$arrReport = Array($arrUsrData['usrID']=>Array());
 			while ($rw=$oSQL->f($rs)){
+				$arrReport[$rw['responsible']] = $rw;
+			};
+			
+			foreach ($arrReport as $user=>$data){
 				?>
-				<div><a href='sp_my.php?ownerID=<?php echo $rw['responsible'];?>#<?php echo $_GET['tab'];?>'><?php echo ($rw['usrFlagDeleted']?'<del>':''),$rw['usrTitle'],($rw['usrFlagDeleted']?'</del>':''),($rw['nCount']?(' ('.$rw['nCount'].')'):'');?></a></div>
-				<?php
+				<div>
+					<?php if ($user==$arrUsrData['usrID']) { echo '<strong>'; }?>
+					<a href='sp_my.php?ownerID=<?php echo $user;?>#<?php echo $_GET['tab'];?>'>
+					<?php echo ($data['usrFlagDeleted']?'<del>':''),$data['usrTitle'],($data['usrFlagDeleted']?'</del>':''),($data['nCount']?(' ('.$data['nCount'].')'):'');?>
+					</a>
+					<?php if ($user==$arrUsrData['usrID']) { echo '</strong>'; }?>
+				</div>
+				<?php	
 			}
 			?>
 			</nav>
@@ -26,9 +37,19 @@
 					GROUP BY pc
 					ORDER BY nCount DESC";
 			$rs =$oSQL->q($sql);
+			$arrReport = Array($arrUsrData['usrProfitID']=>Array());
 			while ($rw=$oSQL->f($rs)){
+				$arrReport[$rw['pc']] = $rw;
+			};
+			foreach ($arrReport as $pc=>$data){
 				?>
-				<div><a href='sp_bu.php?pc=<?php echo $rw['pc'];?>#<?php echo $_GET['tab'];?>'><?php echo ($rw['pccFlagDeleted']?'<del>':''),$rw['pccTitle'],($rw['pccFlagDeleted']?'</del>':''),' (',$rw['nCount'],')';?></a></div>
+				<div>
+				<?php if ($pc==$arrUsrData['usrProfitID']) { echo '<strong>'; }?>
+				<a href='sp_bu.php?pc=<?php echo $pc;?>#<?php echo $_GET['tab'];?>'>
+				<?php echo ($data['pccFlagDeleted']?'<del>':''),$data['pccTitle'],($data['pccFlagDeleted']?'</del>':''),($data['nCount']?(' ('.$data['nCount'].')'):'');?>
+				</a>
+				<?php if ($pc==$arrUsrData['usrProfitID']) { echo '</strong>'; }?>
+				</div>
 				<?php
 			}
 			?>
