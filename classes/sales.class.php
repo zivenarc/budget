@@ -617,7 +617,7 @@ class Sales extends Document{
 							// OFT loss compensation	
 							$master_row = $oMaster->add_master();	
 							$master_row->profit = $this->profit;
-							$activity = ($this->destination_agent==self::PB_Ourselves?$oActivities->OFIGB:$record->activity);
+							$activity = ($this->destination_agent==self::PB_Ourselves?$oActivities::OFIGB:$record->activity);
 							$master_row->activity = $activity;
 							$master_row->customer = $record->customer;				
 							$master_row->sales = $record->sales;
@@ -626,12 +626,14 @@ class Sales extends Document{
 							$master_row->item = $item->id;
 							for($m=1;$m<=15;$m++){
 								$month = $this->budget->arrPeriod[$m];
-								$master_row->{$month} = -$arrGP[$month];
+								if($arrGP[$month]) { 
+									$master_row->{$month} = -$arrGP[$month];
+								}
 							}
 							//SAP rate per TEU
 							$master_row = $oMaster->add_master();	
 							$master_row->profit = $this->profit;
-							$activity = ($this->destination_agent==self::PB_Ourselves?$oActivities->OFICOM:$oActivities->OFECOM);
+							$activity = ($this->destination_agent==self::PB_Ourselves?$oActivities::OFICOM:$oActivities::OFECOM);
 							$master_row->activity = $activity;
 							$master_row->customer = $record->customer;				
 							$master_row->sales = $record->sales;					
