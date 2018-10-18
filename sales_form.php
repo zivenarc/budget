@@ -235,10 +235,12 @@ if ($oDocument->flagPosted){
 		$nKPI+=$record->kpi;
 		if ($record->kpi && $record->unit=='TEU'){
 			$nTEU += $record->total();
+			$hblCount += $record->hbl;
+			$profit = ($record->selling_rate>$record->buying_rate);
 		}
 		if ($record->kpi && $record->unit=='Kgs'){
 			$nKgs += $record->total();
-		}
+		}		
 	}
 	if(!$nKPI){
 		$arrWarning[] = Array('class'=>'error','text'=>'No KPIs are reported by this document');
@@ -246,6 +248,15 @@ if ($oDocument->flagPosted){
 	if($nTEU){
 		$arrWarning[] = Array('class'=>'info','text'=>"OFF Volume: <strong>{$nTEU} TEU</strong>. GP per unit: <strong>".number_format($oDocument->amount/$nTEU,0)."</strong>");
 	}
+	
+	if($oDocument->gbr && !$hblCount){
+		$arrWarning[] = Array('class'=>'error','text'=>'SAP cannot be applied without a HBL');
+	}
+	
+	if($oDocument->gbr && $profit){
+		$arrWarning[] = Array('class'=>'warning','text'=>'SAP applied to a profitable freight rate');
+	}
+	
 	if($nKgs){
 		$arrWarning[] = Array('class'=>'info','text'=>"AFF Volume: <strong>{$nKgs} Kgs</strong>. GP per unit: <strong>".number_format($oDocument->amount/$nKgs,0)."</strong>");
 	}
