@@ -605,23 +605,45 @@ class Sales extends Document{
 					}
 					
 					if ($flagProjectBridge){
-						
-						if($this->gbr){
-							$SCC = $this->gbr;
-						} else {
-							$sql = "SELECT * FROM tbl_route WHERE rteID=".(integer)$this->route;
-							$rs = $this->oSQL->q($sql);
-							$arrRoute = $this->oSQL->f($rs);
-							$SCC_OFF = $arrRoute['rteSC_OFF'];
-							$SCC_AFF = $arrRoute['rteSC_AFF'];
-						}
-						
+										
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];	
 							$arrGP[$month] = ($record->{$month})*($record->selling_rate*$this->settings[strtolower($record->selling_curr)] - $record->buying_rate*$this->settings[strtolower($record->buying_curr)]);
 						}
 						
-						if($this->settings['PS_Scheme']=='PS2018'){
+						if ($this->gbr){
+							//////////////////////// SAP/GBR scheme. OFT loss to be compensated and rate per TEU to be paid
+							$SCC = $this->gbr;
+							// OFT loss compensation	
+							$master_row = $oMaster->add_master();	
+							$master_row->profit = $this->profit;
+							$activity = ($this->destination_agent==self::PB_Ourselves?$oActivities->OFIGB:$record->activity);
+							$master_row->activity = $activity;
+							$master_row->customer = $record->customer;				
+							$master_row->sales = $record->sales;
+							$item = $oItems->getById(Items::REVENUE);
+							$master_row->account = 'J00400';
+							$master_row->item = $item->id;
+							for($m=1;$m<=15;$m++){
+								$month = $this->budget->arrPeriod[$m];
+								$master_row->{$month} = -$arrGP[$month];
+							}
+							//SAP rate per TEU
+							$master_row = $oMaster->add_master();	
+							$master_row->profit = $this->profit;
+							$activity = $activity = ($this->destination_agent==self::PB_Ourselves?$oActivities->OFICOM:$oActivities->OFECOM);
+							$master_row->activity = $activity;
+							$master_row->customer = $record->customer;				
+							$master_row->sales = $record->sales;					
+							$item = $oItems->getById(Items::REVENUE);
+							$master_row->account = 'J00400';
+							$master_row->item = $item->id;
+							for($m=1;$m<=15;$m++){
+								$month = $this->budget->arrPeriod[$m];								
+								if(is_array($this->arrTEU)) $master_row->{$month} = ($this->arrTEU[$month])*$SCC*$this->settings['usd'];
+							}
+						
+						} elseif($this->settings['PS_Scheme']=='PS2018'){
 							$arrProfit = Array();
 							//Profit share for 2018 and onwards
 							if($this->job_owner!=self::PB_Ourselves){ //Import commissions
@@ -691,41 +713,16 @@ class Sales extends Document{
 									}
 								}
 							}								
-						} elseif ($this->gbr){
-							//////////////////////// SAP/GBR scheme. OFT loss to be compensated and rate per TEU to be paid
-							$SCC = $this->gbr;
-							// OFT loss compensation	
-							$master_row = $oMaster->add_master();	
-							$master_row->profit = $this->profit;
-							$activity = $oActivities->OFIGB;
-							$master_row->activity = $record->activity;
-							$master_row->customer = $record->customer;				
-							$master_row->sales = $record->sales;
-							$item = $oItems->getById(Items::REVENUE);
-							$master_row->account = 'J00400';
-							$master_row->item = $item->id;
-							for($m=1;$m<=15;$m++){
-								$month = $this->budget->arrPeriod[$m];
-								$master_row->{$month} = -$arrGP[$month];
-							}
-							//SAP rate per TEU
-							$master_row = $oMaster->add_master();	
-							$master_row->profit = $this->profit;
-							$activity = $oActivities::OFICOM;
-							$master_row->activity = $activity;
-							$master_row->customer = $record->customer;				
-							$master_row->sales = $record->sales;					
-							$item = $oItems->getById(Items::REVENUE);
-							$master_row->account = 'J00400';
-							$master_row->item = $item->id;
-							for($m=1;$m<=15;$m++){
-								$month = $this->budget->arrPeriod[$m];								
-								if(is_array($this->arrTEU)) $master_row->{$month} = ($this->arrTEU[$month])*$SCC*$this->settings['usd'];
-							}
-						
-						} else {
+						}  else {
 							
 							///////////////////////////////////////////////////////// OLD OFF/AFF scheme before 1/04/2018
+							
+							$sql = "SELECT * FROM tbl_route WHERE rteID=".(integer)$this->route;
+							$rs = $this->oSQL->q($sql);
+							$arrRoute = $this->oSQL->f($rs);
+							$SCC_OFF = $arrRoute['rteSC_OFF'];
+							$SCC_AFF = $arrRoute['rteSC_AFF'];
+							
 							//------- Sales commission receivable ----------
 							if ($this->job_owner!=self::PB_Ourselves && $this->business_owner==self::PB_Ourselves){
 								$master_row = $oMaster->add_master();
