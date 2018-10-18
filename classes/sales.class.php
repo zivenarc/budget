@@ -631,7 +631,7 @@ class Sales extends Document{
 							//SAP rate per TEU
 							$master_row = $oMaster->add_master();	
 							$master_row->profit = $this->profit;
-							$activity = $activity = ($this->destination_agent==self::PB_Ourselves?$oActivities->OFICOM:$oActivities->OFECOM);
+							$activity = ($this->destination_agent==self::PB_Ourselves?$oActivities->OFICOM:$oActivities->OFECOM);
 							$master_row->activity = $activity;
 							$master_row->customer = $record->customer;				
 							$master_row->sales = $record->sales;					
