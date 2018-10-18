@@ -1468,7 +1468,7 @@ class Reports{
 		
 		$strFields = $this->_getPeriodicFields();
 		
-		$arrMeasure = $this->_getSQLMeasure($type);
+		$this->arrMeasure = $this->_getSQLMeasure($type);
 				
 		// $this->structure = 'monthly';
 		// $strFields = $this->_getPeriodicFields();
@@ -1480,7 +1480,7 @@ class Reports{
 		
 		ob_start();
 		
-		$sql = "SELECT {$arrMeasure['sql']}
+		$sql = "SELECT {$this->arrMeasure['sql']}
 					{$strFields['actual']}
 			FROM `vw_master`			
 			{$sqlWhere}  
@@ -1488,7 +1488,7 @@ class Reports{
 				AND {$this->strGPFilter}
 			{$sqlGroup}	
 			UNION ALL
-				SELECT {$arrMeasure['sql']}
+				SELECT {$this->arrMeasure['sql']}
 				{$strFields['budget']}
 			FROM `vw_master`				
 			{$sqlWhere} 
@@ -1504,7 +1504,7 @@ class Reports{
 				{$sqlOrder}";
 		
 		// echo '<pre>',$sql,'</pre>';
-		$this->_firstLevelPeriodic($sql, $arrMeasure['title'], $this->oBudget);
+		$this->_firstLevelPeriodic($sql, $this->arrMeasure['title'], $this->oBudget);
 		//==========================================================================================================================Non-customer-related data
 		$this->_nofirstLevelPeriodic($sqlWhere);
 		?>
@@ -1959,7 +1959,7 @@ class Reports{
 		}
 		
 		//$sqlLevel2Default = "`Budget item` as `level2_title`, `Group`, `item` as `level2_code`,`itmOrder`,";
-		$arrMeasure = $this->_getSQLMeasure($type);
+		$this->arrMeasure = $this->_getSQLMeasure($type);
 		
 		
 		$this->structure = 'monthly';
@@ -1972,13 +1972,13 @@ class Reports{
 		
 		ob_start();
 		
-		$sql = "SELECT {$arrMeasure['sql']}
+		$sql = "SELECT {$this->arrMeasure['sql']}
 					{$strFields['actual']}
 			FROM `vw_master`			
 			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND Group_code=".self::GP_CODE." 
 			{$sqlGroup}	
 			UNION ALL
-				SELECT {$arrMeasure['sql']}
+				SELECT {$this->arrMeasure['sql']}
 				{$strFields['budget']}
 			FROM `vw_master`				
 			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND Group_code=".self::GP_CODE."  
@@ -1993,7 +1993,7 @@ class Reports{
 			
 			// echo '<pre>',$sql,'</pre>';
 			
-			self::firstLevelReportMR($sql, $arrMeasure['title'], $this->oBudget);
+			self::firstLevelReportMR($sql, $this->arrMeasure['title'], $this->oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
 			self::_noFirstLevelMonthly($this->currency, $options);
@@ -2030,19 +2030,23 @@ class Reports{
 			case 'customer':
 				$res['sql'] = "Customer_name as 'Level1_title', customer as 'level1_code', {$sqlLevel2Default}";
 				$res['title'] = 'Customer';
+				$res['href'] = "rep_sales_kpi_new.php?cntID=[key]&type=activity";
 				break;
 			case 'customer_group':
 				$res['sql'] = "customer_group_title as 'Level1_title'
 						, customer_group_code as 'level1_code', `Budget item`, {$sqlLevel2Default}";
 				$res['title'] = 'Customer group';
+				$res['href'] = "rep_sales_kpi_new.php?cntID=[key]&type=customer";
 				break;
 			case 'sales':
 				$res['sql'] = "usrTitle as 'Level1_title', sales as 'level1_code', {$sqlLevel2Default}";
 				$res['title'] = 'BDV employee';
+				$res['href'] = "rep_my.php?ownerID=[key]&type=customer";
 				break;
 			case 'bdv':
 				$res['sql'] = "bdvTitle as 'Level1_title', bdv as 'level1_code', {$sqlLevel2Default}";
 				$res['title'] = 'Selling unit';
+				$res['href'] = "rep_my_bu.php?bdv=[key]&type=customer";
 				break;
 			case 'pc':
 				$res['sql'] = "Profit as 'Level1_title', pc as 'level1_code', {$sqlLevel2Default}";
@@ -2076,7 +2080,7 @@ class Reports{
 		$oBudget = new Budget($budget_scenario);
 		
 		$sqlWhere = $this->sqlWhere;
-		$arrMeasure = $this->_getSQLMeasure($type);
+		$this->arrMeasure = $this->_getSQLMeasure($type);
 		
 		$sqlLevel2Default = "`Budget item` as `level2_title`, `Group`, `item` as `level2_code`,`itmOrder`,";
 		
@@ -2088,13 +2092,13 @@ class Reports{
 		
 		ob_start();
 		
-		$sql = "SELECT {$arrMeasure['sql']}
+		$sql = "SELECT {$this->arrMeasure['sql']}
 					{$strFields['actual']}
 			FROM `vw_master`			
 			{$sqlWhere}  AND scenario='{$strFields['from_a']}' AND Group_code=".self::GP_CODE." 
 			{$sqlGroup}	
 			UNION ALL
-				SELECT {$arrMeasure['sql']}
+				SELECT {$this->arrMeasure['sql']}
 				{$strFields['budget']}
 			FROM `vw_master`				
 			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND Group_code=".self::GP_CODE."  
@@ -2114,7 +2118,7 @@ class Reports{
 				ORDER BY `level1_code`, `Group`, `itmOrder` ASC";
 			
 			
-			self::firstLevelReportMR($sql, $arrMeasure['title'], $oBudget);
+			self::firstLevelReportMR($sql, $this->arrMeasure['title'], $oBudget);
 			$tableID = "FLR_".md5($sql);
 			//==========================================================================================================================Non-customer-related data
 			// self::_noFirstLevelMonthly($this->currency);
@@ -2481,43 +2485,18 @@ class Reports{
 					}
 					
 					$l1Code = (string)$rw['level1_code'];
-					$arrSubreport[$l1Code][$rw['level2_code']] = Array('Level1_title'=>$rw['Level1_title'],'Budget item'=>$rw['level2_title'],'level1_code'=>$l1Code);
+					
+					$strL1Title = $rw['Level1_title'];
+					if($this->arrMeasure['href']){
+						$strL1Title = "<a href='".str_replace("[key]",$l1Code,$this->arrMeasure['href'])."' target='_blank'>{$strL1Title}</a>";
+					}
+					
+					$arrSubreport[$l1Code][$rw['level2_code']] = Array('Level1_title'=>$strL1Title,'Budget item'=>$rw['level2_title'],'level1_code'=>$l1Code);
 					
 					foreach($this->columns as $column){
 						$arrSubreport[$l1Code][$rw['level2_code']][$column]+=$rw[$column];	
 					}
-					
-					/*
-					for ($m=1;$m<=15;$m++){						
-						$month = $this->oBudget->arrPeriod[$m];
-						$arrSubreport[$l1Code][$rw['level2_code']][$month]+=$rw[$month];
-						if ($m<=5){
-							$arrSubreport[$l1Code][$rw['level2_code']]['Q'.$m]+=$rw['Q'.$m];
-							$arrSubreport[$l1Code][$rw['level2_code']]['Q'.$m.'_B']+=$rw['Q'.$m.'_B'];
-						};						
-					};
-					
-					$arrSubreport[$l1Code][$rw['level2_code']]['ROY_A']+=$rw['ROY_A'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['ROY_B']+=$rw['ROY_B'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['Total']+=$rw['Total'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['Total_AM']+=$rw['Total_AM'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['estimate']+=$rw['estimate'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['estimate_AM']+=$rw['estimate_AM'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['Total_AprMar']+=$rw['Total_AprMar'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['Total_15']+=$rw['Total_15'];
-					
-					$arrSubreport[$l1Code][$rw['level2_code']]['CM_A'] += $rw['CM_A'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['CM_B'] += $rw['CM_B'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['YTD_A'] += $rw['YTD_A'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['YTD_B'] += $rw['YTD_B'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['Q_A'] += $rw['Q_A'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['Q_B'] += $rw['Q_B'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['NM_A'] += $rw['NM_A'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['NM_B'] += $rw['NM_B'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['FYE_A'] += $rw['FYE_A'];
-					$arrSubreport[$l1Code][$rw['level2_code']]['FYE_B'] += $rw['FYE_B'];
-					*/
-					
+									
 					$arrSort[$l1Code]['value'] += $rw['YTD_A']+$rw['YTD_B']+$rw['Total_AM']+$rw['estimate_AM'];
 					
 					if (!$template) $template = $rw;
@@ -4117,7 +4096,7 @@ class Reports{
 		
 		$strFields = $this->_getPeriodicFields();
 		
-		$arrMeasure = $this->_getSQLMeasure($type);
+		$this->arrMeasure = $this->_getSQLMeasure($type);
 				
 		// $this->structure = 'monthly';
 		// $strFields = $this->_getPeriodicFields();
@@ -4129,7 +4108,7 @@ class Reports{
 		
 		ob_start();
 		
-		$sql = "SELECT {$arrMeasure['sql']}
+		$sql = "SELECT {$this->arrMeasure['sql']}
 					{$strFields['actual']}
 			FROM `vw_master`			
 			{$sqlWhere}  
@@ -4137,7 +4116,7 @@ class Reports{
 				AND {$this->strGPFilter}
 			{$sqlGroup}	
 			UNION ALL
-				SELECT {$arrMeasure['sql']}
+				SELECT {$this->arrMeasure['sql']}
 				{$strFields['budget']}
 			FROM `vw_master`				
 			{$sqlWhere} 
@@ -4153,7 +4132,7 @@ class Reports{
 				{$sqlOrder}";
 		
 		// echo '<pre>',$sql,'</pre>'; die();
-		$this->_firstLevelQuarterly($sql, $arrMeasure['title'], $this->oBudget);
+		$this->_firstLevelQuarterly($sql, $this->arrMeasure['title'], $this->oBudget);
 		//==========================================================================================================================Non-customer-related data
 		$this->_nofirstLevelPeriodic($sqlWhere);
 		?>
