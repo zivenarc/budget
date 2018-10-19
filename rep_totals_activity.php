@@ -45,6 +45,11 @@ if(true || !isset($_GET['ghq'])){
 		?>
 		</ul>
 	</div>
+	<script>
+		$(document).ready(function(){
+			$('#ghq_filter li a').button();
+		});
+	</script>
 <?php
 }
 
@@ -71,7 +76,6 @@ foreach($arrScenario as $scnKey=>$scenario){
 		$arrReport[$scnKey][$rw['Group']][$rw['Budget item']][$keyProfit] += $rw['Total'];
 		$arrTotal[$scnKey][$rw['Group']][$keyProfit] += $rw['Total'];
 		$arrGrandTotal[$scnKey][$keyProfit] += $rw['Total'];	
-		$arrTotal[$scnKey][$rw['Group']][$rw['Budget item']] += $rw['Estimate'];
 		$arrProfit[$keyProfit] = $rw['pccFlagProd'];
 	}
 	
@@ -116,6 +120,23 @@ foreach($arrScenario as $scnKey=>$scenario){
 		$arrGOP[$scnKey][$keyProfit] += $rw['Total'];			
 	}
 	
+	
+	$sql = "SELECT prtTitle, unit, pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total
+			##
+			FROM reg_sales
+			LEFT JOIN vw_profit ON pccID=pc
+			LEFT JOIN vw_product_type ON prtID=activity
+			WHERE scenario='{$scenario}' and posted=1 and kpi=1 AND unit<>'' AND company='{$company}'		
+			{$sqlActivityFilter}
+			GROUP BY activity, Profit
+			ORDER BY activity, pccFlagProd,Profit";
+	$rs = $oSQL->q($sql);
+	while ($rw=$oSQL->f($rs)){
+		$keyProfit = $oBudget->getProfitAlias($rw,false);
+		$arrKPI[$rw['prtTitle'].', '.$rw['unit']][$scnKey][$keyProfit] += $rw['Total'];	
+		//$arrKPIEstimate += $rw['Estimate'];	
+	}
+	
 }
 
 
@@ -123,21 +144,6 @@ foreach($arrScenario as $scnKey=>$scenario){
 
 
 
-$sql = "SELECT prtTitle, unit, pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total
-		##
-		FROM reg_sales
-		LEFT JOIN vw_profit ON pccID=pc
-		LEFT JOIN vw_product_type ON prtID=activity
-		WHERE scenario='$budget_scenario' and posted=1 and kpi=1 AND unit<>'' AND company='{$company}'		
-		{$sqlActivityFilter}
-		GROUP BY activity, Profit
-		ORDER BY activity, pccFlagProd,Profit";
-$rs = $oSQL->q($sql);
-while ($rw=$oSQL->f($rs)){
-	$keyProfit = $rw['Profit'];//Budget::getProfitAlias($rw);
-	$arrKPI[$rw['prtTitle'].', '.$rw['unit']][$keyProfit] += $rw['Total'];	
-	//$arrKPIEstimate += $rw['Estimate'];	
-}
 
 // echo '<pre>';print_r($arrKPI);echo '</pre>';echo $sql;
 // echo '<pre>';print_r($arrReport);echo '</pre>';
@@ -170,8 +176,8 @@ foreach($arrReport['this'] as $group=>$arrItem){
 		}				
 		?>
 			<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($values));?></td>		
-			<td class='budget-decimal'><?php Reports::render($arrTotal['last'][$group][$item]);?></td>
-			<td class='budget-decimal'><?php Reports::render(array_sum($values) - $arrTotal['last'][$group][$item]);?></td>
+			<td class='budget-decimal'><?php if (is_array($arrReport['last'][$group][$item])) Reports::render(array_sum($arrReport['last'][$group][$item]));?></td>
+			<td class='budget-decimal'><?php if (is_array($arrReport['last'][$group][$item])) Reports::render(array_sum($values) - array_sum($arrReport['last'][$group][$item]));?></td>
 		</tr>
 		<?php
 	}
@@ -222,22 +228,12 @@ foreach($arrReport['this'] as $group=>$arrItem){
 		<th class='budget-ytd'>Total</th>
 		<th>Last</th>
 		<th>Diff</th>
-	</tr>
-	<tr class="budget-total">
-		<td>Total result</td>
+	</tr>	
 <?php
-foreach($arrProfit as $pc=>$flag){
-	?>
-	<td class='budget-decimal'><?php Reports::render($arrGrandTotal['this'][$pc]);?></td>
-	<?php
-}
+renderDataByPC($arrGrandTotal, $arrProfit, "Total result","budget-total");
 ?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrGrandTotal['this']));?></td>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotal['last']));?></td>
-	<td class='budget-decimal'><?php Reports::render(array_sum($arrGrandTotal['this'])-array_sum($arrGrandTotal['last']));?></td>
-</tr>
 <tr>
-		<td>Last</td>
+	<td>Last</td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
@@ -343,22 +339,10 @@ foreach($arrProfit as $pc=>$flag){
 ?>
 	<td class='budget-decimal budget-ytd'><?php Reports::render_ratio(array_sum($arrOP['this'])/100,array_sum($arrHeadcount['this']['FTE']),0);?></td>
 </tr>
-<tr><th colspan="<?php echo count($arrProfit)+4;?>">KPI</th></td>
-<?php foreach ($arrKPI as $kpi=>$values){ ?>
-<tr>
-	<td><?php echo $kpi;?></td>
-<?php
-	foreach($arrProfit as $pc=>$flag){
-		?>
-		<td class='budget-decimal'><?php Reports::render($values[$pc]);?></td>
-		<?php
-	}
-?>
-	<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($values));?></td>
-	<td class='budget-decimal'><?php echo 'n/a';?></td>
-	<td class='budget-decimal'><?php echo 'n/a';?></td>
-</tr>
+<tr><th colspan="<?php echo count($arrProfit)+5;?>">KPI</th></td>
 <?php 
+foreach ($arrKPI as $kpi=>$values){ 
+	renderDataByPC($values, $arrProfit, $kpi ,""); 
 } 
 ?>
 </tfoot>

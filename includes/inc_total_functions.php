@@ -10,10 +10,10 @@ function renderDataByPC($data, $arrProfit, $strTitle, $strClass=""){
 			<?php
 		}
 		?>
-		<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($data['this']));?></td>
-		<td class='budget-decimal '><?php Reports::render(array_sum($data['last']));?></td>
-		<td class='budget-decimal '><?php Reports::render(array_sum($data['this']) - array_sum($data['last']));?></td>
-		<td class='budget-decimal budget-ratio'><?php Reports::render_ratio(array_sum($data['this']) , array_sum($data['last']));?></td>
+		<td class='budget-decimal budget-ytd'><?php if(is_array($data['this'])) Reports::render(array_sum($data['this']));?></td>
+		<td class='budget-decimal '><?php if(is_array($data['last'])) Reports::render(array_sum($data['last']));?></td>
+		<td class='budget-decimal '><?php if(is_array($data['last'])&&is_array($data['this'])) Reports::render(array_sum($data['this']) - array_sum($data['last']));?></td>
+		<td class='budget-decimal budget-ratio'><?php if(is_array($data['last'])&&is_array($data['this'])) Reports::render_ratio(array_sum($data['this']) , array_sum($data['last']),0);?></td>
 	</tr>
 	<?php
 }
