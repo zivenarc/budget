@@ -3810,6 +3810,12 @@ class Reports{
 				$rw['Budget item'] = "Profit before tax";
 				$this->echoBudgetItemString($rw, 'budget-subtotal');
 			}
+			
+		?>
+		</tbody>
+		</table>
+		<?php
+		$this->_echoButtonCopyTable($this->ID);
 		// } else {
 			//------- KPIs -----------------	
 			// $strFields = self::_getMRFields(Array('denominator'=>1,'currency'=>643));
@@ -3845,13 +3851,21 @@ class Reports{
 				
 			$sql = self::_unionMRQueries($sql,"`prtTitle`, `activity`, `unit`",'', $arrUnion);
 			
+			?>
+			<table id='<?php echo $this->ID;?>_kpi' class='budget' style='font-size:1.2em;'>
+			<caption><?php echo "KPI: ",$this->caption;?></caption>
+			<thead>				
+				<tr>					
+					<th rowspan="2" colspan="2">KPI</th>
+					<?php echo $strHeader; ?>					
+			</thead>			
+			<tbody>
+			<?php
+			
 			// echo '<pre>',$sql,'</pre>';
 			$rs = $this->oSQL->q($sql);
 			
-			if ($this->oSQL->n($rs)){
-				?>
-				<tr><th colspan="<?php echo $this->colspan;?>">Operational KPIs</th></tr>				
-				<?php		
+			if ($this->oSQL->n($rs)){				
 				while ($rw = $this->oSQL->f($rs)){			
 					$rw['Budget item'] = $rw['prtTitle'];//." ({$rw['unit']})";
 					$rw['Level1_title'] = $rw['unit'];
@@ -3873,15 +3887,16 @@ class Reports{
 			}
 		// }
 		
-		$this->_getMRHeadcount($sqlWhere);
+		//$this->_getMRHeadcount($sqlWhere);
 		$this->_getMRHeadcount($sqlWhere,'funRHQ');
-		
 		
 		?>
 		</tbody>
 		</table>
 		<?php
-		$this->_echoButtonCopyTable($this->ID);
+		$this->_echoButtonCopyTable($this->ID.'_kpi');
+		
+
 		// $this->oSQL->showProfileInfo();
 	}
 	
