@@ -110,6 +110,20 @@ foreach($arrScenario as $scnKey=>$scenario){
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$scenario}' and active=1 AND company='{$company}'
+		".Reports::OWN_OPERATING_PROFIT."
+		{$sqlActivityFilter}
+		GROUP BY Profit
+		ORDER BY pccFlagProd,Profit";
+	$rs = $oSQL->q($sql);
+	while ($rw=$oSQL->f($rs)){
+		$keyProfit = $oBudget->getProfitAlias($rw,false);
+		$arrOOP[$scnKey][$keyProfit] += $rw['Total'];		
+	}
+	
+	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total
+		FROM reg_master
+		LEFT JOIN vw_profit ON pccID=pc
+		WHERE scenario='{$scenario}' and active=1 AND company='{$company}'
 			".Reports::GOP_FILTER."
 		{$sqlActivityFilter}
 		GROUP BY Profit
@@ -300,7 +314,8 @@ foreach($arrProfit as $pc=>$flag){
 </tr>
 <?php
 renderDataByPC($arrGOP, $arrProfit, "Gross Operating Profit","budget-subtotal");
-renderDataByPC($arrOP, $arrProfit, "Operating income","budget-subtotal");
+renderDataByPC($arrOOP, $arrProfit, "Own Operating Profit","budget-subtotal");
+renderDataByPC($arrOP, $arrProfit, "Net Operating Profit","budget-subtotal");
 ?>
 <tr class="budget-ratio">
 	<td>OP % of total</td>
