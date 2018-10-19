@@ -34,8 +34,8 @@ class Interco_sales extends Document{
 		
 		$sqlWhere = $this->getSqlWhere($id);
 				
-		$sql = "SELECT ICS.*, prdIdxLeft, prdIdxRight, usrTitle FROM tbl_interco_sales ICS
-				LEFT JOIN vw_product ON prdID=icsProductFolderID
+		$sql = "SELECT ICS.*, usrTitle 
+				FROM tbl_interco_sales ICS				
 				LEFT JOIN stbl_user ON usrID=icsEditBy
 				WHERE $sqlWhere";
 		
@@ -58,51 +58,9 @@ class Interco_sales extends Document{
 		global $budget_scenario;
 	
 		parent::defineEF();
-		// $this->Columns = Array();
-		
-		// $this->Columns[] = Array(
-			// 'field'=>self::Prefix.'ID'	
-		// );
-		// $this->Columns[] = Array(
-			// 'field'=>self::Prefix.'GUID'
-			// ,'type'=>'guid'
-		// );
-		// $this->Columns[] = Array(
-			// 'title'=>'Scenario'
-			// ,'field'=>self::Prefix.'Scenario'
-			// ,'type'=>'combobox'
-			// ,'sql'=>'SELECT scnID as optValue, scnTitle as optText FROM tbl_scenario'
-			// ,'default'=>$budget_scenario			
-		// );
-		// $this->Columns[] = Array(
-			// 'title'=>'Profit center'
-			// ,'field'=>self::Prefix.'ProfitID'
-			// ,'type'=>'combobox'
-			// ,'sql'=>'SELECT pccID as optValue, pccTitle as optText FROM vw_profit'
-			// ,'default'=>$arrUsrData['usrProfitID']
-		// );
-		
-		$this->Columns[] = Array( //------------SPECIAL CASE, Customer is another profit center
-			'title'=>'Customer'
-			,'field'=>self::Prefix.'CustomerID'
-			,'type'=>'combobox'
-			,'table'=>'vw_profit'
-			,'prefix'=>'pcc'
-			,'sql'=>'vw_profit'
-			,'default'=>6
-			, 'disabled'=>!$this->flagUpdate
-		);
-		
-		$this->Columns[] = Array(
-			'title'=>'Product folder'
-			,'field'=>self::Prefix.'ProductFolderID'
-			,'type'=>'combobox'
-			,'sql'=>'vw_folder'
-			,'prefix'=>'prd'
-			,'default'=>22
-			,'disabled'=>!$this->flagUpdate
-		);
-		
+
+		$this->Columns[] = $this->getProfitEG(Array('field'=>self::Prefix.'CustomerID','title'=>'Customer'));
+
 		$this->Columns[] = Array( 
 			'title'=>'Type'
 			,'field'=>self::Prefix.'Type'
@@ -120,14 +78,14 @@ class Interco_sales extends Document{
 		
 		$this->grid->Columns[] = parent::getCustomerEG();
 		
-		$this->grid->Columns[] = Array(
-			'title'=>'Code'
-			,'field'=>'prdExternalID'
-			,'type'=>'text'
-			,'disabled'=>true
-		);
+		// $this->grid->Columns[] = Array(
+			// 'title'=>'Code'
+			// ,'field'=>'prdExternalID'
+			// ,'type'=>'text'
+			// ,'disabled'=>true
+		// );
 		
-		$this->grid->Columns[] = parent::getProductEG();
+		$this->grid->Columns[] = parent::getActivityEG();
 		
 		$this->grid->Columns[] = Array(
 			'title'=>'Description'
@@ -164,7 +122,7 @@ class Interco_sales extends Document{
 		if (!$this->flagPosted){		
 			$this->setMonthlyEG('int');
 		} else {
-			$grid->Columns[] = parent::getActivityEG();
+			//
 		}
 		
 		$this->grid->Columns[] =Array(
@@ -179,7 +137,7 @@ class Interco_sales extends Document{
 	}
 	
 	public function fillGrid(){
-		parent::fillGrid($this->grid,Array('prdExternalID'),'reg_sales LEFT JOIN vw_product ON prdID=product');
+		parent::fillGrid($this->grid,Array('prtUnit'),'reg_sales LEFT JOIN vw_product_type ON prtID=activity');
 	}
 	
 	public function save($mode='update'){

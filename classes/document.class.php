@@ -418,7 +418,7 @@ class Document extends easyForm{
 		return ($res);
 	}
 	
-	protected function getProfitEG(){
+	protected function getProfitEG($params=Array()){
 		GLOBAL $arrUsrData, $strLocal, $oSQL;
 		
 		$sql = "SELECT PCC.pccID as optValue, PCC.pccTitle{$strLocal} as optText, PCC.pccFlagDeleted as optDeleted,
@@ -432,8 +432,8 @@ class Document extends easyForm{
 		}
 		
 		$res = Array(
-			'title'=>'Profit center'
-			,'field'=>$this->prefix.'ProfitID'
+			'title'=>(isset($params['title'])?$params['title']:'Profit center')
+			,'field'=>(isset($params['field'])?$params['field']:$this->prefix.'ProfitID')
 			,'type'=>'combobox'
 			,'width'=>'80px'
 			,'sql'=>$arrProfit
