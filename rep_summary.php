@@ -91,7 +91,7 @@ if(!isset($_GET['pccGUID'])){
 	$oWF = new Waterfall($settings['gpcus']);
 	$oWF->draw();
 	
-	$settings['pbt'] = Array('title'=>"PBT by factors",
+	$settings['oop'] = Array('title'=>"OOP by factors",
 						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
 											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
 											{$sqlActual} as Actual, 
@@ -99,6 +99,7 @@ if(!isset($_GET['pccGUID'])){
 											{$sqlActual} as Diff
 									FROM vw_master 
 									{$oReport->sqlWhere}
+										".Reports::OOP_FILTER."
 										AND  scenario='{$oBudget->id}'
 										AND account NOT LIKE 'SZ%'																				
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)
@@ -109,6 +110,7 @@ if(!isset($_GET['pccGUID'])){
 									{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 									FROM vw_master 
 									{$oReport->sqlWhere}
+										".Reports::OOP_FILTER."
 										AND scenario='{$oReference->id}'
 										AND source<>'Estimate' 	
 										AND account NOT LIKE 'SZ%'										
@@ -119,7 +121,7 @@ if(!isset($_GET['pccGUID'])){
 							'tolerance'=>0.05,
 							'limit'=>10);
 	
-	$oWF = new Waterfall($settings['pbt']);
+	$oWF = new Waterfall($settings['oop']);
 	$oWF->draw();
 	
 	
