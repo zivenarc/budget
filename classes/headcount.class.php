@@ -372,7 +372,7 @@ class Headcount extends Document{
 						$row->job = $_POST['function'][$id];				
 						$row->pc_profile = $_POST['pc_profile'][$id];				
 						$row->wc = (integer)$_POST['wc'][$id];
-						$row->vks = (integer)$_POST['sga'][$id];			
+						$row->sga = (integer)$_POST['sga'][$id];			
 						$row->vks = (integer)$_POST['vks'][$id];			
 						$row->insurance = (double)str_replace(',','',$_POST['insurance'][$id]);							
 						$row->salary = (double)str_replace(',','',$_POST['salary'][$id]);							
