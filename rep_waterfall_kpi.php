@@ -147,7 +147,7 @@ if (isset($_REQUEST['pccGUID'])){
 		die('Wrong report type');
 	}
 						
-	if($_REQUEST['DataAction']=='reload'){
+	if($_REQUEST['DataAction']=='waterfall_reload'){
 		header('Content-type: application/json');
 		echo json_encode($oWF->getDataTable());
 		die();

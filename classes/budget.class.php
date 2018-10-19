@@ -501,6 +501,8 @@ class Budget{
 			if ($arrData['pccFlagProd']){
 				switch ($arrData['Profit']){
 					case 'TMMR':
+					case 'Automotive':
+					case 'TRU':
 					case 'ICD':
 						$keyProfit = 'Toyota';
 						break;
