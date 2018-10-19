@@ -99,7 +99,7 @@ if(!isset($_GET['pccGUID'])){
 											{$sqlActual} as Diff
 									FROM vw_master 
 									{$oReport->sqlWhere}
-										".Reports::OOP_FILTER."
+										".Reports::OWN_OPERATING_PROFIT."
 										AND  scenario='{$oBudget->id}'
 										AND account NOT LIKE 'SZ%'																				
 									GROUP BY IF(`Group_code` IN (108,110,96),item,Group_code)
@@ -110,7 +110,7 @@ if(!isset($_GET['pccGUID'])){
 									{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 									FROM vw_master 
 									{$oReport->sqlWhere}
-										".Reports::OOP_FILTER."
+										".Reports::OWN_OPERATING_PROFIT."
 										AND scenario='{$oReference->id}'
 										AND source<>'Estimate' 	
 										AND account NOT LIKE 'SZ%'										
