@@ -121,15 +121,14 @@ foreach($arrScenario as $scnKey=>$scenario){
 	}
 	
 	
-	$sql = "SELECT prtTitle, unit, pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total
-			##
+	$sql = "SELECT prtTitle, unit, pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).") as Total			
 			FROM reg_sales
 			LEFT JOIN vw_profit ON pccID=pc
 			LEFT JOIN vw_product_type ON prtID=activity
 			WHERE scenario='{$scenario}' and posted=1 and kpi=1 AND unit<>'' AND company='{$company}'		
 			{$sqlActivityFilter}
 			GROUP BY activity, Profit
-			ORDER BY activity, pccFlagProd,Profit";
+			ORDER BY prtGHQ, pccFlagProd,Profit";
 	$rs = $oSQL->q($sql);
 	while ($rw=$oSQL->f($rs)){
 		$keyProfit = $oBudget->getProfitAlias($rw,false);
