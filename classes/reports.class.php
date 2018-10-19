@@ -2972,6 +2972,7 @@ class Reports{
 				
 				for($q=1;$q<=5;$q++){
 					$rw["Q$q"] = $rw["Q$q"]/3;
+					$rw["Q{$q}_B"] = $rw["Q{$q}_B"]/3;
 				}
 				
 				$rw['Total_AM'] = $rw['Total_AM']/12;

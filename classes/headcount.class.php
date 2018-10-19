@@ -112,7 +112,8 @@ class Headcount extends Document{
 	}
 	
 	public function defineGrid(){
-				
+		
+		GLOBAL $strLocal;
 		// $grid->Columns[] = Array(
 			// 'title'=>'Employee'
 			// ,'field'=>'particulars'
@@ -164,12 +165,19 @@ class Headcount extends Document{
 			);
 		}
 		
+		$sql = "SELECT * FROM vw_function ORDER BY funRHQ";
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			$group = strlen($rw['funRHQ'])?$rw['funRHQ']:'Undefined group';
+			$arrFun[$group][$rw['funGUID']] = $rw["funTitle{$strLocal}"];
+		}
+		
 		$this->grid->Columns[] = Array(
 			'title'=>'Function'
 			,'field'=>'function'
 			,'type'=>'combobox'
 			,'width'=>'180px'				
-			,'sql'=>"SELECT funGUID as optValue, funTitle as optText FROM vw_function"
+			,'sql'=> $arrFun
 			, 'disabled'=>false
 		);
 		
