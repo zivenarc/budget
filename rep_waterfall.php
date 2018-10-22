@@ -22,17 +22,7 @@ $limit = 8;
 
 SetCookie('period_type',$period_type,0,'/budget/');
 
-$arrPeriodType['ytd'] = 'YTD';
-$arrPeriodType['cm'] = 'Current month';
-$arrPeriodType['nm'] = 'Next month';
-$arrPeriodType['q1'] = '1<sup>st</sup> quarter';
-$arrPeriodType['q2'] = '2<sup>nd</sup> quarter';
-$arrPeriodType['q3'] = '3<sup>rd</sup> quarter';
-$arrPeriodType['q4'] = '4<sup>th</sup> quarter';
-$arrPeriodType['q5'] = '5<sup>th</sup> quarter';
-$arrPeriodType['roy'] = 'Rest-of-year';
-$arrPeriodType['fye'] = 'FYE';
-$arrPeriodType['am'] = 'Apr-Mar';
+include ('includes/inc_report_period.php');
 	
 foreach($arrPeriodType as $id=>$title){
 	$temp = $_GET;
@@ -62,7 +52,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								WHERE
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 								GROUP BY customer_group_code",
-						'tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,
+						'tolerance'=>0.05,
 						'limit'=>10);
 
 $settings['gopcus'] = Array('title'=>"GOP by customer",
@@ -83,7 +73,7 @@ $settings['gopcus'] = Array('title'=>"GOP by customer",
 								WHERE
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GOP_FILTER." AND company='{$company}'
 								GROUP BY customer_group_code",
-						'tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,
+						'tolerance'=>0.05,
 						'limit'=>10);
 						
 // echo '<pre>';print_r($settings);echo '</pre>';
@@ -103,7 +93,7 @@ $settings['gpsal'] = Array('title'=>"GP by sales",
 								WHERE
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 								GROUP BY sales",
-						'tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,
+						'tolerance'=>0.02,
 						'limit'=>10);						
 						
 $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
@@ -126,7 +116,7 @@ $settings['gpcuswwh'] = Array('title'=>"GP by customer, FF",
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 								AND pc NOT in (5,15)
 								GROUP BY IF(C.cntParentID<>723,C.cntParentID, C.cntID)",
-						'tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,
+						'tolerance'=>0.05,
 						'limit'=>10);
 						
 $settings['gpbu'] = Array('title'=>"GP by business unit",
@@ -144,7 +134,7 @@ $settings['gpbu'] = Array('title'=>"GP by business unit",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 			GROUP BY pc",
-			'tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.001
+			'tolerance'=>0.001
 			);
 
 $settings['gopbu'] = Array('title'=>"GOP by business unit",
@@ -162,7 +152,7 @@ $settings['gopbu'] = Array('title'=>"GOP by business unit",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::GOP_FILTER." AND company='{$company}'
 			GROUP BY pc",
-			'tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.001
+			'tolerance'=>0.001
 			);
 			
 $settings['oopbu'] = Array('title'=>"Own OP by business unit",
@@ -184,7 +174,7 @@ $settings['oopbu'] = Array('title'=>"Own OP by business unit",
 				AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND account NOT LIKE '5999%' AND pccFlagProd=1) 
 				AND company='{$company}'
 			GROUP BY pc",
-			'tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.001
+			'tolerance'=>0.001
 			);
 
 			
@@ -203,7 +193,7 @@ $settings['scbu'] = Array('title'=>"Staff cost by business unit",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::SC_FILTER." AND company='{$company}'
 			GROUP BY pc",
-			'tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.005
+			'tolerance'=>0.005
 			);			
 			
 $settings['gpact'] = Array('title'=>"GP by activity",
@@ -221,7 +211,7 @@ $settings['gpact'] = Array('title'=>"GP by activity",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 			GROUP BY activity",
-			'tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.1
+			'tolerance'=>0.1
 			);			
 			
 $settings['opbu'] = Array('title'=>"OP by business unit",
@@ -239,7 +229,7 @@ $settings['opbu'] = Array('title'=>"OP by business unit",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' ".Reports::OP_FILTER." AND company='{$company}'
 			GROUP BY pc",
-			'tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.001
+			'tolerance'=>0.001
 			);
 
 			
@@ -261,7 +251,7 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' AND Group_code<>121 AND company='{$company}'
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
-			'tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.07,
+			'tolerance'=>0.07,
 			'limit'=>5);
 			
 $type = $_GET['type']?$_GET['type']:'gpcus';
@@ -271,16 +261,10 @@ if (is_array($settings[$type])){
 	$settings[$type]['actual_title'] = $oActual->title;
 	$settings[$type]['budget_title'] = $oBudget->title;
 	$settings[$type]['denominator'] = $denominator;
-	$settings[$type]['currency'] = $arrCurrencySelector[$currency];
+	$settings[$type]['currency'] = $arrCurrencySelector[$currency];	
 	
 	$oWF = new Waterfall($settings[$type]);
-	
-	if($_REQUEST['DataAction']=='waterfall_reload'){
-		header('Content-type: application/json');
-		echo json_encode($oWF->getDataTable());
-		die();
-	}	
-	
+
 } else {
 	die('Wrong report type');
 }

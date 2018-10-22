@@ -24,17 +24,7 @@ $arrBudgetRates = $oBudget->getMonthlyRates($currency);
 
 SetCookie('period_type',$period_type,0,'/budget/');
 
-$arrPeriodType['ytd'] = 'YTD';
-$arrPeriodType['cm'] = 'Current month';
-$arrPeriodType['nm'] = 'Next month';
-$arrPeriodType['q1'] = '1<sup>st</sup> quarter';
-$arrPeriodType['q2'] = '2<sup>nd</sup> quarter';
-$arrPeriodType['q3'] = '3<sup>rd</sup> quarter';
-$arrPeriodType['q4'] = '4<sup>th</sup> quarter';
-$arrPeriodType['q5'] = '5<sup>th</sup> quarter';
-$arrPeriodType['roy'] = 'Rest-of-year';
-$arrPeriodType['fye'] = 'FYE';
-$arrPeriodType['am'] = 'Apr-Mar';
+include ('includes/inc_report_period.php');
 	
 foreach($arrPeriodType as $id=>$title){
 	$temp = $_GET;
@@ -55,10 +45,10 @@ $sqlBudget = "SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates).")";
 $type = $_REQUEST['type']?$_REQUEST['type']:'teucus';
 						
 $settings = Array(
-				'teucus'=>Array('title'=>"TEU by customer",'currency'=>'TEU','tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,'limit'=>10),
-				'kgcus'=>Array('title'=>"AFF volume by customer",'currency'=>'Kgs','tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,'limit'=>10),
-				'rffcus'=>Array('title'=>"RFF volume by customer",'currency'=>'Trips','tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,'limit'=>10),
-				'gpsal'=>Array('title'=>"GP by sales",'currency'=>'RUB','tolerance'=>isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:0.05,'limit'=>7, 'denominator'=>1000)				
+				'teucus'=>Array('title'=>"TEU by customer",'currency'=>'TEU','tolerance'=>0.05,'limit'=>10),
+				'kgcus'=>Array('title'=>"AFF volume by customer",'currency'=>'Kgs','tolerance'=>0.05,'limit'=>10),
+				'rffcus'=>Array('title'=>"RFF volume by customer",'currency'=>'Trips','tolerance'=>0.05,'limit'=>10),
+				'gpsal'=>Array('title'=>"GP by sales",'currency'=>'RUB','tolerance'=>0.05,'limit'=>7, 'denominator'=>1000)				
 			);
 
 	$settings['teucus']['sqlBase'] = "SELECT customer_group_code as optValue, 
@@ -147,12 +137,6 @@ if (isset($_REQUEST['pccGUID'])){
 		die('Wrong report type');
 	}
 						
-	if($_REQUEST['DataAction']=='waterfall_reload'){
-		header('Content-type: application/json');
-		echo json_encode($oWF->getDataTable());
-		die();
-	}	
-	
 	?>
 	<script>
 		var requestOptions = {tabKey:'pccGUID',tabValue:'<?php echo $_REQUEST['pccGUID'];?>'};
