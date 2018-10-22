@@ -13,7 +13,7 @@ class Waterfall {
 	public function __construct($options){		
 		$this->sqlBase = $options['sqlBase'];
 		$this->limit = isset($_REQUEST['limit'])?$_REQUEST['limit']:$options['limit'];
-		$this->chartID = md5($this->sqlBase?$this->sqlBase:time());
+		$this->chartID = md5($this->sqlBase?$this->sqlBase.time():time());
 		$this->title = $options['title'];
 		$this->tolerance = isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:(isset($options['tolerance'])?$options['tolerance']:0.05);
 		$this->currency = $options['currency']?$options['currency']:'RUB';
@@ -297,47 +297,49 @@ class Waterfall {
 													}]};
 				
 				// $('#<?php echo $this->chartID;?>').highcharts(hs_data["<?php echo $this->chartID;?>"]);	
-				chart[chartID] = Highcharts.chart(chartID,hs_data[chartID]);
-				var handle_tolerance = $('#tolerance_'+chartID+'-handle');
-				$('#tolerance_'+chartID).slider({
-					  value: <?php echo ($this->tolerance*100);?>,
-					  create: function() {
-						handle_tolerance.text( $( this ).slider( "value" )+'%');
-					  },
-					  slide: function( event, ui ) {
-						handle_tolerance.text( ui.value+'%' );
-						var request = {DataAction:'waterfall_reload',	tolerance:ui.value/100};
-						if (typeof(requestOptions)!='undefined'){
-							request[requestOptions.tabKey] = requestOptions.tabValue;
-						};
-						$('#table_'+chartID+' caption').addClass('ajax-loading');
-						$.get(location.href,request, function(data){
-							updateChart(chartID,data);
+				$('#'+chartID).ready(function(){
+					chart[chartID] = Highcharts.chart(chartID,hs_data[chartID]);
+					var handle_tolerance = $('#tolerance_'+chartID+'-handle');
+					$('#tolerance_'+chartID).slider({
+						  value: <?php echo ($this->tolerance*100);?>,
+						  create: function() {
+							handle_tolerance.text( $( this ).slider( "value" )+'%');
+						  },
+						  slide: function( event, ui ) {
+							handle_tolerance.text( ui.value+'%' );
+							var request = {DataAction:'waterfall_reload',	tolerance:ui.value/100};
+							if (typeof(requestOptions)!='undefined'){
+								request[requestOptions.tabKey] = requestOptions.tabValue;
+							};
+							$('#table_'+chartID+' caption').addClass('ajax-loading');
+							$.get(location.href,request, function(data){
+								updateChart(chartID,data);
+							});
+						  },
+						  min: 1,
+						  max: 15
 						});
-					  },
-					  min: 1,
-					  max: 15
-					});
-				var handle_limit = $('#limit_'+chartID+'-handle');
-				$('#limit_'+chartID).slider({
-					  value: <?php echo ($this->limit);?>,
-					  create: function() {
-						handle_limit.text( $( this ).slider( "value" )+'%');
-					  },
-					  slide: function( event, ui ) {
-						handle_limit.text( ui.value );
-						var request = {DataAction:'waterfall_reload', limit:ui.value};
-						if (typeof(requestOptions)!='undefined'){
-							request[requestOptions.tabKey] = requestOptions.tabValue;
-						};
-						$('#table_'+chartID+' caption').addClass('ajax-loading');
-						$.get(location.href,request, function(data){
-							updateChart(chartID,data);
+					var handle_limit = $('#limit_'+chartID+'-handle');
+					$('#limit_'+chartID).slider({
+						  value: <?php echo ($this->limit);?>,
+						  create: function() {
+							handle_limit.text( $( this ).slider( "value" ));
+						  },
+						  slide: function( event, ui ) {
+							handle_limit.text( ui.value );
+							var request = {DataAction:'waterfall_reload', limit:ui.value};
+							if (typeof(requestOptions)!='undefined'){
+								request[requestOptions.tabKey] = requestOptions.tabValue;
+							};
+							$('#table_'+chartID+' caption').addClass('ajax-loading');
+							$.get(location.href,request, function(data){
+								updateChart(chartID,data);
+							});
+						  },
+						  min: 5,
+						  max: 20
 						});
-					  },
-					  min: 5,
-					  max: 20
-					});
+				});
 			</script>
 		<?php
 	}
