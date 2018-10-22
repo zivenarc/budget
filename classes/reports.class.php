@@ -2064,6 +2064,10 @@ class Reports{
 				$res['sql'] = "ivlGroup as 'Level1_title', ivlGroup as 'level1_code', `customer_group_title` as `level2_title`, `".($this->YACT?'yact_group':'Group')."` as 'Group', `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
 				$res['title'] = 'Industry vertical';
 				break;
+			case 'item_bu':
+				$res['sql'] = "`Budget item` as 'Level1_title', item as 'level1_code', `Profit` as `level2_title`, `".($this->YACT?'yact_group':'Group')."` as 'Group', `pc` as `level2_code`,-SUM(Total_AM) as itmOrder,";				
+				$res['title'] = 'Item by BU';
+				break;
 			case 'ghq':
 			default:
 				$res['sql'] = "prtGHQ as 'Level1_title', prtGHQ as 'level1_code', {$sqlLevel2Default}";
@@ -4098,7 +4102,7 @@ class Reports{
 		<?php
 	}
 	
-	function quarterly($type='ghq'){
+	function quarterly($type='ghq', $flagNoFL = true){
 		
 		$sqlWhere = $this->sqlWhere;
 		
@@ -4123,6 +4127,8 @@ class Reports{
 
 		
 		ob_start();
+		
+		if (!$flagNoFL) $this->strGPFilter = 'TRUE';
 		
 		$sql = "SELECT {$this->arrMeasure['sql']}
 					{$strFields['actual']}
@@ -4150,7 +4156,7 @@ class Reports{
 		// echo '<pre>',$sql,'</pre>'; die();
 		$this->_firstLevelQuarterly($sql, $this->arrMeasure['title'], $this->oBudget);
 		//==========================================================================================================================Non-customer-related data
-		$this->_nofirstLevelPeriodic($sqlWhere);
+		if ($flagNoFL) $this->_nofirstLevelPeriodic($sqlWhere);
 		?>
 		</tbody>
 		</table>
