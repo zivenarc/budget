@@ -266,9 +266,9 @@ class Waterfall {
 		<script>
 			var hs_data = [];
 			var chart = [];
-			
+			var chartID = '<?php echo $this->chartID;?>';
 			//google_chart_data["<?php echo $this->chartID;?>"] = {data:<?php echo json_encode($this->arrChart);?>,title:'<?php echo $this->title;?>'};			
-			hs_data["<?php echo $this->chartID;?>"] = {chart: {type: 'waterfall'},
+			hs_data[chartID] = {chart: {type: 'waterfall'},
 													title: {text: '<?php echo $this->title, ': "', $this->actual_title,'" vs "',$this->budget_title,'"';?>'},
 													xAxis: {type: 'category'},
 													yAxis: {
@@ -297,9 +297,9 @@ class Waterfall {
 													}]};
 				
 				// $('#<?php echo $this->chartID;?>').highcharts(hs_data["<?php echo $this->chartID;?>"]);	
-				chart["<?php echo $this->chartID;?>"] = Highcharts.chart('<?php echo $this->chartID;?>',hs_data["<?php echo $this->chartID;?>"]);
-				var handle = $('#tolerance_<?php echo $this->chartID;?>-handle');
-				$('#tolerance_<?php echo $this->chartID;?>').slider({
+				chart[chartID] = Highcharts.chart(chartID,hs_data[chartID]);
+				var handle = $('#tolerance_'+chartID''-handle');
+				$('#tolerance_'+chartID).slider({
 					  value: <?php echo ($this->tolerance*100);?>,
 					  create: function() {
 						handle.text( $( this ).slider( "value" )+'%');
@@ -310,15 +310,15 @@ class Waterfall {
 						if (typeof(requestOptions)!='undefined'){
 							request[requestOptions.tabKey] = requestOptions.tabValue;
 						};
-						$('#table_<?php echo $this->chartID;?> caption').addClass('ajax-loading');
+						$('#table_'+chartID+' caption').addClass('ajax-loading');
 						$.get(location.href,request, function(data){
-							updateChart('<?php echo $this->chartID;?>',data);
+							updateChart(chartID,data);
 						});
 					  },
 					  min: 1,
 					  max: 15
 					});
-				$('#limit_<?php echo $this->chartID;?>').slider({
+				$('#limit_'+chartID).slider({
 					  value: <?php echo ($this->limit);?>,
 					  create: function() {
 						handle.text( $( this ).slider( "value" )+'%');
@@ -329,9 +329,9 @@ class Waterfall {
 						if (typeof(requestOptions)!='undefined'){
 							request[requestOptions.tabKey] = requestOptions.tabValue;
 						};
-						$('#table_<?php echo $this->chartID;?> caption').addClass('ajax-loading');
+						$('#table_'+chartID+' caption').addClass('ajax-loading');
 						$.get(location.href,request, function(data){
-							updateChart('<?php echo $this->chartID;?>',data);
+							updateChart(chartID,data);
 						});
 					  },
 					  min: 5,
