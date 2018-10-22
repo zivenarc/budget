@@ -298,14 +298,14 @@ class Waterfall {
 				
 				// $('#<?php echo $this->chartID;?>').highcharts(hs_data["<?php echo $this->chartID;?>"]);	
 				chart[chartID] = Highcharts.chart(chartID,hs_data[chartID]);
-				var handle = $('#tolerance_'+chartID''-handle');
+				var handle_tolerance = $('#tolerance_'+chartID+'-handle');
 				$('#tolerance_'+chartID).slider({
 					  value: <?php echo ($this->tolerance*100);?>,
 					  create: function() {
-						handle.text( $( this ).slider( "value" )+'%');
+						handle_tolerance.text( $( this ).slider( "value" )+'%');
 					  },
 					  slide: function( event, ui ) {
-						handle.text( ui.value+'%' );
+						handle_tolerance.text( ui.value+'%' );
 						var request = {DataAction:'waterfall_reload',	tolerance:ui.value/100};
 						if (typeof(requestOptions)!='undefined'){
 							request[requestOptions.tabKey] = requestOptions.tabValue;
@@ -318,13 +318,14 @@ class Waterfall {
 					  min: 1,
 					  max: 15
 					});
+				var handle_limit = $('#limit_'+chartID+'-handle');
 				$('#limit_'+chartID).slider({
 					  value: <?php echo ($this->limit);?>,
 					  create: function() {
-						handle.text( $( this ).slider( "value" )+'%');
+						handle_limit.text( $( this ).slider( "value" )+'%');
 					  },
 					  slide: function( event, ui ) {
-						handle.text( ui.value+'%' );
+						handle_limit.text( ui.value );
 						var request = {DataAction:'waterfall_reload', limit:ui.value};
 						if (typeof(requestOptions)!='undefined'){
 							request[requestOptions.tabKey] = requestOptions.tabValue;
