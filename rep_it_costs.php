@@ -37,13 +37,13 @@ $oReport->quarterly('item_bu',false);
 		WHERE vw_journal.scenario='{$budget_scenario}' 
 			AND guid IN (SELECT source 
 						FROM reg_master 
-						WHERE scenario='{{$budget_scenario}}' 
+						WHERE scenario='{$budget_scenario}' 
 							AND item IN('".implode("','",$arrItems)."') 
 							AND company='{$company}')
 		GROUP BY vw_journal.guid
-		ORDER BY vw_journal.edit_date ASC";	
+		ORDER BY vw_journal.prefix ASC";	
 		
-		// echo '<pre>',$sql,'</pre>';
+		 //echo '<pre>',$sql,'</pre>';
 		
 		$rs =$oSQL->q($sql);
 		while ($rw=$oSQL->f($rs)){
