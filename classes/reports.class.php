@@ -2039,7 +2039,7 @@ class Reports{
 				$res['href'] = "rep_sales_kpi_new.php?cntID=[key]&type=customer";
 				break;
 			case 'sales':
-				$res['sql'] = "usrTitle as 'Level1_title', sales as 'level1_code', {$sqlLevel2Default}";
+				$res['sql'] = "usrTitle as 'Level1_title', sales as 'level1_code', `customer_group_title` as `level2_title`, `".($this->YACT?'yact_group':'Group')."` as 'Group', `customer_group_code` as `level2_code`,-SUM(Total_AM) as itmOrder,";
 				$res['title'] = 'BDV employee';
 				$res['href'] = "rep_my.php?ownerID=[key]&type=customer";
 				break;
