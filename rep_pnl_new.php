@@ -25,7 +25,11 @@ if(!isset($_GET['pccGUID'])){
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	
 	Budget::getProfitTabs('reg_master', true, Array('pccID'=>$arrBus));
-	
+	?>
+	<script>
+		$('#reference').attr('disabled',true);		
+	</script>
+	<?php
 	include ('includes/inc-frame_bottom.php');
 } else {
 	require ('classes/reports.class.php');
