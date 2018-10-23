@@ -2044,7 +2044,7 @@ class Reports{
 				$res['href'] = "rep_my.php?ownerID=[key]&type=customer";
 				break;
 			case 'bdv':
-				$res['sql'] = "bdvTitle as 'Level1_title', bdv as 'level1_code', {$sqlLevel2Default}";
+				$res['sql'] = "bdvTitle as 'Level1_title', bdv as 'level1_code', `".($this->YACT?'yact_group':'Group')."` as 'Group', `sales` as `level2_code`,`usrTitle` as `level2_title`,-SUM(Total_AM) as itmOrder,";
 				$res['title'] = 'Selling unit';
 				$res['href'] = "rep_my_bu.php?bdv=[key]&type=customer";
 				break;
