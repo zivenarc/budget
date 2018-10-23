@@ -67,6 +67,17 @@ var header = document.title;
 $(document).ready(function(){
 	$('#tabs').tabs(tabs_options);
 	init_panel(this);
+	
+	$('table.budget').find('td').each(function(){		
+		$(this).click(function(){					
+			$('#'+report_id).find('tr').removeClass('report-selected');
+			$('#'+report_id).find('td').removeClass('report-selected');
+			var tr = $(this).parent('tr');
+			tr.addClass('report-selected');
+			$(this).addClass('report-selected');
+		});
+	});
+	
 });
 
 function init_panel(o){
