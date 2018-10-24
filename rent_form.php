@@ -60,6 +60,7 @@ if ($_GET['tab']){
 include ('includes/inc_document_menu.php');
 if ($oDocument->GUID && !$oDocument->flagPosted){
 	$arrActions[] = Array ('title'=>'SQM','action'=>'javascript:fillGrid(\'_sqm\');','class'=>'brick');	
+	$arrActions[] = Array ('title'=>'KPI','action'=>'javascript:fillGrid(\'_kpi\');','class'=>'brick');	
 }
 
 //============================== Main form definition ==============================

@@ -1,5 +1,5 @@
 <?php
-include_once ('classes/budget.class.php');
+include_once ('classes/reports.class.php');
 include_once ('classes/document.class.php');
 include_once ('classes/distribution_record.class.php');
 include_once ('classes/item.class.php');
@@ -251,7 +251,17 @@ class Distribution extends Document{
 				$row->unit = 'sqm';
 				$row->customer = self::EMPTY_CUSTOMER;
 				$row->set_months($arrSum);
-			break;
+				break;
+			case 'kpi':
+				$sql = "SELECT unit, customer, ".$this->budget->getMonthlySumSQL()." 
+						FROM reg_sales
+						WHERE scenario='".$this->budget->id."' 
+							AND active=1 AND kpi=1
+							AND pc='{$this->profit}'
+							AND activity='{$this->activity}'
+						GROUP BY customer"; 
+
+				break;
 			default:
 				return (false);
 			break;
@@ -301,8 +311,9 @@ class Distribution extends Document{
 					} else {
 						$strItemFilter = $this->item;
 					}
-					$sqlFilter = " AND item IN ('{$strItemFilter}') ";
+					$sqlFilter = " AND item IN ('{$strItemFilter}') AND ".Reports::RFC_FILTER;
 				}
+				
 				$sql = "SELECT account, activity, item, ".$this->budget->getMonthlySumSQL(1,15)." 
 						FROM reg_master
 						WHERE scenario='{$this->scenario}'
