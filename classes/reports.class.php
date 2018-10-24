@@ -4190,24 +4190,27 @@ class Reports{
 				$customerKey = 'Existing';
 			}
 		
-			$arrCategories[] = $rw['usrTitle'];
+			$arrCategories[$rw['usrTitle']] += $rw['Total_AM'];
 			$arrData[$customerKey][$rw['usrTitle']] += $rw['Total_AM'];
 			
 		}
 		
-		$arrCategories = array_unique($arrCategories);
+		// $arrCategories = array_unique($arrCategories);
 		asort($arrCategories);
 				
 		foreach($arrData as $customer=>$data){
-			foreach($arrCategories as $key=>$category){
-				if(!isset($data[$category])) $data[$category] = 0;
+			$series = Array();
+			foreach($arrCategories as $category=>$value){
+				// if(!isset($data[$category])) $data[$category] = 0;
+				$series[] = $data[$category];
 			};
 			
-			ksort($data);
+			// ksort($data);
 			
 			$arrHSSeries[] = Array('type'=>'column',
 								'name'=>$customer,
-								'data'=>array_values($data));
+								// 'data'=>array_values($data));
+								'data'=>array_values($series));
 								
 			$arrTotalData[] = Array('name'=>$customer,
 									'y'=>array_sum($data));
@@ -4216,11 +4219,11 @@ class Reports{
 		$arrHSSeries[] = Array('type'=>'pie', 'name'=>'Total',
 								'data'=>$arrTotalData,
 								'center'=>Array(100,100),
-								'size'=>100
+								'size'=>200
 								);
 		
 		$arrHS = Array('title'=>Array('text'=>'Sales composition'),
-						'xAxis'=>Array('categories'=>array_values($arrCategories)),
+						'xAxis'=>Array('categories'=>array_keys($arrCategories)),
 						'plotOptions'=>Array('column'=>Array('stacking'=>'normal')),
 						'series'=>$arrHSSeries
 					);
