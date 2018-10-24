@@ -25,8 +25,7 @@ if(!isset($_GET['pccGUID'])){
 	
 	include('includes/inc_group_buttons.php');	
 	include ('includes/inc-frame_top.php');
-	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
-	echo '<h2>Reference to actual periods not available</h2>';
+	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';	
 	include ('includes/inc_report_selectors.php');
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	
