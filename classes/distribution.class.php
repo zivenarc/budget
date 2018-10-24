@@ -297,7 +297,7 @@ class Distribution extends Document{
 				
 				if($this->yact!=''){
 					$sqlFilter = " AND account='{$this->yact}' ";
-				} else {
+				} elseif($this->item) {
 					$sql = "SELECT * FROM vw_item WHERE itmGUID='{$this->item}'";
 					$rs = $this->oSQL->q($sql);
 					$rw = $this->oSQL->f($rs);
@@ -312,6 +312,8 @@ class Distribution extends Document{
 						$strItemFilter = $this->item;
 					}
 					$sqlFilter = " AND item IN ('{$strItemFilter}') ".Reports::RFC_FILTER;
+				} else {
+					$sqlFilter = Reports::RFC_FILTER;
 				}
 				
 				$sql = "SELECT account, activity, item, ".$this->budget->getMonthlySumSQL(1,15)." 
