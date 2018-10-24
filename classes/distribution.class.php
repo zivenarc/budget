@@ -311,7 +311,7 @@ class Distribution extends Document{
 					} else {
 						$strItemFilter = $this->item;
 					}
-					$sqlFilter = " AND item IN ('{$strItemFilter}') AND ".Reports::RFC_FILTER;
+					$sqlFilter = " AND item IN ('{$strItemFilter}') ".Reports::RFC_FILTER;
 				}
 				
 				$sql = "SELECT account, activity, item, ".$this->budget->getMonthlySumSQL(1,15)." 
@@ -350,7 +350,7 @@ class Distribution extends Document{
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
 					$master_row->activity = $total['activity'];
-					$master_row->customer = self::EMPTY_CUSTOMER;	
+					$master_row->customer = 0;// self::EMPTY_CUSTOMER;	
 					$master_row->sales = $this->getSales($master_row->customer);					
 					$item = $Items->getById($total['item']);
 					$master_row->account = $total['account'];
