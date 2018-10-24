@@ -4232,6 +4232,7 @@ class Reports{
 			foreach($arrCategories as $category=>$value){
 				// if(!isset($data[$category])) $data[$category] = 0;
 				$series[] = $data[$category];
+				$series_extra[] = $data[$category] - $arrRefData[$customer][$category];
 			};
 			
 			// ksort($data);
@@ -4239,7 +4240,8 @@ class Reports{
 			$arrHSSeries[] = Array('type'=>'column',
 								'name'=>$customer,
 								// 'data'=>array_values($data));
-								'data'=>array_values($series));
+								'data'=>array_values($series),
+								'extra'=>array_values($series_extra));
 			
 			if(is_array($arrRefData[$customer])){
 				$strRef = number_format(array_sum($data)-array_sum($arrRefData[$customer]),0,'.',',');
@@ -4260,8 +4262,8 @@ class Reports{
 		
 		$arrHSSeries[] = Array('type'=>'pie', 'name'=>'Total',
 								'data'=>$arrTotalData,
-								'center'=>Array(200,100),
-								'size'=>200
+								'center'=>Array(300,100),
+								'size'=>300
 								);
 		
 		$diff = $arrTotal['budget']-$arrTotal['reference'];
@@ -4278,8 +4280,10 @@ class Reports{
 		
 		$arrHS = Array('title'=>Array('text'=>'Sales composition, '.$this->oBudget->title),
 						'subtitle'=>Array('text'=>$subtitle),
+						'chart'=>Array('height'=>600),
 						'xAxis'=>Array('categories'=>array_keys($arrCategories)),
-						'plotOptions'=>Array('column'=>Array('stacking'=>'normal'),
+						'plotOptions'=>Array('column'=>Array('stacking'=>'normal',
+															'dataLabels'=>Array('format'=>'{point.y:,.0f}', 'enabled'=>true)),
 											'pie'=>Array('dataLabels'=>Array('format'=>'{point.name}<br><b>{point.percentage:.0f} %</b><br>{point.y:,.0f}<br>{point.extra}',
 																			'distance'=>0))
 										),
