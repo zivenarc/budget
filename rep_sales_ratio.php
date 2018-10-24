@@ -39,7 +39,7 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc-frame_bottom.php');
 } else {
 	
-	include ('includes/inc_report_buttons.php');
+	// include ('includes/inc_report_buttons.php');
 	
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator,'reference'=>$budget_scenario,'filter'=>$filter));
 	$oReport->salesRatio();

@@ -4224,7 +4224,10 @@ class Reports{
 		
 		$arrHS = Array('title'=>Array('text'=>'Sales composition'),
 						'xAxis'=>Array('categories'=>array_keys($arrCategories)),
-						'plotOptions'=>Array('column'=>Array('stacking'=>'normal')),
+						'plotOptions'=>Array('column'=>Array('stacking'=>'normal'),
+											'pie'=>Array('dataLabels'=>Array('format'=>'<b>{point.name}</b><br>{point.percentage:.1f} %',
+																			'distance'=>-50))
+										),
 						'series'=>$arrHSSeries
 					);
 		
