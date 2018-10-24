@@ -1,5 +1,5 @@
 <?php
-// $flagNoAuth = true;
+$flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
@@ -33,7 +33,7 @@ if(!isset($_GET['pccGUID'])){
 	Budget::getProfitTabs('reg_master', true, Array('pccID'=>$arrBus));
 	?>
 	<script>
-		$('#reference').attr('disabled',true);		
+		//$('#reference').attr('disabled',true);		
 	</script>
 	<?php
 	include ('includes/inc-frame_bottom.php');
@@ -41,7 +41,7 @@ if(!isset($_GET['pccGUID'])){
 	
 	// include ('includes/inc_report_buttons.php');
 	
-	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator,'reference'=>$budget_scenario,'filter'=>$filter));
+	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator,'reference'=>$reference,'filter'=>$filter));
 	$oReport->salesRatio();
 }
 
