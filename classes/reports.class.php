@@ -4173,7 +4173,7 @@ class Reports{
 			$arrNewCustomer[] = $rw['cntID'];
 		}
 		
-		$sql = "SELECT sales, usrTitle, SUM(Total_AM) as 'Total', customer,Customer_name , `new` 
+		$sql = "SELECT sales, usrTitle, SUM(Total_AM)/1000 as 'Total', customer,Customer_name , `new` 
 				FROM vw_master
 				{$this->sqlWhere}
 				AND scenario = '{$this->oBudget->id}'
@@ -4181,6 +4181,12 @@ class Reports{
 				GROUP BY sales, customer, `new`";
 		// echo '<pre>',$sql,'</pre>';
 		$rs = $this->oSQL->q($sql);
+		
+		if(!$this->oSQL->n($rs)){
+				echo '<div class="warning">No Gross Profit found</div>';
+				return(false);
+		}
+		
 		while ($rw = $this->oSQL->f($rs)){
 			if(in_array($rw['customer'],$arrNewCustomer)){
 				$customerKey = 'Unknown customer';			
@@ -4197,7 +4203,29 @@ class Reports{
 		
 		// $arrCategories = array_unique($arrCategories);
 		asort($arrCategories);
+		
+		$sql = "SELECT sales, usrTitle, SUM(Total_AM)/1000 as 'Total', customer,Customer_name , `new` 
+				FROM vw_master
+				{$this->sqlWhere}
+				AND scenario = '{$this->oReference->id}'
+				".self::GP_FILTER."
+				GROUP BY sales, customer, `new`";
+		// echo '<pre>',$sql,'</pre>';
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			if(in_array($rw['customer'],$arrNewCustomer)){
+				$customerKey = 'Unknown customer';			
+			} elseif ($rw['new']) {
+				$customerKey = 'New business, existing';			
+			} else {
+				$customerKey = 'Existing';
+			}
 				
+			$arrRefData[$customerKey][$rw['usrTitle']] += $rw['Total'];
+			
+		}
+		
+		
 		foreach($arrData as $customer=>$data){
 			$series = Array();
 			foreach($arrCategories as $category=>$value){
@@ -4211,22 +4239,35 @@ class Reports{
 								'name'=>$customer,
 								// 'data'=>array_values($data));
 								'data'=>array_values($series));
-								
+			
+			if(is_array($arrRefData[$customer])){
+				$strRef = number_format(array_sum($data)-array_sum($arrRefData[$customer]),0,'.',',');
+				if(array_sum($data)>array_sum($arrRefData[$customer])){
+					$strRef = '<span style="color:green;">(+'.$strRef.')</span>';
+				} else {
+					$strRef = '<span style="color:red;">('.$strRef.')</span>';
+				};
+			} else {
+				$strRef='';
+			}
+			
 			$arrTotalData[] = Array('name'=>$customer,
-									'y'=>array_sum($data));
+									'y'=>array_sum($data),
+									'extra'=>$strRef
+									);
 		}
 		
 		$arrHSSeries[] = Array('type'=>'pie', 'name'=>'Total',
 								'data'=>$arrTotalData,
-								'center'=>Array(100,100),
+								'center'=>Array(200,100),
 								'size'=>200
 								);
 		
 		$arrHS = Array('title'=>Array('text'=>'Sales composition'),
 						'xAxis'=>Array('categories'=>array_keys($arrCategories)),
 						'plotOptions'=>Array('column'=>Array('stacking'=>'normal'),
-											'pie'=>Array('dataLabels'=>Array('format'=>'<b>{point.name}</b><br>{point.percentage:.1f} %',
-																			'distance'=>-50))
+											'pie'=>Array('dataLabels'=>Array('format'=>'{point.name}<br><b>{point.percentage:.0f} %</b><br>{point.y:,.0f}<br>{point.extra}',
+																			'distance'=>0))
 										),
 						'series'=>$arrHSSeries
 					);
