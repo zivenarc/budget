@@ -4173,7 +4173,7 @@ class Reports{
 			$arrNewCustomer[] = $rw['cntID'];
 		}
 		
-		$sql = "SELECT sales, usrTitle, Total_AM, customer,Customer_name , `new` 
+		$sql = "SELECT sales, usrTitle, SUM(Total_AM) as 'Total', customer,Customer_name , `new` 
 				FROM vw_master
 				{$this->sqlWhere}
 				AND scenario = '{$this->oBudget->id}'
@@ -4190,8 +4190,8 @@ class Reports{
 				$customerKey = 'Existing';
 			}
 		
-			$arrCategories[$rw['usrTitle']] += $rw['Total_AM'];
-			$arrData[$customerKey][$rw['usrTitle']] += $rw['Total_AM'];
+			$arrCategories[$rw['usrTitle']] += $rw['Total'];
+			$arrData[$customerKey][$rw['usrTitle']] += $rw['Total'];
 			
 		}
 		
