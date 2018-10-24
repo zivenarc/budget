@@ -7,12 +7,15 @@ include ('includes/inc_report_pcfilter.php');
 
 if(!isset($_GET['pccGUID'])){
 	$oBudget = new Budget($budget_scenario);
-	// if ($reference!=$oBudget->reference_scenario->id){
-		// $oReference = new Budget($reference);
-		// $strVsTitle = ' vs '.$oReference->title;
-	// } else {
-		// $reference = $oBudget->reference_scenario->id;
-	// }
+	
+	/// Prepare data for the report
+	$sql = Array();
+	$sql[] = "UPDATE reg_master SET `new`=1 WHERE customer IN (SELECT cntID FROM tbl_unknown)";
+	$sql[] = "UPDATE reg_sales SET `new`=1 WHERE customer IN (SELECT cntID FROM tbl_unknown)";
+	$sql[] = "UPDATE reg_master SET `new`=1 WHERE item IN ('7bfcd52d-50ad-11e5-b3b1-00155d010e0b','b2e02fdd-803a-11e4-b3b1-00155d010e0b')";
+	for ($i=0;$i<count($sql);$i++){
+		$oSQL->q($sql[$i]);
+	};
 	
 	$arrJS[]='js/rep_pnl.js';
 	// $arrJS[]='js/input_form.js';	
