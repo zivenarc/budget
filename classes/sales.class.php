@@ -384,6 +384,7 @@ class Sales extends Document{
 						$row->flagUpdated = true;							
 						$row->pod = $this->pod;
 					}
+					
 				}
 			}
 						
@@ -943,6 +944,8 @@ class Sales extends Document{
 							WHERE `{$this->prefix}ID`={$this->ID} 
 							AND `{$this->prefix}GUID`=`Budget`.`source`;");
 				
+				$this->doSQL("UPDATE reg_master SET `new`=".(integer)$this->new_biz." WHERE source='".$this->GUID."';");
+				$this->doSQL("UPDATE reg_sales SET `new`=".(integer)$this->new_biz." WHERE source='".$this->GUID."';");
 				
 				$this->doSQL("UPDATE tbl_sales
 							SET salKg=(SELECT SUM(".$this->budget->getYTDSQL($this->budget->cm, max($this->budget->length,12+$this->budget->offset)).") FROM reg_sales
