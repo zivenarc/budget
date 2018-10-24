@@ -4198,6 +4198,7 @@ class Reports{
 		
 			$arrCategories[$rw['usrTitle']] += $rw['Total'];
 			$arrData[$customerKey][$rw['usrTitle']] += $rw['Total'];
+			$arrTotal['budget'] += $rw['Total'];
 			
 		}
 		
@@ -4222,7 +4223,7 @@ class Reports{
 			}
 				
 			$arrRefData[$customerKey][$rw['usrTitle']] += $rw['Total'];
-			
+			$arrTotal['reference'] += $rw['Total'];
 		}
 		
 		
@@ -4263,7 +4264,20 @@ class Reports{
 								'size'=>200
 								);
 		
-		$arrHS = Array('title'=>Array('text'=>'Sales composition'),
+		$diff = $arrTotal['budget']-$arrTotal['reference'];
+		$subtitle = 'Total Gross Profit '.number_format($arrTotal['budget'],0,'.',',');
+		if($arrTotal['budget']!=0){
+				$ratio = (integer)($diff/$arrTotal['budget']*100);
+		}
+		if ($diff>=0){
+			$subtitle .= '<span style="color:green;"> (+'.number_format($diff,0,'.',',').', '.$ratio.'%)</span>';
+		} else {
+			$subtitle .= '<span style="color:red;"> ('.number_format($diff,0,'.',',').', '.$ratio.'%)</span>';
+		}
+		
+		
+		$arrHS = Array('title'=>Array('text'=>'Sales composition, '.$this->oBudget->title),
+						'subtitle'=>Array('text'=>$subtitle),
 						'xAxis'=>Array('categories'=>array_keys($arrCategories)),
 						'plotOptions'=>Array('column'=>Array('stacking'=>'normal'),
 											'pie'=>Array('dataLabels'=>Array('format'=>'{point.name}<br><b>{point.percentage:.0f} %</b><br>{point.y:,.0f}<br>{point.extra}',
