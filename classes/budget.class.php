@@ -174,7 +174,7 @@ class Budget{
 		$res = implode(',',$arrRes);
 		return($res);
 	}
-	public function getMonthlySumSQL($start=1, $end=12, $arrRates = null, $denominator=1){
+	public function getMonthlySumSQL($start=4, $end=15, $arrRates = null, $denominator=1){
 		
 		for($m=$start;$m<=$end;$m++){
 			// $month = date('M',mktime(0,0,0,$m,15));			
