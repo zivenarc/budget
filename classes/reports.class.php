@@ -4178,7 +4178,7 @@ class Reports{
 				{$this->sqlWhere}
 				AND scenario = '{$this->oBudget->id}'
 				".self::GP_FILTER."
-				GROUP BY sales, customer_group_code, `new`";
+				GROUP BY sales, customer, `new`";
 		// echo '<pre>',$sql,'</pre>';
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
