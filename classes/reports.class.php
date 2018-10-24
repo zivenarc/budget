@@ -4164,5 +4164,75 @@ class Reports{
 		$this->_echoButtonCopyTable($this->ID);		
 		ob_flush(); 
 	}
+	
+	function salesRatio(){
+		
+		$sql = "SELECT * FROM tbl_unknown";
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			$arrNewCustomer[] = $rw['cntID'];
+		}
+		
+		$sql = "SELECT sales, usrTitle, Total_AM, customer,Customer_name , `new` 
+				FROM vw_master
+				{$this->sqlWhere}
+				AND scenario = '{$this->oBudget->id}'
+				".self::GP_FILTER."
+				GROUP BY sales, customer_group_code, `new`";
+		// echo '<pre>',$sql,'</pre>';
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			if(in_array($rw['customer'],$arrNewCustomer)){
+				$customerKey = 'Unknown customer';			
+			} elseif ($rw['new']) {
+				$customerKey = 'New business, existing';			
+			} else {
+				$customerKey = 'Existing';
+			}
+		
+			$arrCategories[] = $rw['usrTitle'];
+			$arrData[$customerKey][$rw['usrTitle']] += $rw['Total_AM'];
+			
+		}
+		
+		$arrCategories = array_unique($arrCategories);
+		asort($arrCategories);
+				
+		foreach($arrData as $customer=>$data){
+			foreach($arrCategories as $key=>$category){
+				if(!isset($data[$category])) $data[$category] = 0;
+			};
+			
+			ksort($data);
+			
+			$arrHSSeries[] = Array('type'=>'column',
+								'name'=>$customer,
+								'data'=>array_values($data));
+								
+			$arrTotalData[] = Array('name'=>$customer,
+									'y'=>array_sum($data));
+		}
+		
+		$arrHSSeries[] = Array('type'=>'pie', 'name'=>'Total',
+								'data'=>$arrTotalData,
+								'center'=>Array(100,100),
+								'size'=>100
+								);
+		
+		$arrHS = Array('title'=>Array('text'=>'Sales composition'),
+						'xAxis'=>Array('categories'=>array_values($arrCategories)),
+						'plotOptions'=>Array('column'=>Array('stacking'=>'normal')),
+						'series'=>$arrHSSeries
+					);
+		
+		// echo '<pre>';print_r($arrHS);echo '</pre>';
+		?>
+		<div id='<?php echo $this->ID;?>'></div>
+		<script>
+		Highcharts.chart('<?php echo $this->ID;?>',<?php echo json_encode($arrHS);?>);
+		</script>
+		<?php
+	}
+	
 }
 ?>
