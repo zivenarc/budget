@@ -18,7 +18,10 @@ if ($_POST['DataAction']){
 	switch ($_POST['DataAction']){
 		case 'fill_sqm':
 			$oDocument->fill_distribution($oBudget, 'sqm');
-			break;		
+			break;
+		case 'fill_kpi':
+			$oDocument->fill_distribution($oBudget, 'kpi');
+			break;				
 	}
 	
 	if ($oDocument->save($_POST['DataAction'])){
