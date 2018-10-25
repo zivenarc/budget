@@ -258,6 +258,32 @@ while ($rw=$oSQL->f($rs)){
 	$arrGOP['last'][$keyProfit] += $rw['Estimate'];	
 }
 
+
+$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
+		FROM reg_master
+		LEFT JOIN vw_profit ON pccID=pc
+		WHERE scenario='{$oBudget->id}'  AND company='{$company}' {$sqlWherePC}
+			".Reports::OWN_OPERATING_PROFIT."
+		GROUP BY Profit
+		UNION ALL
+		SELECT pccTitle as Profit, pccFlagProd, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
+		FROM reg_master
+		LEFT JOIN vw_profit ON pccID=pc
+		WHERE scenario='{$reference}'  AND company='{$company}' {$sqlWherePC}
+			".Reports::OWN_OPERATING_PROFIT."
+		GROUP BY Profit
+		ORDER BY pccFlagProd,Profit";
+$rs = $oSQL->q($sql);
+while ($rw=$oSQL->f($rs)){
+	if (!$bu_group) {
+		$keyProfit = $oBudget->getProfitAlias($rw);		
+	} else {
+		$keyProfit = $rw['Profit'];
+	}
+	$arrOOP['this'][$keyProfit] += $rw['Total'];	
+	$arrOOP['last'][$keyProfit] += $rw['Estimate'];	
+}
+
 // echo '<pre>';print_r($arrHeadcount);echo '</pre>';echo $sql;
 // echo '<pre>';print_r($arrReport);echo '</pre>';
 ?>
@@ -475,6 +501,7 @@ foreach($arrProfit as $pc=>$flag){
 </tr>
 <?php 
 renderActualVsBudget($arrGOP, $arrProfit, "Gross Operating Profit",$strLastTitle);
+renderActualVsBudget($arrOOP, $arrProfit, "Operating income",$strLastTitle);
 renderActualVsBudget($arrOpIncome, $arrProfit, "Operating income",$strLastTitle);
 ?>
 <tr class="budget-ratio">
