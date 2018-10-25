@@ -4284,7 +4284,8 @@ class Reports{
 						'xAxis'=>Array('categories'=>array_keys($arrCategories)),
 						'plotOptions'=>Array('column'=>Array('stacking'=>'normal',
 															'dataLabels'=>Array('format'=>'{point.y:,.0f}', 'enabled'=>true)),
-											'pie'=>Array('dataLabels'=>Array('format'=>'{point.name}<br><b>{point.percentage:.0f} %</b><br>{point.y:,.0f}<br>{point.extra}',
+											'pie'=>Array('startAngle'=>120,
+														'dataLabels'=>Array('format'=>'{point.name}<br><b>{point.percentage:.0f} %</b><br>{point.y:,.0f}<br>{point.extra}',
 																			'distance'=>0))
 										),
 						'series'=>$arrHSSeries
