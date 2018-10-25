@@ -501,8 +501,8 @@ foreach($arrProfit as $pc=>$flag){
 </tr>
 <?php 
 renderActualVsBudget($arrGOP, $arrProfit, "Gross Operating Profit",$strLastTitle);
-renderActualVsBudget($arrOOP, $arrProfit, "Operating income",$strLastTitle);
-renderActualVsBudget($arrOpIncome, $arrProfit, "Operating income",$strLastTitle);
+renderActualVsBudget($arrOOP, $arrProfit, "OWN operating profit",$strLastTitle);
+renderActualVsBudget($arrOpIncome, $arrProfit, "Net operating profit",$strLastTitle);
 ?>
 <tr class="budget-ratio">
 	<td>OI, %of total</td>
