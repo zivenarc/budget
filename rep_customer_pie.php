@@ -109,6 +109,9 @@ if(!isset($_GET['pccGUID'])){
 			title: {
 				text: 'Customer share by GP, <?php echo $oBudget->title;?>'
 			},
+			subtitle: {
+				text: 'with ABC-analysis'
+			},
 			tooltip: {
 				pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
 			},
@@ -132,7 +135,7 @@ if(!isset($_GET['pccGUID'])){
 				}
 			},
 			"series": [{
-				name: 'Customers',
+				name: 'A-Class customers',
 				colorByPoint: true,
 				data: <?php echo json_encode($arrHSSeries);?>
 			}],
