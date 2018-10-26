@@ -64,14 +64,18 @@ if(!isset($_GET['pccGUID'])){
 	while ($rw = $oSQL->f($rs)){
 		if($runningTotal<0.8*$nTotalGP){
 			$arrHSSeries[] = Array('name'=>($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),'y'=>(integer)$rw['YTD']);
+		} elseif ($runningTotal<0.96*$nTotalGP) {
+			$yOthers['b'] += (integer)$rw['YTD'];
+			$arrOthers['b'][] = Array(($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),(integer)$rw['YTD']);
 		} else {
-			$yOthers += (integer)$rw['YTD'];
-			$arrOthers[] = Array(($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),(integer)$rw['YTD']);
+			$yOthers['c'] += (integer)$rw['YTD'];
+			$arrOthers['c'][] = Array(($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),(integer)$rw['YTD']);
 		}
 		$runningTotal += $rw['YTD'];
 	}
-	if ($yOthers){
-		$arrHSSeries[] = Array('name'=>'Others','y'=>$yOthers, 'drilldown'=>'Others');
+	if (is_array($yOthers)){
+		$arrHSSeries[] = Array('name'=>'B-Class ('.count($arrOthers['b']).')','y'=>$yOthers['b'], 'drilldown'=>'Others_B');
+		$arrHSSeries[] = Array('name'=>'C-Class ('.count($arrOthers['c']).')','y'=>$yOthers['c'], 'drilldown'=>'Others_C');
 	}
 
 	$sql = "SELECT ivlGroup, SUM(".$oBudget->getThisYTDSQL('fye').") as YTD 
@@ -134,9 +138,13 @@ if(!isset($_GET['pccGUID'])){
 			}],
 			"drilldown": {
 				series: [
-					{name:'Others',
-						id:'Others',
-						data: <?php echo json_encode($arrOthers); ?>
+					{name:'B-Class (<?php echo count($arrOthers['b']);?>)',
+						id:'Others_B',
+						data: <?php echo json_encode($arrOthers['b']); ?>
+						
+					},{name:'C-Class (<?php echo count($arrOthers['c']);?>)',
+						id:'Others_C',
+						data: <?php echo json_encode($arrOthers['c']); ?>
 						
 					}
 				]
