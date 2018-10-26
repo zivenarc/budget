@@ -113,7 +113,8 @@ if(!isset($_GET['pccGUID'])){
 				text: 'with ABC-analysis'
 			},
 			tooltip: {
-				pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+				headerFormat: '<b>{point.key}</b><br>',
+				pointFormat: '{point.y:,.0f}: {point.percentage:.0f}%'
 			},
 			plotOptions: {
 				pie: {
