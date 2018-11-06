@@ -12,7 +12,7 @@ class Waterfall {
 	
 	public function __construct($options){		
 		$this->sqlBase = $options['sqlBase'];
-		$this->limit = isset($_REQUEST['limit'])?$_REQUEST['limit']:$options['limit'];
+		$this->limit = isset($_REQUEST['limit'])?$_REQUEST['limit']:(isset($options['limit'])?$options['limit']:10);
 		$this->chartID = md5($this->sqlBase?$this->sqlBase.time():time());
 		$this->title = $options['title'];
 		$this->tolerance = isset($_REQUEST['tolerance'])?$_REQUEST['tolerance']:(isset($options['tolerance'])?$options['tolerance']:0.05);
