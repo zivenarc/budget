@@ -109,7 +109,7 @@ $sql = "SELECT Profit, pccFlagProd, {$sqlAccountString} , SUM(".$oBudget->getYTD
 		FROM vw_master
 		WHERE scenario='{$reference}' AND company='{$company}'  AND account NOT LIKE 'SZ%' {$sqlWherePC}
 		GROUP BY Profit, {$sqlGroupBy}
-		ORDER BY `Group`,pccFlagProd,Profit";
+		ORDER BY `Group`,itmOrder, pccFlagProd,Profit";
 
 // echo '<pre>',$sql,'</pre>';
 		
