@@ -252,7 +252,8 @@ class Interco_sales extends Document{
 					//-------------------------------------- Intercompany cost for department --------------------------------------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->customer;
-					$master_row->activity = $oProduct->activity_cost;
+					// $master_row->activity = $oProduct->activity_cost;
+					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
 					$activity = $oActivities->getByCode($master_row->activity);
@@ -308,7 +309,8 @@ class Interco_sales extends Document{
 					//-------------------------------------- Elimination of cost --------------------------------------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = 99;
-					$master_row->activity = $oProduct->activity_cost;
+					// $master_row->activity = $oProduct->activity_cost;
+					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
 					$activity = $oActivities->getByCode($master_row->activity);
@@ -325,7 +327,8 @@ class Interco_sales extends Document{
 					
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $this->customer;
-						$master_row->activity = $oProduct->activity_cost;
+						// $master_row->activity = $oProduct->activity_cost;
+						$master_row->activity = $record->activity;
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $this->getSales($master_row->customer);
 						$activity = $oActivities->getByCode($master_row->activity);
