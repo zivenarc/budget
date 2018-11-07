@@ -311,7 +311,7 @@ class Distribution extends Document{
 					} else {
 						$strItemFilter = $this->item;
 					}
-					$sqlFilter = " AND item IN ('{$strItemFilter}') ".Reports::RFC_FILTER;
+					$sqlFilter = " AND item IN ('{$strItemFilter}') ".Reports::GOP_FILTER;
 				} else {
 					$sqlFilter = Reports::RFC_FILTER;
 				}
