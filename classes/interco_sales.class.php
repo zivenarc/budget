@@ -170,7 +170,7 @@ class Interco_sales extends Document{
 					if ($arrUpdated[$id]){				
 						$row->flagUpdated = true;				
 						$row->profit = $_POST[$this->prefix.'ProfitID'];
-						$row->product = $_POST['product'][$id];				
+						$row->activity = $_POST['activity'][$id];				
 						$row->customer = $_POST['customer'][$id];
 						$row->sales = $this->sales;							
 						$row->comment = $_POST['comment'][$id];				
