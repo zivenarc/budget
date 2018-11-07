@@ -100,12 +100,12 @@ switch($repType){
 		break;
 }
 
-$sql = "SELECT Profit, pccFlagProd, {$sqlAccountString} , SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
+$sql = "SELECT itmOrder, Profit, pccFlagProd, {$sqlAccountString} , SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM vw_master
 		WHERE scenario='{$oBudget->id}' AND company='{$company}' AND account NOT LIKE 'SZ%' {$sqlWherePC}
 		GROUP BY Profit, {$sqlGroupBy}
 		UNION ALL
-		SELECT Profit, pccFlagProd, {$sqlAccountString}, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
+		SELECT itmOrder,Profit, pccFlagProd, {$sqlAccountString}, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM vw_master
 		WHERE scenario='{$reference}' AND company='{$company}'  AND account NOT LIKE 'SZ%' {$sqlWherePC}
 		GROUP BY Profit, {$sqlGroupBy}
