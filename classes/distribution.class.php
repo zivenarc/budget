@@ -357,7 +357,7 @@ class Distribution extends Document{
 					$item = $Items->getById($total['item']);
 					$master_row->account = $total['account'];
 					$master_row->item = $total['item'];
-					for($m=$m=$this->budget->nm;$m<=15;$m++){
+					for($m=$this->budget->nm;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -$total[$month];
 					}
