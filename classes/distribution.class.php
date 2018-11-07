@@ -123,7 +123,7 @@ class Distribution extends Document{
 				,'prefix'=>'cnt'
 				,'sql'=>"SELECT cntID as optValue, cntTitle as optText FROM vw_customer"
 				, 'mandatory' => true
-				, 'disabled'=>!$this->flagUpdate
+				, 'disabled'=>false
 				, 'default'=>0
 				, 'class'=>'costs_supplier'
 			);		
