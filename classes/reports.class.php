@@ -2007,6 +2007,8 @@ class Reports{
 	
 	private function _getSQLMeasure($type){
 		
+		GLOBAL $strLocal;
+		
 		if ($this->YACT){
 			// $strAccountTitle = "title";
 			// $strAccountGroup = "yact_group";
@@ -2024,7 +2026,7 @@ class Reports{
 		
 		switch($type){
 			case 'activity':
-				$res['sql'] = "Activity_title as 'Level1_title', activity as 'level1_code', {$sqlLevel2Default}";
+				$res['sql'] = "Activity_title{$strLocal} as 'Level1_title', activity as 'level1_code', {$sqlLevel2Default}";
 				$res['title'] = 'Activity';
 				break;
 			case 'customer':
