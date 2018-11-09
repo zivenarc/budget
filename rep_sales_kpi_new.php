@@ -79,7 +79,7 @@ if(!isset($_GET['pccGUID'])){
 	LEFT JOIN stbl_user ON usrID=vw_journal.edit_by				
 	WHERE vw_journal.guid IN (SELECT source FROM reg_master 
 									WHERE
-										scenario = '{$budget_scenario}'
+										scenario IN ('{$budget_scenario}','{$reference}')
 										AND customer IN (".implode(',',$arrCounterparty['codes']).")
 									)		
 	GROUP BY vw_journal.guid
