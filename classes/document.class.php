@@ -506,9 +506,9 @@ class Document extends easyForm{
 		return($res);
 	}
 	
-	protected function getActivityEG($field='activity'){
+	protected function getActivityEG($field='activity', $title='Activity'){
 		$res = Array(
-			'title'=>'Activity'
+			'title'=>$title
 			,'field'=>$field
 			,'type'=>'combobox'
 			,'width'=>'280px'

@@ -1,7 +1,7 @@
 <?php
 include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
-include_once ('classes/sales_record.class.php');
+include_once ('classes/interco_sales_record.class.php');
 include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
 include_once ('classes/yact_coa.class.php');
@@ -12,7 +12,7 @@ $YACT = new YACT_COA();
 
 class Interco_sales extends Document{
 
-	const Register='reg_sales';
+	const Register='reg_interco_sales';
 	const GridName = 'interco_sales';
 	const Prefix = 'ics';
 	const Table = 'tbl_interco_sales';
@@ -22,7 +22,7 @@ class Interco_sales extends Document{
 		GLOBAL $arrUsrData;
 		
 		$this->gridName = self::GridName;
-		$this->gridClass = 'sales_record';
+		$this->gridClass = 'interco_sales_record';
 		$this->table = self::Table;
 		$this->prefix = self::Prefix;
 		$this->register = self::Register;
@@ -37,7 +37,7 @@ class Interco_sales extends Document{
 		$sql = "SELECT ICS.*, usrTitle 
 				FROM tbl_interco_sales ICS				
 				LEFT JOIN stbl_user ON usrID=icsEditBy
-				WHERE $sqlWhere";
+				WHERE {$sqlWhere}";
 		
 		parent::refresh($sql);
 		
@@ -47,7 +47,7 @@ class Interco_sales extends Document{
 			$sql = "SELECT * FROM `".self::Register."` WHERE `source`='".$this->GUID."';";
 			$rs = $this->oSQL->q($sql);			
 			while($rw = $this->oSQL->f($rs)){
-				$this->records[$this->gridName][$rw['id']] = new sales_record($this->GUID, $this->scenario,  $this->company, $rw['id'], $rw);
+				$this->records[$this->gridName][$rw['id']] = new interco_sales_record($this->GUID, $this->scenario,  $this->company, $rw['id'], $rw);
 			}		
 		}
 	}
@@ -86,6 +86,7 @@ class Interco_sales extends Document{
 		// );
 		
 		$this->grid->Columns[] = parent::getActivityEG();
+		$this->grid->Columns[] = parent::getActivityEG('activity_cost', 'Activity, cost');
 		
 		$this->grid->Columns[] = Array(
 			'title'=>'Description'
@@ -137,7 +138,7 @@ class Interco_sales extends Document{
 	}
 	
 	public function fillGrid(){
-		parent::fillGrid($this->grid,Array('prtUnit'),'reg_sales LEFT JOIN vw_product_type ON prtID=activity');
+		parent::fillGrid($this->grid,Array('prtUnit'),'reg_interco_sales LEFT JOIN vw_product_type ON prtID=activity');
 	}
 	
 	public function save($mode='update'){
@@ -171,6 +172,7 @@ class Interco_sales extends Document{
 						$row->flagUpdated = true;				
 						$row->profit = $_POST[$this->prefix.'ProfitID'];
 						$row->activity = $_POST['activity'][$id];				
+						$row->activity_cost = $_POST['activity_cost'][$id];				
 						$row->customer = $_POST['customer'][$id];
 						$row->sales = $this->sales;							
 						$row->comment = $_POST['comment'][$id];				
@@ -253,7 +255,7 @@ class Interco_sales extends Document{
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->customer;
 					// $master_row->activity = $oProduct->activity_cost;
-					$master_row->activity = $record->activity;
+					$master_row->activity = $record->activity_cost;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
 					$activity = $oActivities->getByCode($master_row->activity);
@@ -276,7 +278,7 @@ class Interco_sales extends Document{
 					//-------------------------------------- Cost for supplier --------------------------------------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
-					$master_row->activity = $record->activity;
+					$master_row->activity = $record->activity_cost;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
 					$activity = $oActivities->getByCode($record->activity);
@@ -310,7 +312,7 @@ class Interco_sales extends Document{
 					$master_row = $oMaster->add_master();
 					$master_row->profit = 99;
 					// $master_row->activity = $oProduct->activity_cost;
-					$master_row->activity = $record->activity;
+					$master_row->activity = $record->activity_cost;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
 					$activity = $oActivities->getByCode($master_row->activity);
@@ -328,7 +330,7 @@ class Interco_sales extends Document{
 						$master_row = $oMaster->add_master();
 						$master_row->profit = $this->customer;
 						// $master_row->activity = $oProduct->activity_cost;
-						$master_row->activity = $record->activity;
+						$master_row->activity = $record->activity_cost;
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $this->getSales($master_row->customer);
 						$activity = $oActivities->getByCode($master_row->activity);
