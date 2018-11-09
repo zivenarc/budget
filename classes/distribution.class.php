@@ -289,6 +289,7 @@ class Distribution extends Document{
 		GLOBAL $Activities;
 		GLOBAL $YACT;
 		GLOBAL $Items;
+		
 	
 		$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new Master($this->scenario, $this->GUID, $this->company);
@@ -363,6 +364,9 @@ class Distribution extends Document{
 					}
 				}
 				$oMaster->save();
+				
+				$this->doSQL("UPDATE reg_master SET customer=".self::EMPTY_CUSTOMER." WHERE item='".$Items::WH_RENT."' AND scenario='{$this->scenario}'");
+				
 				$this->markPosted();
 			}
 	}
