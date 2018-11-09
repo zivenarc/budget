@@ -3830,20 +3830,20 @@ class Reports{
 				$sql = "SELECT activity, unit, prtTitle,
 					{$strFieldsKPI['actual']}
 				FROM `vw_sales`				
-				{$sqlWhere} AND scenario='{$strFieldsKPI['from_a']}' 
+				{$sqlWhere} AND scenario='{$strFieldsKPI['from_a']}' AND IFNULL(unit,'')<>''
 				GROUP BY activity, unit
 				";
 			} else {
 				$sql = "SELECT activity, unit, prtTitle,
 						{$strFieldsKPI['actual']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND ".self::ACTUAL_DATA_FILTER."
+				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND ".self::ACTUAL_DATA_FILTER." AND IFNULL(unit,'')<>''
 				GROUP BY activity, unit
 				UNION ALL
 				SELECT activity, unit, prtTitle, 
 						{$strFieldsKPI['next']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND source<>'Actual'
+				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND source<>'Actual' AND IFNULL(unit,'')<>''
 				GROUP BY activity, unit
 				";
 			}
@@ -3851,7 +3851,7 @@ class Reports{
 					SELECT activity, unit, prtTitle,
 					{$strFieldsKPI['budget']}
 				FROM `vw_sales`				
-				{$sqlWhere} AND scenario='{$strFieldsKPI['from_b']}' 
+				{$sqlWhere} AND scenario='{$strFieldsKPI['from_b']}' AND IFNULL(unit,'')<>''
 				GROUP BY activity, unit
 				";
 				
