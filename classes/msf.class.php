@@ -423,7 +423,7 @@ class MSF extends Document{
 							AND pc<>'{$this->profit}'
 							AND pccFlagProd=1 AND pc<>99
 							AND company='{$company}'
-							AND item='".self::REVENUE_ITEM."'
+							AND ".Reports::REVENUE_FILTER."
 							AND company='{$this->company}'
 						GROUP BY pc"; 
 			break;
