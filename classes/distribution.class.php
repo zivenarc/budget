@@ -365,7 +365,7 @@ class Distribution extends Document{
 				}
 				$oMaster->save();
 				
-				$this->doSQL("UPDATE reg_master SET customer=".self::EMPTY_CUSTOMER." WHERE item='".$Items::WH_RENT."' AND scenario='{$this->scenario}'");
+				$this->doSQL("UPDATE reg_master SET customer=".self::EMPTY_CUSTOMER." WHERE IFNULL(customer,0)=0 AND item='".$Items::WH_RENT."' AND scenario='{$this->scenario}'");
 				
 				$this->markPosted();
 			}
