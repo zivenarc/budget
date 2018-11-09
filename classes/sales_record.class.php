@@ -35,7 +35,7 @@ class sales_record extends table_record{
 			$arrRes[] = "`source`='".$this->source."'";
 			$arrRes[] = "`scenario`='".$this->scenario."'";
 			$arrRes[] = "`customer`=".(integer)$this->customer;
-			$arrRes[] = "`customer_group_code`=SELECT IFNULL(cntGroupID,cntID) FROM common_db.tbl_counterparty WHERE cntID=".(integer)$this->customer.")";
+			$arrRes[] = "`customer_group_code`=(SELECT IFNULL(cntGroupID,cntID) FROM common_db.tbl_counterparty WHERE cntID=".(integer)$this->customer.")";
 			$arrRes[] = "`comment`=".$oSQL->e($this->comment);
 			$arrRes[] = "`product`=".(integer)$this->product;
 			$arrRes[] = "`selling_rate`=".(double)$this->selling_rate;
