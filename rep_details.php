@@ -13,7 +13,11 @@ include ('includes/inc-frame_top.php');
 <div id='output'>
 <h2><?php echo $_POST['title'];?></h2>
 <?php
-$oReport->monthlyReport('activity',Array('financial'=>true,'summary'=>false,'kpi'=>false,'headcount'=>false));
+if(strpos($oReport->oBudget->type,'budget')!==false){
+	$oReport->periodicPnL('activity',Array('financial'=>true,'summary'=>false,'kpi'=>false,'headcount'=>false));
+} else {
+	$oReport->monthlyReport('activity',Array('financial'=>true,'summary'=>false,'kpi'=>false,'headcount'=>false));
+}
 ?>
 </div>
 <?php
