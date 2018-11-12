@@ -13,7 +13,7 @@ include ('includes/inc-frame_top.php');
 <div id='output'>
 <h2><?php echo $_POST['title'];?></h2>
 <?php
-if(strpos($oReport->oBudget->type,'budget')!==false){
+if(strpos($oReport->oBudget->type,'Budget')!==false){
 	$oReport->periodicPnL('activity',Array('financial'=>true,'summary'=>false,'kpi'=>false,'headcount'=>false));
 } else {
 	$oReport->monthlyReport('activity',Array('financial'=>true,'summary'=>false,'kpi'=>false,'headcount'=>false));
