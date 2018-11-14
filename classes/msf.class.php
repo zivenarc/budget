@@ -1,5 +1,5 @@
 <?php
-include_once ('classes/budget.class.php');
+include_once ('classes/reports.class.php');
 include_once ('classes/document.class.php');
 include_once ('classes/msf_record.class.php');
 include_once ('classes/item.class.php');
