@@ -357,11 +357,13 @@ class Indirect_costs extends Document{
 					WHERE scenario='".$oBudget->id."' AND company='{$this->company}' AND posted=1 AND prdGDS='OFT' GROUP BY pc, activity, customer";
 				break;
 			case 'revenue':
-				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_master 
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." 
+					FROM reg_master 
 					LEFT JOIN vw_customer ON customer=cntID
 					WHERE scenario='".$oBudget->id."' 
 						AND company='{$this->company}' 
-						".Reports::REVENUE_FILTER." 
+						".Reports::REVENUE_FILTER."
+						AND pc<>99
 						AND source<>'estimate' 
 					GROUP BY pc, activity";
 				break;
