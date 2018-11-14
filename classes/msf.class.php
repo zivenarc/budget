@@ -419,11 +419,11 @@ class MSF extends Document{
 				$sql = "SELECT 'RUB' as unit, pc, ".$this->budget->getMonthlySumSQL(1,15, null, 1000)." FROM reg_master
 						LEFT JOIN vw_profit ON pccID=pc
 						WHERE scenario='".$oBudget->id."' 
-							AND active=1 
-							AND pc<>'{$this->profit}'
-							AND pccFlagProd=1 AND pc<>99
+							AND posted=1 
+							AND pc NOT IN ('{$this->profit}',99)
+							AND pccFlagProd=1
 							AND company='{$company}'
-							AND ".Reports::REVENUE_FILTER."
+							".Reports::REVENUE_FILTER."
 							AND company='{$this->company}'
 						GROUP BY pc"; 
 			break;
