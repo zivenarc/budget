@@ -421,10 +421,9 @@ class MSF extends Document{
 						WHERE scenario='".$oBudget->id."' 
 							AND active=1 
 							AND pc NOT IN ('{$this->profit}',99)
-							AND pccFlagProd=1
-							##AND company='{$company}'
+							AND pccFlagProd=1							
 							".Reports::REVENUE_FILTER."
-							AND company='{$this->company}'
+							##AND company='{$this->company}'
 						GROUP BY pc"; 
 			break;
 			case 'users':
