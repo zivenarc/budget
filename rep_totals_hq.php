@@ -67,14 +67,14 @@ $sql = "SELECT account,Customer_group_code, vw_profit.pccTitle as Profit, SUM(".
 		FROM vw_master		
 		LEFT JOIN vw_profit ON bdv=pccID
 		WHERE scenario='{$oBudget->id}'
-			AND account IN('J00400','J00802')
+		".Reports::GP_FILTER."
 		GROUP BY bdv, account, Customer_group_code, Profit
 		UNION ALL
 		SELECT account,Customer_group_code, vw_profit.pccTitle as Profit,  0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
 		FROM vw_master		
 		LEFT JOIN vw_profit ON bdv=pccID		
 		WHERE scenario='{$oReference->id}'
-			AND account IN('J00400','J00802')
+		".Reports::GP_FILTER."
 		GROUP BY bdv, account,Customer_group_code, Profit
 		ORDER BY Profit";
 $rs = $oSQL->q($sql);
@@ -87,6 +87,31 @@ while ($rw=$oSQL->f($rs)){
 	$arrGP[$cusGroup]['last'][$rw['Profit']] += $rw['Estimate'];
 	$arrGPTotal['last'][$rw['Profit']] += $rw['Estimate'];
 }
+
+//------------------------------ Fees ---------------------------
+$sql = "SELECT account,pc,  vw_profit.pccTitle as Corp, Profit, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Total, 0 as Estimate
+		FROM vw_master				
+		LEFT JOIN vw_profit ON bdv=pccID
+		WHERE scenario='{$oBudget->id}'
+		AND account IN ('5999CO','5999BD','527000')
+		AND vw_master.pccFlagProd=1
+		GROUP BY Corp, Profit
+		UNION ALL
+		SELECT account,pc,  vw_profit.pccTitle as Corp, Profit, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates).")/$denominator as Estimate
+		FROM vw_master				
+		LEFT JOIN vw_profit ON bdv=pccID
+		WHERE scenario='{$oReference->id}'
+		AND account IN ('5999CO','5999BD','527000')
+		AND vw_master.pccFlagProd=1
+		GROUP BY Corp, Profit
+		ORDER BY Corp, Profit";
+$rs = $oSQL->q($sql);
+while ($rw=$oSQL->f($rs)){	
+			
+	$arrDistr[$rw['Profit']]['this'][$rw['Corp']] += $rw['Total'];		
+	$arrDistrTotal[$rw['Profit']]['last'][$rw['Corp']] += $rw['Estimate'];
+}
+
 // echo '<pre>';print_r($arrReport);echo '</pre>';
 ?>
 <table class='budget' id='report'>
@@ -196,6 +221,9 @@ foreach($arrProfit as $pc=>$flag){
 </tr>
 <?php
 foreach ($arrGP as $customer=>$data){
+	renderDataByPC($data, $arrProfit, $customer);	
+}
+foreach ($arrDistr as $customer=>$data){
 	renderDataByPC($data, $arrProfit, $customer);	
 }
 ?>
