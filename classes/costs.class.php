@@ -367,6 +367,17 @@ class Indirect_costs extends Document{
 						AND source<>'estimate' 
 					GROUP BY pc, activity";
 				break;
+			case 'payroll':
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." 
+					FROM reg_master 
+					LEFT JOIN vw_customer ON customer=cntID
+					WHERE scenario='".$oBudget->id."' 
+						AND company='{$this->company}' 
+						AND item='453d8da7-963b-4c4f-85ca-99e26d9fc7a2'
+						AND pc<>99
+						AND source<>'estimate' 
+					GROUP BY pc, activity";
+				break;
 			case 'kaizen':
 				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_master
 					JOIN vw_product_type ON prtID=activity AND prtGHQ='{$params['prtGHQ']}'

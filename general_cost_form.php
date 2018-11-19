@@ -29,7 +29,10 @@ if ($_POST['DataAction']){
 			break;			
 		case 'fill_revenue':
 			$oDocument->fill_general_costs($oBudget, 'revenue');
-			break;			
+			break;
+		case 'fill_payroll':
+			$oDocument->fill_general_costs($oBudget, 'payroll');
+			break;	
 	}
 	
 	if ($oDocument->save($_POST['DataAction'])){
@@ -71,6 +74,7 @@ if ($oDocument->GUID && !$oDocument->flagPosted){
 	$arrActions[] = Array ('title'=>'Users','action'=>'javascript:fillGrid(\'_users\');','class'=>'user_suit');
 	$arrActions[] = Array ('title'=>'TEU','action'=>'javascript:fillGrid(\'_teu\');','class'=>'bricks');
 	$arrActions[] = Array ('title'=>'Revenue','action'=>'javascript:fillGrid(\'_revenue\');','class'=>'money');
+	$arrActions[] = Array ('title'=>'Payroll','action'=>'javascript:fillGrid(\'_payroll\');','class'=>'fa-users');
 }
 
 //============================== Main form definition ==============================
