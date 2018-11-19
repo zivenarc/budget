@@ -157,7 +157,7 @@ if(!isset($_GET['pccGUID'])){
 										FROM vw_master 
 										{$oReport->sqlWhere}
 											AND  scenario='{$oBudget->id}' 
-											AND account NOT IN ('J00400', 'J00802') 
+											AND account NOT IN ('J00400', 'J00802','J45010','J40010') 
 											AND item<>''
 										GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)",
 								'denominator'=>$denominator,
