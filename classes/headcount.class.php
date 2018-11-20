@@ -486,7 +486,7 @@ class Headcount extends Document{
 						JOIN common_db.tbl_employee ON empID=vacEmployeeID
 						WHERE ((vacDateStart BETWEEN @dateStart AND @dateEnd) OR (vacDateEnd BETWEEN @dateStart AND @dateEnd))
 						AND vacStateID BETWEEN 410 AND 450
-						AND empProfitID={$this->pc->code}";
+						AND empProfitID='{$this->pc->code}'";
 						
 						for($i=0;$i<count($sqlV);$i++){
 							$rs = $this->oSQL->q($sqlV[$i]);
