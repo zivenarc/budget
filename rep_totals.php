@@ -19,6 +19,9 @@ $arrActions[] = Array('title'=>'YTD','action'=>'?mthStart='.(1+$oBudget->offset)
 $arrActions[] = Array('title'=>'ROY','action'=>'?mthStart='.$oBudget->nm.'&mthEnd='.(12+$oBudget->offset));
 $arrActions[] = Array('title'=>'This month','action'=>'?mthStart='.$oBudget->cm.'&mthEnd='.$oBudget->cm);
 $arrActions[] = Array('title'=>'Next month','action'=>'?mthStart='.$oBudget->nm.'&mthEnd='.$oBudget->nm);
+$arrActions[] = Array('title'=>'&nbsp', 'action'=>'#');
+$arrActions[] = Array('title'=>'Budget items','action'=>'?repType=item');
+$arrActions[] = Array('title'=>'YACT','action'=>'?repType=yact');
 
 
 if ($bu_group){
@@ -78,7 +81,7 @@ if ($mthStart!=1 || $mthEnd!=12){
 
 echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 
-$repType = 'budget';
+
 
 switch($repType){
 	case 'yact':
@@ -89,7 +92,7 @@ switch($repType){
 		$sqlAccountString = "CONCAT(`account`,':',`Title`) AS 'AccountTitle', `account` AS 'Account', `yact_group` AS 'GroupTitle', `yact_group_code` AS 'Group'";
 		$sqlGroupBy = "`account`";
 		break;
-	case 'budget':
+	case 'item':
 	default:
 		
 		define ('STAFF_COSTS', '02.Staff costs');

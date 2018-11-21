@@ -125,4 +125,18 @@ if($activity=='all'){
 } else {
 	$filter['activity'] = $activity;
 }
+
+//------------------------- Detail switch ----------------------
+
+if (isset($_GET['repType'])) {
+	$repType = $_GET['repType'];
+} elseif (isset($_COOKIE['repType'])) {
+	$repType = $_COOKIE['repType'];
+} else {
+	$activity = 'item'; 
+}
+
+SetCookie('repType',$repType,0,'/budget/');
+
+
 ?>
