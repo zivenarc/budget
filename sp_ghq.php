@@ -146,6 +146,10 @@ $arrAccounts = Array(
 								{$sqlWhere} 
 									AND (account like '65%' or account like '66%')			
 								GROUP by pc, prtGHQ",'subtotal'=>Array('PBT')),
+		'Extraordinary'=>Array('negative'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
+								{$sqlWhere} 
+									AND (account like '7%')			
+								GROUP by pc, prtGHQ",'subtotal'=>Array('PBT')),
 		'PBT'=>Array('class'=>'budget-total')
 	);
 
