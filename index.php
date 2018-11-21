@@ -71,6 +71,7 @@ if($oBudget->flagUpdate){
 		$strQuery = $strBaseQuery."&budget_scenario=".$oBudget->id."&reference=".$oBudget->reference_scenario->id."#".$arrUsrData['PCC']['pccGUID'];
 	?>
 	<a href="rep_summary.php?<?php echo $strQuery;?>">Summary</a>|
+	<a href="rep_monthly.php?<?php echo $strQuery;?>">Quarterly</a>|
 	<a href="rep_sales_kpi.php?<?php echo $strQuery;?>">Sales KPI</a>|
 	<a href="rep_pnl.php?<?php echo $strQuery;?>">Full-year estimate</a>|
 	<a href="rep_totals.php?<?php echo $strQuery;?>">Results per BU</a>|
@@ -84,6 +85,7 @@ if($oBudget->flagUpdate){
 	?>
 	<a href="rep_summary.php?<?php echo $strQuery;?>">Summary</a>|
 	<a href="rep_monthly.php?<?php echo $strQuery;?>">Monthly report</a>|
+	<a href="rep_sales_kpi.php?<?php echo $strQuery;?>">Sales KPI</a>|
 	<a href="rep_pnl.php?<?php echo $strQuery;?>">Full-year estimate</a>|
 	<a href="rep_totals.php?<?php echo $strQuery;?>">Results per BU</a>|
 	<a href="rep_waterfall.php?<?php echo $strQuery;?>">Waterfall</a>|

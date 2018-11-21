@@ -16,7 +16,7 @@ class ProfitCenters extends Reference{
 		$this->child_class = 'ProfitCenter';
 		$this->prefix='pcc';
 		
-		$sql = "SELECT * FROM `".self::TABLE."` WHERE pccFlagDeleted=0";
+		$sql = "SELECT * FROM `".self::TABLE."`";
 		$rs = $this->oSQL->q($sql);
 		while ($rw=$this->oSQL->f($rs)){
 			$this->data[$rw['pccGUID']]=$rw;

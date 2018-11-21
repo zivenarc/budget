@@ -282,7 +282,9 @@ $(document).ready(function(){
 	
 });
 </script>
-
+<nav>
+	<a target='_customer_report' href="rep_sales_kpi_new.php?cntID=<?php echo $oDocument->customer;?>&budget_scenario=<?php echo $oDocument->budget->id;?>&reference=<?php echo $oDocument->budget->reference_scenario->id;?>">Customer report</a>
+</nav>
 <?php
 require ('includes/inc-frame_bottom.php');
 ?>
