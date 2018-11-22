@@ -4308,5 +4308,131 @@ class Reports{
 		<?php
 	}
 	
+	function yearRatio(){
+		
+		$sql = "SELECT cntYear, SUM(Total_AM)/1000 as 'Total', customer,Customer_name 
+				FROM vw_master
+				{$this->sqlWhere}
+				AND scenario = '{$this->oBudget->id}'
+				".self::GP_FILTER."
+				GROUP BY cntYear, customer 
+				ORDER BY cntYear, customer";
+		// echo '<pre>',$sql,'</pre>';
+		$rs = $this->oSQL->q($sql);
+		
+		if(!$this->oSQL->n($rs)){
+				echo '<div class="warning">No Gross Profit found</div>';
+				return(false);
+		}
+		
+		while ($rw = $this->oSQL->f($rs)){
+			
+			$arrCategories[$rw['cntYear']] += $rw['Total'];
+			$arrData[$this->oBudget->title][$rw['cntYear']] += $rw['Total'];
+			$arrTotal[$this->oBudget->title] += $rw['Total'];
+			
+		}
+		
+		// $arrCategories = array_unique($arrCategories);
+		ksort($arrCategories);
+		
+		$sql = "SELECT cntYear, SUM(Total_AM)/1000 as 'Total', customer,Customer_name 
+				FROM vw_master
+				{$this->sqlWhere}
+				AND scenario = '{$this->oReference->id}'
+				".self::GP_FILTER."
+				GROUP BY cntYear, customer 
+				ORDER BY cntYear, customer";
+				
+		// echo '<pre>',$sql,'</pre>';
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			
+			$arrRefData[$rw['cntYear']] += $rw['Total'];
+			$arrData[$this->oReference->title][$rw['cntYear']] += $rw['Total'];
+			$arrTotal[$this->oReference->title] += $rw['Total'];
+		}
+		
+		
+		foreach($arrData as $scenario=>$data){
+			$series = Array();
+			foreach($arrCategories as $category=>$value){
+				// if(!isset($data[$category])) $data[$category] = 0;
+				$series[] = $data[$category];
+				$series_extra[] = $data[$category] - $arrRefData[$scenario][$category];
+			};
+			
+			// ksort($data);
+			
+			$arrHSSeries[] = Array('type'=>'column',
+								'name'=>$scenario,
+								// 'data'=>array_values($data));
+								'data'=>array_values($series),
+								'extra'=>array_values($series_extra));
+			
+			
+			
+			
+		}
+		
+		foreach($arrData[$this->oReference->title] as $year=>$data){
+			
+			if($arrRefData[$year]){
+				$strRef = number_format($data-$arrRefData[$year],0,'.',',');
+				if($data>$arrRefData[$year]){
+					$strRef = '<span style="color:green;">(+'.$strRef.')</span>';
+				} else {
+					$strRef = '<span style="color:red;">('.$strRef.')</span>';
+				};
+			} else {
+				$strRef='';
+			}
+			
+			$arrTotalData[] = Array('name'=>$year?$year:'Unknown year',
+							'y'=>$data,
+							'extra'=>$strRef
+							);
+		}
+		
+		$arrHSSeries[] = Array('type'=>'pie', 'name'=>'GP',
+								'data'=>$arrTotalData,
+								'center'=>Array(300,100),
+								'size'=>300
+								);
+		
+		$diff = $arrTotal[$this->oBudget->title]-$arrTotal[$this->oReference->title];
+		$subtitle = 'Total Gross Profit '.number_format($arrTotal[$this->oBudget->title],0,'.',',');
+		if($arrTotal[$this->oBudget->title]!=0){
+				$ratio = (integer)($diff/$arrTotal[$this->oBudget->title]*100);
+		}
+		if ($diff>=0){
+			$subtitle .= '<span style="color:green;"> (+'.number_format($diff,0,'.',',').', '.$ratio.'%)</span>';
+		} else {
+			$subtitle .= '<span style="color:red;"> ('.number_format($diff,0,'.',',').', '.$ratio.'%)</span>';
+		}
+		
+		
+		$arrHS = Array('title'=>Array('text'=>'Sales composition by year, '.$this->oBudget->title),
+						'subtitle'=>Array('text'=>$subtitle),
+						'chart'=>Array('height'=>600),
+						'xAxis'=>Array('categories'=>array_keys($arrCategories)),
+						'plotOptions'=>Array('column'=>Array('dataLabels'=>Array('format'=>'{point.y:,.0f}', 'enabled'=>true)),
+											'pie'=>Array('startAngle'=>120,
+														'dataLabels'=>Array('format'=>'{point.name}<br><b>{point.percentage:.0f} %</b><br>{point.y:,.0f}<br>{point.extra}',
+																			'distance'=>0))
+										),
+						'series'=>$arrHSSeries
+					);
+		
+		// echo '<pre>';print_r($arrHS);echo '</pre>';
+		?>
+		<div id='<?php echo $this->ID;?>'></div>
+		<script>
+		Highcharts.chart('<?php echo $this->ID;?>',<?php echo json_encode($arrHS);?>);
+		</script>
+		<?php
+	}
+	
+	
 }
 ?>
