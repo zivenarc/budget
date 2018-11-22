@@ -32,15 +32,18 @@ foreach ($arrScenario as $budget_scenario){
 //echo '<pre>';print_r($arrReport);echo '</pre>';
 foreach($arrReport as $profit=>$years){
 	echo '<h2>',$profit,'</h2>';
+	// echo '<pre>';print_r($years);echo '</pre>';
 	?>
 	<table class='budget'>
 		<thead>
+			<tr>
 			<?php foreach ($arrYearTitles as $arrPeriodTitle) { 
 				echo '<th>',implode('</th><th>',$arrPeriodTitle),'</th>';
 			} ?>
+			</tr>
 		</thead>
 		<?php foreach ($years as $scenarios) {
-				// echo '<pre>';print_r($scenarios);echo '</pre>';
+				//echo '<pre>';print_r($scenarios);echo '</pre>';
 				$scenario_count = max($scenario_count, count($scenarios));
 			}
 			// echo $scenario_count;
@@ -49,10 +52,10 @@ foreach($arrReport as $profit=>$years){
 		<?php for ($i = 0;$i<=scenario_count;$i++){
 			?>
 			<tr>
-				<?php foreach ($years as $months){
+				<?php foreach ($arrYearTitles as $year=>$titles){
 					for($m = 3;$m<=15;$m++){
 							$month = $oBudget->arrPeriod[$m];
-							echo '<td>'; Reports::render($months[$i][$month]);echo '</td>';
+							echo '<td>'; Reports::render($arrReport[$profit][$year][$i][$month]);echo '</td>';
 					}
 				}?>
 			</tr>
