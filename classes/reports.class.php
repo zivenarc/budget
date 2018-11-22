@@ -2045,6 +2045,11 @@ class Reports{
 				$res['title'] = 'BDV employee';
 				$res['href'] = "rep_my.php?ownerID=[key]&type=customer";
 				break;
+			case 'year':
+				$res['sql'] = "cntYear as 'Level1_title', cntYear as 'level1_code', `Customer_name` as `level2_title`, `".($this->YACT?'yact_group':'Group')."` as 'Group', `customer` as `level2_code`,-SUM(Total_AM) as itmOrder,";
+				$res['title'] = 'Year';
+				
+				break;
 			case 'bdv':
 				$res['sql'] = "bdvTitle as 'Level1_title', bdv as 'level1_code', `".($this->YACT?'yact_group':'Group')."` as 'Group', `sales` as `level2_code`,`usrTitle` as `level2_title`,-SUM(Total_AM) as itmOrder,";
 				$res['title'] = 'Selling unit';

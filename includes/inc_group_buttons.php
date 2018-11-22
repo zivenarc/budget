@@ -9,5 +9,6 @@
 	$arrActions[] = Array ('title'=>$strLocal?'Отделы продаж':'By BDV dept','action'=>"?type=bdv");	
 	$arrActions[] = Array ('title'=>$strLocal?'Отрасли':'By IV','action'=>"?type=iv");	
 	$arrActions[] = Array ('title'=>$strLocal?'Сегменты':'By GHQ Group','action'=>"?type=ghq_group");	
+	$arrActions[] = Array ('title'=>$strLocal?'Годы':'By year','action'=>"?type=year");	
 	$arrActions[] = Array ('title'=>$strLocal?'Фильтр по номенклатуре':'Activity filter','action'=>"javascript:showActivityList();",'class'=>'fa-filter');	
 ?>
