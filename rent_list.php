@@ -6,7 +6,7 @@ $entID=12;
 $entity = new Entity();
 $entity->getByID($entID);
 
-$arrTabs = $entity->getItemTabs($sqlMyFilter);
+$arrTabs = $entity->getProfitTabs($sqlMyFilter);
 
 if ($_GET['ownerID']) {
 	$sqlMyFilter = $entity->prefix."InsertBy=".$oSQL->e($_GET['ownerID']);
