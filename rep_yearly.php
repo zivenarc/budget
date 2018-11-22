@@ -14,7 +14,7 @@ echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'<
 $arrScenario=Array('A2015','A2016','A2017','FYE_18_Sep','FYE_18_Oct','B2019');
 foreach ($arrScenario as $budget_scenario){
 	$oBudget = new Budget($budget_scenario);
-	$sql = "SELECT Profit, ".$oBudget->getMonthlySumSQL(3,15, null, 1000)."
+	$sql = "SELECT Profit, ".$oBudget->getMonthlySumSQL(4,15, null, 1000)."
 			FROM vw_master
 			WHERE scenario='{$budget_scenario}'
 			AND pccFlagProd=1
@@ -25,6 +25,9 @@ foreach ($arrScenario as $budget_scenario){
 	while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['Profit']][$oBudget->year][] = $rw;
 	}
+	
+	// echo '<pre>';print_r($oBudget->arrPeriodTitle);echo '</pre>';
+	//echo $oBudget->year;
 	
 	$arrYearTitles[$oBudget->year] = array_slice($oBudget->arrPeriodTitle,3,12);
 }
@@ -53,7 +56,7 @@ foreach($arrReport as $profit=>$years){
 			?>
 			<tr>
 				<?php foreach ($arrYearTitles as $year=>$titles){
-					for($m = 3;$m<=15;$m++){
+					for($m = 4;$m<=15;$m++){
 							$month = $oBudget->arrPeriod[$m];
 							echo '<td>'; Reports::render($arrReport[$profit][$year][$i][$month]);echo '</td>';
 					}

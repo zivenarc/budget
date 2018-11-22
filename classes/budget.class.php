@@ -18,15 +18,16 @@ class Budget{
 				WHERE scnID='$scenario'";
 		$rs = $this->oSQL->q($sql);
 		$rw = $this->oSQL->f($rs);
-			
+
+		$this->year = (integer)$rw['scnYear'];
+		
 		$this->arrPeriod = Array(1=>'jan',2=>'feb',3=>'mar',4=>'apr',5=>'may',6=>'jun',7=>'jul',8=>'aug',9=>'sep',10=>'oct',11=>'nov',12=>'dec',13=>'jan_1',14=>'feb_1',15=>'mar_1');
-		$this->arrPeriodTitle = Array(1=>'Jan',2=>'Feb',3=>'Mar',4=>'Apr',5=>'May',6=>'Jun',7=>'Jul',8=>'Aug',9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dec',13=>'Jan\''.$this->year-1999,14=>'Feb\''.$this->year-1999,15=>'Mar\''.$this->year-1999);
+		$this->arrPeriodTitle = Array(1=>'Jan',2=>'Feb',3=>'Mar',4=>'Apr',5=>'May',6=>'Jun',7=>'Jul',8=>'Aug',9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dec',13=>'Jan\''.($this->year - 1999),14=>'Feb\''.($this->year - 1999),15=>'Mar\''.($this->year - 1999));
 		$this->type = $rw['scnType'];
 		if (strpos($this->type,'AM')){
 			$this->offset = 3;
 		}
 		
-		$this->year = $rw['scnYear'];
 		$this->date_start = strtotime($rw['scnDateStart']);
 		$this->date_end = mktime(23,59,59,12+$this->offset,31,$this->year);
 		
