@@ -34,11 +34,17 @@ foreach ($arrScenario as $budget_scenario){
 
 //echo '<pre>';print_r($arrReport);echo '</pre>';
 foreach($arrReport as $profit=>$years){
+	$tableID = md5($profit);
 	echo '<h2>',$profit,'</h2>';
 	// echo '<pre>';print_r($years);echo '</pre>';
 	?>
-	<table class='budget'>
+	<table id="<?php echo $tableID;?>" class='budget'>
 		<thead>
+			<tr>
+				<?php foreach ($arrYearTitles as $year=>$arrPeriodTitle) { 
+					echo '<th colspan="12">',$year,'</th>';
+				} ?>
+			</tr>
 			<tr>
 			<?php foreach ($arrYearTitles as $arrPeriodTitle) { 
 				echo '<th>',implode('</th><th>',$arrPeriodTitle),'</th>';
@@ -52,7 +58,7 @@ foreach($arrReport as $profit=>$years){
 			// echo $scenario_count;
 		?>
 		<tbody>
-		<?php for ($i = 0;$i<=scenario_count;$i++){
+		<?php for ($i = 0;$i<$scenario_count;$i++){
 			?>
 			<tr>
 				<?php foreach ($arrYearTitles as $year=>$titles){
@@ -67,6 +73,7 @@ foreach($arrReport as $profit=>$years){
 		</tbody>
 	</table>
 	<?php
+	Reports::_echoButtonCopyTable($tableID);
 }
 include ('includes/inc-frame_bottom.php');
 
