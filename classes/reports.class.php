@@ -4327,6 +4327,16 @@ class Reports{
 		
 		while ($rw = $this->oSQL->f($rs)){
 			
+			if($rw['cntYear']==$this->oBudget->year){
+				$yearTitle = "Current year";
+			} elseif ($rw['cntYear']){
+				$yearTitle = "Previous years";
+			} else {
+				$yearTitle = "Unknown";
+			}
+			
+			$arrPieData[$this->oBudget->title][$yearTitle] += $rw['Total'];
+			
 			$arrCategories[$rw['cntYear']] += $rw['Total'];
 			$arrData[$this->oBudget->title][$rw['cntYear']] += $rw['Total'];
 			$arrTotal[$this->oBudget->title] += $rw['Total'];
@@ -4347,6 +4357,16 @@ class Reports{
 		// echo '<pre>',$sql,'</pre>';
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
+			
+			if($rw['cntYear']==$this->oBudget->year){
+				$yearTitle = "Current year";
+			} elseif ($rw['cntYear']){
+				$yearTitle = "Previous years";
+			} else {
+				$yearTitle = "Unknown";
+			}
+			
+			$arrPieData[$this->oReference->title][$yearTitle] += $rw['Total'];
 			
 			$arrRefData[$rw['cntYear']] += $rw['Total'];
 			$arrData[$this->oReference->title][$rw['cntYear']] += $rw['Total'];
@@ -4375,21 +4395,23 @@ class Reports{
 			
 		}
 		
-		foreach($arrData[$this->oReference->title] as $year=>$data){
+		foreach($arrPieData[$this->oBudget->title] as $year=>$data){
 			
-			if($arrRefData[$year]){
-				$strRef = number_format($data-$arrRefData[$year],0,'.',',');
-				if($data>$arrRefData[$year]){
-					$strRef = '<span style="color:green;">(+'.$strRef.')</span>';
+			$refData = $arrPieData[$this->oReference->title][$year];
+			
+			if($refData){
+				$strRef = number_format($data-$refData,0,'.',',');
+				if($data>$refData){
+					$strRef = '<span style="color:green;">(+'.$strRef.', +'.number_format((($data-$refData)/$refData)*100,0,'.',',').'%)</span>';
 				} else {
-					$strRef = '<span style="color:red;">('.$strRef.')</span>';
+					$strRef = '<span style="color:red;">('.$strRef.', '.number_format((($data-$refData)/$refData)*100,0,'.',',').'%)</span>';
 				};
 			} else {
 				$strRef='';
 			}
 			
-			$arrTotalData[] = Array('name'=>$year?$year:'Unknown year',
-							'y'=>$data,
+			$arrTotalData[] = Array('name'=>$year,
+							'y'=>(integer)$data,
 							'extra'=>$strRef
 							);
 		}
