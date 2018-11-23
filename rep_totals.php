@@ -143,13 +143,13 @@ while ($rw=$oSQL->f($rs)){
 }
 
 $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd).")/".($mthEnd-$mthStart+1)." as Total, 0 as Estimate
-		FROM reg_headcount
+		FROM `reg_headcount`
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$oBudget->id}'  AND company='{$company}' and posted=1 and salary>10000 {$sqlWherePC}
 		GROUP BY Profit
 		UNION ALL
-		SELECT pccTitle as Profit, pccFlagProd, 0 as Total, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd).")/".($mthEnd-$mthStart+1)." as Estimate
-		FROM reg_headcount
+		SELECT pccTitle as Profit, pccFlagProd, 0 as Total, SUM(".$oBudget->getYTDSQL($mthEnd,$mthEnd).") as Estimate
+		FROM `reg_headcount`
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$reference}'  AND company='{$company}' and posted=1 and salary>10000 {$sqlWherePC}
 		GROUP BY Profit
@@ -456,7 +456,7 @@ foreach($arrProfit as $pc=>$flag){
 	<td class='budget-decimal'><?php Reports::render_ratio(array_sum($arrHeadcount['FTE']),array_sum($arrHeadcountBudget['FTE']),1);?></td>
 </tr>
 <tr>
-	<td>Headcount, <?php echo $strLastTitle;?></td>
+	<td>Headcount, end of <?php echo $strLastTitle;?></td>
 <?php
 foreach($arrProfit as $pc=>$flag){
 	?>
