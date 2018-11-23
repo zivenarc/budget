@@ -169,13 +169,13 @@ while ($rw=$oSQL->f($rs)){
 $sql = "SELECT account,Customer_group_code, customer, Profit, pccFlagProd, bdv, bdvTitle, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM vw_master		
 		WHERE scenario='{$oBudget->id}'  AND company='{$company}' {$sqlWherePC}
-			AND account IN('J00400','J00802')
+		".Reports::GP_FILTER."
 		GROUP BY account, Customer_group_code, customer, Profit, bdvTitle
 		UNION ALL
 		SELECT account,Customer_group_code, customer,  Profit, pccFlagProd, bdv, bdvTitle, 0, SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_last).")/$denominator as Estimate
 		FROM vw_master		
 		WHERE scenario='{$reference}'  AND company='{$company}' {$sqlWherePC}
-			AND account IN('J00400','J00802')
+		".Reports::GP_FILTER."
 		GROUP BY account,Customer_group_code, customer, Profit, bdvTitle
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
@@ -186,7 +186,7 @@ while ($rw=$oSQL->f($rs)){
 		$keyProfit = $rw['Profit'];
 	}
 	
-	if ($rw['account']=='J00400'){
+	if (in_array($rw['account'],Array('J00400','J40010'))){
 		$arrGrossRevenue[$keyProfit] += $rw['Total'];	
 		$arrGrossRevenueEstimate += $rw['Estimate'];
 	}
