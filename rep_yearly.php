@@ -11,7 +11,7 @@ $arrJS[]="https://code.highcharts.com/modules/exporting.js";
 include ('includes/inc-frame_top.php');
 echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';	
 
-$arrScenario=Array('A2015','A2016','A2017','FYE_18_Oct','FYE_18_Aug','B2019');
+$arrScenario=Array('A2015','A2016','A2017','FYE_18_Oct','FYE_18_Sep','FYE_18_Aug','B2019');
 foreach ($arrScenario as $budget_scenario){
 	$oBudget = new Budget($budget_scenario);
 	$sql = "SELECT Profit, ".$oBudget->getMonthlySumSQL(4,15, null, 1000)."
