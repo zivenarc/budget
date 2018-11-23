@@ -2,6 +2,13 @@
 require ('common/auth.php');
 require ('classes/budget.class.php');
 
+$bdv = isset($_GET['bdv'])?$_GET['bdv']:($_COOKIE['bdv']?$_COOKIE['bdv']:$arrUsrData['usrProfitID']);
+if ($_GET['bdv']=='MYSELF'){
+	$bdv = $arrUsrData['usrProfitID'];
+}
+SetCookie('bdv',$bdv,0);
+
+
 include ('includes/inc_report_settings.php');
 include ('includes/inc_report_pcfilter.php');
 
@@ -21,6 +28,21 @@ if(!isset($_GET['pccGUID'])){
 	// $arrJS[]='js/input_form.js';	
 	
 	include('includes/inc_group_buttons.php');	
+	
+	
+	if($bdv){
+		$sql = "SELECT * FROM common_db.tbl_profit WHERE pccID=".$oSQL->e($bdv);
+		$rs = $oSQL->q($sql);
+		$arrBDV = $oSQL->f($rs);
+		$arrUsrData["pagTitle$strLocal"] .= 'Sales by '.($arrBDV['pccTitle']?$arrBDV['pccTitle']:'<Unknown>');
+	}
+	
+	$arrDefaultParams = Array('currency'=>643,'period_type'=>'cm','denominator'=>1000,'bu_group'=>'');
+	$strQuery = http_build_query($arrDefaultParams);
+	$arrActions[] = Array('title'=>'NSD','action'=>'?bdv=9&type=bu_group&'.$strQuery);
+	$arrActions[] = Array('title'=>'JSD','action'=>'?bdv=130&type=bu_group&'.$strQuery);
+	
+	
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
 	echo '<h2>Reference to actual periods not available</h2>';
@@ -39,7 +61,8 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc_report_buttons.php');
 	
 	$filter['new'] = true;
-	
+	$filter['bdv'] = $bdv;
+		
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator,'reference'=>$budget_scenario,'filter'=>$filter));
 	// echo '<pre>';print_r($filter);echo '</pre>';
 	$oReport->periodicPnL($type);

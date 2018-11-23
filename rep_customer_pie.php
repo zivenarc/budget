@@ -94,8 +94,8 @@ if(!isset($_GET['pccGUID'])){
 	$customerPie = 'customer_'.$_GET['pccGUID'];
 	$industryPie = 'industry_'.$_GET['pccGUID'];
 	?>
-	<div id='<?php echo $customerPie;?>' style='width:1600px; height: 900px;'></div>
-	<div id='<?php echo $industryPie;?>' style='width:1600px; height: 900px;'></div>
+	<div id='<?php echo $customerPie;?>' style='width:100%; height:900px;'></div>
+	<div id='<?php echo $industryPie;?>' style='width:100%; height:900px;'></div>
 	<script>
 	$(document).ready(function(){
 		
