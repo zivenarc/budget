@@ -88,7 +88,7 @@ class Location_costs extends Document{
 			'title'=>'Distribution method'
 			,'field'=>self::Prefix.'Distribution'
 			,'type'=>'combobox'
-			,'sql'=>Array('all'=>'All employees','wc'=>'White collars','bc'=>'Blue collars','users'=>'Domain users')
+			,'sql'=>Array('all'=>'All employees','wc'=>'White collars','bc'=>'Blue collars','users'=>'Domain users','wcc'=>'All companies')
 			,'default'=>'all'
 			, 'disabled'=>!$this->flagUpdate
 		);
@@ -256,7 +256,7 @@ class Location_costs extends Document{
 			$sqlWhere = " WHERE scenario='{$this->scenario}' 
 							AND location=".(integer)$this->location." 
 							AND posted=1
-							AND salary>0";
+							AND salary>10000";
 			$sqlGroup = " GROUP BY pc, activity";
 			
 			switch ($this->distribution){
@@ -264,10 +264,13 @@ class Location_costs extends Document{
 					//change nothing
 					break;
 				case 'wc':
-					$sqlWhere .= " AND wc=1";						
+					$sqlWhere .= " AND wc=1 AND company='{$this->company}'";						
 					break;
 				case 'bc':
-					$sqlWhere .= " AND wc=0";
+					$sqlWhere .= " AND wc=0 AND company='{$this->company}'";
+					break;
+				case 'wcc':
+					$sqlWhere .= " AND wc=1";
 					break;
 				case 'users':
 						$sqlFrom .= " LEFT JOIN vw_employee ON empGUID1C=particulars
