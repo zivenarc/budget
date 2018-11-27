@@ -27,6 +27,9 @@ class sales_ghq_record{
 			$month = $this->arrPeriod[$m];
 			$this->masterData[$keys['ghq']][$keys['account']][$month] += (double)$data[$month];
 		}
+		
+		// echo '<pre>';print_r($this->masterData);echo '</pre>';
+		
 	}
 	
 	public function getSQL(){
