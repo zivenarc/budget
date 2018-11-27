@@ -32,7 +32,7 @@ if ($_GET['tab']){
 	$arrJS[] = 'js/journal.js';		
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
-	echo Budget::getScenarioTabs(true);
+	echo Budget::getScenarioTabs();
 	include ('includes/inc-frame_bottom.php');
 }
 ?>
