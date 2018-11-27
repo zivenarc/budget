@@ -493,6 +493,7 @@ class Sales extends Document{
 				foreach($this->records[$this->gridName] as $id=>$record){
 					
 					// echo '<pre>';print_r($record);echo '</pre>';
+					$oActivity = $oActivities->getByCode($record->activity);					
 					
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
@@ -500,10 +501,9 @@ class Sales extends Document{
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $record->sales;				
 					
-					$activity = $oActivities->getByCode($record->activity);
-					$master_row->item = $activity->item_income;
+					$master_row->item = $oActivity->item_income;
 					
-					$account = $activity->YACT;
+					$account = $oActivity->YACT;
 					$master_row->account = $account;
 					
 					for($m=1;$m<=15;$m++){
@@ -517,7 +517,7 @@ class Sales extends Document{
 								if (!isset($freight_r_row)){
 									$freight_r_row = $oMaster->add_master();
 								}
-								// $freight_r_row->item = $activity->item_cost;
+								// $freight_r_row->item = $oActivity->item_cost;
 								$freight_r_row->item = $oItems::PROFIT_SHARE_COST;
 								$freight_r_row->account = 'J00400';
 								$freight_r_row->profit = $this->profit;
@@ -536,8 +536,8 @@ class Sales extends Document{
 						
 					}		
 
-					$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>$activity->YACT_Title),(array)$master_row);
-					$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>$activity->YACT_Title),(array)$freight_r_row);
+					$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oActivity->YACT_Title),(array)$master_row);
+					$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oActivity->YACT_Title),(array)$freight_r_row);
 					
 					if ($record->buying_rate!=0){
 						$master_row = $oMaster->add_master();
@@ -546,8 +546,8 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $oActivities->getByCode($record->activity);
-						$master_row->item = $activity->item_cost;
+						$oActivity = $oActivities->getByCode($record->activity);
+						$master_row->item = $oActivity->item_cost;
 						
 						$item = $oItems->getById($master_row->item);
 						$master_row->account = $item->YACT;
@@ -567,7 +567,7 @@ class Sales extends Document{
 									if (!isset($freight_c_row)){
 										$freight_c_row = $oMaster->add_master();
 									}					
-									$freight_c_row->item = $activity->item_cost;
+									$freight_c_row->item = $oActivity->item_cost;
 									$freight_c_row->item =  $oItems::PROFIT_SHARE_COST;
 									$freight_c_row->account = 'J00400';
 									$freight_c_row->profit = $this->profit;
@@ -583,8 +583,8 @@ class Sales extends Document{
 							
 						}
 						
-						$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>$item->YACT_Title),(array)$master_row);
-						$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>$activity->YACT_Title),(array)$freight_c_row);	
+						$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$item->YACT_Title),(array)$master_row);
+						$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oActivity->YACT_Title),(array)$freight_c_row);	
 						
 					}
 					
@@ -598,8 +598,8 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $oActivities->getByCode($record->activity);
-						$account = $activity->YACT;
+						$oActivity = $oActivities->getByCode($record->activity);
+						$account = $oActivity->YACT;
 						
 						$item = $oItems->getById(Items::PROFIT_SHARE);
 						$master_row->account = $item->getYACT($master_row->profit);
@@ -660,7 +660,7 @@ class Sales extends Document{
 							}
 							
 							$oSalesGHQ->gbr = true;
-							$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>"Profit Share as BO"),(array)$master_row);	
+							$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>"Profit Share as BO"),(array)$master_row);	
 						
 						} elseif($this->settings['PS_Scheme']=='PS2018'){
 							$arrProfit = Array();
@@ -672,8 +672,8 @@ class Sales extends Document{
 									$master_row->activity = $record->activity;
 									$master_row->customer = $record->customer;				
 									$master_row->sales = $record->sales;
-									$activity = $oActivities->getByCode($record->activity);
-									$account = $activity->YACT;
+									$oActivity = $oActivities->getByCode($record->activity);
+									$account = $oActivity->YACT;
 									$item = $oItems->getById(Items::PROFIT_SHARE_COST);
 									$master_row->account = 'J00400';
 									$master_row->item = $item->id;
@@ -682,7 +682,7 @@ class Sales extends Document{
 										$master_row->{$month} = 0.4 * $arrGP[$month];
 									}	
 								}
-								$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>"Profit Share as BO"),(array)$master_row);	
+								$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>"Profit Share as BO"),(array)$master_row);	
 								
 								if($this->destination_agent==self::PB_Ourselves){
 									$master_row = $oMaster->add_master();	
@@ -690,8 +690,8 @@ class Sales extends Document{
 									$master_row->activity = $record->activity;
 									$master_row->customer = $record->customer;				
 									$master_row->sales = $record->sales;
-									$activity = $oActivities->getByCode($record->activity);
-									$account = $activity->YACT;
+									$oActivity = $oActivities->getByCode($record->activity);
+									$account = $oActivity->YACT;
 									$item = $oItems->getById(Items::PROFIT_SHARE_COST);
 									$master_row->account = 'J00400';
 									$master_row->item = $item->id;
@@ -700,7 +700,7 @@ class Sales extends Document{
 										$master_row->{$month} = 0.2 * $arrGP[$month];
 									}	
 								}
-								$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>"Profit Share as DA"),(array)$master_row);	
+								$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>"Profit Share as DA"),(array)$master_row);	
 								
 							} else { //export commissions
 								if($this->business_owner!=self::PB_Ourselves){ 
@@ -709,8 +709,8 @@ class Sales extends Document{
 									$master_row->activity = $record->activity;
 									$master_row->customer = $record->customer;				
 									$master_row->sales = $record->sales;
-									$activity = $oActivities->getByCode($record->activity);
-									$account = $activity->YACT;
+									$oActivity = $oActivities->getByCode($record->activity);
+									$account = $oActivity->YACT;
 									$item = $oItems->getById(Items::PROFIT_SHARE_COST);
 									$master_row->account = '523000';
 									$master_row->item = $item->id;
@@ -719,7 +719,7 @@ class Sales extends Document{
 										$master_row->{$month} = -0.4 * $arrGP[$month];
 									}
 
-									$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>"COS Profit Share to BO"),(array)$master_row);	
+									$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>"COS Profit Share to BO"),(array)$master_row);	
 									
 								}
 								if($this->destination_agent!=self::PB_Ourselves){ 
@@ -728,8 +728,8 @@ class Sales extends Document{
 									$master_row->activity = $record->activity;
 									$master_row->customer = $record->customer;				
 									$master_row->sales = $record->sales;
-									$activity = $oActivities->getByCode($record->activity);
-									$account = $activity->YACT;
+									$oActivity = $oActivities->getByCode($record->activity);
+									$account = $oActivity->YACT;
 									$item = $oItems->getById(Items::PROFIT_SHARE_COST);
 									$master_row->account = 'J00802';
 									$master_row->item = $item->id;
@@ -738,7 +738,7 @@ class Sales extends Document{
 										$master_row->{$month} = -0.2 * $arrGP[$month];
 									}
 									
-									$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>"COS Profit Share to DA"),(array)$master_row);	
+									$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>"COS Profit Share to DA"),(array)$master_row);	
 								}
 							}								
 						}  else {
@@ -759,8 +759,8 @@ class Sales extends Document{
 								$master_row->customer = $record->customer;				
 								$master_row->sales = $record->sales;
 								
-								$activity = $oActivities->getByCode($master_row->activity);
-								$account = $activity->YACT;
+								$oActivity = $oActivities->getByCode($master_row->activity);
+								$account = $oActivity->YACT;
 								
 								//$master_row->item = Items::PROFIT_SHARE;
 								$item = $oItems->getById(Items::REVENUE);
@@ -786,8 +786,8 @@ class Sales extends Document{
 								$master_row->customer = $record->customer;				
 								$master_row->sales = $record->sales;
 								
-								$activity = $oActivities->getByCode($master_row->activity);
-								$account = $activity->YACT;
+								$oActivity = $oActivities->getByCode($master_row->activity);
+								$account = $oActivity->YACT;
 								
 								//$master_row->item = Items::PROFIT_SHARE;
 								$item = $oItems->getById(Items::PROFIT_SHARE);
@@ -817,8 +817,8 @@ class Sales extends Document{
 								$master_row->customer = $record->customer;				
 								$master_row->sales = $record->sales;
 								
-								$activity = $oActivities->getByCode($master_row->activity);
-								$account = $activity->YACT;
+								$oActivity = $oActivities->getByCode($master_row->activity);
+								$account = $oActivity->YACT;
 								
 								//$master_row->item = Items::PROFIT_SHARE;
 								$item = $oItems->getById(Items::REVENUE);
@@ -844,8 +844,8 @@ class Sales extends Document{
 								$master_row->customer = $record->customer;				
 								$master_row->sales = $record->sales;
 								
-								$activity = $oActivities->getByCode($master_row->activity);
-								$account = $activity->YACT;
+								$oActivity = $oActivities->getByCode($master_row->activity);
+								$account = $oActivity->YACT;
 								
 								//$master_row->item = Items::PROFIT_SHARE;
 								$item = $oItems->getById(Items::DIRECT_COSTS);
@@ -879,8 +879,8 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $oActivities->getByCode($record->activity);
-						$account = $activity->YACT;
+						$oActivity = $oActivities->getByCode($record->activity);
+						$account = $oActivity->YACT;
 						
 						//$master_row->item = Items::PROFIT_SHARE;
 						$item = $oItems->getById(Items::INTERCOMPANY_COSTS);
@@ -900,8 +900,8 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $oActivities->getByCode($record->activity);
-						$account = $activity->YACT;
+						$oActivity = $oActivities->getByCode($record->activity);
+						$account = $oActivity->YACT;
 						
 						//$master_row->item = Items::PROFIT_SHARE;
 						$item = $oItems->getById(Items::INTERCOMPANY_COSTS);
@@ -921,8 +921,8 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $oActivities->getByCode($record->activity);
-						$account = $activity->YACT;
+						$oActivity = $oActivities->getByCode($record->activity);
+						$account = $oActivity->YACT;
 						
 						//$master_row->item = Items::PROFIT_SHARE;
 						$item = $oItems->getById(Items::INTERCOMPANY_REVENUE);
@@ -942,8 +942,8 @@ class Sales extends Document{
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $record->sales;
 						
-						$activity = $oActivities->getByCode($record->activity);
-						$account = $activity->YACT;
+						$oActivity = $oActivities->getByCode($record->activity);
+						$account = $oActivity->YACT;
 						
 						//$master_row->item = Items::PROFIT_SHARE;
 						$item = $oItems->getById(Items::INTERCOMPANY_REVENUE);
