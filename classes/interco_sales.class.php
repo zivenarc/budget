@@ -2,6 +2,7 @@
 include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
 include_once ('classes/interco_sales_record.class.php');
+include_once ('classes/sales_ghq_record.class.php');
 include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
 include_once ('classes/yact_coa.class.php');
@@ -225,6 +226,11 @@ class Interco_sales extends Document{
 			$this->refresh($this->ID);
 			$oMaster = new Master($this->scenario, $this->GUID, $this->company);
 			
+			$oSalesGHQ = new sales_ghq_record((array)$this);
+			
+			$oYACT_Cost = $YACT->getByCode('J00802');
+			$oYACT_Revenue = $YACT->getByCode('J00400');
+			
 			if(is_array($this->records[$this->gridName])){
 				foreach($this->records[$this->gridName] as $id=>$record){
 					$oProduct = $oProducts->getByCode($record->product);
@@ -235,10 +241,10 @@ class Interco_sales extends Document{
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;	
 					$master_row->sales = $this->getSales($master_row->customer);					
-					$activity = $oActivities->getByCode($record->activity);
+					$oActivity = $oActivities->getByCode($record->activity);
 					switch ($this->type) {
 						case 'DC':
-							$master_row->account = 'J00400';
+							$master_row->account = 'J00400';							
 							$master_row->item = Items::INTERCOMPANY_REVENUE;
 							break;
 						case 'SC':
@@ -250,7 +256,11 @@ class Interco_sales extends Document{
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}				
-
+					
+					// if($this->type=='DC'){
+						// $oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oYACT_Revenue->name),(array)$master_row);
+					// }
+					
 					//-------------------------------------- Intercompany cost for department --------------------------------------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->customer;
@@ -258,10 +268,10 @@ class Interco_sales extends Document{
 					$master_row->activity = $record->activity_cost;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $oActivities->getByCode($master_row->activity);
+					$oActivity = $oActivities->getByCode($master_row->activity);
 					switch ($this->type) {
 						case 'DC':			
-							$master_row->account = 'J00802';
+							$master_row->account = 'J00802';							
 							$master_row->item = Items::INTERCOMPANY_COSTS;
 							break;
 						case 'SC':
@@ -274,23 +284,25 @@ class Interco_sales extends Document{
 						$master_row->{$month} = -($record->{$month})*$record->selling_rate*$settings[strtolower($record->selling_curr)];
 					}
 					
-					if ($this->type=='DC'){					
+					if ($this->type=='DC'){
+						
+										
 					//-------------------------------------- Cost for supplier --------------------------------------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
 					$master_row->activity = $record->activity_cost;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $oActivities->getByCode($record->activity);
+					$oActivity = $oActivities->getByCode($record->activity);
 					$master_row->account = 'J00802';
-					$master_row->item = $activity->item_cost;
+					$master_row->item = $oActivity->item_cost;
 
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -($record->{$month})*$record->buying_rate*$settings[strtolower($record->buying_curr)];
 					}
 					
-
+					$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oYACT_Cost->name),(array)$master_row);
 					
 					//-------------------------------------- Elimination of revenue --------------------------------------------------
 					$master_row = $oMaster->add_master();
@@ -298,7 +310,7 @@ class Interco_sales extends Document{
 					$master_row->activity = $record->activity;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $oActivities->getByCode($record->activity);
+					$oActivity = $oActivities->getByCode($record->activity);
 					$account = 'J00400';
 					
 					$master_row->account = $account;
@@ -315,7 +327,7 @@ class Interco_sales extends Document{
 					$master_row->activity = $record->activity_cost;
 					$master_row->customer = $record->customer;				
 					$master_row->sales = $this->getSales($master_row->customer);
-					$activity = $oActivities->getByCode($master_row->activity);
+					$oActivity = $oActivities->getByCode($master_row->activity);
 					$account = 'J00802';
 					
 					$master_row->account = $account;
@@ -333,11 +345,11 @@ class Interco_sales extends Document{
 						$master_row->activity = $record->activity_cost;
 						$master_row->customer = $record->customer;				
 						$master_row->sales = $this->getSales($master_row->customer);
-						$activity = $oActivities->getByCode($master_row->activity);
+						$oActivity = $oActivities->getByCode($master_row->activity);
 						$account = 'J00802';
 									
 						$master_row->account = $account;
-						$master_row->item = $activity->item_cost;
+						$master_row->item = $oActivity->item_cost;
 						
 						// $rate = ($record->buying_rate==0?$record->selling_rate*$settings[strtolower($record->selling_curr)]:$record->buying_rate*$settings[strtolower($record->buying_curr)]);
 						$rate = $record->selling_rate*$settings[strtolower($record->selling_curr)];
@@ -346,11 +358,22 @@ class Interco_sales extends Document{
 							$month = $this->budget->arrPeriod[$m];
 							$master_row->{$month} = ($record->{$month})*$rate;
 						}
+						
+						$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oYACT_Cost->name),(array)$master_row);
+						
 					}
 				}
 				$oMaster->save();
+				
+				$arrSalesGHQ = $oSalesGHQ->getSQL();
+				for($i=0;$i<count($arrSalesGHQ);$i++){
+					$this->doSQL($arrSalesGHQ[$i]);
+				};
+				
 				$this->markPosted();
 			}
+		} else {
+			$this->doSQL("DELETE FROM `reg_sales_rhq` WHERE source='{$this->GUID}'");	
 		}
 		
 		return($sqlSuccess);
