@@ -20,7 +20,7 @@ if ($_GET['tab']){
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
 		$arrGUID[] = $rw['source'];
-		$arrRHQ[$rw['source']] = number_format($rw['Total_RHQ'],0,'.',',');
+		$arrRHQ[$rw['source']] = $rw['Total_RHQ'];
 	}
 	
 	$sql = "SELECT *,  edit_date as timestamp FROM vw_journal 				
@@ -34,7 +34,7 @@ if ($_GET['tab']){
 
 		$rs =$oSQL->q($sql);
 		while ($rw=$oSQL->f($rs)){
-			$rw['comment'] = $arrRHQ[$rw['guid']];
+			$rw['comment'] = $rw['amount'] - $arrRHQ[$rw['guid']];
 			$data[] = $rw;
 		}
 		
