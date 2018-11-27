@@ -664,13 +664,18 @@ function distribute($reportKey, $sql){
 function getAccountAlias($account){
 	switch($account){
 			case 'J00801':
+			case 'J45110':
+			case 'J45120':
+			case 'J45140':
 				$accKey = 'Labor costs';
 				break;
 			case 'J0080W':
+			case 'J45550':
 				$accKey = 'Warehouse costs';
 				break;
 			case 'J00806':
 			case '512000':
+			case 'J45560':
 				$accKey = 'Depreciation';
 				break;
 			case '502000':
