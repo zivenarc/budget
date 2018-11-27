@@ -47,7 +47,7 @@ if ($_GET['tab']){
 	} else {
 		echo "<h2>Item not {{$itmGUID}} found</h2>";
 	}
-	echo Budget::getScenarioTabs(true);
+	echo Budget::getScenarioTabs(false);
 	$sql = "SELECT * FROM vw_item ORDER by itmParentId, itmTitle";
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
