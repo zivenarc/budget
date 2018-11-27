@@ -1,10 +1,10 @@
 <?php
 // $flagNoAuth = true;
+require ('classes/reports.class.php');
 require ('common/auth.php');
 require ('classes/reference.class.php');
 require ('classes/item.class.php');
-require ('classes/budget.class.php');
-require ('classes/reports.class.php');
+
 
 include ('includes/inc_report_settings.php');
 $oBudget = new Budget($budget_scenario);
@@ -12,7 +12,15 @@ $oBudget = new Budget($budget_scenario);
 $arrRates = $oBudget->getMonthlyRates($currency);
 
 $arrKeys = Array();
-$arrReport = Array('Air export'=>$arrKeys,'Air import'=>$arrKeys,'Ocean export'=>$arrKeys,'Ocean import'=>$arrKeys,'OCM'=>$arrKeys,'Warehouse'=>$arrKeys,'Land transport'=>$arrKeys);
+$arrReport = Array('Air export'=>$arrKeys,
+					'Air import'=>$arrKeys,
+					// 'AFF Total'=>$arrKeys,
+					'Ocean export'=>$arrKeys,
+					'Ocean import'=>$arrKeys,
+					// 'OFF Total'=>$arrKeys,
+					'OCM (SCS)'=>$arrKeys,
+					'Warehouse'=>$arrKeys,
+					'Land transport'=>$arrKeys);
 
 $arrJS[] = 'js/rep_totals.js';
 
@@ -38,7 +46,8 @@ $sql = "SELECT account, pc, prtGHQ, ".$oBudget->getMonthlySumSQL($startMonth,$en
 		WHERE scenario='{$budget_scenario}' AND company='{$company}'
 		AND account IN ('5999CO','5999BD')
 		AND pccFlagProd=1
-		GROUP BY prtGHQ, account";
+		GROUP BY prtGHQ, account
+		ORDER BY prtGHQ, account";
 $rs = $oSQL->q($sql);
 if(!$oSQL->n($rs)){
 	die("<div class='error'>No base for cost distribution. Prepare the <a href='rep_ratios.php?budget_scenario={$budget_scenario}&DataAction=update'>revenue register</a> first</div>");
@@ -105,7 +114,7 @@ $arrAccounts = Array(
 		'Revenue'=>Array('sql'=>"SELECT {$sqlFields} FROM vw_master 
 							{$sqlWhere} 
 							".Reports::REVENUE_FILTER."			
-							GROUP by {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
+							GROUP by {$sqlGroupBy} ORDER BY {$sqlGroupBy}",'subtotal'=>Array('Gross profit','Gross operating profit','Net operating profit','PBT')),
 		'Direct costs'=>Array('negative'=>true, 'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere}  
 								".Reports::DIRECT_COST_FILTER."	
@@ -166,23 +175,48 @@ foreach ($arrAccounts as $reportKey=>$settings){
 	if(strlen($sql)){
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){
-			$arrPC[$rw['prtGHQ']][] = $rw['Profit'];
+			
+			$product = $rw['prtGHQ'];
+			if (strpos($product,'Air')!==false){
+				$productTotal = "AFF Total";
+			} elseif (strpos($product,'Ocean')!==false) {
+				$productTotal = "OFF Total";
+			} else {
+				$productTotal = '';
+			}
+			
+			
+			$arrPC[$product][] = $rw['Profit'];
+			if($productTotal) { $arrPC[$productTotal][] = $rw['Profit']; };
+				
 			if($rw['pccFlagProd']){
 				for($m=$startMonth;$m<=$endMonth;$m++){
 					$month = $oBudget->arrPeriod[$m];
-					$arrReport[$rw['prtGHQ']][$reportKey]['monthly'][$month] += $rw[$month]*($settings['negative']?-1:1);
-					$arrReport[$rw['prtGHQ']][$reportKey]['pc'][$rw['Profit']] += $rw[$month]*($settings['negative']?-1:1);
+					
+					$arrReport[$product][$reportKey]['monthly'][$month] += $rw[$month]*($settings['negative']?-1:1);
+					$arrReport[$product][$reportKey]['pc'][$rw['Profit']] += $rw[$month]*($settings['negative']?-1:1);
 					for($i=0;$i<count($settings['subtotal']);$i++){
-						$arrReport[$rw['prtGHQ']][$settings['subtotal'][$i]]['monthly'][$month] += $rw[$month];
-						$arrReport[$rw['prtGHQ']][$settings['subtotal'][$i]]['pc'][$rw['Profit']] += $rw[$month];
+						$arrReport[$product][$settings['subtotal'][$i]]['monthly'][$month] += $rw[$month];
+						$arrReport[$product][$settings['subtotal'][$i]]['pc'][$rw['Profit']] += $rw[$month];
 						$arrGrandTotal[$settings['subtotal'][$i]]['monthly'][$month] += $rw[$month];
 					};
+					
 					$arrGrandTotal[$reportKey]['monthly'][$month] += $rw[$month];
 				
 					if($settings['breakdown']){
 						$accKey = getAccountAlias($rw['account']);
-						$arrBreakDown[$reportKey][$accKey][$rw['prtGHQ']] += $rw[$month];
-					}		
+						$arrBreakDown[$reportKey][$accKey][$product] += $rw[$month];
+					}
+					
+					if ($productTotal){
+						$arrReport[$productTotal][$reportKey]['monthly'][$month] += $rw[$month]*($settings['negative']?-1:1);
+						$arrReport[$productTotal][$reportKey]['pc'][$rw['Profit']] += $rw[$month]*($settings['negative']?-1:1);
+						for($i=0;$i<count($settings['subtotal']);$i++){
+							$arrReport[$productTotal][$settings['subtotal'][$i]]['monthly'][$month] += $rw[$month];
+							$arrReport[$productTotal][$settings['subtotal'][$i]]['pc'][$rw['Profit']] += $rw[$month];							
+						};
+					
+					}
 			
 				}
 			} else {
@@ -557,8 +591,17 @@ foreach ($arrBreakDown as $group=>$accounts){
 	<ul class='link-footer'>
 		<li><a href='javascript:SelectContent("<?php echo $strTableID;?>");'>Copy table</a></li>
 	</ul>
+	
+	
 	<?php
 }
+?>
+<hr/>
+<h2>RHQ report format FY2019</h2>	
+<?php
+
+$oReport = new Reports(Array('budget_scenario'=>$budget_scenario));
+$oReport->salesRHQ("WHERE scenario='{$budget_scenario}' AND company='{$company}'");
 
 include ('includes/inc-frame_bottom.php');
 
