@@ -1408,7 +1408,7 @@ class Reports{
 			$rs = $oSQL->q($sql);
 			$tableID = "RHQ_".md5($sql);
 			if (!$oSQL->num_rows($rs)){
-				echo "<div class='warning'>No data found</div>";
+				echo "<div class='warning'>No data exists for RHQ GP breakdown</div>";
 				//echo "<pre>$sql</pre>";
 				return (false);
 			}

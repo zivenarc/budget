@@ -43,6 +43,7 @@ if ($_GET['tab']){
 			$oReport = new Reports(Array('budget_scenario'=>$oDocument->budget->id));
 			$oReport->masterByActivity($sqlWhere);
 			$oReport->masterByYACT($sqlWhere);
+			$oReport->salesRHQ($sqlWhere);
 			die();
 			break;
 		default:

@@ -2,6 +2,7 @@
 include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
 include_once ('classes/costs_record.class.php');
+include_once ('classes/sales_ghq_record.class.php');
 include_once ('classes/yact_coa.class.php');
 include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
@@ -9,7 +10,7 @@ include_once ('classes/profit.class.php');
 
 
 
-//$Activities = new Activities ();
+$oActivities = new Activities ();
 $YACT = new YACT_COA();
 $Items = new Items();
 $ProfitCenters = new ProfitCenters();
@@ -317,6 +318,8 @@ class Indirect_costs extends Document{
 			
 		if($mode=='post'){
 			$this->post();			
+		} else {
+			$this->doSQL("DELETE FROM `reg_sales_rhq` WHERE source='{$this->GUID}'");		
 		}
 		
 		return($sqlSuccess);
@@ -415,17 +418,20 @@ class Indirect_costs extends Document{
 		
 	function post(){
 		
-		GLOBAL $Activities;
+		GLOBAL $oActivities;
 		GLOBAL $YACT;
 		GLOBAL $Items;		
 		GLOBAL $ProfitCenters;
 		
 		$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 		$oMaster = new Master($this->scenario, $this->GUID, $this->company);
-				
+		$oSalesGHQ = new sales_ghq_record((array)$this);		
+			
 		if(is_array($this->records[$this->gridName])){
 		
 			foreach($this->records[$this->gridName] as $id=>$record){
+					
+					
 					
 					if ($record->item == Items::WH_RENT) {
 						$record->customer = self::EMPTY_CUSTOMER;
@@ -452,10 +458,26 @@ class Indirect_costs extends Document{
 					} else {
 						$oMaster->distribute_activity($master_row,$record->pc->activity);
 					}						
-					
+									
 					//echo '<pre>';print_r($master_row);echo '</pre>';
 
 			}
+			
+			///////////////////////////////////////////////////////// ADD Direct costs to RHQ breakdown
+			for ($i=0;$i<count($oMaster->records['master']);$i++){
+				$data = (array)$oMaster->records['master'][$i];
+				if (in_array($data['account'],Array('J00802','J45010'))){
+					$oActivity = $oActivities->getByCode($data['activity']);
+					$oYACT = $YACT->getByCode($data['account']);
+					$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oYACT->name),$data);
+				}
+			}
+			$arrSalesGHQ = $oSalesGHQ->getSQL();
+				for($i=0;$i<count($arrSalesGHQ);$i++){
+					$this->doSQL($arrSalesGHQ[$i]);
+			};
+			
+			
 			$oMaster->save();
 			$this->markPosted();
 		}
