@@ -27,6 +27,7 @@ if ($_GET['tab']){
 			FROM reg_sales_rhq 			
 			WHERE scenario = '{$_GET['tab']}'			
 			GROUP BY source";
+	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){		
 		$arrRHQ[$rw['source']] = $rw['Total_RHQ'];
 	}
