@@ -24,9 +24,10 @@ if ($_GET['tab']){
 	
 	$sql = "SELECT *,  edit_date as timestamp FROM vw_journal 				
 		LEFT JOIN stbl_user ON usrID=vw_journal.edit_by				
-		WHERE vw_journal.posted=1 AND vw_journal.scenario='{$_GET['tab']}' 
+		WHERE vw_journal.posted=1 
+		AND vw_journal.scenario='{$_GET['tab']}' 
 		AND prefix IN ('sal', 'ics')
-		AND guid IN ('".implode("','",$arrGUID)."');
+		AND vw_journal.guid IN ('".implode("','",$arrGUID)."');
 		GROUP BY vw_journal.guid
 		ORDER BY vw_journal.edit_date ASC";	
 
