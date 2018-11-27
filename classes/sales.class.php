@@ -527,7 +527,8 @@ class Sales extends Document{
 								$freight_r_row->{$month} -= ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
 								//$master_row->{$month} = 0;
 								
-								
+								$oSalesGHQ->hbl = true;
+								$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oActivity->YACT_Title),(array)$freight_r_row);
 								
 							} else{
 								// leave it alone
@@ -537,7 +538,7 @@ class Sales extends Document{
 					}		
 
 					$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oActivity->YACT_Title),(array)$master_row);
-					$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oActivity->YACT_Title),(array)$freight_r_row);
+					
 					
 					if ($record->buying_rate!=0){
 						$master_row = $oMaster->add_master();
@@ -576,7 +577,10 @@ class Sales extends Document{
 									$freight_c_row->sales = $record->sales;	
 									$freight_c_row->{$month} += ($record->{$month})*$record->buying_rate*$this->settings[strtolower($record->buying_curr)];
 									//$master_row->{$month} = 0;
-									} else {
+								
+									$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oActivity->YACT_Title),(array)$freight_c_row);
+								
+								} else {
 									// leave it alone
 								}
 							}
@@ -584,7 +588,7 @@ class Sales extends Document{
 						}
 						
 						$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$item->YACT_Title),(array)$master_row);
-						$oSalesGHQ->addRecord(Array('ghq'=>$oActivity->GHQ,'account'=>$oActivity->YACT_Title),(array)$freight_c_row);	
+							
 						
 					}
 					
