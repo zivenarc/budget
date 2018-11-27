@@ -12,9 +12,9 @@ if ($_GET['tab']){
 	require ('classes/reports.class.php');
 	
 	$sql = "SELECT source, salID, salAmount, SUM(apr+may+jun+jul+aug+sep+`oct`+`nov`+`dec`+jan_1+feb_1+mar_1) as Total_RHQ
-			FROM reg_sales_rhq 
-			WHERE scenario = '{$_GET['tab']}'
+			FROM reg_sales_rhq 			
 			LEFT JOIN tbl_sales ON salGUID=source 
+			WHERE scenario = '{$_GET['tab']}'
 			GROUP BY source 
 			HAVING Total_RHQ<>salAmount";
 	$rs = $oSQL->q($sql);
