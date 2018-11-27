@@ -51,7 +51,11 @@ if ($_GET['tab']){
 	$sql = "SELECT * FROM vw_item ORDER by itmParentId, itmTitle";
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
-		echo "<a href='?itmGUID={$rw['itmGUID']}'>{$rw['itmTitle']}</a>";
+		if($rw['itmFlagFolder']){
+			echo "<h3>{$rw['itmTitle']}</h3>";
+		} else {
+			echo "<a href='?itmGUID={$rw['itmGUID']}'>{$rw['itmTitle']}</a> ";
+		}
 	}
 	include ('includes/inc-frame_bottom.php');
 }

@@ -2,6 +2,7 @@
 include_once ('classes/budget.class.php');
 include_once ('classes/document.class.php');
 include_once ('classes/sales_record.class.php');
+include_once ('classes/sales_ghq_record.class.php');
 include_once ('classes/reference.class.php');
 include_once ('classes/item.class.php');
 include_once ('classes/product.class.php');
@@ -465,6 +466,8 @@ class Sales extends Document{
 				
 		if($mode=='post'){
 			$this->post();
+		} else {
+			$this->doSQL("DELETE FROM `reg_sales_rhq` WHERE source='{$this->GUID}'");	
 		}
 		
 		return($sqlSuccess);
@@ -482,7 +485,10 @@ class Sales extends Document{
 		
 		$this->refresh($this->ID);		
 		$oMaster = new Master($this->scenario, $this->GUID, $this->company);
-			
+		
+		$oSalesGHQ = new sales_ghq_record((array)$this);
+		
+		
 			if(is_array($this->records[$this->gridName])){
 				foreach($this->records[$this->gridName] as $id=>$record){
 					
@@ -503,7 +509,7 @@ class Sales extends Document{
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];	
 						$master_row->{$month} = ($record->{$month})*$record->selling_rate*$this->settings[strtolower($record->selling_curr)];
-						
+												
 						//------Update for Project bridge since 1st April 2016-----------
 						$current_month_start = mktime(0,0,0,$m,1,$oBudget->year);
 						if ($current_month_start>=$dateProjectBridge && $this->job_owner!=self::PB_Ourselves){							
@@ -528,7 +534,10 @@ class Sales extends Document{
 							}
 						}
 						
-					}				
+					}		
+
+					$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>$activity->YACT_Title),(array)$master_row);
+					$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>$activity->YACT_Title),(array)$freight_r_row);
 					
 					if ($record->buying_rate!=0){
 						$master_row = $oMaster->add_master();
@@ -573,6 +582,10 @@ class Sales extends Document{
 							}
 							
 						}
+						
+						$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>$item->YACT_Title),(array)$master_row);
+						$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>$activity->YACT_Title),(array)$freight_c_row);	
+						
 					}
 					
 					if ($record->hbl){
@@ -645,6 +658,9 @@ class Sales extends Document{
 								$month = $this->budget->arrPeriod[$m];								
 								if(is_array($this->arrTEU)) $master_row->{$month} = ($this->arrTEU[$month])*$SCC*$this->settings['usd'];
 							}
+							
+							$oSalesGHQ->gbr = true;
+							$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>"Profit Share as BO"),(array)$master_row);	
 						
 						} elseif($this->settings['PS_Scheme']=='PS2018'){
 							$arrProfit = Array();
@@ -666,6 +682,8 @@ class Sales extends Document{
 										$master_row->{$month} = 0.4 * $arrGP[$month];
 									}	
 								}
+								$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>"Profit Share as BO"),(array)$master_row);	
+								
 								if($this->destination_agent==self::PB_Ourselves){
 									$master_row = $oMaster->add_master();	
 									$master_row->profit = $this->profit;
@@ -682,6 +700,8 @@ class Sales extends Document{
 										$master_row->{$month} = 0.2 * $arrGP[$month];
 									}	
 								}
+								$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>"Profit Share as DA"),(array)$master_row);	
+								
 							} else { //export commissions
 								if($this->business_owner!=self::PB_Ourselves){ 
 									$master_row = $oMaster->add_master();	
@@ -697,7 +717,10 @@ class Sales extends Document{
 									for($m=1;$m<=15;$m++){
 										$month = $this->budget->arrPeriod[$m];
 										$master_row->{$month} = -0.4 * $arrGP[$month];
-									}	
+									}
+
+									$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>"COS Profit Share to BO"),(array)$master_row);	
+									
 								}
 								if($this->destination_agent!=self::PB_Ourselves){ 
 									$master_row = $oMaster->add_master();	
@@ -714,6 +737,8 @@ class Sales extends Document{
 										$month = $this->budget->arrPeriod[$m];
 										$master_row->{$month} = -0.2 * $arrGP[$month];
 									}
+									
+									$oSalesGHQ->addRecord(Array('ghq'=>$activity->GHQ,'account'=>"COS Profit Share to DA"),(array)$master_row);	
 								}
 							}								
 						}  else {
@@ -935,6 +960,11 @@ class Sales extends Document{
 					
 				}
 				$oMaster->save();
+				
+				$arrSalesGHQ = $oSalesGHQ->getSQL();
+				for($i=0;$i<count($arrSalesGHQ);$i++){
+					$this->doSQL($arrSalesGHQ[$i]);
+				};
 				
 				$this->doSQL("UPDATE `{$this->table}`, (SELECT SUM(".$this->budget->getYTDSQL(1+$this->budget->offset,max($this->budget->length,12+$this->budget->offset)).") as Total, source 
 							FROM reg_master 

@@ -104,6 +104,7 @@ class Item{
 		$this->YACTProd = $params['itmYACTProd'];
 		$this->YACTCorp = $params['itmYACTCorp'];		
 		$this->YACT = $params['itmYACTProd'];		
+		$this->YACT_Title = $params['yctTitle'];		
 	}
 	
 	function getYACT($pc){

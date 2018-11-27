@@ -201,6 +201,7 @@ if ($_GET['tab']){
 				$oReport->masterByActivity($sqlWhere);
 			}			
 			$oReport->masterByYACT($sqlWhere);
+			$oReport->salesRHQ($sqlWhere);
 			die();
 			break;
 		default:

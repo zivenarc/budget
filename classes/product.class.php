@@ -126,7 +126,9 @@ class Activity{
 		$this->id = $id;
 		$this->name = $params['prtTitle'];
 		$this->RHQ = $params['prtRHQ'];
+		$this->GHQ = $params['prtGHQ'];
 		$this->YACT = $params['prtYACT'];
+		$this->YACT_Title = $params['yctTitle'];
 		$this->item_income = $params['prtBudgetIncomeID'];
 		$this->item_cost = $params['prtBudgetCostID'];
 	}

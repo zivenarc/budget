@@ -1394,6 +1394,89 @@ class Reports{
 		
 	}
 	
+	public function salesRHQ($sqlWhere=''){
+		global $oSQL;
+		
+		ob_start();
+			$sql = "SELECT account, ghq,
+							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).") as Total 
+			FROM `reg_sales_rhq`
+			{$sqlWhere}
+			GROUP BY ghq, account
+			ORDER BY ghq, account	
+			";
+			$rs = $oSQL->q($sql);
+			$tableID = "RHQ_".md5($sql);
+			if (!$oSQL->num_rows($rs)){
+				echo "<div class='warning'>No data found</div>";
+				//echo "<pre>$sql</pre>";
+				return (false);
+			}
+			
+			while ($rw=$oSQL->f($rs)){								
+				$arrGHQ[] = $rw['ghq'];
+				$arrReport[$rw['account']][$rw['ghq']] = $rw['Total'];
+			}
+			$arrGHQ = array_unique($arrGHQ);
+			
+			?>
+			<table id='<?php echo $tableID;?>' class='budget'>
+			<caption>RHQ reporting (version FY2019)</caption>
+			<thead>
+				<tr>
+					<th>Account</th>
+					<?php foreach ($arrGHQ as $prtGHQ){
+							echo "<th>{$prtGHQ}</th>";
+						}
+					?>
+					<th class='budget-ytd'>Total</th>
+				</tr>
+			</thead>			
+			<tbody>
+			<?php
+			$arrTotal = array();			
+			foreach ($arrReport as $yact=>$data){
+								
+				?>
+				<tr>
+					<td><?php echo $yact;?></td>					
+				<?php
+					foreach ($arrGHQ as $prtGHQ){
+						$arrTotal[$prtGHQ] += $data[$prtGHQ];
+						?>
+						<td class="budget-decimal"><?php self::render($data[$prtGHQ],0);?></td>
+						<?php
+					}
+					?>
+				<td class="budget-decimal budget-ytd"><?php self::render(array_sum($data),0);?></td>
+				</tr>
+				<?php
+				
+				
+			}
+			?>
+				<tr class='budget-total'>
+					<td>Total Gross Profit</td>
+					<?php
+					foreach ($arrGHQ as $prtGHQ){
+						?>
+						<td class="budget-decimal"><?php self::render($arrTotal[$prtGHQ],0);?></td>
+						<?php
+					}?>
+					<td class="budget-decimal budget-ytd"><?php self::render(array_sum($arrTotal),0);?></td>
+				</tr>
+				<?php
+			?>
+			</tbody>
+			</table>
+			<?php		
+			$this->_echoButtonCopyTable($tableID);
+			ob_flush();
+		
+		
+	}
+	
+	
 	public function allocation($sqlWhere=''){
 		echo "<div class='warning'>Under construction</div>";
 	}
@@ -1421,6 +1504,11 @@ class Reports{
 		for($m=$this->oBudget->nm;$m<=$this->oBudget->offset+12;$m++){
 			$this->columns[] = $this->oBudget->arrPeriod[$m];
 		}
+		$this->columns[] = 'Q2';
+		$this->columns[] = 'Q3';
+		$this->columns[] = 'Q4';
+		$this->columns[] = 'Q5';
+		$this->columns[] = 'Total';
 		
 		$this->columns[] = 'ROY_A';
 		
