@@ -23,7 +23,7 @@ if ($_GET['tab']){
 		$arrAM[$rw['source']] = $rw['Total_AM'];
 	}
 	
-	$sql = "SELECT source SUM(Apr+May+Jun+Jul+Aug+Sep+`Oct`+Nov+`Dec`+Jan_1+Feb_1+Mar_1) as Total_RHQ
+	$sql = "SELECT source, SUM(Apr+May+Jun+Jul+Aug+Sep+`Oct`+Nov+`Dec`+Jan_1+Feb_1+Mar_1) as Total_RHQ
 			FROM reg_sales_rhq 			
 			WHERE scenario = '{$_GET['tab']}'			
 			GROUP BY source";
