@@ -20,6 +20,7 @@ if ($_GET['tab']){
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
 		$arrGUID[] = $rw['source'];
+		$arrRHQ[$rw['source']] = number_format($rw['Total_RHQ'],0,'.',',');
 	}
 	
 	$sql = "SELECT *,  edit_date as timestamp FROM vw_journal 				
@@ -27,12 +28,13 @@ if ($_GET['tab']){
 		WHERE vw_journal.posted=1 
 		AND vw_journal.scenario='{$_GET['tab']}' 
 		AND prefix IN ('sal', 'ics')
-		AND vw_journal.guid IN ('".implode("','",$arrGUID)."');
+		AND vw_journal.guid IN ('".implode("','",$arrGUID)."')
 		GROUP BY vw_journal.guid
 		ORDER BY vw_journal.edit_date ASC";	
 
 		$rs =$oSQL->q($sql);
 		while ($rw=$oSQL->f($rs)){
+			$rw['comment'] = $arrRHQ[$rw['guid']];
 			$data[] = $rw;
 		}
 		
