@@ -34,7 +34,7 @@ if ($_GET['tab']){
 
 		$rs =$oSQL->q($sql);
 		while ($rw=$oSQL->f($rs)){
-			$rw['comment'] = $rw['amount'] - $arrRHQ[$rw['guid']];
+			$rw['comment'] = number_format($rw['amount'] - $arrRHQ[$rw['guid']],0,'.',',');
 			$data[] = $rw;
 		}
 		
