@@ -77,7 +77,7 @@ while ($rw = $oSQL->f($rs)){
 $sqlFields = "account, title, prtGHQ, pc, pccFlagProd, Profit, 
 				SUM(".$oBudget->getYTDSQL($startMonth,$endMonth, $arrRates).") as Total, 				
 				".$oBudget->getMonthlySumSQL($startMonth,$endMonth, $arrRates);
-$sqlGroupBy = "account, pc, prtGHQ";
+$sqlGroupBy = "account, pc, prtGHQ, pccFlagProd";
 
 $sqlWhere = "WHERE scenario='{$budget_scenario}' 
 			AND company='{$company}' 
@@ -137,7 +137,7 @@ $arrAccounts = Array(
 		'Corporate costs'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
 								{$sqlWhere} 
 								".Reports::CORP_FILTER."
-								AND pccFlagProd=1	
+								##AND pccFlagProd=1	
 								GROUP by {$sqlGroupBy}
 								ORDER BY account",'subtotal'=>Array('Net operating profit','PBT')),
 		'MSF'=>Array('negative'=>true,'breakdown'=>true,'sql'=>"SELECT {$sqlFields} FROM vw_master 
