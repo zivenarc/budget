@@ -11,7 +11,7 @@ if ($_GET['tab']){
 	<?php
 	require ('classes/reports.class.php');
 	
-	$sql = "SELECT source SUM(Total_AM) as Total_AM
+	$sql = "SELECT source,SUM(Total_AM) as Total_AM
 			FROM vw_master 			
 			WHERE scenario = '{$_GET['tab']}'
 			AND account IN ('J00400', 'J00802','J45010','J40010')
