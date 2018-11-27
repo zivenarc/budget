@@ -637,21 +637,21 @@ class Sales extends Document{
 							//////////////////////// SAP/GBR scheme. OFT loss to be compensated and rate per TEU to be paid
 							$SCC = $this->gbr;
 							// OFT loss compensation	
-							$master_row = $oMaster->add_master();	
-							$master_row->profit = $this->profit;
-							$activity = ($this->destination_agent==self::PB_Ourselves?$oActivities::OFIGB:$record->activity);
-							$master_row->activity = $activity;
-							$master_row->customer = $record->customer;				
-							$master_row->sales = $record->sales;
-							$item = $oItems->getById(Items::REVENUE);
-							$master_row->account = 'J00400';
-							$master_row->item = $item->id;
-							for($m=1;$m<=15;$m++){
-								$month = $this->budget->arrPeriod[$m];
-								if($arrGP[$month]) { 
-									$master_row->{$month} = -$arrGP[$month];
-								}
-							}
+							// $master_row = $oMaster->add_master();	
+							// $master_row->profit = $this->profit;
+							// $activity = ($this->destination_agent==self::PB_Ourselves?$oActivities::OFIGB:$record->activity);
+							// $master_row->activity = $activity;
+							// $master_row->customer = $record->customer;				
+							// $master_row->sales = $record->sales;
+							// $item = $oItems->getById(Items::REVENUE);
+							// $master_row->account = 'J00400';
+							// $master_row->item = $item->id;
+							// for($m=1;$m<=15;$m++){
+								// $month = $this->budget->arrPeriod[$m];
+								// if($arrGP[$month]) { 
+									// $master_row->{$month} = -$arrGP[$month];
+								// }
+							// }
 							//SAP rate per TEU
 							$master_row = $oMaster->add_master();	
 							$master_row->profit = $this->profit;
