@@ -58,7 +58,7 @@ if(!isset($_GET['prtGHQ'])){
 	<?php
 	// die();
 	// $period_type = 'roy'; $period_title = "Rest-of-year";
-	$period_type = $_GET['period_type']?$_GET['period_type']:'ytd';
+	//$period_type = $_GET['period_type']?$_GET['period_type']:'ytd';
 	$period_title = strtoupper($period_type);
 	
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
