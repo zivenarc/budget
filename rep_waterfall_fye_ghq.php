@@ -73,20 +73,21 @@ if(!isset($_GET['prtGHQ'])){
 	
 	$oWF = new Waterfall($settings);
 	
+	
+	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).") as Budget
+			FROM vw_master 
+			{$sqlWhere} 
+			AND scenario='{$oReference->id}' ".Reports::OP_FILTER;	
+	$rs = $oSQL->q($sql);
+	$rw = $oSQL->f($rs);			
+	$oWF->arrReport[] = Array('title'=>$oReference->title,
+								'this'=>null,
+								'that'=>null,
+								'diff'=>$rw['Budget']/$oWF->denominator,
+								'class'=>'budget-subtotal');
+	$oWF->arrHSChart[] = Array('name'=>$oWF->budget_title,'y'=>(integer)$rw['Budget'], 'color'=>'blue');
+	
 	if(strpos($oBudget->type,'FYE')!==false){ ///////////////////////////////////////////////// Get YTD difference for non-budget scenarios
-		$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).") as Budget
-				FROM vw_master 
-				{$sqlWhere} 
-				AND scenario='{$oReference->id}' ".Reports::OP_FILTER;	
-		$rs = $oSQL->q($sql);
-		$rw = $oSQL->f($rs);			
-		$oWF->arrReport[] = Array('title'=>$oReference->title,
-									'this'=>null,
-									'that'=>null,
-									'diff'=>$rw['Budget']/$oWF->denominator,
-									'class'=>'budget-subtotal');
-		$oWF->arrHSChart[] = Array('name'=>$oWF->budget_title,'y'=>(integer)$rw['Budget'], 'color'=>'blue');
-		
 		$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).") as Diff
 			FROM vw_master 
 			{$sqlWhere} 
