@@ -24,6 +24,8 @@ if ($bu_group){
 	
 	$oBudget = new Budget($budget_scenario);
 	$oReference = new Budget($reference);
+
+	$arrActualRates = $oBudget->getMonthlyRates($currency);
 	
 	if(strpos($oBudget->type,"Budget")!==false){	
 		$period_type = 'fye';
@@ -72,7 +74,7 @@ if(!isset($_GET['prtGHQ'])){
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).") as Budget
 			FROM reg_master 
 			{$sqlWhere} and company='{$company}' 
-			AND scenario='{$oReference->id}' ".Reports::GOP_FILTER;	
+			AND scenario='{$oReference->id}' ".Reports::OP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);			
 	$oWF->arrReport[] = Array('title'=>$oReference->title,
@@ -85,14 +87,14 @@ if(!isset($_GET['prtGHQ'])){
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).") as Diff
 		FROM reg_master 
 		{$sqlWhere} and company='{$company}' 
-		AND scenario='{$oReference->id}' ".Reports::GOP_FILTER;	
+		AND scenario='{$oReference->id}' ".Reports::OP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
 	$ytdBudget = $rw['Diff'];
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).") as Actual
 			FROM reg_master 
 			{$sqlWhere} and company='{$company}'
-			AND scenario='{$oBudget->id}' ".Reports::GOP_FILTER;
+			AND scenario='{$oBudget->id}' ".Reports::OP_FILTER;
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);			
 	$strDiff = ($rw['Actual']>=$ytdBudget?"YTD proficit":"YTD deficit");
@@ -155,7 +157,7 @@ if(!isset($_GET['prtGHQ'])){
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).") as Diff
 			FROM reg_master 
 			{$sqlWhere} and company='{$company}' 
-			AND scenario='{$oBudget->id}' ".Reports::GOP_FILTER;	
+			AND scenario='{$oBudget->id}' ".Reports::OP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);		
 	$oWF->arrReport[] = Array('title'=>$oBudget->title,
@@ -184,6 +186,5 @@ if(!isset($_GET['prtGHQ'])){
 	<?php
 	
 }
-
 
 ?>
