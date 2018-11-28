@@ -61,7 +61,7 @@ if(!isset($_GET['prtGHQ'])){
 	<div>
 	<?php
 	
-	$settings = Array('title'=>"FYE by factors, GOP",
+	$settings = Array('title'=>"FYE by factors, Operating profit",
 						'sqlBase' => "",
 							'denominator'=>$denominator,
 							'actual_title'=>$oBudget->title,
@@ -72,8 +72,8 @@ if(!isset($_GET['prtGHQ'])){
 	$oWF = new Waterfall($settings);
 	
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).") as Budget
-			FROM reg_master 
-			{$sqlWhere} and company='{$company}' 
+			FROM vw_master 
+			{$sqlWhere} 
 			AND scenario='{$oReference->id}' ".Reports::OP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);			
@@ -85,14 +85,14 @@ if(!isset($_GET['prtGHQ'])){
 	$oWF->arrHSChart[] = Array('name'=>$oWF->budget_title,'y'=>(integer)$rw['Budget'], 'color'=>'blue');
 	
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).") as Diff
-		FROM reg_master 
-		{$sqlWhere} and company='{$company}' 
+		FROM vw_master 
+		{$sqlWhere} 
 		AND scenario='{$oReference->id}' ".Reports::OP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
 	$ytdBudget = $rw['Diff'];
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates).") as Actual
-			FROM reg_master 
+			FROM vw_master 
 			{$sqlWhere} and company='{$company}'
 			AND scenario='{$oBudget->id}' ".Reports::OP_FILTER;
 	$rs = $oSQL->q($sql);
@@ -114,7 +114,7 @@ if(!isset($_GET['prtGHQ'])){
 					{$sqlActual} as Diff
 			FROM vw_master 
 			{$sqlWhere}
-				AND  scenario='{$oBudget->id}' AND company='{$company}' AND account IN ('J00400', 'J00802')
+				AND  scenario='{$oBudget->id}' AND account IN ('J00400', 'J00802')
 			GROUP BY customer_group_code
 			UNION ALL
 			SELECT  customer_group_code as optValue, 
@@ -124,7 +124,7 @@ if(!isset($_GET['prtGHQ'])){
 			-{$sqlBudget} as Diff
 			FROM vw_master 									
 			{$sqlWhere}
-				AND scenario='{$oReference->id}' AND company='{$company}' 
+				AND scenario='{$oReference->id}' 
 				AND source<>'Estimate' 
 				AND account IN ('J00400', 'J00802')										
 			GROUP BY customer_group_code";
@@ -138,7 +138,7 @@ if(!isset($_GET['prtGHQ'])){
 											{$sqlActual} as Diff
 									FROM vw_master 
 									{$sqlWhere}
-										AND  scenario='{$oBudget->id}' AND company='{$company}' 
+										AND  scenario='{$oBudget->id}' 
 										".Reports::RFC_FILTER."																			
 									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)
 									UNION ALL
@@ -148,15 +148,15 @@ if(!isset($_GET['prtGHQ'])){
 									{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 									FROM vw_master 
 									{$sqlWhere}
-										AND scenario='{$oReference->id}' AND company='{$company}' 								
+										AND scenario='{$oReference->id}' 								
 										".Reports::RFC_FILTER."										
 									GROUP BY IF(`Group_code` IN (108,110,96,94),item,Group_code)";
 	
 	$oWF->processSQL($sqlBase,$limit,'RFC');
 	
 	$sql = "SELECT SUM(".$oBudget->getThisYTDSQL('fye',$arrActualRates).") as Diff
-			FROM reg_master 
-			{$sqlWhere} and company='{$company}' 
+			FROM vw_master 
+			{$sqlWhere} 
 			AND scenario='{$oBudget->id}' ".Reports::OP_FILTER;	
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);		
