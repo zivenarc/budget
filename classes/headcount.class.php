@@ -616,7 +616,12 @@ class Headcount extends Document{
 						
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
-						$master_row->{$month} = - (28+$oEmployee->addlVacation)/12/29.4 * ($record->{$month})*($record->salary+$record->monthly_bonus)*(1+array_sum($social_tax)/array_sum($salary));
+						if(array_sum($salary)){
+							$scRate = (1+array_sum($social_tax)/array_sum($salary));
+						} else {
+							$scRate = 1.24;
+						}
+						$master_row->{$month} = - (28+$oEmployee->addlVacation)/12/29.4 * ($record->{$month})*($record->salary+$record->monthly_bonus)*$scRate;
 					}
 					if($record->activity){
 						$master_row->activity = $record->activity;
