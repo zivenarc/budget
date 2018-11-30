@@ -49,20 +49,20 @@ $arrRates_last = $oReference->getMonthlyRates($currency);
 
 $arrUsrData["pagTitle$strLocal"] .= ': '.$oBudget->title;
 
-if($currency!=643){
-		$sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
-		$rs = $oSQL->q($sql);
-		$rw = $oSQL->f($rs);
-		$curTitle = $rw["curTitle$strLocal"];		
-} else {
-	$curTitle = "RUB";
-}
+// if($currency!=643){
+		// $sql = "SELECT * FROM vw_currency WHERE curID={$currency} LIMIT 1";
+		// $rs = $oSQL->q($sql);
+		// $rw = $oSQL->f($rs);
+		// $curTitle = $rw["curTitle$strLocal"];		
+// } else {
+	// $curTitle = "RUB";
+// }
 
-$arrUsrData["pagTitle$strLocal"] .= ': '.$curTitle;
+// $arrUsrData["pagTitle$strLocal"] .= ': '.$curTitle;
 
-if ($denominator!=1) {
-	$arrUsrData["pagTitle$strLocal"] .= ' x'.$denominator;
-}
+// if ($denominator!=1) {
+	// $arrUsrData["pagTitle$strLocal"] .= ' x'.$denominator;
+// }
 
 include ('includes/inc-frame_top.php');	
 ?>

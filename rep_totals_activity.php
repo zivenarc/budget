@@ -62,7 +62,10 @@ if(true || !isset($_GET['ghq'])){
 $arrScenario=Array('this'=>$budget_scenario,'last'=>$reference);
 
 foreach($arrScenario as $scnKey=>$scenario){
-	$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd, $arrRates_{$scnKey}).")/$denominator as Total
+	
+	$arrRates = "arrRates_{$scnKey}";
+	
+	$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd, $$arrRates).")/$denominator as Total
 			FROM vw_master
 			WHERE scenario='{$scenario}' AND company='{$company}'
 			{$sqlActivityFilter}
@@ -98,7 +101,7 @@ foreach($arrScenario as $scnKey=>$scenario){
 		$arrHeadcount[$scnKey]['FTE'][$keyProfit] += $rw['Total'];	
 	}
 	
-	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd, $arrRates_{$scnKey}).")/$denominator as Total
+	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd, $$arrRates).")/$denominator as Total
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$scenario}' and active=1 AND company='{$company}'
@@ -112,7 +115,7 @@ foreach($arrScenario as $scnKey=>$scenario){
 		$arrOP[$scnKey][$keyProfit] += $rw['Total'];		
 	}
 	
-	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd, $arrRates_{$scnKey}).")/$denominator as Total
+	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd,$$arrRates).")/$denominator as Total
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$scenario}' and active=1 AND company='{$company}'
@@ -126,7 +129,7 @@ foreach($arrScenario as $scnKey=>$scenario){
 		$arrOOP[$scnKey][$keyProfit] += $rw['Total'];		
 	}
 	
-	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd, $arrRates_{$scnKey}).")/$denominator as Total
+	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd, $$arrRates).")/$denominator as Total
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$scenario}' and active=1 AND company='{$company}'
