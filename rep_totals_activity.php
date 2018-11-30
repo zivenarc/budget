@@ -172,15 +172,15 @@ foreach($arrScenario as $scnKey=>$scenario){
 ?>
 <h2><?php echo $_GET['ghq']?$_GET['ghq']:"All activities";?></h2>
 <table class='budget' id='report'>
-<caption><?php echo $_GET['ghq']?$_GET['ghq']:"All activities";?></caption>
+<caption><?php echo ($_GET['ghq']?$_GET['ghq']:"All activities"),", {$strCurrencyTitle}";?></caption>
 <thead>
 	<tr>
 		<th>Account</th>
 		<?php foreach($arrProfit as $pc=>$flag){
 					echo '<th>',$pc,'</th>';
 		};?>
-		<th class='budget-ytd'>Total</th>
-		<th>Last</th>
+		<th class='budget-ytd'><?php echo $oBudget->title;?></th>
+		<th><?php echo $oReference->title;?></th>
 		<th>Diff</th>
 	</tr>
 </thead>
