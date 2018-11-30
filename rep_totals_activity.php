@@ -9,6 +9,9 @@ include ('includes/inc_rep_activity.php');
 include ('includes/inc_report_settings.php');
 include ('includes/inc_total_functions.php');
 
+$oBudget = new Budget($budget_scenario);
+$oReference = new Budget($reference);
+
 $mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1+$oBudget->offset;
 $mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12+$oBudget->offset;
 

@@ -103,10 +103,14 @@ if($currency!=643){
 }
 
 $arrUsrData["pagTitle$strLocal"] .= ': '.$curTitle;
+$strCurrencyTitle = $curTitle;
 
 if ($denominator!=1) {
 	$arrUsrData["pagTitle$strLocal"] .= ' x'.$denominator;
+	$strCurrencyTitle .= ' x'.$denominator;
 }
+
+
 
 //------------------------------------ Activity filter ------------------------------------------//
 

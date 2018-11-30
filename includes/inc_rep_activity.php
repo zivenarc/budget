@@ -3,19 +3,18 @@ $activity = (integer)$_GET['activity'];
 if (isset($_GET['ghq'])) $ghq = urldecode($_GET['ghq']);
 if (isset($_GET['unit'])) $unit = urldecode($_GET['unit']);
 
-$budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
-$reference = isset($_GET['reference'])?$_GET['reference']:$reference;
+// $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
+// $reference = isset($_GET['reference'])?$_GET['reference']:$reference;
 
-$oBudget = new Budget($budget_scenario);
-$oReference = new Budget($reference);
-$denominator = isset($_GET['denominator'])?(double)$_GET['denominator']:1;
+// $oBudget = new Budget($budget_scenario);
+// $oReference = new Budget($reference);
+// $denominator = isset($_GET['denominator'])?(double)$_GET['denominator']:1;
 
 $arrJS[] = 'js/rep_totals.js';
 
-
-if ($denominator!=1) {
-	echo '<h2>RUB x',$denominator,'</h2>';
-}
+// if ($denominator!=1) {
+	// echo "<h2>{$curTitle} x{$denominator}</h2>";
+// }
 if ($activity){
 	$sql = "SELECT prtTitle FROM vw_product_type WHERE prtID={$activity}";
 	$rs = $oSQL->q($sql);
