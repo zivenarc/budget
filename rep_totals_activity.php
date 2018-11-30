@@ -164,8 +164,9 @@ foreach($arrScenario as $scnKey=>$scenario){
 // echo '<pre>';print_r($arrKPI);echo '</pre>';echo $sql;
 // echo '<pre>';print_r($arrReport);echo '</pre>';
 ?>
+<h2><?php echo $_GET['ghq']?$_GET['ghq']:"All activities";?></h2>
 <table class='budget' id='report'>
-<caption><?php echo $_GET['ghq'];?></caption>
+<caption><?php echo $_GET['ghq']?$_GET['ghq']:"All activities";?></caption>
 <thead>
 	<tr>
 		<th>Account</th>
