@@ -12,6 +12,9 @@ include ('includes/inc_total_functions.php');
 $mthStart = $_GET['mthStart']?(integer)$_GET['mthStart']:1+$oBudget->offset;
 $mthEnd = $_GET['mthEnd']?(integer)$_GET['mthEnd']:12+$oBudget->offset;
 
+$arrRates_this = $oBudget->getMonthlyRates($currency);
+$arrRates_last = $oReference->getMonthlyRates($currency);
+
 include ('includes/inc-frame_top.php');
 ?>
 <h1><?php echo $arrUsrData["pagTitle$strLocal"];?></h1>
@@ -56,7 +59,7 @@ if(true || !isset($_GET['ghq'])){
 $arrScenario=Array('this'=>$budget_scenario,'last'=>$reference);
 
 foreach($arrScenario as $scnKey=>$scenario){
-	$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total
+	$sql = "SELECT Profit, pccFlagProd, `Budget item`, `Group`, `item`, `Group_code`, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd, $arrRates_{$scnKey}).")/$denominator as Total
 			FROM vw_master
 			WHERE scenario='{$scenario}' AND company='{$company}'
 			{$sqlActivityFilter}
@@ -92,7 +95,7 @@ foreach($arrScenario as $scnKey=>$scenario){
 		$arrHeadcount[$scnKey]['FTE'][$keyProfit] += $rw['Total'];	
 	}
 	
-	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total
+	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd, $arrRates_{$scnKey}).")/$denominator as Total
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$scenario}' and active=1 AND company='{$company}'
@@ -106,7 +109,7 @@ foreach($arrScenario as $scnKey=>$scenario){
 		$arrOP[$scnKey][$keyProfit] += $rw['Total'];		
 	}
 	
-	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total
+	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd, $arrRates_{$scnKey}).")/$denominator as Total
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$scenario}' and active=1 AND company='{$company}'
@@ -120,7 +123,7 @@ foreach($arrScenario as $scnKey=>$scenario){
 		$arrOOP[$scnKey][$keyProfit] += $rw['Total'];		
 	}
 	
-	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd).")/$denominator as Total
+	$sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthStart, $mthEnd, $arrRates_{$scnKey}).")/$denominator as Total
 		FROM reg_master
 		LEFT JOIN vw_profit ON pccID=pc
 		WHERE scenario='{$scenario}' and active=1 AND company='{$company}'

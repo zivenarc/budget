@@ -33,6 +33,7 @@ $arrKPI[] = Array('prtID'=>50,'ghq'=>'AFF c/c','kpi'=>'COUNT(DISTINCT jobID)', '
 $arrKPI[] = Array('prtID'=>69,'ghq'=>'Rail','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>61,'ghq'=>'Rail, OFF','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobETAPort');
 $arrKPI[] = Array('prtID'=>53,'ghq'=>'Door delivery','kpi'=>'SUM((SELECT COUNT(jcnID) FROM nlogjc.tbl_job_container WHERE jcnJobID=jobID))', 'date'=>'jobETAPort');
+$arrKPI[] = Array('prtID'=>55,'ghq'=>'Precarriage','kpi'=>'SUM((SELECT COUNT(jcnID) FROM nlogjc.tbl_job_container WHERE jcnJobID=jobID))', 'date'=>'jobShipmentDate');
 
 $sql = Array();
 
