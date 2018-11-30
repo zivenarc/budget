@@ -4,8 +4,10 @@ if (isset($_GET['ghq'])) $ghq = urldecode($_GET['ghq']);
 if (isset($_GET['unit'])) $unit = urldecode($_GET['unit']);
 
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
+$reference = isset($_GET['reference'])?$_GET['reference']:$reference;
 
 $oBudget = new Budget($budget_scenario);
+$oReference = new Budget($reference);
 $denominator = isset($_GET['denominator'])?(double)$_GET['denominator']:1;
 
 $arrJS[] = 'js/rep_totals.js';
