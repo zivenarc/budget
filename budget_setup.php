@@ -1,8 +1,42 @@
 <?php
 require ('common/auth.php');
-include ('classes/budget.class.php');
+include ('classes/reports.class.php');
 $arrJS[] = 'js/journal.js';
 $arrJS[] = 'js/budget_setup.js';
+
+if ($_GET['DataAction']=='excel'){
+	$oBudget = new Budget($_GET['budget_scenario']);
+	include_once ("../common/eiseList/inc_excelXML.php");
+	$xl = new excelXML();            
+	$arrHeader = Array('Company','IV','Customer group','Customer','Account','Account Group','Activity','GHQ Product','Amount');	
+	$xl->addHeader($arrHeader);
+	
+	$sql = "SELECT comTitle, ivlGroup, customer_group_title, Customer_name, Title, yact_group, Activity_title, prtGHQ, ".$oBudget->getThisYTDSQL('fye')." as Amount
+			FROM vw_master
+			LEFT JOIN common_db.tbl_company ON comID=company
+			WHERE scenario='{$_GET['budget_scenario']}'
+			".Reports::GP_FILTER."
+			GROUP BY company, ivlGroup, customer_group_code, customer, account, activity
+			ORDER BY company, ivlGroup, customer_group_code, customer, account, activity";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+	
+			$arrRow = Array();
+			$arrRow[] = $rw['comTitle'];	
+			$arrRow[] = $rw['ivlGroup'];					
+			$arrRow[] = $rw['customer_group_title'];					
+			$arrRow[] = $rw['Customer_name'];					
+			$arrRow[] = $rw['Title'];					
+			$arrRow[] = $rw['yact_group'];					
+			$arrRow[] = $rw['Activity_title'];					
+			$arrRow[] = $rw['prtGHQ'];								
+			$arrRow[] = number_format($rw['Amount'],2,'.','');			
+			$xl->addRow($arrRow);
+	}
+     
+	$xl->Output("GP_".urlencode($oBudget->title)."_".date('Ymd'));
+	die();	
+}
 		
 if ($_GET['option']=='full'){
 	include ('includes/inc-frame_top.php');
@@ -146,6 +180,7 @@ $oBudget = new Budget($_GET['tab']);
 		<a href="sp_ghq.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">GHQ report</a>|
 		<a href="rep_summary_ghq.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">GHQ summary</a>|
 		<a href="rep_sales_kpi.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Sales KPI</a>
+		<a href="<?php echo $_SERVER['PHP_SELF'];?>?&budget_scenario=<?php echo $oBudget->id;?>&DataAction=excel">GP Excel</a>
 	</nav>
 	<nav>
 		<a href='sp_post_all.php#<?php echo $_GET['tab'];?>'>Post all</a>|
