@@ -11,13 +11,17 @@ if ($_GET['DataAction']=='excel'){
 	$arrHeader = Array('Company','IV','Customer group','Customer','Account','Account Group','Activity','GHQ Product','Amount');	
 	$xl->addHeader($arrHeader);
 	
-	$sql = "SELECT comTitle, ivlGroup, customer_group_title, Customer_name, Title, yact_group, Activity_title, prtGHQ, ".$oBudget->getThisYTDSQL('fye')." as Amount
+	$sql = "SELECT comTitle, ivlGroup, customer_group_title, Customer_name, Title, yact_group, Activity_title, prtGHQ, SUM(".$oBudget->getThisYTDSQL('fye').") as Amount
 			FROM vw_master
 			LEFT JOIN common_db.tbl_company ON comID=company
 			WHERE scenario='{$_GET['budget_scenario']}'
 			".Reports::GP_FILTER."
 			GROUP BY company, ivlGroup, customer_group_code, customer, account, activity
 			ORDER BY company, ivlGroup, customer_group_code, customer, account, activity";
+			
+			
+	// die($sql);
+	
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
 	
