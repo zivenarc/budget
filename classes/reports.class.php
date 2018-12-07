@@ -3726,7 +3726,7 @@ class Reports{
 		
 		$sqlWhere = $this->sqlWhere;
 
-		$this->colspan = 19;	
+		$this->colspan = 20;	
 		
 		//---------------check if summary is up to date--------------------
 		if($this->oBudget->checksum != $this->oBudget->get_checksum()){
@@ -4043,7 +4043,7 @@ class Reports{
 			$sql = self::_unionMRQueries($sql,"`prtTitle`, `activity`, `unit`",'', $arrUnion);
 			
 			?>
-			<table id='<?php echo $this->ID;?>_kpi' class='budget' style='font-size:1.2em;'>
+			<table id='<?php echo $this->ID;?>_kpi' class='budget'>
 			<caption><?php echo "KPI: ",$this->caption;?></caption>
 			<thead>				
 				<tr>					
