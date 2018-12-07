@@ -270,7 +270,7 @@ class Budget{
 				?>
 					<th colspan="6">Current month (<?php echo date('M',$this->date_start-1);?>)</th>					
 					<th colspan="6">YTD</th>				
-					<th colspan="6">Full year</th>					
+					<th colspan="6">Full year<?php if ($this->flagUpdate) echo " <em>(in progress)</em>";?></th>					
 				</tr>
 				<tr>
 					<th class='budget-ytd'>Actual</th>
