@@ -29,10 +29,10 @@ $rs = $oSQL->q($sql);
 				echo "<th>{$oBudget->arrPeriodTitle[$m]}</th>";
 			}
 			?>
-			<th>Min</th>
 			<th>Prev</th>
-			<th>This</th>
 			<th>Max</th>
+			<th>Min</th>			
+			<th>This</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -51,10 +51,10 @@ $rs = $oSQL->q($sql);
 					if($rw[$month]<$rw['min']) $rw['min'] = $rw[$month];
 					if($rw[$month]>$rw['max']) $rw['max'] = $rw[$month];					
 				} ?>
-				<td class="budget-decimal budget-quarterly"><?php Reports::render($rw['min']);?></td>
 				<td class="budget-decimal budget-ytd"><?php Reports::render($rw['prev']);?></td>
-				<td class="budget-decimal budget-ytd"><?php Reports::render($rw['this']);?></td>
 				<td class="budget-decimal budget-quarterly"><?php Reports::render($rw['max']);?></td>
+				<td class="budget-decimal budget-quarterly"><?php Reports::render($rw['min']);?></td>		
+				<td class="budget-decimal budget-ytd"><?php Reports::render($rw['this']);?></td>
 			</tr>
 		<?php } ?>
 	</tbody>
