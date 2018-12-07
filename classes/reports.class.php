@@ -3038,13 +3038,13 @@ class Reports{
 				SELECT   {$field}, 
 				{$strFieldsKPI['forecast']}
 			FROM `vw_headcount`				
-			{$sqlWhere} AND scenario='{$this->forecast}' AND salary>".self::SALARY_THRESHOLD."
+			{$sqlWhere} AND scenario='{$this->oBudget->forecast}' AND salary>".self::SALARY_THRESHOLD."
 			GROUP BY  {$groupBy}
 			UNION ALL
 				SELECT   {$field}, 
 				{$strFieldsKPI['lastyear']}
 			FROM `vw_headcount`				
-			{$sqlWhere} AND scenario='{$this->lastyear}' AND salary>".self::SALARY_THRESHOLD."
+			{$sqlWhere} AND scenario='{$this->oBudget->lastyear}' AND salary>".self::SALARY_THRESHOLD."
 			GROUP BY  {$groupBy}
 			";
 			
@@ -3726,11 +3726,7 @@ class Reports{
 		
 		$sqlWhere = $this->sqlWhere;
 
-	if(($this->oBudget->cm % 3 && $this->oBudget->nm % 3) || $this->oBudget->cm==6){
-			$this->colspan = 14;
-		} else {
-			$this->colspan = 18;
-		}
+		$this->colspan = 19;	
 		
 		//---------------check if summary is up to date--------------------
 		if($this->oBudget->checksum != $this->oBudget->get_checksum()){
@@ -4024,9 +4020,15 @@ class Reports{
 				GROUP BY activity, unit
 				UNION ALL
 				SELECT activity, unit, prtTitle, 
-						{$strFieldsKPI['next']}
+						{$strFieldsKPI['forecast']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND source<>'Actual' AND IFNULL(unit,'')<>''
+				{$sqlWhere}  AND scenario='{$this->oBudget->forecast}' AND IFNULL(unit,'')<>''
+				GROUP BY activity, unit
+				UNION ALL
+				SELECT activity, unit, prtTitle, 
+						{$strFieldsKPI['lastyear']}
+				FROM `vw_sales`			
+				{$sqlWhere}  AND scenario='{$this->oBudget->lastyear}' AND IFNULL(unit,'')<>''
 				GROUP BY activity, unit
 				";
 			}
