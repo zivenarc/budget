@@ -64,7 +64,11 @@ class Budget{
 			if (!$from) {
 				$this->reference_scenario = new Budget($rw['scnLastID'], $this->id);
 			}
-		};				
+		};	
+
+		$this->reference = $rw['scnLastID'];
+		$this->forecast = $rw['scnForecastID'];
+		$this->lastyear = $rw['scnLastYearID'];
 	}
 	
 	public function getSettings($oSQL=null, $scenario=''){
@@ -257,6 +261,36 @@ class Budget{
 					<th>Diff</th>
 					<th>%</th>
 					<?php } ?>
+				</tr>
+				<?php
+				$res = ob_get_clean();				
+				break;
+			case 'mr_rhq':
+				ob_start();
+				?>
+					<th colspan="6">Current month (<?php echo date('M',$this->date_start-1);?>)</th>					
+					<th colspan="6">YTD</th>				
+					<th colspan="6">Full year</th>					
+				</tr>
+				<tr>
+					<th class='budget-ytd'>Actual</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+					<th>Forecast</th>
+					<th>%</th>
+					<th class='budget-ytd'>Actual</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+					<th>Last year</th>					
+					<th>%</th>
+					<th class='budget-ytd'>Forecast</th>
+					<th>Budget</th>
+					<th>Diff</th>
+					<th>%</th>
+					<th>Last year</th>
+					<th>%</th>					
 				</tr>
 				<?php
 				$res = ob_get_clean();				

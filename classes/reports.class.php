@@ -3260,7 +3260,10 @@ class Reports{
 						SUM(".$this->oBudget->getYTDSQL($nCurrent+1,12+$this->oBudget->offset,$arrRates).")/{$denominator} as ROY_A ,
 						0 as ROY_B,
 						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates).")/{$denominator} as FYE_A ,
-						0 as FYE_B
+						0 as FYE_B,
+						0 as CM_F,
+						0 as YTD_L,
+						0 as FYE_L						
 						";
 		$res['next']=	"0 as CM_A, 
 						0 as CM_B,								
@@ -3273,7 +3276,10 @@ class Reports{
 						SUM(".$this->oBudget->getYTDSQL($nCurrent+1,12+$this->oBudget->offset,$arrRates).")/{$denominator} as ROY_A,
 						0 as ROY_B,
 						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates).")/{$denominator} as FYE_A,
-						0 as FYE_B";
+						0 as FYE_B,
+						0 as CM_F,
+						0 as YTD_L,
+						0 as FYE_L";
 		$res['budget'] = "0 as CM_A, 
 						SUM(`{$cm}`)/{$arrRates[$cm]}/{$denominator} as CM_B,								
 						0 as YTD_A,
@@ -3285,8 +3291,41 @@ class Reports{
 						0 as ROY_A ,
 						SUM(".$this->oBudget->getYTDSQL($nCurrent+1,12+$this->oBudget->offset,$arrRates).")/{$denominator} as ROY_B,
 						0 as FYE_A ,
-						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates).")/{$denominator} as FYE_B";
-		
+						SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates).")/{$denominator} as FYE_B,
+						0 as CM_F,
+						0 as YTD_L,
+						0 as FYE_L";
+		$res['forecast'] = "0 as CM_A, 
+				0 as CM_B,								
+				0 as YTD_A,
+				0 as YTD_B, 
+				0 as Q_A,
+				0 as Q_B, 
+				0 as NM_A , 
+				0 as NM_B,
+				0 as ROY_A ,
+				0 as ROY_B,
+				0 as FYE_A ,
+				0 as FYE_B,
+				SUM(`{$cm}`)/{$arrRates[$cm]}/{$denominator} as CM_F,
+				0 as YTD_L,
+				0 as FYE_L";		
+		$res['lastyear'] = "0 as CM_A, 
+				0 as CM_B,								
+				0 as YTD_A,
+				0 as YTD_B, 
+				0 as Q_A,
+				0 as Q_B, 
+				0 as NM_A , 
+				0 as NM_B,
+				0 as ROY_A ,
+				0 as ROY_B,
+				0 as FYE_A ,
+				0 as FYE_B,
+				0 as CM_F,
+				SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,$nCurrent,$arrRates).")/{$denominator} as YTD_L,
+				SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset,12+$this->oBudget->offset,$arrRates).")/{$denominator} as FYE_L";	
+				
 		$res['from_a'] = $this->oBudget->id;
 		$res['from_b'] = $this->oReference->id;
 		
@@ -3355,6 +3394,30 @@ class Reports{
 				<td class='budget-decimal'><em><?php self::render_ratio($data['FYE_A'],$data['FYE_B'],0);?></em></td>
 				<?php
 				}
+				break;
+			case 'monthly_rhq':
+			?>
+				<td class='budget-decimal budget-quarterly <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['CM_A'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['CM_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['CM_A']-$data['CM_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><em><?php self::render_ratio($data['CM_A'],$data['CM_B'],0);?></em></td>
+				<td class='budget-decimal <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['CM_F'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><em><?php self::render_ratio($data['CM_A'],$data['CM_F'],0);?></em></td>
+				
+				<td class='budget-decimal budget-ytd <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_A'],0);?></td>
+				<td class='budget-decimal  <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_A']-$data['YTD_B'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_B'],0);?></em></td>
+				<td class='budget-decimal  <?php echo $this->oReference->flagPublic?"":"budget-cloak";?>'><?php self::render($data['YTD_L'],0);?></td>
+				<td class='budget-decimal <?php echo $this->oBudget->flagPublic?"":"budget-cloak";?>'><em><?php self::render_ratio($data['YTD_A'],$data['YTD_L'],0);?></em></td>
+				
+				<td class='budget-decimal budget-ytd'><?php self::render($data['FYE_A'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['FYE_B'],0);?></td>
+				<td class='budget-decimal'><?php self::render($data['FYE_A']-$data['FYE_B'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['FYE_A'],$data['FYE_B'],0);?></em></td>
+				<td class='budget-decimal'><?php self::render($data['FYE_L'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['FYE_A'],$data['FYE_L'],0);?></em></td>
+				<?php
 				break;
 			case 'forecast':
 				?>		
@@ -3640,7 +3703,377 @@ class Reports{
 					'Q5'=>($rw['jan_1']+$rw['feb_1']+$rw['mar_1'])/$divider);
 		return ($res);
 	}
+	
+	
+	public function shortMonthlyReportRHQ($type='cm'){
+		
+		// $this->oSQL->startProfiling();
+		
+		$sqlWhere = $this->sqlWhere;
 
+	if(($this->oBudget->cm % 3 && $this->oBudget->nm % 3) || $this->oBudget->cm==6){
+			$this->colspan = 14;
+		} else {
+			$this->colspan = 18;
+		}
+		
+		//---------------check if summary is up to date--------------------
+		if($this->oBudget->checksum != $this->oBudget->get_checksum()){
+			$this->oBudget->write_checksum();
+		}
+		if($this->oReference->checksum != $this->oReference->get_checksum()){
+			$this->oReference->write_checksum();
+		}
+		
+		$strFields = $this->_getMRFields();
+		$strFieldsKPI = $this->_getMRFields(Array('denominator'=>1,'currency'=>643));
+		
+		//$sqlGroup = "GROUP BY `item`";
+		
+		$sql = "SELECT 
+					{$strFields['actual']}
+			FROM `reg_summary`			
+			{$sqlWhere}  AND scenario='{$this->oBudget->id}' AND `item` IS NOT NULL			
+			UNION ALL
+				SELECT 
+				{$strFields['budget']}
+			FROM `reg_summary`				
+			{$sqlWhere} AND scenario='{$this->oBudget->reference}' AND `item` IS NOT NULL
+			UNION ALL
+				SELECT 
+				{$strFields['forecast']}
+			FROM `reg_summary`				
+			{$sqlWhere} AND scenario='{$this->oBudget->forecast}' AND `item` IS NOT NULL
+			UNION ALL
+				SELECT 
+				{$strFields['lastyear']}
+			FROM `reg_summary`				
+			{$sqlWhere} AND scenario='{$this->oBudget->lastyear}' AND `item` IS NOT NULL
+			";
+		
+		switch ($type){
+			case 'budget':
+				$this->columns = Array('FYE_A','FYE_B');
+				$this->structure = 'budget';
+				$strHeader = $this->oBudget->getTableHeader('budget');	
+				$this->colspan = 6;				
+				break;
+			case 'fye':
+				$this->columns = Array('YTD_A','YTD_B','ROY_A','ROY_B','FYE_A','FYE_B');
+				$this->structure = 'forecast';
+				$strHeader = $this->oBudget->getTableHeader('roy');				
+				break;
+			case 'ytd':
+			case 'cm':
+			default:
+				$this->columns = Array('CM_A','CM_B','CM_F','YTD_A','YTD_B','YTD_L','FYE_A','FYE_B','FYE_L');
+				$this->structure = 'monthly_rhq';
+				$strHeader = $this->oBudget->getTableHeader('mr_rhq');				
+		}
+		
+		
+		$this->sqlSelect = "";
+		foreach($this->columns as $i=>$field){
+			$this->sqlSelect .= ($this->sqlSelect?",\r\n":"")."SUM(`{$field}`) as '{$field}'";
+		}
+		
+		$sql = self::_unionMRQueries($sql,'','', $this->columns);
+		
+		//$tableID = "SUMMARY_".md5($sql);
+		// die( $sql);
+		if (!$rs = $this->oSQL->q($sql)){
+				echo "<div class='error'>SQL error:</div>";
+				echo "<pre>$sql</pre>";
+				return (false);
+		};
+			?>
+			<table id='<?php echo $this->ID;?>' class='budget'>
+			<caption><?php echo $this->caption;?></caption>
+			<thead>				
+				<tr>					
+					<th rowspan="2" colspan="2"><?php echo $this->CurrencyTitle, "&nbsp;", number_format($this->Denominator);?></th>
+					<?php echo $strHeader; ?>					
+			</thead>			
+			<tbody>
+		<?php
+		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
+		
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND item IN('".implode("','",self::GROSS_REVENUE_ITEMS)."') AND pccFlagProd=1", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Gross revenue";
+			$this->echoBudgetItemString($rw, 'budget-ratio');
+		}
+		
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::REVENUE_FILTER, $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Net revenue";
+			$rw['title'] = "Revenue less proceeds from import freight";
+			$this->echoBudgetItemString($rw);
+		}
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::DIRECT_COST_FILTER, $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		// echo '<pre>',$sqlOps,'</pre>';
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Direct costs";
+			$rw['title'] = "Subcontractor costs, except import freight";
+			$this->echoBudgetItemString($rw);
+		}
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::GP_FILTER, $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Gross profit";
+			$this->echoBudgetItemString($rw, 'budget-subtotal');
+		}
+		
+		
+		//-------Reclassified fixed costs --------------------------------------------------------------
+		$arrYCT = Array();
+		$_rs = $this->oSQL->q("SELECT yctID FROM vw_yact WHERE yctID LIKE 'J%' AND yctID NOT IN ('J00400', 'J00802','J45010','J40010')");
+		while ($rw = $this->oSQL->f($_rs)){
+				$arrYCT[] = $rw['yctID'];
+		}
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::RFC_FILTER." AND pccFlagProd=1", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		try {
+			$rs = $this->oSQL->q($sqlOps);
+		} catch (Exception $e) {
+			echo $e;
+			echo '<pre>',$sqlOps,'</pre>';
+		}
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Reclassified fixed costs";
+			$rw['title'] = "Direct production costs: labor, rent, fuel, depreciation";
+			$metadata = Array('filter'=>$this->filter, 'DataAction'=>'budget_item');
+			$metadata['filter']['account'] = $arrYCT;
+			$metadata['title'] = $rw['Budget item'];
+			$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
+			$this->echoBudgetItemString($rw);
+		}
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::GOP_FILTER." AND pccFlagProd=1", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Gross operating profit";
+			$this->echoBudgetItemString($rw, 'budget-subtotal');
+		}
+		
+		// if (!($this->filter['activity'])){
+			$arrYCT = Array();
+			$_rs = $this->oSQL->q("SELECT yctID FROM vw_yact WHERE yctID LIKE '5%' AND yctID NOT IN('5999CO','527000')");
+			while ($rw = $this->oSQL->f($_rs)){
+					$arrYCT[] = $rw['yctID'];
+			}
+			
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN ('".implode("','",$arrYCT)."') AND pccFlagProd=1)", $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "Selling & general";
+				$rw['title'] = "Costs of sales and BU management";
+				$metadata = Array('filter'=>$this->filter, 'DataAction'=>'budget_item');
+				$metadata['filter']['account'] = $arrYCT;
+				$metadata['filter']['pccFlagProd'] = 1;
+				$metadata['title'] = $rw['Budget item'];
+				$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
+				$this->echoBudgetItemString($rw);
+			}
+			
+			$sqlOps = str_replace($sqlWhere, $sqlWhere.self::CORP_FILTER, $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "Corporate costs";
+				$rw['title'] = "Costs of headquarters, except BDV";
+				$metadata = Array('filter'=>$this->filter, 'DataAction'=>'budget_item');
+				$metadata['filter']['account'] = '5999CO';
+				$metadata['title'] = $rw['Budget item'];
+				$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
+				$this->echoBudgetItemString($rw);
+			}
+			
+			$sqlOps = str_replace($sqlWhere, $sqlWhere.self::MSF_FILTER, $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "MSF";
+				$rw['title'] = "Costs of regional and global HQ";
+				$metadata = Array('filter'=>$this->filter, 'DataAction'=>'budget_item');
+				$metadata['filter']['account'] = '527000';
+				$metadata['title'] = $rw['Budget item'];
+				$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
+				$this->echoBudgetItemString($rw);
+			}
+			
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND pccFlagProd=1)", $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "Operating profit";				
+				$this->echoBudgetItemString($rw, 'budget-subtotal');
+			}
+			
+			// $sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND account NOT LIKE '5999%' AND pccFlagProd=1)", $sql);
+			$sqlOps = str_replace($sqlWhere, $sqlWhere.self::OWN_OPERATING_PROFIT, $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "Own operating profit";		
+				$rw['title'] = "Result of business unit without any corporate costs";				
+				$this->echoBudgetItemString($rw, 'budget-ratio');
+			}
+			
+			$arrYCT = Array();
+			$_rs = $this->oSQL->q("SELECT yctID FROM vw_yact WHERE yctID LIKE '60%' AND yctID<>'607000'");
+			while ($rw = $this->oSQL->f($_rs)){
+					$arrYCT[] = $rw['yctID'];
+			}
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN('".implode("','",$arrYCT)."'))", $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "Non-operating income";
+				$rw['title'] = "Interest receivable, sublease, sale of assets";
+				$metadata['filter']['account'] = $arrYCT;
+				$metadata['title'] = $rw['Budget item'];
+				$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
+				$this->echoBudgetItemString($rw);
+			}
+			
+			$arrYCT = Array();
+			$_rs = $this->oSQL->q("SELECT yctID FROM vw_yact WHERE yctID LIKE '65%' OR yctID LIKE '66%'");
+			while ($rw = $this->oSQL->f($_rs)){
+					$arrYCT[] = $rw['yctID'];
+			}
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account IN('".implode("','",$arrYCT)."'))", $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "Non-operating losses";
+				$rw['title'] = "Interest and FX losses";
+				$metadata['filter']['account'] = $arrYCT;
+				$metadata['title'] = $rw['Budget item'];
+				$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
+				$this->echoBudgetItemString($rw);
+			}
+			
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '7%')", $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "Extraordinary";
+				$this->echoBudgetItemString($rw);
+			}
+			
+			$sqlOps = str_replace($sqlWhere, $sqlWhere." AND pccFlagProd=1", $sql);
+			$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+			// echo '<pre>',$sqlOps,'</pre>';
+			$rs = $this->oSQL->q($sqlOps);
+			while ($rw = $this->oSQL->f($rs)){
+				$rw['Budget item'] = "Profit before tax";
+				$this->echoBudgetItemString($rw, 'budget-subtotal');
+			}
+			
+		?>
+		</tbody>
+		</table>
+		<?php
+		$this->_echoButtonCopyTable($this->ID);
+		// } else {
+			//------- KPIs -----------------	
+			// $strFields = self::_getMRFields(Array('denominator'=>1,'currency'=>643));
+			
+			if (strpos($this->oBudget->type,'Budget')!==false){
+				$sql = "SELECT activity, unit, prtTitle,
+					{$strFieldsKPI['actual']}
+				FROM `vw_sales`				
+				{$sqlWhere} AND scenario='{$strFieldsKPI['from_a']}' AND IFNULL(unit,'')<>''
+				GROUP BY activity, unit
+				";
+			} else {
+				$sql = "SELECT activity, unit, prtTitle,
+						{$strFieldsKPI['actual']}
+				FROM `vw_sales`			
+				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND ".self::ACTUAL_DATA_FILTER." AND IFNULL(unit,'')<>''
+				GROUP BY activity, unit
+				UNION ALL
+				SELECT activity, unit, prtTitle, 
+						{$strFieldsKPI['next']}
+				FROM `vw_sales`			
+				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND source<>'Actual' AND IFNULL(unit,'')<>''
+				GROUP BY activity, unit
+				";
+			}
+			$sql .= "UNION ALL
+					SELECT activity, unit, prtTitle,
+					{$strFieldsKPI['budget']}
+				FROM `vw_sales`				
+				{$sqlWhere} AND scenario='{$strFieldsKPI['from_b']}' AND IFNULL(unit,'')<>''
+				GROUP BY activity, unit
+				";
+				
+			$sql = self::_unionMRQueries($sql,"`prtTitle`, `activity`, `unit`",'', $arrUnion);
+			
+			?>
+			<table id='<?php echo $this->ID;?>_kpi' class='budget' style='font-size:1.2em;'>
+			<caption><?php echo "KPI: ",$this->caption;?></caption>
+			<thead>				
+				<tr>					
+					<th rowspan="2" colspan="2">KPI</th>
+					<?php echo $strHeader; ?>					
+			</thead>			
+			<tbody>
+			<?php
+			
+			// echo '<pre>',$sql,'</pre>';
+			$rs = $this->oSQL->q($sql);
+			
+			if ($this->oSQL->n($rs)){				
+				while ($rw = $this->oSQL->f($rs)){			
+					$rw['Budget item'] = $rw['prtTitle'];//." ({$rw['unit']})";
+					$rw['Level1_title'] = $rw['unit'];
+					$rw['Level1_code'] = $rw['unit'];
+					$filter = $this->filter;
+					$filter['activity'] = $rw['activity'];
+					$arrMetadata = Array('filter' => $filter, 'DataAction' => 'kpiByCustomer', 'title'=>$rw['prtTitle']);
+					$rw['metadata'] = json_encode($arrMetadata);
+					$rw['href'] = "javascript:getCustomerKPI(".json_encode($arrMetadata).");";
+					$arrKPIReport[$rw['unit']][$rw['activity']] = $rw;
+					
+				}
+				
+				foreach($arrKPIReport as $unit=>$data){
+					$this->echoBudgetItemString($data);
+				}
+				
+				
+			}
+		// }
+		
+		//$this->_getMRHeadcount($sqlWhere);
+		$this->_getMRHeadcount($sqlWhere,'funRHQ');
+		
+		?>
+		</tbody>
+		</table>
+		<?php
+		$this->_echoButtonCopyTable($this->ID.'_kpi');
+		
+
+		// $this->oSQL->showProfileInfo();
+	}
+	
 	public function shortMonthlyReport($type='cm'){
 		
 		// $this->oSQL->startProfiling();
