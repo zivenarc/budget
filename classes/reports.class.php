@@ -2991,6 +2991,7 @@ class Reports{
 		
 		switch ($this->structure){
 			case 'monthly':
+			case 'monthly_rhq':
 			case 'budget':
 			case 'forecast':
 				$strFieldsKPI = self::_getMRFields(Array('currency'=>643,'denominator'=>1));
@@ -3033,6 +3034,18 @@ class Reports{
 			FROM `vw_headcount`				
 			{$sqlWhere} AND scenario='{$strFieldsKPI['from_b']}' AND salary>".self::SALARY_THRESHOLD."
 			GROUP BY  {$groupBy}
+			UNION ALL
+				SELECT   {$field}, 
+				{$strFieldsKPI['forecast']}
+			FROM `vw_headcount`				
+			{$sqlWhere} AND scenario='{$this->forecast}' AND salary>".self::SALARY_THRESHOLD."
+			GROUP BY  {$groupBy}
+			UNION ALL
+				SELECT   {$field}, 
+				{$strFieldsKPI['lastyear']}
+			FROM `vw_headcount`				
+			{$sqlWhere} AND scenario='{$this->lastyear}' AND salary>".self::SALARY_THRESHOLD."
+			GROUP BY  {$groupBy}
 			";
 			
 		$sql = "SELECT  `Budget item`, 
@@ -3062,6 +3075,7 @@ class Reports{
 				if($monthsYTD){
 					$rw['YTD_A'] = $rw['YTD_A']/($monthsYTD);
 					$rw['YTD_B'] = $rw['YTD_B']/($monthsYTD);
+					$rw['YTD_L'] = $rw['YTD_L']/($monthsYTD);
 				}
 				
 				$rw['Q_A'] = $rw['Q_A']/3;
@@ -3069,6 +3083,7 @@ class Reports{
 				
 				$rw['FYE_A'] = $rw['FYE_A']/12;
 				$rw['FYE_B'] = $rw['FYE_B']/12;
+				$rw['FYE_L'] = $rw['FYE_L']/12;
 				
 				for($q=1;$q<=5;$q++){
 					$rw["Q$q"] = $rw["Q$q"]/3;
