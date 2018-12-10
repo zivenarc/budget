@@ -3998,7 +3998,7 @@ class Reports{
 			
 
 			?>
-			<tr><td colspan="<?php echo $this->colspan;?>">Operational KPI</td></tr>
+			<tr><th colspan="<?php echo $this->colspan;?>">Operational KPI</th></tr>
 			<?php
 			// } else {
 			//------- KPIs -----------------	
