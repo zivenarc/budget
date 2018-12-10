@@ -3996,11 +3996,7 @@ class Reports{
 				$this->echoBudgetItemString($rw, 'budget-subtotal');
 			}
 			
-		?>
-		</tbody>
-		</table>
-		<?php
-		$this->_echoButtonCopyTable($this->ID);
+
 		// } else {
 			//------- KPIs -----------------	
 			// $strFields = self::_getMRFields(Array('denominator'=>1,'currency'=>643));
@@ -4042,17 +4038,7 @@ class Reports{
 				
 			$sql = self::_unionMRQueries($sql,"`prtTitle`, `activity`, `unit`",'', $arrUnion);
 			
-			?>
-			<table id='<?php echo $this->ID;?>_kpi' class='budget'>
-			<caption><?php echo "KPI: ",$this->caption;?></caption>
-			<thead>				
-				<tr>					
-					<th rowspan="2" colspan="2">KPI</th>
-					<?php echo $strHeader; ?>					
-			</thead>			
-			<tbody>
-			<?php
-			
+		
 			// echo '<pre>',$sql,'</pre>';
 			$rs = $this->oSQL->q($sql);
 			
