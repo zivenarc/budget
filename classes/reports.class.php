@@ -3997,7 +3997,10 @@ class Reports{
 			}
 			
 
-		// } else {
+			?>
+			<tr><td colspan="<?php echo $this->colspan;?>">Operational KPI</td></tr>
+			<?php
+			// } else {
 			//------- KPIs -----------------	
 			// $strFields = self::_getMRFields(Array('denominator'=>1,'currency'=>643));
 			
@@ -4071,7 +4074,7 @@ class Reports{
 		</tbody>
 		</table>
 		<?php
-		$this->_echoButtonCopyTable($this->ID.'_kpi');
+		$this->_echoButtonCopyTable($this->ID);
 		
 
 		// $this->oSQL->showProfileInfo();
