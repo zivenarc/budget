@@ -49,7 +49,14 @@ if(!isset($_GET['pccGUID'])){
 	if(is_array($arrPCHeader)){
 		echo '<p>',implode(' | ',$arrPCHeader),'</p>';
 	}
-	$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
+	$oReport = new Reports(Array(	'budget_scenario'=>$oBudget->id, 
+									'currency'=>$currency, 
+									'denominator'=>$denominator, 
+									'reference'=>$oReference->id, 
+									'filter'=>$filter, 
+									'title'=>$oBudget->arrProfit[$_GET['pccGUID']]["pccTitle{$strLocal}"]
+								)
+							);
 	// $oReport->shortMonthlyReport($period_type);	
 	$oReport->shortMonthlyReportRHQ($period_type);	
 	

@@ -18,7 +18,7 @@ class Budget{
 				WHERE scnID='$scenario'";
 		$rs = $this->oSQL->q($sql);
 		$rw = $this->oSQL->f($rs);
-
+		
 		$this->year = (integer)$rw['scnYear'];
 		
 		$this->arrPeriod = Array(1=>'jan',2=>'feb',3=>'mar',4=>'apr',5=>'may',6=>'jun',7=>'jul',8=>'aug',9=>'sep',10=>'oct',11=>'nov',12=>'dec',13=>'jan_1',14=>'feb_1',15=>'mar_1');
@@ -69,6 +69,12 @@ class Budget{
 		$this->reference = $rw['scnLastID'];
 		$this->forecast = $rw['scnForecastID'];
 		$this->lastyear = $rw['scnLastYearID'];
+		
+		$sql = "SELECT * FROM common_db.tbl_profit";
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			$this->arrProfit[$rw['pccGUID']] = $rw;
+		}		
 	}
 	
 	public function getSettings($oSQL=null, $scenario=''){

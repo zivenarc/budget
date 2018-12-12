@@ -60,7 +60,7 @@ class Reports{
 		$this->filter = $params['filter'];
 		$this->_setWhere();
 		
-		$this->caption = $this->oBudget->title.' vs '.$this->oReference->title.', '.$this->CurrencyTitle.($this->Denominator!=1?'x'.$this->Denominator:'');
+		$this->caption = ($params['title']?"{$params['title']} :: ":"").$this->oBudget->title.' vs '.$this->oReference->title.', '.$this->CurrencyTitle.($this->Denominator!=1?'x'.$this->Denominator:'');
 	}
 	
 	private function _setWhere(){
