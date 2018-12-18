@@ -2,7 +2,6 @@
 $flagNoAuth = true;
 // $_DEBUG = true;
 include('common/auth.php');
-require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
