@@ -40,29 +40,32 @@ for ($i=12;$i>=1;$i--){
 //echo '<pre>';print_r($arrScnUse);echo '<pre>';
 $sql = Array();
 
+$groupTitle = 'Profit';
+$groupValue = 'pc';
+
 foreach($arrScnUse as $dateStart=>$scenario){
 	$oRef = new Budget($scenario);
-	$sql['forecast'][] = "SELECT usrTitle, sales, SUM(".$oRef->getThisYTDSQL('nm').") as `".$oActual->arrPeriod[$oRef->nm]."`
+	$sql['forecast'][] = "SELECT `{$groupTitle}`, `{$groupValue}`, SUM(".$oRef->getThisYTDSQL('nm').") as `".$oActual->arrPeriod[$oRef->nm]."`
 			FROM vw_master 
 			WHERE scenario='{$oRef->id}' 
 				AND company='{$company}'
 				".Reports::GP_FILTER."
-				GROUP BY sales";	
+				GROUP BY `{$groupValue}`";	
 }
 
-$sql['actual'][] = "SELECT usrTitle, sales,".$oActual->getMonthlySumSQL(4,$oActual->cm)."
+$sql['actual'][] = "SELECT `{$groupTitle}`, `{$groupValue}`,".$oActual->getMonthlySumSQL(4,$oActual->cm)."
 					FROM vw_master 
 								WHERE scenario='{$oActual->id}' 
 									AND company='{$company}'
 									".Reports::GP_FILTER."
-									GROUP BY sales";
+									GROUP BY `{$groupValue}`";
 
-$sql['actual'][] = "SELECT usrTitle, sales,".$oActual->getMonthlySumSQL($oActual->nm,15)."
+$sql['actual'][] = "SELECT `{$groupTitle}`, `{$groupValue}`,".$oActual->getMonthlySumSQL($oActual->nm,15)."
 					FROM vw_master 
 								WHERE scenario='{$oActual->lastyear}' 
 									AND company='{$company}'
 									".Reports::GP_FILTER."
-									GROUP BY sales";
+									GROUP BY `{$groupValue}`";
 				
 	
 foreach ($sql as $datatype=>$arrQuery){	
@@ -74,7 +77,7 @@ foreach ($sql as $datatype=>$arrQuery){
 		while ($rw = $oSQL->f($rs)){
 			for($m=4;$m<=15;$m++){
 				$month = $oActual->arrPeriod[$m];
-				$arrReport[$rw['usrTitle']][$datatype][$month] += $rw[$month];				
+				$arrReport[$rw[$groupTitle]][$datatype][$month] += $rw[$month];				
 			}
 		}
 	}
