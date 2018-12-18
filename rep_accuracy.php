@@ -74,7 +74,7 @@ foreach ($sql as $datatype=>$arrQuery){
 		while ($rw = $oSQL->f($rs)){
 			for($m=4;$m<=15;$m++){
 				$month = $oActual->arrPeriod[$m];
-				$arrReport[$rw['usrTitle']][$datatype][$month] += $rw[$month];
+				$arrReport[$rw['usrTitle']][$datatype][$month] += $rw[$month];				
 			}
 		}
 	}
@@ -82,7 +82,7 @@ foreach ($sql as $datatype=>$arrQuery){
 
 // echo '<pre>';print_r($arrReport);echo '</pre>';
 ?>
-<table class="budget">
+<table class="budget" id="accuracy">
 <tr>
 	<th>Responsible</th>
 	<th>Data</th>
@@ -181,5 +181,7 @@ foreach ($sql as $datatype=>$arrQuery){
 ?>
 </table>
 <?php
+Reports::_echoButtonCopyTable('accuracy');
+
 require ('includes/inc-frame_bottom.php');
 ?>
