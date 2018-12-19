@@ -60,6 +60,49 @@ if(!isset($_GET['pccGUID'])){
 	
 	Budget::getProfitTabs('reg_sales', false, Array('sales'=>$ownerID));
 	
+	if(strpos($oBudget->type,'Budget')!==false){
+		$period_type = 'fye';
+	} else {
+		$period_type = 'cm';
+	}
+
+	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
+	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
+	
+	$settings['gpcus'] = Array('title'=>"GP by customer sold by ".($rw['usrTitle']?$rw['usrTitle']:'<Unknown>'),
+						'actual_title'=>$oBudget->title,
+						'budget_title'=>$oReference->title,
+						'sqlBase' => "SELECT customer_group_code as optValue, 
+												customer_group_title as optText,  
+											{$sqlActual} as Actual, 
+											0 as Budget, 
+											{$sqlActual} as Diff
+									FROM vw_master 
+									WHERE sales='{$ownerID}'
+										AND scenario='{$oBudget->id}'  
+										AND company='{$company}'
+										".Reports::GP_FILTER."										
+									GROUP BY customer_group_code
+									UNION ALL
+									SELECT customer_group_code as optValue, 
+												customer_group_title as optText,  
+												0 as Actual, 
+									{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+									FROM vw_master 
+									WHERE sales='{$ownerID}'
+										AND scenario='{$oReference->id}'  
+										AND company='{$company}'
+										AND source<>'Estimate' 
+										".Reports::GP_FILTER."										
+									GROUP BY customer_group_code",
+							'tolerance'=>0.05,
+							'denominator'=>$denominator,
+							'limit'=>10);	
+
+	$oWF = new Waterfall($settings['gpcus']);
+
+	$oWF->draw();
+	
 	include ('includes/inc_subordinates.php');
 
 	include ('includes/inc-frame_bottom.php');
