@@ -3,7 +3,8 @@
 // $arrUsrData['usrID'] = 'ZHAROVA';
 
 require ('common/auth.php');
-
+require ('classes/reports.class.php');
+require ('classes/waterfall.class.php');
 
 $ownerID = isset($_GET['ownerID'])?$_GET['ownerID']:($_COOKIE['ownerID']?$_COOKIE['ownerID']:$arrUsrData['usrID']);
 if ($_GET['ownerID']=='MYSELF'){
@@ -11,7 +12,7 @@ if ($_GET['ownerID']=='MYSELF'){
 }
 SetCookie('ownerID',$ownerID,0);
 
-require ('classes/reports.class.php');
+
 include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
