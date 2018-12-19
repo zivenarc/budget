@@ -16,6 +16,7 @@ SetCookie('ownerID',$ownerID,0);
 include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
+$oReference = new Budget($reference);
 
 include ('includes/inc_report_pcfilter.php');
 
@@ -27,7 +28,8 @@ include('includes/inc_group_buttons.php');
 $sql = "SELECT * FROM stbl_user WHERE usrID=".$oSQL->e($ownerID);
 $rs = $oSQL->q($sql);
 $rw = $oSQL->f($rs);
-$arrUsrData["pagTitle$strLocal"] = 'Sales by '.($rw['usrTitle']?$rw['usrTitle']:'<Unknown>');
+$usrTitle = $rw['usrTitle']?$rw['usrTitle']:'<Unknown>';
+$arrUsrData["pagTitle$strLocal"] = 'Sales by '.$usrTitle;
 	
 	
 if(!isset($_GET['pccGUID'])){
@@ -70,7 +72,7 @@ if(!isset($_GET['pccGUID'])){
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	
-	$settings['gpcus'] = Array('title'=>"GP by customer sold by ".($rw['usrTitle']?$rw['usrTitle']:'<Unknown>'),
+	$settings['gpcus'] = Array('title'=>"GP by customer sold by ".$usrTitle,
 						'actual_title'=>$oBudget->title,
 						'budget_title'=>$oReference->title,
 						'sqlBase' => "SELECT customer_group_code as optValue, 
