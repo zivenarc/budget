@@ -51,7 +51,7 @@ class Budget{
 		$this->timestamp = "Updated by ".$rw['usrTitle']." on ".date('d.m.Y H:i',strtotime($rw['scnEditDate'])).", <a href='{$rw['script']}?{$rw['prefix']}ID={$rw['id']}'>".$rw['title']." #".$rw['id']."</a>";
 		$this->length = $rw['scnLength'];
 		
-		$this->flagUpdate = !$rw['scnFlagReadOnly'];
+		$this->flagUpdate = !$rw['scnFlagReadOnly'] && strtotime($rw['scnDeadline'])>time();
 		$this->flagArchive = (integer)$rw['scnFlagArchive'];
 		$this->flagPublic = (integer)$rw['scnFlagPublic'];
 		
