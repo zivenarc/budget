@@ -69,6 +69,7 @@ class Budget{
 		$this->reference = $rw['scnLastID'];
 		$this->forecast = $rw['scnForecastID'];
 		$this->lastyear = $rw['scnLastYearID'];
+		$this->deadline = date('d M Y H:i',strtotime($rw['scnDeadline']));
 		
 		$sql = "SELECT * FROM common_db.tbl_profit";
 		$rs = $this->oSQL->q($sql);

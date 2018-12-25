@@ -52,7 +52,7 @@ if($oActual->flagUpdate){
 	$rs = $oSQL->q($sql);
 	if($oSQL->n($rs)){
 		$rw = $oSQL->f($rs);
-		echo "<div class='warning'>You have {$rw['nCount']} <a href='sp_my.php?ownerID={$arrUsrData['usrID']}#{$oActual->id}'>unposted documents</a> in [{$oActual->title}]</div>";
+		echo "<div class='warning'>You have {$rw['nCount']} <a href='sp_my.php?ownerID={$arrUsrData['usrID']}#{$oActual->id}'>unposted documents</a> in [{$oActual->title}]. The scenario locks up at {$oActual->deadline}</div>";
 	}
 }
 if($oBudget->flagUpdate){
@@ -60,7 +60,7 @@ if($oBudget->flagUpdate){
 	$rs = $oSQL->q($sql);
 	if($oSQL->n($rs)){
 		$rw = $oSQL->f($rs);
-		echo "<div class='warning'>You have {$rw['nCount']} <a href='sp_my.php?ownerID={$arrUsrData['usrID']}#{$oBudget->id}'>unposted documents</a> in [{$oBudget->title}]</div>";
+		echo "<div class='warning'>You have {$rw['nCount']} <a href='sp_my.php?ownerID={$arrUsrData['usrID']}#{$oBudget->id}'>unposted documents</a> in [{$oBudget->title}]. The scenario locks up at {$oBudget->deadline}</div>";
 	}
 	
 	
