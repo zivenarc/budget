@@ -52,7 +52,8 @@ class Headcount extends Document{
 		
 		$sqlWhere = $this->getSqlWhere($id);
 				
-		$sql = "SELECT ".$this->prefix.".*, usrTitle FROM `".$this->table."` ".$this->prefix."
+		$sql = "SELECT ".$this->prefix.".*, usrTitle 
+				FROM `".$this->table."` ".$this->prefix."
 				LEFT JOIN stbl_user ON `usrID`=`".$this->prefix."EditBy`
 				WHERE $sqlWhere";
 		
@@ -65,11 +66,15 @@ class Headcount extends Document{
 		$this->bonus_department = $this->data[$this->prefix.'BonusDepartment'];
 		
 		if($this->GUID){
+			$this->headcount = 0;
 			$sql = "SELECT * FROM `".self::Register."` WHERE `source`='".$this->GUID."';";
 			$rs = $this->oSQL->q($sql);			
 			while($rw = $this->oSQL->f($rs)){
 				$this->records[$this->gridName][$rw['id']] = new headcount_record($this->GUID, $this->scenario,  $this->company, $rw['id'], $rw);
+				$this->headcount += $rw['mar_1'];
+				$this->arrLocation[] = $rw['location'];
 			}		
+			$this->arrLocation = array_values(array_unique($this->arrLocation));
 		}
 	}
 	

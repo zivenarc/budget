@@ -5,13 +5,17 @@ require ('common/auth.php');
 if ($_GET['tab']){
 	
 	?>
-<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
+<<div>
+	<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
+	<button onclick="fill('<?php echo $_GET['tab']; ?>', event);">Fill data</button>
 <div/>
 
 	<?php
 	require ('classes/reports.class.php');
-	$sql = "SELECT *, edit_date as timestamp FROM vw_journal 				
-		LEFT JOIN stbl_user ON usrID=vw_journal.edit_by				
+	$sql = "SELECT vw_journal.*, edit_date as timestamp, SUM(mar_1) as headcount 
+		FROM vw_journal 				
+		LEFT JOIN stbl_user ON usrID=vw_journal.edit_by	
+		LEFT JOIN reg_headcount ON source=vw_journal.guid
 		WHERE vw_journal.posted=1 AND vw_journal.scenario='{$_GET['tab']}' 
 		AND prefix IN ('cem','nem')
 		GROUP BY vw_journal.guid
@@ -19,6 +23,7 @@ if ($_GET['tab']){
 
 		$rs =$oSQL->q($sql);
 		while ($rw=$oSQL->f($rs)){
+			$rw['comment'] = "[<span class='headcount'>{$rw['headcount']}</span>] {$rw['comment']}";
 			$data[] = $rw;
 		}
 		

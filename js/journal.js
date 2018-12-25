@@ -70,6 +70,64 @@ $(document).ready(function(){
 	$('#tabs').tabs(tabs_options);	
 });
 
+function fill(tab, event){
+	$(event.srcElement).addClass('spinner');
+	$('.budget-document-link',$('#div_'+tab)).each(function(){
+		var href = $(this).attr('href');
+		var tr = $(this).parents('tr');
+		var cb = tr.find('input:checkbox');		
+		if(cb.prop('checked')){						
+			var td_posted = tr.find('td.td-posted'); 			
+			var guid = tr.attr('id').replace('tr_','');
+			td_posted.addClass('spinner');
+			
+			if (tr.hasClass('journal-deleted')){
+				//skip
+			} else if (tr.hasClass('journal-posted')){
+				//--unpost, then post
+				$.post(href,{DataAction:'unpost'},function(data){
+					// console.log(data);
+					if (data.flagPosted==0){
+						tr.removeClass('journal-posted');
+						td_posted.removeClass('budget-icon-posted');						
+						$.post(href,{DataAction:'fill'},function(data){
+							// console.log(data);
+							if (data.status=='success'){
+								td_posted.removeClass('spinner');						
+								tr.find('#usrTitle_'+guid).text(data.editor);
+								tr.find('#timestamp_'+guid).text(data.timestamp_short);									
+								tr.find('span.headcount').text(data.headcount);
+							} else {
+								td_posted.removeClass('spinner').text('Error');
+							}
+						});
+					} else {
+						td_posted.removeClass('spinner').text('Error');
+					}
+				});
+			} else {
+				//post only
+				$.post(href,{DataAction:'fill'},function(data){
+					// console.log(data);
+					if (data.status=='success'){						
+						td_posted.removeClass('spinner');						
+						tr.find('#usrTitle_'+guid).text(data.editor);
+						tr.find('#timestamp_'+guid).text(data.timestamp_short);						
+						tr.find('span.headcount').text(data.headcount);
+					} else {
+						td_posted.removeClass('spinner').text('Error');
+					}
+				});
+			}
+		} else {
+			//skip the line
+		}
+	});
+	
+	$(event.srcElement).removeClass('spinner');
+	
+}
+
 function repost(tab, event){
 		
 		var t0 = performance.now();
