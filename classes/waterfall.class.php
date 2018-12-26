@@ -215,7 +215,7 @@ class Waterfall {
 			<div id="limit_<?php echo $this->chartID;?>-handle" class="ui-slider-handle"></div>
 		</div>
 		<table id="table_<?php echo $this->chartID;?>" class="<?php echo $strClass;?>" style="width:auto;">
-		<caption><?php echo $this->title, ': ', $this->actual_title,' vs ',$this->budget_title, ', ', $this->currency, 'x', $this->denominator;?></caption>
+		<caption><?php echo $this->title, ': ', $this->currency, 'x', $this->denominator;?></caption>
 		<thead>			
 			<tr>
 				<th>Factors</th>			
@@ -269,7 +269,8 @@ class Waterfall {
 			var chartID = '<?php echo $this->chartID;?>';
 			//google_chart_data["<?php echo $this->chartID;?>"] = {data:<?php echo json_encode($this->arrChart);?>,title:'<?php echo $this->title;?>'};			
 			hs_data[chartID] = {chart: {type: 'waterfall'},
-													title: {text: '<?php echo $this->title, ': "', $this->actual_title,'" vs "',$this->budget_title,'"';?>'},
+													title: {text: '<?php echo $this->title; ?>'},
+													subtitle: {text: '<?php echo '"',$this->actual_title,'" vs "',$this->budget_title,'"';?>'},
 													xAxis: {type: 'category'},
 													yAxis: {
 															min: <?php echo (integer)$this->min;?>,
