@@ -3749,7 +3749,7 @@ class Reports{
 				SELECT 
 				{$strFields['budget']}
 			FROM `reg_summary`				
-			{$sqlWhere} AND scenario='{$this->oBudget->reference}' AND `item` IS NOT NULL
+			{$sqlWhere} AND scenario='{$this->oReference->id}' AND `item` IS NOT NULL
 			UNION ALL
 				SELECT 
 				{$strFields['forecast']}
