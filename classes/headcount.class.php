@@ -902,7 +902,7 @@ class Headcount extends Document{
 		
 		
 		$arrMaternity = Array();
-		$sql = "SELECT DISTINCT(vacEmployeeID) as empID, empTitle 
+		$sql = "SELECT DISTINCT(vacEmployeeID) as empID, empTitle,vacDateEnd
 					FROM treasury.tbl_vacation 
 					LEFT JOIN common_db.tbl_employee ON empID=vacEmployeeID
 					WHERE vacVactypeID IN (4,5) 
@@ -911,9 +911,9 @@ class Headcount extends Document{
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
 			$arrMaternity[] = $rw['empID'];
-			$this->comment .= "/r/n".$rw['empTitle']." on maternity leave till ".date('M Y',strtotime($rw['vacDateEnd']));
+			$this->comment .= "\r\n".$rw['empTitle']." on maternity leave till ".date('M Y',strtotime($rw['vacDateEnd']));
 		}
-		$sql = "SELECT DISTINCT(sklEmployeeID) as empID, empTitle 
+		$sql = "SELECT DISTINCT(sklEmployeeID) as empID, empTitle,sklDateEnd
 					FROM treasury.tbl_sickleave
 					LEFT JOIN common_db.tbl_employee ON empID=sklEmployeeID
 					WHERE DATEDIFF(sklDateEnd, sklDateStart)>=139 AND sklDateStart<'{$dateBudgetEnd}' AND sklDateEnd>'{$dateBudgetStart}'
