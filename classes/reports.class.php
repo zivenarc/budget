@@ -1351,7 +1351,8 @@ class Reports{
 				</tr>
 			</thead>			
 			<tbody>
-			<?php			
+			<?php
+			$arrGrandTotal= Array();
 			foreach ($arrReport as $yact=>$arrReport_yact){
 				$arrTotal = array();
 				foreach ($arrReport_yact as $item=>$data){
@@ -1362,6 +1363,7 @@ class Reports{
 				<?php
 					foreach ($arrGHQ as $prtGHQ){
 						$arrTotal[$prtGHQ] += $data[$prtGHQ];
+						$arrGrandTotal[$prtGHQ] += $data[$prtGHQ];
 						?>
 						<td class="budget-decimal"><?php self::render($data[$prtGHQ],0);?></td>
 						<?php
@@ -1386,6 +1388,18 @@ class Reports{
 			}
 			?>
 			</tbody>
+			<tfoot>
+				<tr class='budget-total'>
+					<td>Grand total</td>
+					<?php
+					foreach ($arrGHQ as $prtGHQ){
+						?>
+						<td class="budget-decimal"><?php self::render($arrGrandTotal[$prtGHQ],0);?></td>
+						<?php
+					}?>
+					<td class="budget-decimal budget-ytd"><?php self::render(array_sum($arrGrandTotal),0);?></td>
+				</tr>
+			</tfoot>
 			</table>
 			<?php		
 			$this->_echoButtonCopyTable($tableID);
