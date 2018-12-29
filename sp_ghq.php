@@ -235,13 +235,14 @@ foreach ($arrAccounts as $reportKey=>$settings){
 							default:
 								$bdKey = "Corporate costs";
 								$corpKey = '5999CO';
+								$arrPCBreakdown[$accKey][$rw['Profit']] -= $rw[$month];
 								break;
 						}
 						
 						
 						foreach($arrGHQSubtotal[$corpKey] as $ghq=>$data){
 							if ($arrCost[$corpKey][$month]){
-								$arrBreakDown[$bdKey][$accKey][$ghq] += $rw[$month]*$data[$month]/$arrCost[$corpKey][$month];
+								$arrBreakDown[$bdKey][$accKey][$ghq] += $rw[$month]*$data[$month]/$arrCost[$corpKey][$month];								
 							}
 						}
 					}	
@@ -255,7 +256,7 @@ foreach ($arrAccounts as $reportKey=>$settings){
 	}
 }
 
-// echo '<pre>';print_r($arrBreakDown);echo '</pre>';
+// echo '<pre>';print_r($arrPCBreakdown);echo '</pre>';
 
 $reportKey = 'Extraordinary income';
 $sql = "SELECT {$sqlFields} FROM vw_master 
@@ -482,10 +483,8 @@ for ($m=$startMonth;$m<=$endMonth;$m++){
 </tbody>
 </table>
 </div>
-<ul class='link-footer'>
-	<li><a href='javascript:SelectContent("report");'>Select all</a></li>
-</ul>
 <?php
+Reports::_echoButtonCopyTable('report');
 // echo '<pre>';print_r($arrGHQSubtotal);echo '</pre>';
 
 ?>
@@ -526,47 +525,43 @@ foreach($arrReport as $ghq=>$values){
 
 <h1>Additional info</h1>
 <?php
-foreach ($arrBreakDown as $group=>$accounts){
-	$arrColTotal = Array();
-	$nControlTotal = 0;
+getBreakdown($arrBreakDown, $arrReport);
 
-	echo '<h3>',$group,'</h3>';
-	$strTableID = urlencode($group);
-	?>
+
+$strTableID = 'corp_breakdown';
+?>	
+	<h3>Corporate cost breakdown</h3>
 	<table class='budget' id='<?php echo $strTableID;?>'>
-	<caption><?php echo $group,", ",$oBudget->title;?></caption>
+	<caption>Corporate costs :: <?php $oBudget->title;?></caption>
 	<thead>
 		<tr>
-			<th>Activity</th>
+			<th>Cost center</th>
 			<?php
-			foreach ($accounts as $account=>$ghq){
+			foreach ($arrPCBreakdown as $account=>$pcData){
 				echo '<th>',$account,'</th>';
 			}
 			?>
-			<th class="budget-ytd">Total</th>
-			<th>Control</th>
+			<th class="budget-ytd">Total</th>			
 		</tr>
 	</thead>
 	<tbody>
 		<?php
-			foreach ($arrReport as $ghq=>$values){
+			foreach ($pcData as $pc=>$values){
 				$rowTotal = 0;
 				?>
 				<tr>
-				<td><?php echo ($ghq?$ghq:'[None]');?></td>
+				<td><?php echo ($pc?$pc:'[None]');?></td>
 				<?php				
-				foreach ($accounts as $account=>$products){					
-					$rowTotal += $products[$ghq];
-					$arrColTotal[$account] += $products[$ghq];
+				foreach ($arrPCBreakdown as $account=>$pcData){					
+					$rowTotal += $pcData[$pc];
+					$arrColTotal[$account] += $pcData[$pc];
 					?>
-					<td class="budget-decimal"><?php Reports::render(-$products[$ghq]);?></td>
+					<td class="budget-decimal"><?php Reports::render($pcData[$pc]);?></td>
 					<?php
 				}
 				
-				$nControlTotal += is_array($arrReport[$ghq][$group])?array_sum($arrReport[$ghq][$group]):0;
-				
-				echo '<td class="budget-ytd budget-decimal">',Reports::render(-$rowTotal),'</td>';
-				echo '<td class="budget-decimal">',is_array($arrReport[$ghq][$group])?Reports::render(-array_sum($arrReport[$ghq][$group])):'n/a','</td>';
+								
+				echo '<td class="budget-ytd budget-decimal">',Reports::render($rowTotal),'</td>';				
 				?>
 				</tr>
 				<?php
@@ -576,27 +571,23 @@ foreach ($arrBreakDown as $group=>$accounts){
 			<tr class='budget-total'>
 				<td>Total:</td>
 				<?php
-				foreach ($accounts as $account=>$products){	
+				foreach ($arrPCBreakdown as $account=>$pcData){	
 					?>
-					<td class='budget-decimal'><?php Reports::render(-$arrColTotal[$account]);?></td>					
+					<td class='budget-decimal'><?php Reports::render($arrColTotal[$account]);?></td>					
 					<?php
 				}
 				?>
-				<td class='budget-decimal'><?php Reports::render(-array_sum($arrColTotal));?></td>										
-				<td class='budget-decimal'><?php Reports::render(-($nControlTotal));?></td>										
+				<td class='budget-decimal'><?php Reports::render(array_sum($arrColTotal));?></td>														
 			</tr>
 		</tfoot>
 	</tbody>
 	</table>
-	<ul class='link-footer'>
-		<li><a href='javascript:SelectContent("<?php echo $strTableID;?>");'>Copy table</a></li>
-	</ul>
-	
-	
 	<?php
-}
+	Reports::_echoButtonCopyTable($strTableID);
+
 ?>
 <hr/>
+
 <h2>RHQ report format FY2019</h2>	
 <?php
 
@@ -659,6 +650,77 @@ function distribute($reportKey, $sql){
 			} 
 		}
 	}
+}
+
+function getBreakdown($arrData, $arrReport){
+	
+	GLOBAL $oBudget;
+	
+	foreach ($arrData as $group=>$accounts){
+	$arrColTotal = Array();
+	$nControlTotal = 0;
+
+	echo '<h3>',$group,'</h3>';
+	$strTableID = urlencode($group);
+	?>
+	<table class='budget' id='<?php echo $strTableID;?>'>
+	<caption><?php echo $group,", ",$oBudget->title;?></caption>
+	<thead>
+		<tr>
+			<th>Activity</th>
+			<?php
+			foreach ($accounts as $account=>$ghq){
+				echo '<th>',$account,'</th>';
+			}
+			?>
+			<th class="budget-ytd">Total</th>
+			<th>Control</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php
+			foreach ($arrReport as $ghq=>$values){
+				$rowTotal = 0;
+				?>
+				<tr>
+				<td><?php echo ($ghq?$ghq:'[None]');?></td>
+				<?php				
+				foreach ($accounts as $account=>$products){					
+					$rowTotal += $products[$ghq];
+					$arrColTotal[$account] += $products[$ghq];
+					?>
+					<td class="budget-decimal"><?php Reports::render(-$products[$ghq]);?></td>
+					<?php
+				}
+				
+				$nControlTotal += is_array($arrReport[$ghq][$group])?array_sum($arrReport[$ghq][$group]):0;
+				
+				echo '<td class="budget-ytd budget-decimal">',Reports::render(-$rowTotal),'</td>';
+				echo '<td class="budget-decimal">',is_array($arrReport[$ghq][$group])?Reports::render(-array_sum($arrReport[$ghq][$group])):'n/a','</td>';
+				?>
+				</tr>
+				<?php
+			}									
+		?>
+		<tfoot>
+			<tr class='budget-total'>
+				<td>Total:</td>
+				<?php
+				foreach ($accounts as $account=>$products){	
+					?>
+					<td class='budget-decimal'><?php Reports::render(-$arrColTotal[$account]);?></td>					
+					<?php
+				}
+				?>
+				<td class='budget-decimal'><?php Reports::render(-array_sum($arrColTotal));?></td>										
+				<td class='budget-decimal'><?php Reports::render(-($nControlTotal));?></td>										
+			</tr>
+		</tfoot>
+	</tbody>
+	</table>
+	<?php
+	Reports::_echoButtonCopyTable($strTableID);
+}
 }
 
 function getAccountAlias($account){
