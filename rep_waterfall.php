@@ -251,8 +251,8 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 			WHERE
 			scenario='{$budget}' AND source<>'Estimate' AND Group_code<>121 AND company='{$company}'
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
-			'tolerance'=>0.07,
-			'limit'=>5);
+			'tolerance'=>0.03,
+			'limit'=>10);
 			
 $type = $_GET['type']?$_GET['type']:'gpcus';
 			
