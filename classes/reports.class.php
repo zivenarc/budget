@@ -1521,11 +1521,11 @@ class Reports{
 							for($m=4;$m<=15;$m++){
 								$month = $this->oBudget->arrPeriod[$m];
 								?>						
-								<td class="budget-decimal"><?php Reports::render(-$data[$month]);?></td>
+								<td class="budget-decimal"><?php Reports::render($data[$month]);?></td>
 								<?php
 							};
 							?>
-							<td class="budget-decimal budget-ytd"><?php Reports::render(-array_sum($data));?></td>
+							<td class="budget-decimal budget-ytd"><?php Reports::render(array_sum($data));?></td>
 							<?php
 						if ($i>0) echo '</tr>';
 						$i++;
