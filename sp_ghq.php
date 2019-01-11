@@ -205,7 +205,9 @@ foreach ($arrAccounts as $reportKey=>$settings){
 				
 					if($settings['breakdown']){
 						$accKey = getAccountAlias($rw['account']);
+						$accKeyOther = getOtherAccountAlias($rw['account']);
 						$arrBreakDown[$reportKey][$accKey][$product] += $rw[$month];
+						$arrBreakDownMonthly[$reportKey][$product][$accKeyOther][$month] += $rw[$month];
 					}
 					
 					if ($productTotal){
@@ -226,6 +228,7 @@ foreach ($arrAccounts as $reportKey=>$settings){
 					if($settings['breakdown']){
 						
 						$accKey = getAccountAlias($rw['account']);
+						$accKeyOther = getOtherAccountAlias($rw['account']);
 						switch((integer)$rw['pc']){
 							case 9:
 							case 130:
@@ -242,7 +245,8 @@ foreach ($arrAccounts as $reportKey=>$settings){
 						
 						foreach($arrGHQSubtotal[$corpKey] as $ghq=>$data){
 							if ($arrCost[$corpKey][$month]){
-								$arrBreakDown[$bdKey][$accKey][$ghq] += $rw[$month]*$data[$month]/$arrCost[$corpKey][$month];								
+								$arrBreakDown[$bdKey][$accKey][$ghq] += $rw[$month]*$data[$month]/$arrCost[$corpKey][$month];
+								$arrBreakDownMonthly[$bdKey][$ghq][$accKeyOther][$month] += $rw[$month]*$data[$month]/$arrCost[$corpKey][$month];
 							}
 						}
 					}	
@@ -527,6 +531,61 @@ foreach($arrReport as $ghq=>$values){
 <?php
 getBreakdown($arrBreakDown, $arrReport);
 
+?>
+<h1>Additional monthly</h2>
+<?php
+//$arrBreakDownMonthly[$bdKey][$ghq][$accKeyOther][$month]
+
+foreach($arrBreakDownMonthly as $costType=>$costReport){
+	$strTableID = 'breakdown_'.$costType;
+	?>
+	<h3><?php echo $costType ;?></h3>
+	<table class="budget" id="<?php echo $strTableID;?>">
+	<tr>
+		<th>Activity</th>
+		<th>Cost</th>
+		<?php
+					for($m=4;$m<=15;$m++){
+						$month = $oBudget->arrPeriodTitle[$m];
+						?>						
+						<th><?php echo $month;?></th>
+						<?php
+					};
+		?>
+		<th>Total</th>
+	</tr>
+	<?php
+	foreach($costReport as $activity=>$breakdowndata){
+		$i=0;
+		?>
+		<tr>
+			<td rowspan="<?php echo count($breakdowndata);?>"><?php echo $activity;?></td>
+			<?php foreach ($breakdowndata as $account=>$data){
+				if ($i>0) echo '<tr>';
+					?>
+					<td><?php echo $account;?></td>					
+					<?php
+					for($m=4;$m<=15;$m++){
+						$month = $oBudget->arrPeriod[$m];
+						?>						
+						<td class="budget-decimal"><?php Reports::render(-$data[$month]);?></td>
+						<?php
+					};
+					?>
+					<td class="budget-decimal budget-ytd"><?php Reports::render(-array_sum($data));?></td>
+					<?php
+				if ($i>0) echo '</tr>';
+				$i++;
+			}
+			?>			
+		</tr>
+		<?php
+	}
+	?>
+	</table>
+	<?php
+	Reports::_echoButtonCopyTable($strTableID);
+}
 
 $strTableID = 'corp_breakdown';
 ?>	
@@ -764,4 +823,27 @@ function getAccountAlias($account){
 		}
 	return ($accKey);
 }
+
+function getOtherAccountAlias($account){
+	switch($account){
+			case '502000':
+			case '505000':
+			case '506000':
+			case 'J00801':
+			case 'J45110':
+			case 'J45120':
+			case 'J45140':
+				$accKey = 'Personel';
+				break;
+			case '5999CO':
+			case '5999BD':
+				$accKey = 'Int.distr';
+				break;
+			default:
+				$accKey = 'Other';
+				break;			
+		}
+	return ($accKey);
+}
+
 ?>
