@@ -316,7 +316,7 @@ class Distribution extends Document{
 					$sqlFilter = " AND item IN ('{$strItemFilter}') ".Reports::GOP_FILTER;
 				} else {
 					if(in_array($oActivity->GHQ,Array('Land transport','Warehouse'))){						
-						$sqlFilter = Reports::RFC_FILTER." OR (account LIKE '5%' AND account NOT IN ('527000'))";
+						$sqlFilter = "AND ((account LIKE 'J%' OR account LIKE '5%') AND account NOT IN ('J00400', 'J00802','J45010','J40010','527000'))";
 					} else {						
 						$sqlFilter = Reports::RFC_FILTER;
 					}
