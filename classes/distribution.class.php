@@ -290,7 +290,8 @@ class Distribution extends Document{
 		GLOBAL $YACT;
 		GLOBAL $Items;
 		
-	
+		$oActivity = $Activities->getByCode($this->activity);
+		
 		$this->refresh($this->ID);//echo '<pre>',print_r($this->data);echo '</pre>';
 			$oMaster = new Master($this->scenario, $this->GUID, $this->company);
 			// print_r($this->subtotal);
@@ -314,7 +315,11 @@ class Distribution extends Document{
 					}
 					$sqlFilter = " AND item IN ('{$strItemFilter}') ".Reports::GOP_FILTER;
 				} else {
-					$sqlFilter = Reports::RFC_FILTER;
+					if(in_array($oActivity->GHQ,Array('Land transport','Warehouse'))){						
+						$sqlFilter = Reports::RFC_FILTER." OR (account LIKE '5%' AND account NOT IN ('527000'))";
+					} else {						
+						$sqlFilter = Reports::RFC_FILTER;
+					}
 				}
 				
 				$sql = "SELECT account, activity, item, ".$this->budget->getMonthlySumSQL(1,15)." 
