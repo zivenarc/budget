@@ -51,13 +51,17 @@ if ($_GET['DataAction']=='excel_nop'){
 		$month = $oBudget->arrPeriodTitle[$m];
 		$arrHeader[] = $month;
 	}
+	
+	$arrHeader[] = 'Total';
+	
 	$xl->addHeader($arrHeader);
 	
-	$sql = "SELECT comTitle, Profit, ivlGroup, customer_group_title, Title, yact_group, account,  Activity_title, prtGHQ, ".$oBudget->getMonthlySumSQL()."
+	$sql = "SELECT comTitle, Profit, ivlGroup, customer_group_title, Title, yact_group, account,  Activity_title, prtGHQ, ".$oBudget->getMonthlySumSQL().", SUM(".$oBudget->getThisYTDSQL('fye').") as Total
 			FROM vw_master
 			LEFT JOIN common_db.tbl_company ON comID=company
 			WHERE scenario='{$_GET['budget_scenario']}'
-			".Reports::OP_FILTER."
+				AND company='{$company}'
+				".Reports::OP_FILTER."
 				AND prtGHQ IN ('Warehouse','Land transport')
 			GROUP BY company, pc, ivlGroup, customer_group_code, account, activity
 			ORDER BY company, pc, ivlGroup, customer_group_code, account, activity";
@@ -81,7 +85,8 @@ if ($_GET['DataAction']=='excel_nop'){
 			for($m=4;$m<=15;$m++){
 				$month = $oBudget->arrPeriod[$m];
 				$arrRow[] = number_format($rw[$month],0,'.','');
-			}			
+			}		
+			$arrRow[] = $rw['Total'];			
 			$xl->addRow($arrRow);
 	}
      
