@@ -1499,7 +1499,7 @@ class Reports{
 				<th>Item</th>
 				<?php
 				for($m=4;$m<=15;$m++){
-					$month = $oBudget->arrPeriodTitle[$m];
+					$month = $this->oBudget->arrPeriodTitle[$m];
 					?>						
 					<th><?php echo $month;?></th>
 					<?php
@@ -1519,7 +1519,7 @@ class Reports{
 							<td><?php echo $account;?></td>					
 							<?php
 							for($m=4;$m<=15;$m++){
-								$month = $oBudget->arrPeriod[$m];
+								$month = $this->oBudget->arrPeriod[$m];
 								?>						
 								<td class="budget-decimal"><?php Reports::render(-$data[$month]);?></td>
 								<?php
