@@ -328,7 +328,7 @@ class Distribution extends Document{
 							AND pc='{$this->profit}'
 							{$sqlFilter}
 							AND (IFNULL(customer,".self::EMPTY_CUSTOMER.")=".self::EMPTY_CUSTOMER." OR customer=0)
-							".($this->activity?" AND activity={$this->activity}":"")."
+							AND activity='{$this->activity}'
 						GROUP BY account, item, activity;"; 
 				$this->log($sql);
 				$rs = $this->oSQL->q($sql);
