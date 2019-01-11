@@ -4,7 +4,7 @@ include ('classes/reports.class.php');
 $arrJS[] = 'js/journal.js';
 $arrJS[] = 'js/budget_setup.js';
 
-if ($_GET['DataAction']=='excel'){
+if ($_GET['DataAction']=='excel_gp'){
 	$oBudget = new Budget($_GET['budget_scenario']);
 	include_once ("../common/eiseList/inc_excelXML.php");
 	$xl = new excelXML();            
@@ -39,6 +39,53 @@ if ($_GET['DataAction']=='excel'){
 	}
      
 	$xl->Output("GP_".urlencode($oBudget->title)."_".date('Ymd'));
+	die();	
+}
+
+if ($_GET['DataAction']=='excel_nop'){
+	$oBudget = new Budget($_GET['budget_scenario']);
+	include_once ("../common/eiseList/inc_excelXML.php");
+	$xl = new excelXML();            
+	$arrHeader = Array('Company','Site','Customer','Industry','YACT','Account','Account Group','Activity','GHQ Product');
+	for($m=4;$m<=15;$m++){
+		$month = $oBudget->arrPeriodTitle[$m];
+		$arrHeader[] = $month;
+	}
+	$xl->addHeader($arrHeader);
+	
+	$sql = "SELECT comTitle, Profit, ivlGroup, customer_group_title, Title, yact_group, account,  Activity_title, prtGHQ, ".$oBudget->getMonthlySumSQL()."
+			FROM vw_master
+			LEFT JOIN common_db.tbl_company ON comID=company
+			WHERE scenario='{$_GET['budget_scenario']}'
+			".Reports::OP_FILTER."
+				AND prtGHQ IN ('Warehouse','Land transport')
+			GROUP BY company, pc, ivlGroup, customer_group_code, account, activity
+			ORDER BY company, pc, ivlGroup, customer_group_code, account, activity";
+			
+			
+	// die($sql);
+	
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+	
+			$arrRow = Array();
+			$arrRow[] = $rw['comTitle'];	
+			$arrRow[] = $rw['Profit'];
+			$arrRow[] = $rw['customer_group_title'];	
+			$arrRow[] = $rw['ivlGroup'];			
+			$arrRow[] = $rw['account'];					
+			$arrRow[] = $rw['Title'];								
+			$arrRow[] = $rw['yact_group'];					
+			$arrRow[] = $rw['Activity_title'];					
+			$arrRow[] = $rw['prtGHQ'];
+			for($m=4;$m<=15;$m++){
+				$month = $oBudget->arrPeriod[$m];
+				$arrRow[] = number_format($rw[$month],0,'.','');
+			}			
+			$xl->addRow($arrRow);
+	}
+     
+	$xl->Output("CL_NOP_".urlencode($oBudget->title)."_".date('Ymd'));
 	die();	
 }
 		
@@ -142,13 +189,22 @@ $oBudget = new Budget($_GET['tab']);
 	?>
 	<div>
 	<h2><?php echo $oBudget->title;?></h2>
+	<p>Deadline for completion <?php echo $oBudget->deadline;?></p>
 	<pre>Checksum: <?php echo $oBudget->checksum; ?></pre>
 	<pre>Current:  <?php echo $oBudget->get_checksum(); ?></pre>
 	<div id='controlPanel' style="display:inline-block;">
 	<table><tr>
 	<td>
-		<label for='scnLastID'>Reference period</label>
+		<label for='scnLastID'>Default reference period</label>
 		<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->reference_scenario->id)); ?>
+	</td>
+	<td>
+		<label for='scnForecastID'>Forecast period</label>
+		<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->forecast)); ?>
+	</td>
+	<td>
+		<label for='scnForecastID'>Last year</label>
+		<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->lastyear)); ?>
 	</td>
 	<td>
 	<label for="scnFlagReadOnly|<?php echo $oBudget->id;?>">Read-only</label><input type='checkbox' <?php echo $oBudget->flagUpdate?"":"checked";?> class='scnFlagReadOnly' id='scnFlagReadOnly|<?php echo $oBudget->id;?>'>
@@ -184,7 +240,8 @@ $oBudget = new Budget($_GET['tab']);
 		<a href="sp_ghq.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">GHQ report</a>|
 		<a href="rep_summary_ghq.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">GHQ summary</a>|
 		<a href="rep_sales_kpi.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Sales KPI</a>
-		<a href="<?php echo $_SERVER['PHP_SELF'];?>?&budget_scenario=<?php echo $oBudget->id;?>&DataAction=excel">GP Excel</a>
+		<a href="<?php echo $_SERVER['PHP_SELF'];?>?&budget_scenario=<?php echo $oBudget->id;?>&DataAction=excel_gp">GP Excel</a>
+		<a href="<?php echo $_SERVER['PHP_SELF'];?>?&budget_scenario=<?php echo $oBudget->id;?>&DataAction=excel_nop">NOP Excel</a>
 	</nav>
 	<nav>
 		<a href='sp_post_all.php#<?php echo $_GET['tab'];?>'>Post all</a>|
