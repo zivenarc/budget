@@ -44,6 +44,11 @@ if ($_GET['DataAction']=='excel_gp'){
 
 if ($_GET['DataAction']=='excel_nop'){
 	$oBudget = new Budget($_GET['budget_scenario']);
+	
+	$oSQL->q("Update reg_master, common_db.tbl_counterparty 
+				set customer_group_code=IFNULL(cntGroupID, customer)
+				where customer=cntID and scenario='{$oBudget->id}';"
+	
 	include_once ("../common/eiseList/inc_excelXML.php");
 	$xl = new excelXML();            
 	$arrHeader = Array('Company','Site','Customer','Industry','YACT','Account','Account Group','Activity','GHQ Product');
@@ -86,7 +91,7 @@ if ($_GET['DataAction']=='excel_nop'){
 				$month = $oBudget->arrPeriod[$m];
 				$arrRow[] = number_format($rw[$month],0,'.','');
 			}		
-			$arrRow[] = $rw['Total'];			
+			$arrRow[] = number_format($rw['Total'],0,'.','');			
 			$xl->addRow($arrRow);
 	}
      

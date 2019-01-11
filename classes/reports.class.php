@@ -1413,6 +1413,7 @@ class Reports{
 		
 		ob_start();
 			$sql = "SELECT account, ghq,
+							".$this->oBudget->getMonthlySumSQL().",
 							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).") as Total 
 			FROM `reg_sales_rhq`
 			{$sqlWhere}
@@ -1430,6 +1431,10 @@ class Reports{
 			while ($rw=$oSQL->f($rs)){								
 				$arrGHQ[] = $rw['ghq'];
 				$arrReport[$rw['account']][$rw['ghq']] = $rw['Total'];
+				for($m=4;$m<=15;$m++){
+					$month = $this->oBudget->arrPeriod[$m];
+					$arrReportMonthly[$rw['ghq']][$rw['account']][$month] = $rw[$month];
+				}
 			}
 			$arrGHQ = array_unique($arrGHQ);
 			
@@ -1485,6 +1490,55 @@ class Reports{
 			</table>
 			<?php		
 			$this->_echoButtonCopyTable($tableID);
+			
+			$tableID = "RHQ_Monthly_".md5($sql);
+			?>
+			<table class="budget" id="<?php echo $tableID;?>">
+			<tr>
+				<th>Activity</th>
+				<th>Item</th>
+				<?php
+				for($m=4;$m<=15;$m++){
+					$month = $oBudget->arrPeriodTitle[$m];
+					?>						
+					<th><?php echo $month;?></th>
+					<?php
+				};
+				?>
+				<th>Total</th>
+			</tr>
+			<?php
+			foreach($arrReportMonthly as $activity=>$breakdowndata){
+				$i=0;
+				?>
+				<tr>
+					<td rowspan="<?php echo count($breakdowndata);?>"><?php echo $activity;?></td>
+					<?php foreach ($breakdowndata as $account=>$data){
+						if ($i>0) echo '<tr>';
+							?>
+							<td><?php echo $account;?></td>					
+							<?php
+							for($m=4;$m<=15;$m++){
+								$month = $oBudget->arrPeriod[$m];
+								?>						
+								<td class="budget-decimal"><?php Reports::render(-$data[$month]);?></td>
+								<?php
+							};
+							?>
+							<td class="budget-decimal budget-ytd"><?php Reports::render(-array_sum($data));?></td>
+							<?php
+						if ($i>0) echo '</tr>';
+						$i++;
+					}
+					?>			
+				</tr>
+				<?php
+			}
+			?>
+			</table>
+			<?php
+			$this->_echoButtonCopyTable($tableID);
+			
 			ob_flush();
 		
 		
