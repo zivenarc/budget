@@ -49,12 +49,15 @@ if(!isset($_GET['pccGUID'])){
 	if(is_array($arrPCHeader)){
 		echo '<p>',implode(' | ',$arrPCHeader),'</p>';
 	}
+	
+	$strPCHeader = $oBudget->arrProfit[$_GET['pccGUID']]["pccTitle{$strLocal}"];
+	
 	$oReport = new Reports(Array(	'budget_scenario'=>$oBudget->id, 
 									'currency'=>$currency, 
 									'denominator'=>$denominator, 
 									'reference'=>$oReference->id, 
 									'filter'=>$filter, 
-									'title'=>$oBudget->arrProfit[$_GET['pccGUID']]["pccTitle{$strLocal}"]
+									'title'=>$strPCHeader
 								)
 							);
 	// $oReport->shortMonthlyReport($period_type);	
@@ -67,7 +70,7 @@ if(!isset($_GET['pccGUID'])){
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	
-	$settings['gpcus'] = Array('title'=>"GP by customer",
+	$settings['gpcus'] = Array('title'=>"{$strPCHeader} :: GP by customer",
 						'sqlBase' => "SELECT  customer_group_code as optValue, 
 											customer_group_title as optText,  
 											{$sqlActual} as Actual, 
@@ -99,7 +102,7 @@ if(!isset($_GET['pccGUID'])){
 	$oWF = new Waterfall($settings['gpcus']);
 	$oWF->draw();
 	
-	$settings['oop'] = Array('title'=>"OOP by factors",
+	$settings['oop'] = Array('title'=>"{$strPCHeader} :: OOP by factors",
 						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
 											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
 											{$sqlActual} as Actual, 
@@ -156,7 +159,7 @@ if(!isset($_GET['pccGUID'])){
 		$oWF = new Waterfall($settings['nextGP']);
 		$oWF->draw();
 		
-		$settings['nextCosts'] = Array('title'=>"Costs, next month changes",
+		$settings['nextCosts'] = Array('title'=>"{$strPCHeader} :: Costs, next month changes",
 							'sqlBase' => "SELECT  IF(`Group_code` IN (108,110,96,94),item,Group_code)  as optValue, 
 												IF(`Group_code` IN (108,110,96,94),`Budget item`,`Group`) as optText, 
 												{$sqlActual} as Actual, 
@@ -180,7 +183,7 @@ if(!isset($_GET['pccGUID'])){
 		if ($oBudget->cm<15){
 			$sqlActual = "SUM(".$oBudget->getThisYTDSQL('roy',$arrActualRates,(12+$oBudget->offset-$oBudget->cm)).")";
 			$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('ytd',$arrActualRates,($oBudget->cm-$oBudget->offset)).")";
-			$settings['ROYYTD'] = Array('title'=>"GP by customer, ROY vs YTD",
+			$settings['ROYYTD'] = Array('title'=>"{$strPCHeader} :: GP by customer, ROY vs YTD",
 								'sqlBase' => "SELECT  customer_group_code as optValue, 
 													customer_group_title as optText,  
 													{$sqlActual} as Actual, 
