@@ -3295,6 +3295,8 @@ class Reports{
 					0 as Q5_B";
 		
 		$res['next'] = $res['actual'];
+		$res['lastyear'] = $res['actual'];
+		$res['forecast'] = $res['actual'];
 		
 		$arrRates = $this->oReference->getMonthlyRates($currency);
 		
