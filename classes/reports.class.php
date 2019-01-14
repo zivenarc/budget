@@ -2874,6 +2874,7 @@ class Reports{
 			$arrOther[] = Array('title'=>'Gross revenue','sqlWhere'=>" AND (account = 'J00400')");
 					
 			if (!(isset($this->filter['customer']) || isset($this->filter['sales']) || isset($this->filter['bdv']))){
+				$arrOther[] = Array('title'=>'Gross profit','sqlWhere'=>self::GP_FILTER);
 				$arrOther[] = Array('title'=>'Gross operatng profit','sqlWhere'=>self::GOP_FILTER);
 				$arrOther[] = Array('title'=>'Net operatng profit','sqlWhere'=>" AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%')");	
 				$arrOther[] = Array('title'=>'Own operatng profit','sqlWhere'=>self::OWN_OPERATING_PROFIT);	
@@ -2881,6 +2882,7 @@ class Reports{
 			
 			if (!(isset($this->filter['customer']) || isset($this->filter['sales']) )){
 				$arrOther[] = Array('title'=>'BD costs','sqlWhere'=>" AND (account = '5999BD')");				
+				$arrOther[] = Array('title'=>'Corp costs','sqlWhere'=>" AND (account = '5999CO')");				
 			}
 			
 			for($i=0;$i<count($arrOther);$i++){
@@ -3124,8 +3126,11 @@ class Reports{
 		// echo '<pre>',$sql,'</pre>';
 		
 		$cm = $this->oBudget->cm;
-		
-		$rs = $this->oSQL->q($sql);
+		try{
+			$rs = $this->oSQL->q($sql);
+		} catch (Exception $e){
+			echo '<pre>',$e->getMessage(),'</pre>';
+		}
 		if (!$this->oSQL->n($rs)){
 			// echo '<pre>',$sql,'</pre>';
 			?>
