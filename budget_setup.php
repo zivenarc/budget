@@ -47,7 +47,7 @@ if ($_GET['DataAction']=='excel_nop'){
 	
 	$oSQL->q("Update reg_master, common_db.tbl_counterparty 
 				set customer_group_code=IFNULL(cntGroupID, customer)
-				where customer=cntID and scenario='{$oBudget->id}';"
+				where customer=cntID and scenario='{$oBudget->id}';";
 	
 	include_once ("../common/eiseList/inc_excelXML.php");
 	$xl = new excelXML();            
