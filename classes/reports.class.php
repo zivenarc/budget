@@ -1672,7 +1672,9 @@ class Reports{
 	}
 	
 	public function periodicGraph(){
-					
+		
+		$this->oLastYear = new Budget($this->oBudget->lastyear);
+		
 		$sqlWhere = $this->sqlWhere;
 		
 		$strFields = $this->_getPeriodicFields();		
@@ -1689,51 +1691,85 @@ class Reports{
 			$strGPFilter = "Group_code=".self::GP_CODE; 
 		}
 		
+		$arrScenario = Array('last_a'=>$this->oLastYear->id, 'last_b'=>$this->oLastYear->reference, 'this_a'=>$this->oBudget->id,'this_b'=>$this->oReference->id);
+		$arrChartType[] = Array('id'=>'revenue','title'=>'Revenue','filter'=>self::REVENUE_FILTER);
+		$arrChartType[] = Array('id'=>'gp','title'=>'Gross profit','filter'=>self::GP_FILTER);
+		$arrChartType[] = Array('id'=>'gop','title'=>'Gross operating profit','filter'=>self::GOP_FILTER);
+		$arrChartType[] = Array('id'=>'oop','title'=>'Own operating profit','filter'=>self::OWN_OPERATING_PROFIT);
+		
 		$arrRates_this = $this->oBudget->getMonthlyRates($this->Currency);
 		$arrRates_that = $this->oReference->getMonthlyRates($this->Currency);
 		
-		ob_start();
-			
-		$sqlSelect = $this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset,max($this->oBudget->length,12+$this->oBudget->offset),$arrRates_this, $this->Denominator).", ".
+		$sqlSelect = $this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset,max($this->oBudget->length,12+$this->oBudget->offset),$arrRates_this).", ".
 				"SUM(".$this->oBudget->getYTDSQL(1,3,$arrRates_this, $this->Denominator).") as Q1, ".
 				"SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates_this, $this->Denominator).") as Total_AM";
+				
+
+		for ($i = 0;$i<count($arrChartType);$i++){
+			foreach ($arrScenario as $key=>$value){
+				$sql = "SELECT {$sqlSelect}
+						FROM `vw_master`
+						{$sqlWhere} 
+						{$arrChartType[$i]['filter']} 
+						AND scenario = '{$value}'";
+				try{
+					$rs = $this->oSQL->q($sql);				
+				} catch (Exception $e) {
+					die ($e->getMessage());
+				}
+				
+				// echo '<pre>',$sql,'</pre>';
+				$rwData[$arrChartType[$i]['id']][$key] = $this->oSQL->f($rs);
+			}
+			
+			$arrHighCharts[$arrChartType[$i]['id']] = Array(
+				'title'=>Array('text'=>$arrChartType[$i]['title'].' by month','x'=>-20),
+				'subtitle'=>Array('text'=>$this->oBudget->title." vs ".$this->oReference->title,'x'=>-20),
+				'chart'=>Array('type'=>'column', 'width'=>900, 'height'=>600)
+			);
+			
+		}
 		
-		$sql = "SELECT {$sqlSelect}
-				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND account='J00400'";
-		$rs = $this->oSQL->q($sql);
-		$rwGR = $this->oSQL->f($rs);
+		ob_start();
+			
 		
 		
-		$sql = "SELECT {$sqlSelect}
-				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=".self::GP_CODE;
-		$rs = $this->oSQL->q($sql);
-		$rwGP = $this->oSQL->f($rs);
+		// $sql = "SELECT {$sqlSelect}
+				// FROM `vw_master` 			
+				// {$sqlWhere} AND scenario='{$this->oBudget->id}' AND account='J00400'";
+		// $rs = $this->oSQL->q($sql);
+		// $rwGR = $this->oSQL->f($rs);
 		
-		$sql = "SELECT {$sqlSelect}
-				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oReference->id}' AND Group_code=".self::GP_CODE;
-		$rs = $this->oSQL->q($sql);
-		$rwBGP = $this->oSQL->f($rs);
 		
-		$sql = "SELECT {$sqlSelect}
-				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=95";
-		$rs = $this->oSQL->q($sql);
-		$rwSC = $this->oSQL->f($rs);
+		// $sql = "SELECT {$sqlSelect}
+				// FROM `vw_master` 			
+				// {$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=".self::GP_CODE;
+		// $rs = $this->oSQL->q($sql);
+		// $rwGP = $this->oSQL->f($rs);
 		
-		$sql = "SELECT {$sqlSelect}
-				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oBudget->id}' ".self::OP_FILTER;
-		$rs = $this->oSQL->q($sql);
-		$rwOP = $this->oSQL->f($rs);
+		// $sql = "SELECT {$sqlSelect}
+				// FROM `vw_master` 			
+				// {$sqlWhere} AND scenario='{$this->oReference->id}' AND Group_code=".self::GP_CODE;
+		// $rs = $this->oSQL->q($sql);
+		// $rwBGP = $this->oSQL->f($rs);
 		
-		$sql = "SELECT {$sqlSelect}
-				FROM `vw_master` 			
-				{$sqlWhere} AND scenario='{$this->oReference->id}' ".self::OP_FILTER;
-		$rs = $this->oSQL->q($sql);
-		$rwBOP = $this->oSQL->f($rs);
+		// $sql = "SELECT {$sqlSelect}
+				// FROM `vw_master` 			
+				// {$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=95";
+		// $rs = $this->oSQL->q($sql);
+		// $rwSC = $this->oSQL->f($rs);
+		
+		// $sql = "SELECT {$sqlSelect}
+				// FROM `vw_master` 			
+				// {$sqlWhere} AND scenario='{$this->oBudget->id}' ".self::OWN_OPERATING_PROFIT;
+		// $rs = $this->oSQL->q($sql);
+		// $rwOP = $this->oSQL->f($rs);
+		
+		// $sql = "SELECT {$sqlSelect}
+				// FROM `vw_master` 			
+				// {$sqlWhere} AND scenario='{$this->oReference->id}' ".self::OWN_OPERATING_PROFIT;
+		// $rs = $this->oSQL->q($sql);
+		// $rwBOP = $this->oSQL->f($rs);
 		
 		
 		//-----------------------------------Natural KPIs------------------------
@@ -1785,35 +1821,64 @@ class Reports{
 		);
 		
 		//-------------------------------------------------------------------------
-		$arrHighCharts = Array(
-						'title'=>Array('text'=>'Performance by month','x'=>-20),
-						'subtitle'=>Array('text'=>$this->oBudget->title." vs ".$this->oReference->title,'x'=>-20)						
-					);
+		
+		for ($m=1+$this->oLastYear->offset;$m<=12+$this->oLastYear->offset;$m++){
+			$period = $this->oLastYear->arrPeriod[$m];
+			$periodTitle = $this->oLastYear->arrPeriodTitle[$m];			
+			for ($i = 0;$i<count($arrChartType);$i++){
+				$arrHighCharts[$arrChartType[$i]['id']]['xAxis']['categories'][] = $periodTitle;
+				$arrHSSeries[$arrChartType[$i]['id']][0][] = (integer)$rwData[$arrChartType[$i]['id']]['last_a'][$period];				
+				$arrHSSeries[$arrChartType[$i]['id']][1][] = (integer)$rwData[$arrChartType[$i]['id']]['last_b'][$period];
+				$sumAverage[$arrChartType[$i]['id']] += $rwData[$arrChartType[$i]['id']]['last_a'][$period];
+				if($arrChartType[$i]['id']!='revenue'){
+					$arrHSSeries[$arrChartType[$i]['id']][2][] = round($rwData[$arrChartType[$i]['id']]['last_a'][$period]/$rwData['revenue']['last_a'][$period]*100,1);
+				}
+			}
+			
+		}
+		
 		for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 			$period = $this->oBudget->arrPeriod[$m];
+			$periodTitle = $this->oBudget->arrPeriodTitle[$m];
 		
 			// $arrGraph[] = Array($period,(double)$rwGR[$period],(double)$rwGP[$period], (double)$rwBGP[$period], -(double)$rwSC[$period], (double)$rwOP[$period], (double)$rwBOP[$period]);
-			$arrHighCharts['xAxis']['categories'][] = $period;
-			$arrHighChartsAFF['xAxis']['categories'][] = $period;
-			$arrHighChartsOFF['xAxis']['categories'][] = $period;
-			$arrHighChartsRFF['xAxis']['categories'][] = $period;
-			$arrHSSeries[0][] = (integer)$rwGR[$period];
-			$arrHSSeries[1][] = (integer)$rwGP[$period];
-			$arrHSSeries[2][] = (integer)$rwBGP[$period];
-			$arrHSSeries[3][] = -(integer)$rwSC[$period];
-			$arrHSSeries[4][] = (integer)$rwOP[$period];
-			$arrHSSeries[5][] = (integer)$rwBOP[$period];
+			// $arrHighCharts['xAxis']['categories'][] = $periodTitle;
+			
+			for ($i = 0;$i<count($arrChartType);$i++){
+				$arrHighCharts[$arrChartType[$i]['id']]['xAxis']['categories'][] = $periodTitle;						
+				$arrHSSeries[$arrChartType[$i]['id']][0][] = (integer)$rwData[$arrChartType[$i]['id']]['this_a'][$period]; 
+				$arrHSSeries[$arrChartType[$i]['id']][1][] = (integer)$rwData[$arrChartType[$i]['id']]['this_b'][$period]; 
+				if ($m<=$this->oBudget->cm){
+					$sumAverage[$arrChartType[$i]['id']] += $rwData[$arrChartType[$i]['id']]['this_a'][$period];
+				}
+				if($arrChartType[$i]['id']!='revenue'){
+					if($rwData['revenue']['this_a'][$period]){
+						$arrHSSeries[$arrChartType[$i]['id']][2][] = round($rwData[$arrChartType[$i]['id']]['this_a'][$period]/$rwData['revenue']['this_a'][$period]*100,1);
+					} else {
+						$arrHSSeries[$arrChartType[$i]['id']][2][] = null;
+					}
+				}
+			}	
 						
-		}
-		$arrHighCharts['series']=Array(
-									// Array('name'=>'Gross revenue','data'=>$arrHSSeries[0])
-									Array('name'=>"Gross profit, {$this->oBudget->title}",'data'=>$arrHSSeries[1])
-									,Array('name'=>"Gross profit, {$this->oReference->title}",'data'=>$arrHSSeries[2])
-									// ,Array('name'=>'Staff costs','data'=>$arrHSSeries[3])
-									// ,Array('name'=>"OP, {$this->oBudget->title}",'data'=>$arrHSSeries[4])
-									// ,Array('name'=>"OP, {$this->oReference->title}",'data'=>$arrHSSeries[5])
-								);
+			$arrHighChartsAFF['xAxis']['categories'][] = $periodTitle;
+			$arrHighChartsOFF['xAxis']['categories'][] = $periodTitle;
+			$arrHighChartsRFF['xAxis']['categories'][] = $periodTitle;
 								
+		}
+		
+		for ($i = 0;$i<count($arrChartType);$i++){
+			$arrHighCharts[$arrChartType[$i]['id']]['xAxis']['plotLines'][0] = Array('color'=>'#FF6D10','value'=>8.5+$this->oBudget->cm,'width'=>2);
+			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][0]['plotLines'][0] = Array('color'=>'#3BACEE','value'=>$sumAverage[$arrChartType[$i]['id']]/(9+$this->oBudget->cm),'width'=>2,'dashStyle'=>'dot');
+			$arrHighCharts[$arrChartType[$i]['id']]['series']=Array(									
+									Array('name'=>$this->oBudget->title,'data'=>$arrHSSeries[$arrChartType[$i]['id']][0],'color'=>'#3BACEE')
+									,Array('name'=>$this->oReference->title,'data'=>$arrHSSeries[$arrChartType[$i]['id']][1],'color'=>'#DDDDDD')									
+								);
+			if($arrChartType[$i]['id']!='revenue'){
+					$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][1] = Array('title'=>'%','opposite'=>true);		
+					$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'% to revenue','data'=>$arrHSSeries[$arrChartType[$i]['id']][2],'color'=>'#FF6D10','type'=>'spline','yAxis'=>1);						
+			}
+		}
+		
 		$arrHighChartsAFF['series'] = Array(
 									Array('name'=>"Export, {$this->oBudget->title}",'stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Export']['Actual'],0,12))))									
 									,Array('name'=>"Import, {$this->oBudget->title}",'stack'=>'Actual','data'=>array_map('intval',array_values(array_slice($arrKPI['AFF']['Import']['Actual'],0,12))))									
@@ -1841,7 +1906,7 @@ class Reports{
 		<?php
 			// foreach ($this->oBudget->arrPeriod as $period){
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
+				$period = $this->oBudget->arrPeriodTitle[$m];
 				echo '<th>',$period,'</th>';
 			}
 		?>
@@ -1852,20 +1917,20 @@ class Reports{
 			// foreach ($this->oBudget->arrPeriod as $period){
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render($rwGR[$period]),'</td>';
+				echo '<td class="budget-decimal">',self::render($rwGR[$period]/$this->Denominator),'</td>';
 			}
 		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwGR['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render($rwGR['Total_AM']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($rwGR['Total_AM']/$this->Denominator),'</td>';
 		?>
 		</tr>
 		<tr><td rowspan="4">Gross profit</td><td>This</td>
 		<?php
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render($rwGP[$period]),'</td>';
+				echo '<td class="budget-decimal">',self::render($rwGP[$period]/$this->Denominator),'</td>';
 			}
 		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwGP['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render($rwGP['Total_AM']),'</td>';
+		echo '<td class="budget-decimal budget-ytd">',self::render($rwGP['Total_AM']/$this->Denominator),'</td>';
 		?>
 		</tr>
 		<tr class="budget-ratio"><td>%</td>
@@ -2022,26 +2087,40 @@ class Reports{
 		<?php
 		$this->_echoButtonCopyTable($this->ID);
 		?>
-		
-		<div id='graph_<?php echo $this->ID;?>'>Line chart loading...</div>
-		<div id='aff_<?php echo $this->ID;?>'>AFF chart loading...</div>
-		<div id='off_<?php echo $this->ID;?>'>OFF chart loading...</div>
-		<div id='rff_<?php echo $this->ID;?>'>RFF chart loading...</div>
+		<div id='charts_<?php echo $this->ID;?>'></div>
 		<script type='text/javascript'>
-			console.log('Here should be a chart!');
-			var target = '#graph_<?php echo $this->ID;?>';
-			var targetAFF = '#aff_<?php echo $this->ID;?>';
-			var targetOFF = '#off_<?php echo $this->ID;?>';
-			var targetRFF = '#rff_<?php echo $this->ID;?>';
-			$(target).ready(function(){				
-				var options = <?php echo json_encode($arrHighCharts);?>;		
+			$(document).ready(function(){	
+			
+				var arrCharts = [];
+				<?php for ($i = 0;$i<count($arrChartType);$i++){	?>
+					arrCharts.push({target:'#graph_<?php echo $arrChartType[$i]['id'].'_'.$this->ID;?>',
+								options:<?php echo json_encode($arrHighCharts[$arrChartType[$i]['id']]);?>});
+					$('#charts_<?php echo $this->ID;?>').append($('<div>',{id:'graph_<?php echo $arrChartType[$i]['id'].'_'.$this->ID;?>',
+								text:'<?php echo $arrChartType[$i]['title'];?>'}));
+				<?php } ?>
+				
+				console.log(arrCharts);
+				
+				for (i=0;i<arrCharts.length;i++){
+					console.log(arrCharts[i].target);
+					//$(arrCharts[i].target).ready(function(){
+						$(arrCharts[i].target).highcharts(arrCharts[i].options);
+					//});
+				}
+				
+				var targetAFF = '#aff_<?php echo $this->ID;?>';
+				var targetOFF = '#off_<?php echo $this->ID;?>';
+				var targetRFF = '#rff_<?php echo $this->ID;?>';
+			
+						
+				
+				
 				var optionsAFF = <?php echo json_encode($arrHighChartsAFF);?>;		
 				var optionsOFF = <?php echo json_encode($arrHighChartsOFF);?>;		
-				var optionsRFF = <?php echo json_encode($arrHighChartsRFF);?>;		
-				console.log(optionsAFF);
+				var optionsRFF = <?php echo json_encode($arrHighChartsRFF);?>;						
 				// target = document.getElementById(target);	
 				// drawGraph(arrData, target, options);
-				$(target).highcharts(options);
+				
 				$(targetAFF).highcharts(optionsAFF);
 				$(targetOFF).highcharts(optionsOFF);
 				$(targetRFF).highcharts(optionsRFF);

@@ -5,7 +5,7 @@ require ('common/auth.php');
 if ($_GET['tab']){
 	
 	?>
-<<div>
+<div>
 	<button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
 	<button onclick="fill('<?php echo $_GET['tab']; ?>', event);">Fill data</button>
 <div/>

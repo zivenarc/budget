@@ -1,6 +1,7 @@
 <?php
 // $flagNoAuth =true;
 require ('common/auth.php');
+require_once('classes/item.class.php');
 
 $itmGUID = isset($_GET['itmGUID'])?$_GET['itmGUID']:$_COOKIE['itmGUID'];
 SetCookie('itmGUID',$itmGUID);
@@ -43,20 +44,37 @@ if ($_GET['tab']){
 	$rs = $oSQL->q($sql);
 	if($oSQL->n($rs)){
 		$rw = $oSQL->f($rs);
-		echo '<h2>', $rw['itmTitle'], '</h2>';
+		echo "<h2>{{$itmGUID}} {$rw['itmTitle']} </h2>";
 	} else {
-		echo "<h2>Item not {{$itmGUID}} found</h2>";
+		echo "<h2>Item {{$itmGUID}} not found</h2>";
 	}
 	echo Budget::getScenarioTabs(false);
-	$sql = "SELECT * FROM vw_item ORDER by itmParentId, itmTitle";
+	
+	$sql = "SELECT C.*, P.itmTitle as parentTitle
+			FROM vw_item C 
+			LEFT JOIN vw_item P ON P.itmID=C.itmParentID
+			ORDER by C.itmParentId, C.itmOrder";
 	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		if($rw['itmFlagFolder']){
-			echo "<h3>{$rw['itmTitle']}</h3>";
-		} else {
-			echo "<a href='?itmGUID={$rw['itmGUID']}'>{$rw['itmTitle']}</a> ";
+	
+	$oItems = new Items();
+	$arrItems = $oItems->getStructuredRef();
+	foreach($arrItems as $group=>$items){
+		echo '<h3>',$group,'</h3>';
+		?>
+		<ul>
+		<?php
+		foreach($items as $id=>$title){
+			?>
+			<li><a href="?itmGUID=<?php echo $id;?>"><?php echo $title;?></a></li>
+			<?php
 		}
+		?>
+		</ul>
+		<?php
 	}
+	//echo '<pre>';print_r($arrItems);echo '</pre>';
+		
+	
 	include ('includes/inc-frame_bottom.php');
 }
 ?>
