@@ -1671,7 +1671,10 @@ class Reports{
 		ob_flush();
 	}
 	
-	public function periodicGraph(){
+	public function periodicGraph($options = Array()){
+		
+		$settings = Array('table'=>true,'revenue'=>true,'gp'=>true,'gop'=>true,'oop'=>true);
+		$options = array_merge($settings,$options);
 		
 		$this->oLastYear = new Budget($this->oBudget->lastyear);
 		
@@ -1723,7 +1726,7 @@ class Reports{
 			}
 			
 			$arrHighCharts[$arrChartType[$i]['id']] = Array(
-				'title'=>Array('text'=>$arrChartType[$i]['title'].' by month','x'=>-20),
+				'title'=>Array('text'=>($options['title']?"{$options['title']} :: ":'').$arrChartType[$i]['title'].' by month','x'=>-20),
 				'subtitle'=>Array('text'=>$this->oBudget->title." vs ".$this->oReference->title,'x'=>-20),
 				'chart'=>Array('type'=>'column', 'width'=>900, 'height'=>600)
 			);
@@ -1731,47 +1734,7 @@ class Reports{
 		}
 		
 		ob_start();
-			
-		
-		
-		// $sql = "SELECT {$sqlSelect}
-				// FROM `vw_master` 			
-				// {$sqlWhere} AND scenario='{$this->oBudget->id}' AND account='J00400'";
-		// $rs = $this->oSQL->q($sql);
-		// $rwGR = $this->oSQL->f($rs);
-		
-		
-		// $sql = "SELECT {$sqlSelect}
-				// FROM `vw_master` 			
-				// {$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=".self::GP_CODE;
-		// $rs = $this->oSQL->q($sql);
-		// $rwGP = $this->oSQL->f($rs);
-		
-		// $sql = "SELECT {$sqlSelect}
-				// FROM `vw_master` 			
-				// {$sqlWhere} AND scenario='{$this->oReference->id}' AND Group_code=".self::GP_CODE;
-		// $rs = $this->oSQL->q($sql);
-		// $rwBGP = $this->oSQL->f($rs);
-		
-		// $sql = "SELECT {$sqlSelect}
-				// FROM `vw_master` 			
-				// {$sqlWhere} AND scenario='{$this->oBudget->id}' AND Group_code=95";
-		// $rs = $this->oSQL->q($sql);
-		// $rwSC = $this->oSQL->f($rs);
-		
-		// $sql = "SELECT {$sqlSelect}
-				// FROM `vw_master` 			
-				// {$sqlWhere} AND scenario='{$this->oBudget->id}' ".self::OWN_OPERATING_PROFIT;
-		// $rs = $this->oSQL->q($sql);
-		// $rwOP = $this->oSQL->f($rs);
-		
-		// $sql = "SELECT {$sqlSelect}
-				// FROM `vw_master` 			
-				// {$sqlWhere} AND scenario='{$this->oReference->id}' ".self::OWN_OPERATING_PROFIT;
-		// $rs = $this->oSQL->q($sql);
-		// $rwBOP = $this->oSQL->f($rs);
-		
-		
+					
 		//-----------------------------------Natural KPIs------------------------
 		$arrKPI = Array(
 					'AFF'=>Array(
@@ -1784,7 +1747,8 @@ class Reports{
 					),
 					'RFF'=>Array(
 							'Domestic'=>Array('activity'=>3),
-							'Intl'=>Array('activity'=>13)
+							'Intl'=>Array('activity'=>13),
+							'Rail'=>Array('activity'=>69)
 					)
 				);
 		
@@ -1898,7 +1862,8 @@ class Reports{
 							,Array('name'=>"Domestic, {$this->oReference->title}",'stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Domestic']['Budget'],0,12))))									
 							,Array('name'=>"Intl, {$this->oReference->title}",'stack'=>'Budget','data'=>array_map('intval',array_values(array_slice($arrKPI['RFF']['Intl']['Budget'],0,12))))									
 						);
-		// echo '<pre>';print_r($arrGraph);echo '</pre>';
+		
+		if($options['table']){
 		?>
 		<table class='budget' id='<?php echo $this->ID;?>'>
 		<tr>
@@ -2084,20 +2049,25 @@ class Reports{
 		?>
 		</tr>
 		</table>
-		<?php
+		<?php	
 		$this->_echoButtonCopyTable($this->ID);
+		}
 		?>
 		<div id='charts_<?php echo $this->ID;?>'></div>
 		<script type='text/javascript'>
 			$(document).ready(function(){	
 			
 				var arrCharts = [];
-				<?php for ($i = 0;$i<count($arrChartType);$i++){	?>
-					arrCharts.push({target:'#graph_<?php echo $arrChartType[$i]['id'].'_'.$this->ID;?>',
-								options:<?php echo json_encode($arrHighCharts[$arrChartType[$i]['id']]);?>});
-					$('#charts_<?php echo $this->ID;?>').append($('<div>',{id:'graph_<?php echo $arrChartType[$i]['id'].'_'.$this->ID;?>',
-								text:'<?php echo $arrChartType[$i]['title'];?>'}));
-				<?php } ?>
+				<?php 	for ($i = 0;$i<count($arrChartType);$i++){	
+							if($options[$arrChartType[$i]['id']]){
+						?>
+							arrCharts.push({target:'#graph_<?php echo $arrChartType[$i]['id'].'_'.$this->ID;?>',
+										options:<?php echo json_encode($arrHighCharts[$arrChartType[$i]['id']]);?>});
+							$('#charts_<?php echo $this->ID;?>').append($('<div>',{id:'graph_<?php echo $arrChartType[$i]['id'].'_'.$this->ID;?>',
+										text:'<?php echo $arrChartType[$i]['title'];?>'}));
+						<?php 
+							}
+						} ?>
 				
 				console.log(arrCharts);
 				

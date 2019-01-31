@@ -252,6 +252,27 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 			GROUP BY IF(`Group_code` IN (108,110,96),item, Group_code)",
 			'tolerance'=>0.03,
 			'limit'=>10);
+
+$settings['bdcus'] = Array('title'=>"Bad debt by customer",
+					'sqlBase' => "SELECT customer as optValue, 
+											Customer_name as optText,
+										{$sqlActual} as Actual, 
+										0 as Budget, 
+										{$sqlActual} as Diff
+								FROM vw_master 								
+								WHERE scenario='{$actual}' AND item='f0b14b30-f52b-11de-95b2-00188bc729d2' AND company='{$company}'
+								GROUP BY customer
+								UNION ALL
+								SELECT customer as optValue, 
+											Customer_name as optText, 
+											0 as Actual, 
+								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+								FROM vw_master 								
+								WHERE
+								scenario='{$budget}' AND item='f0b14b30-f52b-11de-95b2-00188bc729d2' AND company='{$company}'
+								GROUP BY customer",
+						'tolerance'=>0.05,
+						'limit'=>10);
 			
 $type = $_GET['type']?$_GET['type']:'gpcus';
 			

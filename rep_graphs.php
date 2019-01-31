@@ -1,8 +1,7 @@
 <?php
 // $flagNoAuth = true;
 require ('common/auth.php');
-require ('classes/budget.class.php');
-
+require ('classes/reports.class.php');
 include ('includes/inc_report_settings.php');
 
 $oBudget = new Budget($budget_scenario);
@@ -42,7 +41,7 @@ if(!isset($_GET['pccGUID'])){
 	
 	include ('includes/inc-frame_bottom.php');
 } else {
-	require ('classes/reports.class.php');
+
 	// include ('includes/inc_report_buttons.php');
 	
 	// $sqlWhere .= " AND scenario='$budget_scenario'";

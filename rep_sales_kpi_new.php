@@ -1,7 +1,6 @@
 <?php
 // $flagNoAuth = true;
 require ('common/auth.php');
-require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
@@ -18,35 +17,11 @@ include ('includes/inc_report_pcfilter.php');
 
 // set_time_limit (10);
 $arrCounterparty = getCnt($cntID);
-
-function getCnt($cntID, &$arrCounterparty=Array()){
-	GLOBAL $oSQL, $strLocal;
-	
-	$sql = "SELECT cntID, cntTitle$strLocal as cntTitle, cntUserID, usrTitle$strLocal as Sales, cntFlagFolder, cntCode1C
-		FROM common_db.tbl_counterparty 
-		LEFT JOIN stbl_user ON usrID=cntUserID
-		WHERE (cntID={$cntID} AND cntFlagFolder=0)
-			OR (cntParentCode1C=(SELECT cntCode1C FROM common_db.tbl_counterparty WHERE cntID={$cntID}))
-		ORDER BY cntUserID, cntTitle$strLocal";
-	// echo "<pre>",$sql,"</pre>";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		// $arrCnt[] = $rw['cntID'];
-		$arrCounterparty['codes'][] = $rw['cntID'];
-		// $arrCntTitle[$rw['Sales']][$rw['cntID']] = $rw;
-		$arrCounterparty['titles'][$rw['Sales']][$rw['cntID']] = $rw;
-		if ($rw['cntFlagFolder']){
-			$arrCounterparty = getCnt($rw['cntID'],$arrCounterparty);
-		}	
-	}
-	
-	return ($arrCounterparty);
-}
+$filter['customer'] = $arrCounterparty['codes'];
 
 if(!isset($_GET['pccGUID'])){
 
-	include('includes/inc_group_buttons.php');
-	// $arrJS[] = 'https://www.google.com/jsapi';
+	include('includes/inc_group_buttons.php');	
 	$arrJS[]='js/rep_pnl.js';
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$oBudget->title,' :: ',$arrUsrData["pagTitle$strLocal"],'</h1>';
@@ -70,7 +45,42 @@ if(!isset($_GET['pccGUID'])){
 	
 	include ('includes/inc_report_selectors.php');
 	Budget::getProfitTabs('reg_sales', false, Array('customer'=>$arrCounterparty['codes']));	
-
+	
+	?>
+	<h2>Charts</h2>
+	<?php
+		unset($filter['pc']);
+		$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
+		$oReport->periodicGraph(Array('table'=>false,'oop'=>false));
+		
+		if (strpos($oBudget->type,'Budget')===false && count($arrCounterparty['codes'])>1){
+					
+			$sqlActual = "SUM(".$oBudget->getThisYTDSQL('nm',$arrActualRates).")";
+			$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('cm',$arrActualRates).")";
+			$settings['nextGP'] = Array('title'=>"GP by activity, next month changes",
+								'sqlBase' => "SELECT activity as optValue, 
+													Activity_title as optText,  
+													{$sqlActual} as Actual, 
+													{$sqlBudget} as Budget, 
+													({$sqlActual}-{$sqlBudget}) as Diff
+											FROM vw_master 
+											{$oReport->sqlWhere}
+												AND  scenario='{$oBudget->id}' 
+												".Reports::GP_FILTER."
+												##AND customer IN (".implode($arrCounterparty['codes']).")
+											GROUP BY activity",
+									'denominator'=>$denominator,
+									'budget_title'=>'This month',
+									'actual_title'=>'Next month',
+									'tolerance'=>0.05,
+									'limit'=>10);	
+			
+			$oWF = new Waterfall($settings['nextGP']);
+			$oWF->draw();
+		}
+		
+		
+		
 	?>
 	<h2>Documents related to this customer</h2>
 	<?php
@@ -101,8 +111,7 @@ if(!isset($_GET['pccGUID'])){
 		$sqlWhere = "WHERE pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).") AND customer IN (".implode(',',$arrCounterparty['codes']).")";
 	}
 	
-	$filter['customer'] = $arrCounterparty['codes'];	
-	
+		
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
 	
 	?>
@@ -119,36 +128,33 @@ if(!isset($_GET['pccGUID'])){
 		$oReport->salesByActivity($sqlWhere);
 	}
 	
-	if (strpos($oBudget->type,'Budget')===false && count($arrCounterparty['codes'])>1){
-		
-		//echo '<pre>';print_r($arrCounterparty['codes']);echo '</pre>';
-		
-		$sqlActual = "SUM(".$oBudget->getThisYTDSQL('nm',$arrActualRates).")";
-		$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('cm',$arrActualRates).")";
-		$settings['nextGP'] = Array('title'=>"GP by customer, next month changes",
-							'sqlBase' => "SELECT  customer as optValue, 
-												customer_name as optText,  
-												{$sqlActual} as Actual, 
-												{$sqlBudget} as Budget, 
-												({$sqlActual}-{$sqlBudget}) as Diff
-										FROM vw_master 
-										{$oReport->sqlWhere}
-											AND  scenario='{$oBudget->id}' 
-											AND account IN ('J00400', 'J00802')
-											##AND customer IN (".implode($arrCounterparty['codes']).")
-										GROUP BY customer",
-								'denominator'=>$denominator,
-								'budget_title'=>'This month',
-								'actual_title'=>'Next month',
-								'tolerance'=>0.05,
-								'limit'=>10);	
-		
-		$oWF = new Waterfall($settings['nextGP']);
-		$oWF->draw();
-	}
+	
 	// $oReport->periodicPnL($sqlWhere,Array('field_data'=>'activity','field_title'=>'Activity_title','title'=>'Activity'));	
 	
 }
 
+function getCnt($cntID, &$arrCounterparty=Array()){
+	GLOBAL $oSQL, $strLocal;
+	
+	$sql = "SELECT cntID, cntTitle$strLocal as cntTitle, cntUserID, usrTitle$strLocal as Sales, cntFlagFolder, cntCode1C
+		FROM common_db.tbl_counterparty 
+		LEFT JOIN stbl_user ON usrID=cntUserID
+		WHERE (cntID={$cntID} AND cntFlagFolder=0)
+			OR (cntParentCode1C=(SELECT cntCode1C FROM common_db.tbl_counterparty WHERE cntID={$cntID}))
+		ORDER BY cntUserID, cntTitle$strLocal";
+	// echo "<pre>",$sql,"</pre>";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		// $arrCnt[] = $rw['cntID'];
+		$arrCounterparty['codes'][] = $rw['cntID'];
+		// $arrCntTitle[$rw['Sales']][$rw['cntID']] = $rw;
+		$arrCounterparty['titles'][$rw['Sales']][$rw['cntID']] = $rw;
+		if ($rw['cntFlagFolder']){
+			$arrCounterparty = getCnt($rw['cntID'],$arrCounterparty);
+		}	
+	}
+	
+	return ($arrCounterparty);
+}
 
 ?>
