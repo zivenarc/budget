@@ -917,6 +917,7 @@ class Reports{
 							freehand
 					FROM `reg_sales`
 					LEFT JOIN common_db.tbl_counterparty CUS ON customer=CUS.cntID					
+					LEFT JOIN common_db.tbl_product_type ON activity=prtID
 					LEFT JOIN vw_profit ON pc=pccID	
 					LEFT JOIN stbl_user ON sales=usrID
 					## LEFT JOIN tbl_sales ON salGUID=source
