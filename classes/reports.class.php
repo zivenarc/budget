@@ -503,7 +503,7 @@ class Reports{
 				};
 				if($rw['freehand']) {
 					?>
-					<td><a href="javascript:getCustomerKPI({filter:{prtGHQ:'<?php echo $rw['prtGHQ'];?>',route:<?php echo $rw['route'];?> ,freehand:1}});"><?php echo $rw['rteTitle'];?></a></td>								
+					<td><a href="javascript:getCustomerKPI({filter:{prtGHQ:'<?php echo $rw['prtGHQ'];?>',route:<?php echo $rw['route'];?> ,freehand:1,activity:<?php echo json_encode($activity_filter);?>}});"><?php echo $rw['rteTitle'];?></a></td>								
 					<?php
 				}
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
