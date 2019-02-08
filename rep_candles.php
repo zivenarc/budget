@@ -27,7 +27,7 @@ $arrReport[] = Array('title'=>'Profit before tax','sql'=>"SELECT ".$oBudget->get
 															WHERE scenario='{$oBudget->id}' AND company='{$company}'
 															GROUP BY pc");
 
-for($i=0;$i<count($arrReport;$i++){
+for($i=0;$i<count($arrReport);$i++){
 	$rs = $oSQL->q($arrReport[$i]['sql']);
 	$strTableID = md5($arrReport[$i]['sql']);
 	?>
