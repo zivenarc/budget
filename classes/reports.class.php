@@ -1796,7 +1796,7 @@ class Reports{
 				$arrHSSeries[$arrChartType[$i]['id']][1][] = (integer)$rwData[$arrChartType[$i]['id']]['last_b'][$period];
 				$sumAverage[$arrChartType[$i]['id']] += $rwData[$arrChartType[$i]['id']]['last_a'][$period];
 				if($arrChartType[$i]['id']!='revenue'){
-					if($rwData['revenue']['last_a'][$period]){
+					if($rwData['revenue']['last_a'][$period]!=0){
 						$arrHSSeries[$arrChartType[$i]['id']][2][] = round($rwData[$arrChartType[$i]['id']]['last_a'][$period]/$rwData['revenue']['last_a'][$period]*100,1);
 					} else {
 						$arrHSSeries[$arrChartType[$i]['id']][2][] = null;
