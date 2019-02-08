@@ -1821,7 +1821,7 @@ class Reports{
 					$sumAverage[$arrChartType[$i]['id']] += $rwData[$arrChartType[$i]['id']]['this_a'][$period];
 				}
 				if($arrChartType[$i]['id']!='revenue'){
-					if($rwData['revenue']['this_a'][$period]){
+					if($rwData['revenue']['this_a'][$period]!=0){
 						$arrHSSeries[$arrChartType[$i]['id']][2][] = round($rwData[$arrChartType[$i]['id']]['this_a'][$period]/$rwData['revenue']['this_a'][$period]*100,1);
 					} else {
 						$arrHSSeries[$arrChartType[$i]['id']][2][] = null;
