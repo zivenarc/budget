@@ -270,7 +270,7 @@ class Waterfall {
 			var chartID = '<?php echo $this->chartID;?>';			
 			hs_data[chartID] = {chart: {type: 'waterfall'},
 													title: {text: '<?php echo $this->title; ?>'},
-													subtitle: {text: '<?php echo '"',$this->actual_title,'" vs "',$this->budget_title,'"';?>'},
+													subtitle: {text: '<?php echo json_encode($this->actual_title." vs ".$this->budget_title,JSON_HEX_APOS);?>'},
 													xAxis: {type: 'category'},
 													yAxis: {
 															min: <?php echo (integer)$this->min;?>,
