@@ -18,6 +18,14 @@ $arrReport[] = Array('title'=>'Gross profit','sql'=>"SELECT ".$oBudget->getMonth
 															FROM vw_master
 															WHERE scenario='{$oBudget->id}' AND company='{$company}' ".Reports::GP_FILTER."
 															GROUP BY pc");
+$arrReport[] = Array('title'=>'Gross operating profit','sql'=>"SELECT ".$oBudget->getMonthlySumSQL(1+$oBudget->offset,$oBudget->cm).", pc, Profit
+															FROM vw_master
+															WHERE scenario='{$oBudget->id}' AND company='{$company}' ".Reports::GOP_FILTER."
+															GROUP BY pc");
+$arrReport[] = Array('title'=>'Staff costs','sql'=>"SELECT ".$oBudget->getMonthlySumSQL(1+$oBudget->offset,$oBudget->cm).", pc, Profit
+															FROM vw_master
+															WHERE scenario='{$oBudget->id}' AND company='{$company}' ".Reports::STAFF_COSTS_FULL."
+															GROUP BY pc");															
 $arrReport[] = Array('title'=>'Own operating profit','sql'=>"SELECT ".$oBudget->getMonthlySumSQL(1+$oBudget->offset,$oBudget->cm).", pc, Profit
 															FROM vw_master
 															WHERE scenario='{$oBudget->id}' AND company='{$company}' ".Reports::OWN_OPERATING_PROFIT."

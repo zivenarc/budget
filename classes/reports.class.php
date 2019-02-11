@@ -15,6 +15,7 @@ class Reports{
 	const CNT_GROUP_EXEMPTION = 723;
 	const OP_FILTER = "AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%') AND pccFlagProd=1 ";	
 	const SC_FILTER = "AND group_code=95";
+	const STAFF_COSTS_FULL = "AND group_code IN(95,136)";
 	const REVENUE_FILTER = "AND account IN ('J00400','J40010') ";
 	const DIRECT_COST_FILTER = "AND account IN ('J00802','J45010') ";
 	const GP_FILTER = "AND account IN ('J00400', 'J00802','J45010','J40010') ";
