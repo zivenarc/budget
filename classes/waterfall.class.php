@@ -282,7 +282,7 @@ class Waterfall {
 													tooltip: {pointFormat: '<b>{point.y:,.0f}</b> <?php echo $this->currency;?>'},
 													series: [{upColor: '#3BACEE',
 																	color: '#FF6D10',
-															data: <?php echo json_encode($this->arrHSChart);?>,
+															data: <?php echo json_encode($this->arrHSChart,JSON_HEX_APOS);?>,
 															dataLabels: {
 																enabled: true,
 																formatter: function () {
