@@ -1,7 +1,4 @@
 <?php
-// $flagNoAuth = true;
-// $arrUsrData['usrID'] = 'ZHAROVA';
-
 require ('common/auth.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
@@ -11,7 +8,7 @@ if ($_GET['ownerID']=='MYSELF'){
 	$ownerID = $arrUsrData['usrID'];
 }
 SetCookie('ownerID',$ownerID,0);
-
+$filter['sales'] = $ownerID;
 
 include ('includes/inc_report_settings.php');
 
@@ -63,6 +60,9 @@ if(!isset($_GET['pccGUID'])){
 	
 	Budget::getProfitTabs('reg_sales', false, Array('sales'=>$ownerID));
 	
+	unset($filter['pc']);
+	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference, 'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));	
+	
 	if(strpos($oBudget->type,'Budget')!==false){
 		$period_type = 'fye';
 	} else {
@@ -71,7 +71,6 @@ if(!isset($_GET['pccGUID'])){
 
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
-	
 	$settings['gpcus'] = Array('title'=>"GP by customer sold by ".$usrTitle,
 						'actual_title'=>$oBudget->title,
 						'budget_title'=>$oReference->title,
@@ -103,8 +102,31 @@ if(!isset($_GET['pccGUID'])){
 							'limit'=>10);	
 
 	$oWF = new Waterfall($settings['gpcus']);
-
 	$oWF->draw();
+	
+	$sqlActual = "SUM(".$oBudget->getThisYTDSQL('nm',$arrActualRates).")";
+	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL('cm',$arrActualRates).")";	
+	$settings['nextGP'] = Array('title'=>"GP by customer, next month changes",
+								'sqlBase' => "SELECT customer as optValue, 
+													Customer_name as optText,  
+													{$sqlActual} as Actual, 
+													{$sqlBudget} as Budget, 
+													({$sqlActual}-{$sqlBudget}) as Diff
+											FROM vw_master 
+											{$oReport->sqlWhere}
+												AND  scenario='{$oBudget->id}' 												
+												".Reports::GP_FILTER."												
+											GROUP BY customer",
+									'denominator'=>$denominator,
+									'budget_title'=>$oBudget->arrPeriodTitle[$oBudget->cm],
+									'actual_title'=>$oBudget->arrPeriodTitle[$oBudget->nm],
+									'tolerance'=>0.05,
+									'limit'=>10);	
+			
+	$oWF = new Waterfall($settings['nextGP']);
+	$oWF->draw();
+	
+	$oReport->periodicGraph(Array('table'=>false,'oop'=>false,'gop'=>false, 'title'=>$usrTitle));
 	
 	include ('includes/inc_subordinates.php');
 
@@ -119,8 +141,6 @@ if(!isset($_GET['pccGUID'])){
 	// } else {
 		// $sqlWhere .= " AND pc in (SELECT pccID FROM vw_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID']).")";
 	// }
-	
-	$filter['sales'] = $ownerID;
 	
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'reference'=>$reference,'currency'=>$currency, 'denominator'=>$denominator, 'filter'=>$filter));
 

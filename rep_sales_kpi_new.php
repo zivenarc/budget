@@ -70,8 +70,8 @@ if(!isset($_GET['pccGUID'])){
 												##AND customer IN (".implode($arrCounterparty['codes']).")
 											GROUP BY activity",
 									'denominator'=>$denominator,
-									'budget_title'=>'This month',
-									'actual_title'=>'Next month',
+									'budget_title'=>$oBudget->arrPeriodTitle[$oBudget->cm],
+									'actual_title'=>$oBudget->arrPeriodTitle[$oBudget->nm],
 									'tolerance'=>0.05,
 									'limit'=>10);	
 			

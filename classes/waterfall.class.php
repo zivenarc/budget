@@ -264,10 +264,10 @@ class Waterfall {
 		<div id="<?php echo $this->chartID;?>" class="google_chart" style="width: 1200px; height: 700px;"></div>
 		<div id="toolbar_div"></div>
 		<script>
+		$(document).ready(function(){
 			var hs_data = [];
 			var chart = [];
-			var chartID = '<?php echo $this->chartID;?>';
-			//google_chart_data["<?php echo $this->chartID;?>"] = {data:<?php echo json_encode($this->arrChart);?>,title:'<?php echo $this->title;?>'};			
+			var chartID = '<?php echo $this->chartID;?>';			
 			hs_data[chartID] = {chart: {type: 'waterfall'},
 													title: {text: '<?php echo $this->title; ?>'},
 													subtitle: {text: '<?php echo '"',$this->actual_title,'" vs "',$this->budget_title,'"';?>'},
@@ -296,8 +296,7 @@ class Waterfall {
 															},
 															pointPadding: 0
 													}]};
-				
-				// $('#<?php echo $this->chartID;?>').highcharts(hs_data["<?php echo $this->chartID;?>"]);	
+								
 				$('#'+chartID).ready(function(){
 					chart[chartID] = Highcharts.chart(chartID,hs_data[chartID]);
 					var handle_tolerance = $('#tolerance_'+chartID+'-handle');
@@ -341,6 +340,7 @@ class Waterfall {
 						  max: 20
 						});
 				});
+		});
 			</script>
 		<?php
 	}
