@@ -47,7 +47,7 @@ class Waterfall {
 		}
 		
 		$this->arrReport = Array();
-		$this->arrChart = Array();
+		// $this->arrChart = Array();
 		$this->arrHSChart = Array();
 		
 		if($_REQUEST['DataAction']=='waterfall_reload'){
@@ -78,7 +78,7 @@ class Waterfall {
 									'ratio'=>'',
 									'class'=>'budget-subtotal');
 									
-		$this->arrChart[] = Array('Budget',0,0,(integer)$baseData['Budget'],(integer)$baseData['Budget'], $this->getTooltip('Budget',$baseData['Budget']));
+		// $this->arrChart[] = Array('Budget',0,0,(integer)$baseData['Budget'],(integer)$baseData['Budget'], $this->getTooltip('Budget',$baseData['Budget']));
 		$this->arrHSChart[] = Array('name'=>$this->budget_title,'y'=>(integer)$baseData['Budget'], 'color'=>'#646464');
 		$diffBalance = $baseData['Diff'];
 		$thisBalance = $baseData['Actual'];
@@ -127,14 +127,16 @@ class Waterfall {
 				if (abs($rw['Diff'])>=$this->tolerance*abs($baseData['Diff'])){
 					// $this->arrReport[] = Array($rw['optText'],$rw['Diff']);
 					
+					$ratio = ($rw['Budget']!=0?$rw['Actual']/$rw['Budget']*100:'n/a');
+					
 					$this->arrReport[] = Array('title'=>$rw['optText'],
 												'this_scenario'=>$rw['Actual']/$this->denominator,
 												'that_scenario'=>$rw['Budget']/$this->denominator,
 												'diff'=>$rw['Diff']/$this->denominator,
-												'ratio'=>($rw['Budget']!=0?$rw['Actual']/$rw['Budget']*100:'n/a')
+												'ratio'=>$ratio
 												);
-					$this->arrChart[] = Array($rw['optText'],(integer)$lastValue,(integer)$lastValue,(integer)($lastValue+$rw['Diff']),(integer)($lastValue+$rw['Diff']), $strTooltip);
-					$this->arrHSChart[] = Array('name'=>$rw['optText'],'y'=>(integer)$rw['Diff']);
+					// $this->arrChart[] = Array($rw['optText'],(integer)$lastValue,(integer)$lastValue,(integer)($lastValue+$rw['Diff']),(integer)($lastValue+$rw['Diff']), $strTooltip);
+					$this->arrHSChart[] = Array('name'=>$rw['optText'],'y'=>(integer)$rw['Diff'], 'r'=>(integer)$ratio);
 					$lastValue += $rw['Diff'];
 					$diffBalance -= $rw['Diff'];
 					$thisBalance -= $rw['Actual'];
@@ -157,8 +159,8 @@ class Waterfall {
 										'that_scenario'=>$thatBalance/$this->denominator, 
 										'diff'=>$diffBalance/$this->denominator,
 												'ratio'=>$thatBalance?$thisBalance/$thatBalance*100:'n/a');
-			$this->arrChart[] = Array('Other',(integer)$lastValue,(integer)$lastValue, (integer)($lastValue+$diffBalance), (integer)($lastValue+$diffBalance)
-							, $this->getTooltip('Other factors not included before',$diffBalance));
+			// $this->arrChart[] = Array('Other',(integer)$lastValue,(integer)$lastValue, (integer)($lastValue+$diffBalance), (integer)($lastValue+$diffBalance)
+							// , $this->getTooltip('Other factors not included before',$diffBalance));
 			$this->arrHSChart[] = Array('name'=>'Other','y'=>(integer)$diffBalance);
 		}
 		$this->arrReport[] = Array('title'=>$this->actual_title,
@@ -167,7 +169,7 @@ class Waterfall {
 									'diff'=>$baseData['Actual']/$this->denominator,
 									'ratio'=>'',
 									'class'=>'budget-subtotal');
-		$this->arrChart[] = Array('Actual',0,0,(integer)$baseData['Actual'],(integer)$baseData['Actual'], $this->getTooltip('Actual',$baseData['Actual']));
+		// $this->arrChart[] = Array('Actual',0,0,(integer)$baseData['Actual'],(integer)$baseData['Actual'], $this->getTooltip('Actual',$baseData['Actual']));
 		$this->arrHSChart[] = Array('name'=>$this->actual_title,'y'=>(integer)$baseData['Actual'],'isSum'=>true, 'color'=>'#646464');
 
 		if ($baseData['Actual'] > $this->max){
@@ -286,7 +288,11 @@ class Waterfall {
 															dataLabels: {
 																enabled: true,
 																formatter: function () {
-																	return Highcharts.numberFormat(this.y/<?php echo $this->denominator;?>, 0, ',');
+																	var ratio='';
+																	if(typeof(this.point.r)!='undefined'){
+																		ratio = '<br/><small>('+Highcharts.numberFormat(Math.abs(this.point.r),0,',')+'%)</small>'
+																	}
+																	return (Highcharts.numberFormat(this.y/<?php echo $this->denominator;?>, 0, ',')+ratio);
 																},
 															style: {
 																color: '#FFFFFF',
