@@ -127,7 +127,7 @@ class Waterfall {
 				if (abs($rw['Diff'])>=$this->tolerance*abs($baseData['Diff'])){
 					// $this->arrReport[] = Array($rw['optText'],$rw['Diff']);
 					
-					$ratio = ($rw['Budget']!=0?$rw['Actual']/$rw['Budget']*100:'n/a');
+					$ratio = ($rw['Budget']!=0?$rw['Actual']/$rw['Budget']*100:'new');
 					
 					$this->arrReport[] = Array('title'=>$rw['optText'],
 												'this_scenario'=>$rw['Actual']/$this->denominator,
@@ -136,7 +136,7 @@ class Waterfall {
 												'ratio'=>$ratio
 												);
 					// $this->arrChart[] = Array($rw['optText'],(integer)$lastValue,(integer)$lastValue,(integer)($lastValue+$rw['Diff']),(integer)($lastValue+$rw['Diff']), $strTooltip);
-					$this->arrHSChart[] = Array('name'=>$rw['optText'],'y'=>(integer)$rw['Diff'], 'r'=>(integer)$ratio);
+					$this->arrHSChart[] = Array('name'=>$rw['optText'],'y'=>(integer)$rw['Diff'], 'r'=>$ratio);
 					$lastValue += $rw['Diff'];
 					$diffBalance -= $rw['Diff'];
 					$thisBalance -= $rw['Actual'];
@@ -289,7 +289,11 @@ class Waterfall {
 																enabled: true,
 																formatter: function () {
 																	var ratio='';
-																	if(typeof(this.point.r)!='undefined'){
+																	if(typeof(this.point.r)==='undefined'){
+																		ratio = '';
+																	} else if (typeof(this.point.r)==='string'){
+																		ratio = '<br/><small>'+this.point.r+'</small>';
+																	} else {
 																		ratio = '<br/><small>('+Highcharts.numberFormat(Math.abs(this.point.r),0,',')+'%)</small>'
 																	}
 																	return (Highcharts.numberFormat(this.y/<?php echo $this->denominator;?>, 0, ',')+ratio);
