@@ -95,7 +95,7 @@ if(!isset($_GET['pccGUID'])){
 							'denominator'=>$denominator,
 							'actual_title'=>$oBudget->title,
 							'budget_title'=>$oReference->title,
-							'tolerance'=>0.05,
+							'tolerance'=>0.03,
 							'limit'=>10);	
 	
 	$oWF = new Waterfall($settings['gpcus']);
@@ -128,7 +128,7 @@ if(!isset($_GET['pccGUID'])){
 							'denominator'=>$denominator,
 							'actual_title'=>$oBudget->title,
 							'budget_title'=>$oReference->title,
-							'tolerance'=>0.05,
+							'tolerance'=>0.03,
 							'limit'=>10);
 	
 	$oWF = new Waterfall($settings['oop']);
@@ -152,7 +152,7 @@ if(!isset($_GET['pccGUID'])){
 								'denominator'=>$denominator,
 								'budget_title'=>'This month',
 								'actual_title'=>'Next month',
-								'tolerance'=>0.05,
+								'tolerance'=>0.03,
 								'limit'=>10);	
 		
 		$oWF = new Waterfall($settings['nextGP']);

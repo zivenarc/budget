@@ -4143,18 +4143,24 @@ class Reports{
 				";
 			} else {
 				$sql = "SELECT activity, unit, prtTitle,
+						## DATA FROM ACTUAL PERIODS
 						{$strFieldsKPI['actual']}
 				FROM `vw_sales`			
-				{$sqlWhere}  AND scenario='{$strFieldsKPI['from_a']}' AND ".self::ACTUAL_DATA_FILTER." AND IFNULL(unit,'')<>''
+				{$sqlWhere} 
+					AND scenario='{$strFieldsKPI['from_a']}' 
+					##AND ".self::ACTUAL_DATA_FILTER." 
+					AND IFNULL(unit,'')<>''
 				GROUP BY activity, unit
 				UNION ALL
 				SELECT activity, unit, prtTitle, 
+						## DATA FROM THE PREVIOUS FORECAST
 						{$strFieldsKPI['forecast']}
 				FROM `vw_sales`			
 				{$sqlWhere}  AND scenario='{$this->oBudget->forecast}' AND IFNULL(unit,'')<>''
 				GROUP BY activity, unit
 				UNION ALL
-				SELECT activity, unit, prtTitle, 
+				SELECT activity, unit, prtTitle,
+						## DATA FROM THE PREVIOUS YEAR				
 						{$strFieldsKPI['lastyear']}
 				FROM `vw_sales`			
 				{$sqlWhere}  AND scenario='{$this->oBudget->lastyear}' AND IFNULL(unit,'')<>''
@@ -4163,6 +4169,7 @@ class Reports{
 			}
 			$sql .= "UNION ALL
 					SELECT activity, unit, prtTitle,
+					## DATA FROM THE BUDGET
 					{$strFieldsKPI['budget']}
 				FROM `vw_sales`				
 				{$sqlWhere} AND scenario='{$strFieldsKPI['from_b']}' AND IFNULL(unit,'')<>''
