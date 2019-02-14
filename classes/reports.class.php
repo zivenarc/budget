@@ -2155,9 +2155,9 @@ class Reports{
 		// GLOBAL $budget_scenario;
 		// $oBudget = new Budget($budget_scenario);
 		if(($this->oBudget->cm % 3 && $this->oBudget->nm % 3) || $this->oBudget->cm==6){
-			$this->colspan = 14;
+			$this->colspan = 16;
 		} else {
-			$this->colspan = 18;
+			$this->colspan = 20;
 		}
 		
 		$sqlWhere = $this->sqlWhere;		
@@ -3530,6 +3530,8 @@ class Reports{
 				<td class='budget-decimal'><?php self::render($data['NM_B'],0);?></td>
 				<td class='budget-decimal'><?php self::render($data['NM_A']-$data['NM_B'],0);?></td>
 				<td class='budget-decimal'><em><?php self::render_ratio($data['NM_A'],$data['NM_B'],0);?></em></td>
+				<td class='budget-decimal'><?php self::render($data['NM_A']-$data['CM_A'],0);?></td>
+				<td class='budget-decimal'><em><?php self::render_ratio($data['NM_A'],$data['CM_A'],0);?></em></td>
 				<?php		
 				if (!($this->oBudget->nm % 3)){
 				?>
@@ -4224,9 +4226,9 @@ class Reports{
 		$sqlWhere = $this->sqlWhere;
 
 	if(($this->oBudget->cm % 3 && $this->oBudget->nm % 3) || $this->oBudget->cm==6){
-			$this->colspan = 14;
+			$this->colspan = 16;
 		} else {
-			$this->colspan = 18;
+			$this->colspan = 20;
 		}
 		
 		//---------------check if summary is up to date--------------------
