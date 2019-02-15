@@ -24,11 +24,20 @@ foreach($arrPRT as $key=>$data){
 if($fieldsetOpen){
 			echo "</fieldset>";
 }
-if($activity!='all'){
-	$strSubtitle .= "Filter: ".$arrPRT[$activity]['prtGHQ']." :: ".$arrPRT[$activity]['prtTitle'];
+if(is_array($arrPRT[$activity])){
+	$strFilterSubtitle .= "Product=".$arrPRT[$activity]['prtGHQ']." :: ".$arrPRT[$activity]['prtTitle'];
 }
 ?>
 <button  onclick='javascript:location.search="activity=all"'>Reset activity filter</button>
+</div>
+<div id="category_list" style='display:none;'>
+<?php
+	$sql = "SELECT * FROM common_db.tbl_category WHERE catTableID='tbl_counterparty'";
+	$rs = $oSQL->q($sql);
+	while ($data = $oSQL->f($rs)){
+		echo "<button onclick='javascript:location.search=\"catID={$data['catID']}\"'>{$data['catTitle']}</button>";
+	}
+?>
 </div>
 <script>
 function showActivityList(){
@@ -40,9 +49,18 @@ function showActivityList(){
 		}
 	);
 }
+function showCategoryList(){
+	$('#category_list').dialog(
+		{
+			title:'Categories',
+			modal: true,
+			width: '30%'
+		}
+	);
+}
 </script>
 <?php
-echo $strSubtitle?"<h2>{$strSubtitle}</h2>":'';
+echo $strFilterSubtitle ? "<h3>Filter: {$strFilterSubtitle}</h3>":'';
 ?>
 <div id="report_selectors">
 	<form>

@@ -7,8 +7,17 @@ include ('includes/inc_report_settings.php');
 
 session_start();
 
-$cntID = isset($_GET['cntID'])?(integer)$_GET['cntID']:(isset($_SESSION['cntID'])?$_SESSION['cntID']:33239);//new if not defined
+if(isset($_GET['cntID'])){
+	$_SESSION['cntFilterMode'] = 'counterparty';	
+}
+$cntID = isset($_GET['cntID'])?(integer)$_GET['cntID']:(isset($_SESSION['cntID'])?$_SESSION['cntID']:743);//new if not defined
 $_SESSION['cntID'] = $cntID;
+
+if(isset($_GET['catID'])){
+	$_SESSION['cntFilterMode'] = 'category';	
+}
+$catID = isset($_GET['catID'])?(integer)$_GET['catID']:(isset($_SESSION['catID'])?$_SESSION['catID']:158021);//new if not defined
+$_SESSION['catID'] = $catID;
 
 $budget_scenario = isset($_GET['budget_scenario'])?$_GET['budget_scenario']:$budget_scenario;
 $oBudget = new Budget($budget_scenario);
@@ -16,20 +25,28 @@ $oBudget = new Budget($budget_scenario);
 include ('includes/inc_report_pcfilter.php');
 
 // set_time_limit (10);
-$arrCounterparty = getCnt($cntID);
+if($_SESSION['cntFilterMode'] = 'category'){
+	$sql = "SELECT catTitle FROM common_db.tbl_category WHERE catID='{$catID}';";
+	$rs = $oSQL->q($sql);
+	$strFilterSubtitle = "Category= ".$oSQL->get_data($rs);
+	print_r($catID);
+	$arrCounterparty = getCategory($catID);
+} else {	
+	$arrCounterparty = getCnt($cntID);
+}
 $filter['customer'] = $arrCounterparty['codes'];
 
 if(!isset($_GET['pccGUID'])){
-
 	include('includes/inc_group_buttons.php');	
+	$arrActions[] = Array('title'=>'Category','class'=>'fa-filter','action'=>'javascript:showCategoryList();');
 	$arrJS[]='js/rep_pnl.js';
 	include ('includes/inc-frame_top.php');
-	echo '<h1>',$oBudget->title,' :: ',$arrUsrData["pagTitle$strLocal"],'</h1>';
+	echo '<h1>',$oBudget->title,' :: ',$arrUsrData["pagTitle$strLocal"],'</h1>';	
 	
 	if (count($arrCounterparty['codes']>1)){
 		foreach ($arrCounterparty['titles'] as $sales=>$customers){
-			echo '<h4>',($sales?$sales:"Unassigned"),'</h4>';
-			echo '<div>';
+			//echo '<h4>',($sales?$sales:"Unassigned"),'</h4>';
+			//echo '<div>';
 			foreach ($customers as $id=>$data){
 				echo "<span title='{$data['cntCode1C']}' class='".($data['cntFlagFolder']?'folder-open':'')."'>";
 				if ($id==$cntID){
@@ -39,7 +56,7 @@ if(!isset($_GET['pccGUID'])){
 				}
 				echo "</span> | ";
 			}
-			echo '</div>';
+			//echo '</div>';
 		}
 	}
 	
@@ -141,6 +158,29 @@ function getCnt($cntID, &$arrCounterparty=Array()){
 		LEFT JOIN stbl_user ON usrID=cntUserID
 		WHERE (cntID={$cntID} AND cntFlagFolder=0)
 			OR (cntParentCode1C=(SELECT cntCode1C FROM common_db.tbl_counterparty WHERE cntID={$cntID}))
+		ORDER BY cntUserID, cntTitle$strLocal";
+	// echo "<pre>",$sql,"</pre>";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		// $arrCnt[] = $rw['cntID'];
+		$arrCounterparty['codes'][] = $rw['cntID'];
+		// $arrCntTitle[$rw['Sales']][$rw['cntID']] = $rw;
+		$arrCounterparty['titles'][$rw['Sales']][$rw['cntID']] = $rw;
+		if ($rw['cntFlagFolder']){
+			$arrCounterparty = getCnt($rw['cntID'],$arrCounterparty);
+		}	
+	}
+	
+	return ($arrCounterparty);
+}
+
+function getCategory($catID, &$arrCounterparty=Array()){
+	GLOBAL $oSQL, $strLocal;
+	$sql = "SELECT cntID, cntTitle$strLocal as cntTitle, cntUserID, usrTitle$strLocal as Sales, cntFlagFolder, cntCode1C
+		FROM common_db.tbl_object_category
+		JOIN common_db.tbl_counterparty ON cntGUID1C=obcObjectID
+		LEFT JOIN stbl_user ON usrID=cntUserID
+		WHERE obcCategoryID='{$catID}'
 		ORDER BY cntUserID, cntTitle$strLocal";
 	// echo "<pre>",$sql,"</pre>";
 	$rs = $oSQL->q($sql);
