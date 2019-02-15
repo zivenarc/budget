@@ -25,7 +25,7 @@ $oBudget = new Budget($budget_scenario);
 include ('includes/inc_report_pcfilter.php');
 
 // set_time_limit (10);
-if($_SESSION['cntFilterMode'] = 'category'){
+if($_SESSION['cntFilterMode'] == 'category'){
 	$sql = "SELECT catTitle FROM common_db.tbl_category WHERE catID='{$catID}';";
 	$rs = $oSQL->q($sql);
 	$strFilterSubtitle = "Category= ".$oSQL->get_data($rs);
