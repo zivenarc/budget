@@ -51,8 +51,8 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								WHERE
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 								GROUP BY customer_group_code",
-						'tolerance'=>0.05,
-						'limit'=>10);
+						'tolerance'=>0.03,
+						'limit'=>15);
 
 $settings['gopcus'] = Array('title'=>"GOP by customer",
 					'sqlBase' => "SELECT customer_group_code as optValue, 
