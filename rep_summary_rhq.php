@@ -425,7 +425,9 @@ if(!isset($_GET['prtGHQ'])){
 	
 	//==================== Staff ==========================/
 	
-	$sql = "SELECT pccTitle, salary, monthly_bonus, empTitleLocal, funTitleLocal, prtTitleLocal,funFlagWC,funRHQ,".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset)." 
+	$sql = "SELECT pccTitle, 
+				".(in_array('HR',$arrUsrData['roleIDs'])?"salary, monthly_bonus,":"")." 
+				empTitleLocal, funTitleLocal, prtTitleLocal,funFlagWC,funRHQ,".$oBudget->getMonthlySumSQL(1+$oBudget->offset,12+$oBudget->offset)." 
 			FROM reg_headcount 
 			LEFT JOIN vw_product_type ON prtID=activity
 			LEFT JOIN common_db.tbl_employee ON empGUID1C=particulars
@@ -462,7 +464,7 @@ if(!isset($_GET['prtGHQ'])){
 			<td><?php echo $rw['empTitleLocal'];?></td>			
 			<td><?php echo $rw['funRHQ'],' | ',$rw['funTitleLocal'];?></td>			
 			<td><?php echo $rw['pccTitle'];?></td>
-			<td><?php echo $rw['prtTitleLocal'];?></td>
+			<td><?php echo $rw['prtTitleLocal'];?></td>			
 			<td class='budget-decimal budget-cloak' ><?php echo Reports::render($rw['salary']);?></td>
 			<td class='budget-decimal budget-cloak' ><?php echo Reports::render($rw['monthly_bonus']);?></td>
 			<?php
