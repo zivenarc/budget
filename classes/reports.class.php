@@ -1863,7 +1863,7 @@ class Reports{
 			if($arrChartType[$i]['id']!='revenue'){					
 					$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'% to revenue','data'=>$arrHSSeries[$arrChartType[$i]['id']][2],'color'=>'#FF6D10','type'=>'spline','yAxis'=>1);						
 			}
-			$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'Growth YoY','data'=>$arrHSSeries[$arrChartType[$i]['id']][3],'color'=>'#39AAEC','type'=>'spline','yAxis'=>1);						
+			// $arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'Growth YoY','data'=>$arrHSSeries[$arrChartType[$i]['id']][3],'color'=>'#39AAEC','type'=>'spline','yAxis'=>1);						
 		}
 		
 		$arrHighChartsAFF['series'] = Array(
