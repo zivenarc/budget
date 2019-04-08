@@ -1675,7 +1675,7 @@ class Reports{
 	
 	public function periodicGraph($options = Array()){
 		
-		$settings = Array('table'=>false,'revenue'=>true,'gp'=>true,'gop'=>true,'oop'=>true);
+		$settings = Array('table'=>true,'revenue'=>true,'gp'=>true,'gop'=>true,'oop'=>true);
 		$options = array_merge($settings,$options);
 		
 		$this->oLastYear = new Budget($this->oBudget->lastyear);
@@ -1898,119 +1898,87 @@ class Reports{
 				echo '<th>',$period,'</th>';
 			}
 		?>
-		<th>FYE</th>
+		<th>Total</th>
 		</tr>
-		<tr><td colspan="2">Gross revenue</td>
 		<?php
-			// foreach ($this->oBudget->arrPeriod as $period){
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render($rwGR[$period]/$this->Denominator),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwGR['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render($rwGR['Total_AM']/$this->Denominator),'</td>';
+		for ($i = 0;$i<count($arrChartType);$i++){
+			?>
+			<tr>
+				<td rowspan="6"><?php echo $arrChartType[$i]['title'];?></td>
+				<td><?php echo $this->oBudget->title;?></td>
+				<?php
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+					$period = $this->oBudget->arrPeriod[$m];
+					?>
+					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['this_a'][$period]);?></td>
+					<?php
+				}
+				?>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['this_a']));?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->oReference->title;?></td>
+				<?php
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+					$period = $this->oBudget->arrPeriod[$m];
+					?>
+					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['this_b'][$period]);?></td>
+					<?php
+				}
+				?>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['this_b']));?></td>
+			</tr>
+			<tr class="budget-ratio">
+				<td>Ratio to <?php echo $this->oReference->title;?></td>
+				<?php
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+					$period = $this->oBudget->arrPeriod[$m];
+					?>
+					<td class="budget-decimal"><?php $this->render_ratio($rwData[$arrChartType[$i]['id']]['this_a'][$period],$rwData[$arrChartType[$i]['id']]['this_b'][$period]);?></td>
+					<?php
+				}
+				?>
+				<td class="budget-decimal budget-ytd"><?php $this->render_ratio(array_sum($rwData[$arrChartType[$i]['id']]['this_a']),array_sum($rwData[$arrChartType[$i]['id']]['this_b']));?></td>
+			</tr>
+			<tr class="budget-ratio">
+				<td>Yoy growth, %</td>
+				<?php
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+					$period = $this->oBudget->arrPeriod[$m];
+					?>
+					<td class="budget-decimal"><?php $this->render_ratio($rwData[$arrChartType[$i]['id']]['this_a'][$period],$rwData[$arrChartType[$i]['id']]['last_a'][$period]);?></td>
+					<?php
+				}
+				?>
+				<td class="budget-decimal budget-ytd"><?php $this->render_ratio(array_sum($rwData[$arrChartType[$i]['id']]['this_a']),array_sum($rwData[$arrChartType[$i]['id']]['last_a']));?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->oLastYear->title;?></td>
+				<?php
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+					$period = $this->oBudget->arrPeriod[$m];
+					?>
+					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['last_a'][$period]);?></td>
+					<?php
+				}
+				?>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['last_a']));?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->oLastYear->reference;?></td>
+				<?php
+				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+					$period = $this->oBudget->arrPeriod[$m];
+					?>
+					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['last_b'][$period]);?></td>
+					<?php
+				}
+				?>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['last_b']));?></td>
+			</tr>
+			<?php
+		}
 		?>
-		</tr>
-		<tr><td rowspan="4">Gross profit</td><td>This</td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render($rwGP[$period]/$this->Denominator),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwGP['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render($rwGP['Total_AM']/$this->Denominator),'</td>';
-		?>
-		</tr>
-		<tr class="budget-ratio"><td>%</td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render_ratio($rwGP[$period],$rwGR[$period]),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwGP['Q1'], $rwGR['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwGP['Total_AM'], $rwGR['Total_AM']),'</td>';
-		?>
-		</tr>
-		<tr><td><?php echo $this->oReference->id;?></td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render($rwBGP[$period]),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwBGP['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render($rwBGP['Total_AM']),'</td>';
-		?>
-		</tr>
-		<tr><td>Diff</td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render($rwGP[$period]-$rwBGP[$period]),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwGP['Q1']-$rwBGP['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render($rwGP['Total_AM']-$rwBGP['Total_AM']),'</td>';
-		?>
-		</tr>
-		<tr><td rowspan="4">Operating income</td><td>This</td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render($rwOP[$period]),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render($rwOP['Total_AM']),'</td>';
-		?>
-		</tr>
-		<tr class="budget-ratio"><td>% of revenue</td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render_ratio($rwOP[$period],$rwGR[$period]),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwOP['Q1'], $rwGR['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwOP['Total_AM'],$rwGR['Total_AM']),'</td>';
-		?>
-		</tr>
-		<tr><td><?php echo $this->oReference->id;?></td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render($rwBOP[$period]),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwBOP['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render($rwBOP['Total_AM']),'</td>';
-		?>
-		</tr>
-		<tr><td>Diff</td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render($rwOP[$period]-$rwBOP[$period]),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render($rwOP['Q1']-$rwBOP['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render($rwOP['Total_AM']-$rwBOP['Total_AM']),'</td>';
-		?>
-		</tr>
-		<tr><td colspan="2">Staff costs</td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render(-$rwSC[$period]),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render(-$rwSC['Q1']),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render(-$rwSC['Total_AM']),'</td>';
-		?>
-		</tr>
-		<tr class="budget-ratio"><td colspan="2">Staff efficiency (GP/Cost)</td>
-		<?php
-			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-				$period = $this->oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',self::render_ratio($rwGP[$period],-$rwSC[$period]*100),'</td>';
-			}
-		// echo '<td class="budget-decimal budget-quarterly">',self::render_ratio($rwGP['Q1'], -$rwSC['Q1']*100),'</td>';
-		echo '<td class="budget-decimal budget-ytd">',self::render_ratio($rwGP['Total_AM'],-$rwSC['Total_AM']*100),'</td>';
-		?>
-		</tr>
 		<tr><td rowspan="2">AFF volume</td><td>Export</td>
 		<?php
 			for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
