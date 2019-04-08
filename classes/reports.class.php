@@ -1675,7 +1675,7 @@ class Reports{
 	
 	public function periodicGraph($options = Array()){
 		
-		$settings = Array('table'=>true,'revenue'=>true,'gp'=>true,'gop'=>true,'oop'=>true);
+		$settings = Array('table'=>false,'revenue'=>true,'gp'=>true,'gop'=>true,'oop'=>true);
 		$options = array_merge($settings,$options);
 		
 		$this->oLastYear = new Budget($this->oBudget->lastyear);
@@ -1829,24 +1829,41 @@ class Reports{
 					}
 				}
 			}	
-						
+			
 			$arrHighChartsAFF['xAxis']['categories'][] = $periodTitle;
 			$arrHighChartsOFF['xAxis']['categories'][] = $periodTitle;
 			$arrHighChartsRFF['xAxis']['categories'][] = $periodTitle;
 								
 		}
+				
+		for ($i = 0;$i<count($arrChartType);$i++){
+			$s = count($arrHSSeries[$arrChartType[$i]['id']]);
+			foreach(range(0,11) as $m){
+				$arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
+			}
+			foreach(range(12,23) as $m){
+				if($arrHSSeries[$arrChartType[$i]['id']][0][$m-12]){
+					$arrHSSeries[$arrChartType[$i]['id']][$s][] = round($arrHSSeries[$arrChartType[$i]['id']][0][$m]/$arrHSSeries[$arrChartType[$i]['id']][0][$m-12]*100-100,1);
+				} else {
+					$arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
+				}
+			}
+		}
 		
 		for ($i = 0;$i<count($arrChartType);$i++){
-			$arrHighCharts[$arrChartType[$i]['id']]['xAxis']['plotLines'][0] = Array('color'=>'#FF6D10','value'=>8.5+$this->oBudget->cm,'width'=>2);
+			if($this->oBudget->cm<15){
+				$arrHighCharts[$arrChartType[$i]['id']]['xAxis']['plotLines'][0] = Array('color'=>'#FF6D10','value'=>8.5+$this->oBudget->cm,'width'=>2);
+			}
 			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][0]['plotLines'][0] = Array('color'=>'#3BACEE','value'=>$sumAverage[$arrChartType[$i]['id']]/(9+$this->oBudget->cm),'width'=>2,'dashStyle'=>'dot');
 			$arrHighCharts[$arrChartType[$i]['id']]['series']=Array(									
 									Array('name'=>$this->oBudget->title,'data'=>$arrHSSeries[$arrChartType[$i]['id']][0],'color'=>'#3BACEE')
 									,Array('name'=>$this->oReference->title,'data'=>$arrHSSeries[$arrChartType[$i]['id']][1],'color'=>'#DDDDDD')									
 								);
-			if($arrChartType[$i]['id']!='revenue'){
-					$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][1] = Array('title'=>'%','opposite'=>true);		
+			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][1] = Array('title'=>'%','opposite'=>true);		
+			if($arrChartType[$i]['id']!='revenue'){					
 					$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'% to revenue','data'=>$arrHSSeries[$arrChartType[$i]['id']][2],'color'=>'#FF6D10','type'=>'spline','yAxis'=>1);						
 			}
+			$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'Growth YoY','data'=>$arrHSSeries[$arrChartType[$i]['id']][3],'color'=>'#39AAEC','type'=>'spline','yAxis'=>1);						
 		}
 		
 		$arrHighChartsAFF['series'] = Array(
