@@ -134,7 +134,7 @@ if(!isset($_GET['pccGUID'])){
 	?>
 		<div id='graph'/>
 	<?php
-	if (strpos($oBudget->type,'FYE')!== false){
+	if (strpos($oBudget->type,'FYE')!== false || strpos($oBudget->type,'Actual')!== false){
 	// if (false){
 		$oReport->monthlyReport($type);	
 	} elseif (strpos($oBudget->type,'Budget')!== false) {
