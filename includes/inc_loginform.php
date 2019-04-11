@@ -3,6 +3,21 @@ require ('../common/common.php');
 $ldap_domain = 'ylrus.com';
 
 function Authenticate($login, $password, &$strError, $method="LDAP"){
+
+    GLOBAL $flagNoAuth, $DBHOST, $DBUSER, $DBPASS, $DB, $eiseIntraKey;
+
+    include ("../common/eiseIntra/inc_intra.php");
+    
+    $flagNoAuth = true;
+    $intra = new eiseIntra(new eiseSQL($DBHOST, $DBUSER, $DBPASS, $DB));
+
+    try {
+        $intra->Authenticate($login, $password, $method);
+        return true;
+    } catch (Exception $e) {
+        return false;
+    }
+
     GLOBAL $ldap_server;
     GLOBAL $ldap_domain;
     GLOBAL $ldap_dn;
@@ -94,9 +109,9 @@ switch ($DataAction){
            session_initialize();
            $_SESSION["usrID"] = strtoupper($login);
            $_SESSION["last_login_time"] = Date("Y-m-d H:i:s");
-           $_SESSION["authstring"] = $_POST["authstring"];
+           //$_SESSION["authstring"] = $_POST["authstring"];
            SetCookie("last_succesfull_usrID", $login);
-           header ("Location: ".(isset($_COOKIE["PageNoAuth"]) ? $_COOKIE["PageNoAuth"] : "index.php"));
+           header ("Location: ".(isset($_COOKIE["PageNoAuth"]) && $_COOKIE["PageNoAuth"]!=$_SERVER['PHP_SELF'] ? $_COOKIE["PageNoAuth"] : "index.php"));
        } else {
            SetCookie("last_succesfull_usrID", "");
            header ("Location: login.php?error=".ShowFieldTitle("Bad password or user name."));
