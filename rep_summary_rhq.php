@@ -269,12 +269,13 @@ if(!isset($_GET['prtGHQ'])){
 		<tr class="<?php echo $strClass;?>">
 			<td><?php echo $strTitle;?></td>
 			<td><?php echo $data['ivlTitle'];?></td>			
+			<td class="budget-decimal"><?php Reports::render($data['GrossRevenue'],0,'.',',');?></td>
 			<td class="budget-decimal"><?php Reports::render($data['Revenue'],0,'.',',');?></td>
 			<td class="budget-decimal"><?php Reports::render($data['GOP'],0,'.',',');?></td>
 			<td class="budget-decimal"><?php Reports::render($data['KPI'],0,'.',',');?></td>
-			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['Revenue'],0);?>%</td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['GrossRevenue'],0);?>%</td>
 			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['KPI']*100,0);?></td>
-			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$arrTotal['GP'],0);?>%</td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$arrTotal['GOP'],0);?>%</td>
 		</tr>
 		<?php
 	}
@@ -362,7 +363,17 @@ if(!isset($_GET['prtGHQ'])){
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
 	$arrReportOther['Revenue'] = $rw['Revenue'];
-	$arrReportTotal['Revenue'] = $rw['Revenue'];
+	$arrReportTotal['Revenue'] = $rw['Revenue'];	
+	
+	$sql = "SELECT {$sqlActual} as GrossRevenue 
+					FROM vw_master 
+					{$sqlWhere}
+					AND  scenario='{$oBudget->id}' ".Reports::GROSS_REVENUE_FILTER;
+					
+	$rs = $oSQL->q($sql);
+	$rw = $oSQL->f($rs);
+	$arrReportOther['GrossRevenue'] = $rw['GrossRevenue'];
+	$arrReportTotal['GrossRevenue'] = $rw['GrossRevenue'];
 	
 	$tableID = "top_".md5(time());
 	?>
@@ -371,8 +382,9 @@ if(!isset($_GET['prtGHQ'])){
 	<thead>	
 		<tr>
 			<th>Customer</th>
-			<th>Vertical</th>			
+			<th>Vertical</th>
 			<th>Gross Revenue</th>
+			<th>Net Revenue</th>
 			<th>GOP</th>
 			<th>Volume</th>
 			<th>Profitability</th>
