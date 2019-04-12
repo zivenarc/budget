@@ -1,6 +1,6 @@
 <?php
 $flagNoAuth = true;
-set_time_limit(60);
+set_time_limit(160);
 require ('common/auth.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
@@ -263,22 +263,7 @@ if(!isset($_GET['prtGHQ'])){
 	</div>
 	<?php
 	//==================== Top 10 customers ==========================/
-	
-	function _renderTopCustomerLine($data, $arrTotal, $strTitle, $strClass=""){
-		?>
-		<tr class="<?php echo $strClass;?>">
-			<td><?php echo $strTitle;?></td>
-			<td><?php echo $data['ivlTitle'];?></td>			
-			<td class="budget-decimal"><?php Reports::render($data['GrossRevenue'],0,'.',',');?></td>
-			<td class="budget-decimal"><?php Reports::render($data['Revenue'],0,'.',',');?></td>
-			<td class="budget-decimal"><?php Reports::render($data['GOP'],0,'.',',');?></td>
-			<td class="budget-decimal"><?php Reports::render($data['KPI'],0,'.',',');?></td>
-			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['GrossRevenue'],0);?>%</td>
-			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['KPI']*100,0);?></td>
-			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$arrTotal['GOP'],0);?>%</td>
-		</tr>
-		<?php
-	}
+
 	
 	if(strpos($oBudget->type,'Budget')!==false){
 		$period_type = 'fye'; $period_title = "Full year";
@@ -318,6 +303,20 @@ if(!isset($_GET['prtGHQ'])){
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
 		$arrReport[$rw['optText']]['Revenue'] = $rw['Revenue'];
+	}
+	
+	$sql = "SELECT customer_group_code as optValue, 
+						customer_group_title as optText,  
+						{$sqlActual} as GrossRevenue
+				FROM vw_master 				
+				{$sqlWhere}
+					AND  scenario='{$oBudget->id}' ".Reports::GROSS_REVENUE_FILTER."
+					##AND  customer_group_code IN (".implode(',',$arrCGFilter).")
+				GROUP BY customer_group_code
+				";
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+		$arrReport[$rw['optText']]['GrossRevenue'] = $rw['GrossRevenue'];
 	}
 	
 	$sql = "SELECT customer_group_code as optValue, 
@@ -378,7 +377,7 @@ if(!isset($_GET['prtGHQ'])){
 	$tableID = "top_".md5(time());
 	?>
 	<table class="budget" id="<?php echo $tableID;?>">
-		<caption>Top 10 and bottom 5 customers, <?php echo urldecode($_GET['prtGHQ']), ", ", $period_title;?></caption>
+		<caption>Top and bottom customers, <?php echo urldecode($_GET['prtGHQ']), ", ", $period_title;?></caption>
 	<thead>	
 		<tr>
 			<th>Customer</th>
@@ -408,25 +407,27 @@ if(!isset($_GET['prtGHQ'])){
 	
 	
 	foreach ($arrTop as $customer=>$values){
-		_renderTopCustomerLine($values, $arrReportTotal, $customer);	
+		Reports::_renderTopCustomerLine($values, $arrReportTotal, $customer);	
+		$arrReportOther['GrossRevenue'] -=  $values['GrossRevenue'];
 		$arrReportOther['Revenue'] -=  $values['Revenue'];
 		$arrReportOther['GOP'] -=  $values['GOP'];
 		$arrReportOther['KPI'] -=  $values['KPI'];
 	}
 	
 	foreach ($arrBottom as $customer=>$values){
-		_renderTopCustomerLine($values, $arrReportTotal, $customer);	
+		Reports::_renderTopCustomerLine($values, $arrReportTotal, $customer);	
+		$arrReportOther['GrossRevenue'] -=  $values['GrossRevenue'];
 		$arrReportOther['Revenue'] -=  $values['Revenue'];
 		$arrReportOther['GOP'] -=  $values['GOP'];
 		$arrReportOther['KPI'] -=  $values['KPI'];
 	}
 	
-		_renderTopCustomerLine($arrReportOther, $arrReportTotal, "Others");
+		Reports::_renderTopCustomerLine($arrReportOther, $arrReportTotal, "Others");
 	?>
 	</tbody>
 	<tfoot>
 	<?php
-		_renderTopCustomerLine($arrReportTotal, $arrReportTotal, "Total", "budget-subtotal");
+		Reports::_renderTopCustomerLine($arrReportTotal, $arrReportTotal, "Total", "budget-subtotal");
 	?>	
 	</tfoot>
 	</table>
