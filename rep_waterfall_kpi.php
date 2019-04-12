@@ -57,7 +57,7 @@ $settings = Array(
 										0 as Budget, 
 										{$sqlActual} as Diff
 								FROM `{$sqlBaseTable}` 								
-								WHERE scenario='{$actual}' AND company='{$company}' %WHERE% AND activity IN (48,63)
+								WHERE scenario='{$actual}' AND company='{$company}' %WHERE% AND unit='TEU'
 								GROUP BY customer_group_code
 								UNION ALL
 								SELECT customer_group_code as optValue, 
@@ -66,7 +66,7 @@ $settings = Array(
 								{$sqlBudget}  as Budget, -{$sqlBudget} as Diff
 								FROM `{$sqlBaseTable}` 								
 								WHERE
-								scenario='{$budget}' AND source<>'Estimate' AND company='{$company}' %WHERE% AND activity IN (48,63)
+								scenario='{$budget}' AND source<>'Estimate' AND company='{$company}' %WHERE% AND unit='TEU'
 								GROUP BY customer_group_code";
 
 	$settings['kgcus']['sqlBase']="SELECT customer_group_code as optValue, 
