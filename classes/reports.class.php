@@ -443,6 +443,7 @@ class Reports{
 							";
 				break;
 			default:
+				/*
 				$sqlFrom = "SELECT activity, route,  source, ".$this->oBudget->getMonthlySumSQL(1,15).", freehand
 							FROM `reg_sales` 							
 							{$this->sqlWhere} AND scenario='{$this->oBudget->id}' AND kpi=1 and ".self::ACTUAL_DATA_FILTER."
@@ -456,6 +457,15 @@ class Reports{
 						AND activity IN (".implode(',',$activity_filter).")
 						AND `company`='{$this->company}'
 					GROUP BY activity, route, unit, freehand";
+				*/
+				$sqlFrom = "SELECT activity, route,  source, ".$this->oBudget->getMonthlySumSQL(1,15).", freehand
+							FROM `reg_sales` 							
+							{$this->sqlWhere} 
+							AND scenario='{$this->oBudget->id}' 
+							AND kpi=1
+							AND activity IN (".implode(',',$activity_filter).")
+							AND `company`='{$this->company}'
+							GROUP BY activity, route, unit, source, freehand";
 				break;
 		}
 		
