@@ -1717,8 +1717,8 @@ class Reports{
 		$arrRates_that = $this->oReference->getMonthlyRates($this->Currency);
 		
 		$sqlSelect = $this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset,max($this->oBudget->length,12+$this->oBudget->offset),$arrRates_this).", ".
-				"SUM(".$this->oBudget->getYTDSQL(1,3,$arrRates_this, $this->Denominator).") as Q1, ".
-				"SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates_this, $this->Denominator).") as Total_AM";
+				"SUM(".$this->oBudget->getYTDSQL(1,3,$arrRates_this).") as Q1, ".
+				"SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates_this).") as Total_AM";
 				
 
 		for ($i = 0;$i<count($arrChartType);$i++){
