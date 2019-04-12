@@ -419,6 +419,7 @@ class Reports{
 		
 		$this->oSQL->q("UPDATE reg_sales, tbl_sales SET bo=IFNULL(salBO,0),jo=salJO, posted=salFlagPosted WHERE source=salGUID");
 		$this->oSQL->q("UPDATE reg_sales SET freehand = IF( bo =714, 1, 0 )");
+		$this->oSQL->q("UPDATE reg_sales, vw_product_type SET unit=IFNULL(prtUnit,'') WHERE activity=prtID");
 		
 		switch ($type){
 			case 'OFF':
@@ -1697,7 +1698,7 @@ class Reports{
 		}
 		
 		$arrScenario = Array('last_a'=>$this->oLastYear->id, 'last_b'=>$this->oLastYear->reference, 'this_a'=>$this->oBudget->id,'this_b'=>$this->oReference->id);
-		$arrChartType[] = Array('id'=>'revenue','title'=>'Revenue','filter'=>self::REVENUE_FILTER);
+		$arrChartType[] = Array('id'=>'revenue','title'=>'Revenue','filter'=>self::GROSS_REVENUE_FILTER);
 		$arrChartType[] = Array('id'=>'gp','title'=>'Gross profit','filter'=>self::GP_FILTER);
 		$arrChartType[] = Array('id'=>'gop','title'=>'Gross operating profit','filter'=>self::GOP_FILTER);
 		$arrChartType[] = Array('id'=>'oop','title'=>'Own operating profit','filter'=>self::OWN_OPERATING_PROFIT);

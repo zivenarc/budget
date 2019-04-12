@@ -188,6 +188,8 @@ class Budget{
 	}
 	public function getMonthlySumSQL($start=4, $end=15, $arrRates = null, $denominator=1){
 		
+		if ($start>$end) return ('');
+		
 		for($m=$start;$m<=$end;$m++){
 			// $month = date('M',mktime(0,0,0,$m,15));			
 			$month = $this->arrPeriod[$m];
