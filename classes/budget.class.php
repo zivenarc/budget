@@ -17,6 +17,9 @@ class Budget{
 				LEFT JOIN `budget`.vw_journal ON guid=scnLastSource
 				WHERE scnID='$scenario'";
 		$rs = $this->oSQL->q($sql);
+		if(!$this->oSQL->n($rs)){
+			throw new Exception("Budget scenario {$scenario} doesn't exist");
+		};
 		$rw = $this->oSQL->f($rs);
 		
 		$this->year = (integer)$rw['scnYear'];
