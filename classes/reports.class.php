@@ -5139,11 +5139,14 @@ class Reports{
 			<td><?php echo $data['ivlTitle'];?></td>			
 			<td class="budget-decimal"><?php Reports::render($data['GrossRevenue'],0,'.',',');?></td>
 			<td class="budget-decimal"><?php Reports::render($data['Revenue'],0,'.',',');?></td>
-			<td class="budget-decimal"><?php Reports::render($data['GOP'],0,'.',',');?></td>
+			<td class="budget-decimal"><?php Reports::render($data['GP'],0,'.',',');?></td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GP'],$data['GrossRevenue'],1);?></td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GP'],$data['KPI']*100,0);?></td>
+			<td class="budget-decimal budget-ytd"><?php Reports::render($data['GOP'],0,'.',',');?></td>
 			<td class="budget-decimal"><?php Reports::render($data['KPI'],0,'.',',');?></td>
-			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['GrossRevenue'],0);?>%</td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['GrossRevenue'],1);?></td>
 			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['KPI']*100,0);?></td>
-			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$arrTotal['GOP'],0);?>%</td>
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$arrTotal['GOP'],0);?></td>
 		</tr>
 		<?php
 	}

@@ -291,32 +291,41 @@ if(!isset($_GET['prtGHQ'])){
 		$arrCGFilter[] = $rw['optValue'];	
 	}
 	
-	$sql = "SELECT customer_group_code as optValue, 
+	$arrMeasure = Array(Array('id'=>'Revenue','title'=>'Net revenue','filter'=>Reports::REVENUE_FILTER),
+						Array('id'=>'GrossRevenue','title'=>'Gross revenue','filter'=>Reports::GROSS_REVENUE_FILTER),
+						Array('id'=>'GP','title'=>'Gross profit','filter'=>Reports::GP_FILTER),
+						Array('id'=>'GOP','title'=>'GOP','filter'=>Reports::GOP_FILTER)
+						);
+
+	for($i = 0;$i<count($arrMeasure);$i++){
+		
+		$sql = "SELECT customer_group_code as optValue, 
 						customer_group_title as optText,  
-						{$sqlActual} as Revenue
+						{$sqlActual} as {$arrMeasure[$i]['id']}
 				FROM vw_master 				
 				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' ".Reports::REVENUE_FILTER."
+					AND  scenario='{$oBudget->id}' 
+					{$arrMeasure[$i]['filter']}
 					##AND  customer_group_code IN (".implode(',',$arrCGFilter).")
 				GROUP BY customer_group_code
 				";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		$arrReport[$rw['optText']]['Revenue'] = $rw['Revenue'];
-	}
-	
-	$sql = "SELECT customer_group_code as optValue, 
-						customer_group_title as optText,  
-						{$sqlActual} as GrossRevenue
-				FROM vw_master 				
+		
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){
+			$arrReport[$rw['optText']][$arrMeasure[$i]['id']] = $rw[$arrMeasure[$i]['id']];
+		}
+		
+		$sql = "SELECT {$sqlActual} as {$arrMeasure[$i]['id']} 
+				FROM vw_master 
 				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' ".Reports::GROSS_REVENUE_FILTER."
-					##AND  customer_group_code IN (".implode(',',$arrCGFilter).")
-				GROUP BY customer_group_code
-				";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		$arrReport[$rw['optText']]['GrossRevenue'] = $rw['GrossRevenue'];
+				AND  scenario='{$oBudget->id}' 
+				{$arrMeasure[$i]['filter']}";
+		$rs = $oSQL->q($sql);
+		$rw = $oSQL->f($rs);
+		$arrReportOther[$arrMeasure[$i]['id']] = $rw[$arrMeasure[$i]['id']];
+		$arrReportTotal[$arrMeasure[$i]['id']] = $rw[$arrMeasure[$i]['id']];
+		
+				
 	}
 	
 	$sql = "SELECT customer_group_code as optValue, 
@@ -345,35 +354,7 @@ if(!isset($_GET['prtGHQ'])){
 	$arrReportOther['KPI'] = $rw['KPI'];
 	$arrReportTotal['KPI'] = $rw['KPI'];
 	
-	$sql = "SELECT {$sqlActual} as GOP 
-					FROM vw_master 
-					{$sqlWhere}
-					AND  scenario='{$oBudget->id}' ".Reports::GOP_FILTER;
-	$rs = $oSQL->q($sql);
-	$rw = $oSQL->f($rs);
-	$arrReportOther['GOP'] = $rw['GOP'];
-	$arrReportTotal['GOP'] = $rw['GOP'];
-	
-	$sql = "SELECT {$sqlActual} as Revenue 
-					FROM vw_master 
-					{$sqlWhere}
-					AND  scenario='{$oBudget->id}' ".Reports::REVENUE_FILTER;
-					
-	$rs = $oSQL->q($sql);
-	$rw = $oSQL->f($rs);
-	$arrReportOther['Revenue'] = $rw['Revenue'];
-	$arrReportTotal['Revenue'] = $rw['Revenue'];	
-	
-	$sql = "SELECT {$sqlActual} as GrossRevenue 
-					FROM vw_master 
-					{$sqlWhere}
-					AND  scenario='{$oBudget->id}' ".Reports::GROSS_REVENUE_FILTER;
-					
-	$rs = $oSQL->q($sql);
-	$rw = $oSQL->f($rs);
-	$arrReportOther['GrossRevenue'] = $rw['GrossRevenue'];
-	$arrReportTotal['GrossRevenue'] = $rw['GrossRevenue'];
-	
+
 	$tableID = "top_".md5(time());
 	?>
 	<table class="budget" id="<?php echo $tableID;?>">
@@ -384,9 +365,12 @@ if(!isset($_GET['prtGHQ'])){
 			<th>Vertical</th>
 			<th>Gross Revenue</th>
 			<th>Net Revenue</th>
-			<th>GOP</th>
+			<th>GP</th>
+			<th>%</th>
+			<th>per unit</th>
+			<th class='budget-ytd'>GOP</th>
 			<th>Volume</th>
-			<th>Profitability</th>
+			<th>%</th>
 			<th>per unit</th>
 			<th>% of total</th>
 		</tr>
@@ -408,17 +392,17 @@ if(!isset($_GET['prtGHQ'])){
 	
 	foreach ($arrTop as $customer=>$values){
 		Reports::_renderTopCustomerLine($values, $arrReportTotal, $customer);	
-		$arrReportOther['GrossRevenue'] -=  $values['GrossRevenue'];
-		$arrReportOther['Revenue'] -=  $values['Revenue'];
-		$arrReportOther['GOP'] -=  $values['GOP'];
+		for($i = 0;$i<count($arrMeasure);$i++){
+			$arrReportOther[$arrMeasure[$i]['id']] -=  $values[$arrMeasure[$i]['id']];			
+		}
 		$arrReportOther['KPI'] -=  $values['KPI'];
 	}
 	
 	foreach ($arrBottom as $customer=>$values){
 		Reports::_renderTopCustomerLine($values, $arrReportTotal, $customer);	
-		$arrReportOther['GrossRevenue'] -=  $values['GrossRevenue'];
-		$arrReportOther['Revenue'] -=  $values['Revenue'];
-		$arrReportOther['GOP'] -=  $values['GOP'];
+		for($i = 0;$i<count($arrMeasure);$i++){
+			$arrReportOther[$arrMeasure[$i]['id']] -=  $values[$arrMeasure[$i]['id']];			
+		}
 		$arrReportOther['KPI'] -=  $values['KPI'];
 	}
 	

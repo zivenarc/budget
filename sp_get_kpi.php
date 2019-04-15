@@ -18,22 +18,22 @@ $year = $oBudget->year;
 
 set_time_limit($ytd*60);
 
-$arrKPI[] = Array('prtID'=>48,'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)",'output'=>true);
-$arrKPI[] = Array('prtID'=>58,'ghq'=>'Ocean import, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)",'output'=>true );
-$arrKPI[] = Array('prtID'=>63,'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate','output'=>true);
-$arrKPI[] = Array('prtID'=>52,'ghq'=>'Ocean export, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate','output'=>true);
-$arrKPI[] = Array('prtID'=>46,'ghq'=>'Air import','kpi'=>'SUM(jobGrossWeight)', 'date'=>'IFNULL(jobATAPort,jobETAPort)');
-$arrKPI[] = Array('prtID'=>47,'ghq'=>'Air export','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobShipmentDate');
-$arrKPI[] = Array('prtID'=>7,'ghq'=>'Distribution','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
-$arrKPI[] = Array('prtID'=>6,'ghq'=>'Delivery to plant','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
-$arrKPI[] = Array('prtID'=>3,'ghq'=>'Transportation','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
-$arrKPI[] = Array('prtID'=>4,'ghq'=>'Customs','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
-$arrKPI[] = Array('prtID'=>13,'ghq'=>'Int.trucking','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
-$arrKPI[] = Array('prtID'=>50,'ghq'=>'AFF c/c','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
-$arrKPI[] = Array('prtID'=>69,'ghq'=>'Rail','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
-$arrKPI[] = Array('prtID'=>61,'ghq'=>'Rail, OFF','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobETAPort');
-$arrKPI[] = Array('prtID'=>53,'ghq'=>'Door delivery','kpi'=>'SUM((SELECT COUNT(jcnID) FROM nlogjc.tbl_job_container WHERE jcnJobID=jobID))', 'date'=>'jobETAPort');
-$arrKPI[] = Array('prtID'=>55,'ghq'=>'Precarriage','kpi'=>'SUM((SELECT COUNT(jcnID) FROM nlogjc.tbl_job_container WHERE jcnJobID=jobID))', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>48,'filter'=>Array(48,72), 'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)",'output'=>true);
+$arrKPI[] = Array('prtID'=>58,'filter'=>Array(58),'ghq'=>'Ocean import, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)",'output'=>false );
+$arrKPI[] = Array('prtID'=>63,'filter'=>Array(63,91),'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate','output'=>true);
+$arrKPI[] = Array('prtID'=>52,'filter'=>Array(52),'ghq'=>'Ocean export, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate','output'=>false);
+$arrKPI[] = Array('prtID'=>46,'filter'=>Array(46,92),'ghq'=>'Air import','kpi'=>'SUM(jobGrossWeight)', 'date'=>'IFNULL(jobATAPort,jobETAPort)','output'=>true);
+$arrKPI[] = Array('prtID'=>47,'filter'=>Array(47,93),'ghq'=>'Air export','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobShipmentDate','output'=>true);
+$arrKPI[] = Array('prtID'=>7,'filter'=>Array(7),'ghq'=>'Distribution','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>6,'filter'=>Array(6),'ghq'=>'Delivery to plant','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>3,'filter'=>Array(3),'ghq'=>'Transportation','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>4,'filter'=>Array(4),'ghq'=>'Customs','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>13,'filter'=>Array(13),'ghq'=>'Int.trucking','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>50,'filter'=>Array(50),'ghq'=>'AFF c/c','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>69,'filter'=>Array(69),'ghq'=>'Rail','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>61,'filter'=>Array(61),'ghq'=>'Rail, OFF','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobETAPort');
+$arrKPI[] = Array('prtID'=>53,'filter'=>Array(53),'ghq'=>'Door delivery','kpi'=>'SUM((SELECT COUNT(jcnID) FROM nlogjc.tbl_job_container WHERE jcnJobID=jobID))', 'date'=>'jobETAPort');
+$arrKPI[] = Array('prtID'=>55,'filter'=>Array(55),'ghq'=>'Precarriage','kpi'=>'SUM((SELECT COUNT(jcnID) FROM nlogjc.tbl_job_container WHERE jcnJobID=jobID))', 'date'=>'jobShipmentDate');
 
 $sql = Array();
 
@@ -72,8 +72,9 @@ for ($i=0; $i<count($arrKPI);$i++){
 		<?php
 	}
 	
-	$sql[] = "SELECT  @prtID:=prtID, @jobGHQ:=prtGHQ, @unit:=prtUnit 
-				FROM vw_product_type WHERE prtID={$arrKPI[$i]['prtID']};";
+	$sql[] = "SELECT  @prtID:=`prtID`, @jobGHQ:=`prtGHQ`, @unit:=`prtUnit` 
+				FROM `vw_product_type` 
+				WHERE `prtID`={$arrKPI[$i]['prtID']}";
 	for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 	
 		$repDateStart = date('Y-m-d',mktime(0,0,0,$m,1,$year));
@@ -94,7 +95,8 @@ for ($i=0; $i<count($arrKPI);$i++){
 						AND (SELECT COUNT(jitGUID) 
 									FROM nlogjc.tbl_job_item 
 									LEFT JOIN common_db.tbl_product ON prdID=jitProductID 
-									WHERE jitJobID=jobID AND prdCategoryID=@prtID
+									WHERE jitJobID=jobID 
+										AND prdCategoryID IN (".implode(',',$arrKPI[$i]['filter']).")
 									)>0				
 					GROUP BY jobCustomerID, jobProfitID, jobPOL, jobPOD,jobFlagSAP, IFNULL(jobGDSBusinessOwnerID,714), jobGDSOwnerID
 					HAVING `{$month}` IS NOT NULL";
