@@ -16,21 +16,11 @@ include ('includes/inc_report_pcfilter.php'); /// filter and tabs for Business u
 
 if(!isset($_GET['pccGUID'])){
 
-	// $arrJS[] = 'https://www.google.com/jsapi';
-	
 	$arrJS[]="https://code.highcharts.com/highcharts.js";
 	$arrJS[]="https://code.highcharts.com/highcharts-more.js";
 	$arrJS[]="https://code.highcharts.com/modules/exporting.js";
 	
 	$arrJS[]='js/rep_pnl.js';
-	// $arrJS[]='js/input_form.js';	
-	
-	// $arrActions[] = Array ('title'=>'By customer group','action'=>"?type=customer_group");
-	// $arrActions[] = Array ('title'=>'By customer','action'=>"?type=customer");
-	// $arrActions[] = Array ('title'=>'By activity','action'=>"?type=activity");
-	// $arrActions[] = Array ('title'=>'By GHQ type','action'=>"?type=ghq");
-	// $arrActions[] = Array ('title'=>'By BDV staff','action'=>"?type=sales");
-	// $arrActions[] = Array ('title'=>'By PC','action'=>"?type=pc");
 		
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,$strVsTitle,'</h1>';
@@ -41,13 +31,12 @@ if(!isset($_GET['pccGUID'])){
 	
 	include ('includes/inc-frame_bottom.php');
 } else {
-
-	// include ('includes/inc_report_buttons.php');
 	
-	// $sqlWhere .= " AND scenario='$budget_scenario'";
+	$strPCHeader = $oBudget->arrProfit[$_GET['pccGUID']]["pccTitle{$strLocal}"];
+	
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator,'reference'=>$reference, 'filter'=>$filter));
 	
-	$oReport->periodicGraph();
+	$oReport->periodicGraph(Array('title'=>$strPCHeader));
 
 }
 

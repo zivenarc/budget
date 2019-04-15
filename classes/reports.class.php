@@ -1813,10 +1813,13 @@ class Reports{
 					} else {
 						$arrHSSeries[$arrChartType[$i]['id']][2][] = null;
 					}
+				
 				}
+				
 			}
 			
 		}
+		
 		
 		for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 			$period = $this->oBudget->arrPeriod[$m];
@@ -1837,9 +1840,10 @@ class Reports{
 						$arrHSSeries[$arrChartType[$i]['id']][2][] = round($rwData[$arrChartType[$i]['id']]['this_a'][$period]/$rwData['revenue']['this_a'][$period]*100,1);
 					} else {
 						$arrHSSeries[$arrChartType[$i]['id']][2][] = null;
-					}
+					}					
 				}
 			}	
+			
 			
 			$arrHighChartsAFF['xAxis']['categories'][] = $periodTitle;
 			$arrHighChartsOFF['xAxis']['categories'][] = $periodTitle;
@@ -1848,6 +1852,16 @@ class Reports{
 		}
 				
 		for ($i = 0;$i<count($arrChartType);$i++){
+
+
+			if($arrChartType[$i]['id']!='revenue'){
+				$arrHighCharts[$arrChartType[$i]['id']]['profitability']['last_a'] = array_sum($rwData[$arrChartType[$i]['id']]['last_a'])/array_sum($rwData['revenue']['last_a']);
+				$arrHighCharts[$arrChartType[$i]['id']]['profitability']['this_a'] = array_sum($rwData[$arrChartType[$i]['id']]['this_a'])/array_sum($rwData['revenue']['this_a']);
+				$arrHighCharts[$arrChartType[$i]['id']]['subtitle']['text'] .= "<br/>% to Revenue: <strong>".number_format($arrHighCharts[$arrChartType[$i]['id']]['profitability']['this_a']*100,1,'.',',')."</strong> vs last year ".number_format($arrHighCharts[$arrChartType[$i]['id']]['profitability']['last_a']*100,1,'.',',');
+			}
+
+
+
 			$s = count($arrHSSeries[$arrChartType[$i]['id']]);
 			foreach(range(0,11) as $m){
 				$arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
