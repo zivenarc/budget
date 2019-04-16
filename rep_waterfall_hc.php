@@ -15,7 +15,7 @@ $actual = $oActual->id;
 $budget = $oBudget->id;
 
 $limit = 8;
-$denominator = 1;
+$denominator = 12;
 $currency = 643;
 
 $arrActualRates = $oActual->getMonthlyRates($currency);
@@ -35,8 +35,8 @@ foreach($arrPeriodType as $id=>$title){
 
 $sqlBaseTable = 'vw_headcount';
 
-$sqlActual = "SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates,$oActual->cm-$oActual->offset).")";
-$sqlBudget = "SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates,$oActual->cm-$oActual->offset).")";
+$sqlActual = "SUM(".$oActual->getThisYTDSQL($period_type,$arrActualRates,$denominator).")";
+$sqlBudget = "SUM(".$oActual->getThisYTDSQL($period_type,$arrBudgetRates,$denominator).")";
 
 					
 						
