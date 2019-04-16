@@ -7,7 +7,7 @@ if (isset($_GET['budget_scenario'])) {
 } elseif (isset($_COOKIE['report_scenario'])) {
 	$budget_scenario = $_COOKIE['report_scenario'];
 } else {
-	$budget_scenario = $budget_scenario;
+	$budget_scenario = $arrSetup['stpFYEID'];
 }
 
 SetCookie('report_scenario',$budget_scenario,0,'/budget/');
