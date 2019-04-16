@@ -297,6 +297,27 @@ $settings['gpcusqq'] = Array('title'=>"GP by customer, quarters",
 						'tolerance'=>0.03,
 						'limit'=>15);							
 
+	$settings['gpcusmm'] = Array('title'=>"GP by customer, quarters",
+					'sqlBase' => "SELECT customer_group_code as optValue, 
+											customer_group_title as optText,
+										SUM(".$oActual->getYTDSQL(4,4,$arrActualRates).") as Actual, 
+										0 as Budget, 
+										SUM(".$oActual->getYTDSQL(4,4,$arrActualRates).") as Diff
+								FROM vw_master 								
+								WHERE scenario='{$actual}' ".Reports::GP_FILTER." AND company='{$company}'
+								GROUP BY customer_group_code
+								UNION ALL
+								SELECT customer_group_code as optValue, 
+											customer_group_title as optText, 
+											0 as Actual, 
+								SUM(".$oActual->getYTDSQL(15,15,$arrBudgetRates).") as Budget, 
+								-SUM(".$oActual->getYTDSQL(15,15,$arrBudgetRates).") as Diff
+								FROM vw_master 								
+								WHERE
+								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
+								GROUP BY customer_group_code",
+						'tolerance'=>0.03,
+						'limit'=>15);
 						
 $type = $_GET['type']?$_GET['type']:'gpcus';
 			
@@ -314,6 +335,10 @@ if (is_array($settings[$type])){
 	$settings['gpcusqq']['title'] = "GP by customer, quarters";
 	$settings['gpcusqq']['actual_title'] = 'Next quarter';
 	$settings['gpcusqq']['budget_title'] = 'Last quarter';
+
+	$settings['gpcusmm']['title'] = "GP by customer, months";
+	$settings['gpcusmm']['actual_title'] = 'April';
+	$settings['gpcusmm']['budget_title'] = 'March';
 	
 $oWF = new Waterfall($settings[$type]);
 	
