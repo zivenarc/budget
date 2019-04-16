@@ -52,29 +52,7 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
 								GROUP BY customer_group_code",
 						'tolerance'=>0.03,
-						'limit'=>15);
-
-$settings['gpcusqq'] = Array('title'=>"GP by customer, quarters",
-					'sqlBase' => "SELECT customer_group_code as optValue, 
-											customer_group_title as optText,
-										SUM(".$oActual->getThisYTDSQL('q2',$arrActualRates).") as Actual, 
-										0 as Budget, 
-										{$sqlActual} as Diff
-								FROM vw_master 								
-								WHERE scenario='{$actual}' ".Reports::GP_FILTER." AND company='{$company}'
-								GROUP BY customer_group_code
-								UNION ALL
-								SELECT customer_group_code as optValue, 
-											customer_group_title as optText, 
-											0 as Actual, 
-								SUM(".$oActual->getThisYTDSQL('q5',$arrBudgetRates).") as Budget, 
-								-SUM(".$oActual->getThisYTDSQL('q5',$arrBudgetRates).") as Diff
-								FROM vw_master 								
-								WHERE
-								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
-								GROUP BY customer_group_code",
-						'tolerance'=>0.03,
-						'limit'=>15);						
+						'limit'=>15);				
 						
 $settings['gopcus'] = Array('title'=>"GOP by customer",
 					'sqlBase' => "SELECT customer_group_code as optValue, 
@@ -295,7 +273,31 @@ $settings['bdcus'] = Array('title'=>"Bad debt by customer",
 								GROUP BY customer",
 						'tolerance'=>0.05,
 						'limit'=>10);
-			
+
+
+$settings['gpcusqq'] = Array('title'=>"GP by customer, quarters",
+					'sqlBase' => "SELECT customer_group_code as optValue, 
+											customer_group_title as optText,
+										SUM(".$oActual->getThisYTDSQL('q2',$arrActualRates).") as Actual, 
+										0 as Budget, 
+										SUM(".$oActual->getThisYTDSQL('q2',$arrActualRates).") as Diff
+								FROM vw_master 								
+								WHERE scenario='{$actual}' ".Reports::GP_FILTER." AND company='{$company}'
+								GROUP BY customer_group_code
+								UNION ALL
+								SELECT customer_group_code as optValue, 
+											customer_group_title as optText, 
+											0 as Actual, 
+								SUM(".$oActual->getThisYTDSQL('q5',$arrBudgetRates).") as Budget, 
+								-SUM(".$oActual->getThisYTDSQL('q5',$arrBudgetRates).") as Diff
+								FROM vw_master 								
+								WHERE
+								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
+								GROUP BY customer_group_code",
+						'tolerance'=>0.03,
+						'limit'=>15);							
+
+						
 $type = $_GET['type']?$_GET['type']:'gpcus';
 			
 if (is_array($settings[$type])){
@@ -305,12 +307,16 @@ if (is_array($settings[$type])){
 	$settings[$type]['denominator'] = $denominator;
 	$settings[$type]['currency'] = $arrCurrencySelector[$currency];	
 	
-	$oWF = new Waterfall($settings[$type]);
-
 } else {
 	die('Wrong report type');
 }
-					
+
+	$settings['gpcusqq']['title'] = "GP by customer, quarters";
+	$settings['gpcusqq']['actual_title'] = 'Next quarter';
+	$settings['gpcusqq']['budget_title'] = 'Last quarter';
+	
+$oWF = new Waterfall($settings[$type]);
+	
 $arrJS[] = 'js/rep_pnl.js';					
 require ('includes/inc-frame_top.php');
 
