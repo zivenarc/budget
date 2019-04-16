@@ -7,7 +7,7 @@ if (isset($_GET['budget_scenario'])) {
 } elseif (isset($_COOKIE['report_scenario'])) {
 	$budget_scenario = $_COOKIE['report_scenario'];
 } else {
-	$budget_scenario = $arrSetup['stpFYEID'];
+	$budget_scenario = $arrSetup['stpScenarioID'];
 }
 
 SetCookie('report_scenario',$budget_scenario,0,'/budget/');
@@ -18,7 +18,7 @@ if (isset($_GET['reference'])) {
 } elseif (isset($_COOKIE['reference'])) {
 	$reference = $_COOKIE['reference'];
 } else {
-	$reference = null; //--to use default reference from budget settings
+	$reference = $arrSetup['stpFYEID']; //--to use default reference from budget settings
 }
 
 SetCookie('reference',$reference,0,'/budget/');
