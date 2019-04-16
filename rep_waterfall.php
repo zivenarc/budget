@@ -54,6 +54,28 @@ $settings['gpcus'] = Array('title'=>"GP by customer",
 						'tolerance'=>0.03,
 						'limit'=>15);
 
+$settings['gpcusqq'] = Array('title'=>"GP by customer, quarters",
+					'sqlBase' => "SELECT customer_group_code as optValue, 
+											customer_group_title as optText,
+										SUM(".$oActual->getThisYTDSQL('q2',$arrActualRates).") as Actual, 
+										0 as Budget, 
+										{$sqlActual} as Diff
+								FROM vw_master 								
+								WHERE scenario='{$actual}' ".Reports::GP_FILTER." AND company='{$company}'
+								GROUP BY customer_group_code
+								UNION ALL
+								SELECT customer_group_code as optValue, 
+											customer_group_title as optText, 
+											0 as Actual, 
+								SUM(".$oActual->getThisYTDSQL('q5',$arrBudgetRates).") as Budget, 
+								-SUM(".$oActual->getThisYTDSQL('q5',$arrBudgetRates).") as Diff
+								FROM vw_master 								
+								WHERE
+								scenario='{$budget}' AND source<>'Estimate' ".Reports::GP_FILTER." AND company='{$company}'
+								GROUP BY customer_group_code",
+						'tolerance'=>0.03,
+						'limit'=>15);						
+						
 $settings['gopcus'] = Array('title'=>"GOP by customer",
 					'sqlBase' => "SELECT customer_group_code as optValue, 
 											customer_group_title as optText,
