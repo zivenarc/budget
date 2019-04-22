@@ -3694,7 +3694,7 @@ class Reports{
 						<tr class="budget-item <?php echo $values['class'];?>">					
 					<?php };
 					?>
-					<td><?php echo (isset($values['href'])?"<a href='{$values['href']}'>":""), $values['Budget item'].(isset($values['href'])?"</a>":"");?></td>
+					<td><?php echo (isset($values['href'])?"<a class='budget-details' href='{$values['href']}'>":""), $values['Budget item'].(isset($values['href'])?"</a>":"");?></td>
 					<?php
 					$this->_echoNumericTDs($values);
 					$row++;
@@ -3707,7 +3707,6 @@ class Reports{
 				}
 				$arrSubtotal['Budget item'] = "Subtotal";						
 				if ($flagSubtotal) $this->echoBudgetItemString($arrSubtotal,'budget-subtotal budget-item');
-				// $this->echoBudgetItemString($arrSubtotal,'budget-subtotal budget-item');
 			} else {	
 			?>
 			<td colspan="2" title="<?php echo $data['title'];?>" data-code='<?php echo $data['metadata'];?>'>
@@ -3718,8 +3717,7 @@ class Reports{
 					if (!isset($data['href'])){
 						echo $data['Budget item']?$data['Budget item']:'<None>';
 					} else {
-						// echo '<a target="_blank" href="javascript:getSource({\'item\':\''.$data['item'].'\'})">'.$data['Budget item'].'</a>';
-						echo "<a target='_blank' href='{$data['href']}'>{$data['Budget item']}</a>";
+						echo "<a class='budget-details' target='_blank' href='{$data['href']}'>{$data['Budget item']}</a>";
 					}
 				}
 			?>

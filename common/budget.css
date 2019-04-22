@@ -222,3 +222,20 @@ td.budget-current{
 	background-repeat:no-repeat;
 	background-position: left center;
 }
+
+a.budget-details:link{
+	color: inherit;
+	text-decoration:none;
+}
+a.budget-details:visited{
+	color: inherit;
+	text-decoration:none;
+}
+a.budget-details:hover{
+	color: blue;
+	text-decoration:dashed;
+}
+a.budget-details:active{
+	color: blue;
+	text-decoration:none;
+}
