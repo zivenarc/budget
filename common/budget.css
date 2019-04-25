@@ -233,7 +233,7 @@ a.budget-details:visited{
 }
 a.budget-details:hover{
 	color: blue;
-	text-decoration:dashed;
+	text-decoration:underline dashed;
 }
 a.budget-details:active{
 	color: blue;

@@ -370,6 +370,83 @@ class Indirect_costs extends Document{
 						AND source<>'estimate' 
 					GROUP BY pc, activity";
 				break;
+			case 'ai':
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." 
+					FROM reg_master 
+					LEFT JOIN vw_customer ON customer=cntID
+					WHERE scenario='".$oBudget->id."' 						
+						".Reports::REVENUE_FILTER."
+						AND pc<>99
+						AND source<>'estimate' 
+						AND activity IN (SELECT prtID FROM common_db.tbl_product_type WHERE prtGHQ='Air import')
+					GROUP BY pc, activity";
+				break;
+			case 'ae':
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." 
+					FROM reg_master 
+					LEFT JOIN vw_customer ON customer=cntID
+					WHERE scenario='".$oBudget->id."' 						
+						".Reports::REVENUE_FILTER."
+						AND pc<>99
+						AND source<>'estimate' 
+						AND activity IN (SELECT prtID FROM common_db.tbl_product_type WHERE prtGHQ='Air export')
+					GROUP BY pc, activity";
+				break;
+			case 'oi':
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." 
+					FROM reg_master 
+					LEFT JOIN vw_customer ON customer=cntID
+					WHERE scenario='".$oBudget->id."' 
+						".Reports::REVENUE_FILTER."
+						AND pc<>99
+						AND source<>'estimate' 
+						AND activity IN (SELECT prtID FROM common_db.tbl_product_type WHERE prtGHQ='Ocean import')
+					GROUP BY pc, activity";
+				break;
+			case 'oe':
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." 
+					FROM reg_master 
+					LEFT JOIN vw_customer ON customer=cntID
+					WHERE scenario='".$oBudget->id."' 
+						".Reports::REVENUE_FILTER."
+						AND pc<>99
+						AND source<>'estimate' 
+						AND activity IN (SELECT prtID FROM common_db.tbl_product_type WHERE prtGHQ='Ocean export')
+					GROUP BY pc, activity";
+				break;
+			case 'ocm':
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." 
+					FROM reg_master 
+					LEFT JOIN vw_customer ON customer=cntID
+					WHERE scenario='".$oBudget->id."' 
+						".Reports::REVENUE_FILTER."
+						AND pc<>99
+						AND source<>'estimate' 
+						AND activity IN (SELECT prtID FROM common_db.tbl_product_type WHERE prtGHQ LIKE '%OCM%')
+					GROUP BY pc, activity";
+				break;
+			case 'lt':
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." 
+					FROM reg_master 
+					LEFT JOIN vw_customer ON customer=cntID
+					WHERE scenario='".$oBudget->id."' 
+						".Reports::REVENUE_FILTER."
+						AND pc<>99
+						AND source<>'estimate' 
+						AND activity IN (SELECT prtID FROM common_db.tbl_product_type WHERE prtGHQ = 'Land transport')
+					GROUP BY pc, activity";
+				break;
+			case 'wh':
+				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." 
+					FROM reg_master 
+					LEFT JOIN vw_customer ON customer=cntID
+					WHERE scenario='".$oBudget->id."' 
+						".Reports::REVENUE_FILTER."
+						AND pc<>99
+						AND source<>'estimate' 
+						AND activity IN (SELECT prtID FROM common_db.tbl_product_type WHERE prtGHQ = 'Warehouse')
+					GROUP BY pc, activity";
+				break;
 			case 'payroll':
 				$sql =  "SELECT pc, activity, 9802 as customer, '' as comment, 'RUB' as 'unit', ".$this->budget->getMonthlySumSQL(1,15)." 
 					FROM reg_master 

@@ -13,7 +13,10 @@ $oBudget = new Budget($oDocument->scenario);
 
 if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
-	
+	if(strpos($_POST['DataAction'],'fill_')!==false){
+		$oDocument->fill_general_costs($oBudget, str_replace('fill_','',$_POST['DataAction']));	
+	}
+	/*
 	switch ($_POST['DataAction']){
 		case 'fill_hc':
 			$oDocument->fill_general_costs($oBudget);
@@ -32,8 +35,21 @@ if ($_POST['DataAction']){
 			break;
 		case 'fill_payroll':
 			$oDocument->fill_general_costs($oBudget, 'payroll');
-			break;	
+			break;
+		case 'fill_ai':
+			$oDocument->fill_general_costs($oBudget, 'ai');
+			break;
+		case 'fill_ae':
+			$oDocument->fill_general_costs($oBudget, 'ae');
+			break;
+		case 'fill_oi':
+			$oDocument->fill_general_costs($oBudget, 'oi');
+			break;
+		case 'fill_oe':
+			$oDocument->fill_general_costs($oBudget, 'oe');
+			break;
 	}
+	*/
 	
 	if ($oDocument->save($_POST['DataAction'])){
 		$oDocument->refresh($oDocument->ID);
@@ -75,6 +91,13 @@ if ($oDocument->GUID && !$oDocument->flagPosted){
 	$arrActions[] = Array ('title'=>'TEU','action'=>'javascript:fillGrid(\'_teu\');','class'=>'bricks');
 	$arrActions[] = Array ('title'=>'Revenue','action'=>'javascript:fillGrid(\'_revenue\');','class'=>'money');
 	$arrActions[] = Array ('title'=>'Payroll','action'=>'javascript:fillGrid(\'_payroll\');','class'=>'fa-users');
+	$arrActions[] = Array ('title'=>'Air import','action'=>'javascript:fillGrid(\'_ai\');','class'=>'hidden');
+	$arrActions[] = Array ('title'=>'Air export','action'=>'javascript:fillGrid(\'_ae\');','class'=>'hidden');
+	$arrActions[] = Array ('title'=>'Ocean import','action'=>'javascript:fillGrid(\'_oi\');','class'=>'hidden');
+	$arrActions[] = Array ('title'=>'Ocean export','action'=>'javascript:fillGrid(\'_oe\');','class'=>'hidden');
+	$arrActions[] = Array ('title'=>'OCM','action'=>'javascript:fillGrid(\'_ocm\');','class'=>'hidden');
+	$arrActions[] = Array ('title'=>'LT','action'=>'javascript:fillGrid(\'_lt\');','class'=>'hidden');
+	$arrActions[] = Array ('title'=>'CL','action'=>'javascript:fillGrid(\'_wh\');','class'=>'hidden');
 }
 
 //============================== Main form definition ==============================
