@@ -395,7 +395,7 @@ class Headcount extends Document{
 								
 						// $start_date = strtotime($_POST['start_date'][$id]);
 								
-						for ($m=1;$m<=15;$m++){
+						for ($m=$oBudget->nm;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
 							$current_month_start = mktime(0,0,0,$m,1,$this->budget->year);
 							$current_month_end = mktime(0,0,0,$m+1,0,$this->budget->year);
