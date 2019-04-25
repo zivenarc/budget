@@ -902,43 +902,55 @@ class Headcount extends Document{
 		
 		
 		$arrMaternity = Array();
-		$sql = "SELECT DISTINCT(vacEmployeeID) as empID, empTitle,vacDateEnd
-					FROM treasury.tbl_vacation 
-					LEFT JOIN common_db.tbl_employee ON empID=vacEmployeeID
-					WHERE vacVactypeID IN (4,5) 
-						AND vacDateStart<'{$dateBudgetEnd}' AND vacDateEnd>'{$dateBudgetStart}'
-						AND empProfitID='{$this->pc->code}'";
-		$rs = $this->oSQL->q($sql);
-		while ($rw = $this->oSQL->f($rs)){
-			$arrMaternity[] = $rw['empID'];
-			$this->comment .= "\r\n".$rw['empTitle']." on maternity leave till ".date('M Y',strtotime($rw['vacDateEnd']));
-		}
-		$sql = "SELECT DISTINCT(sklEmployeeID) as empID, empTitle,sklDateEnd
+		// получить БИР, приходящиеся на бюджетный период
+		$sql = "SELECT empID, empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID, funFlagSGA, funFlagSGA,empSalary,empSalaryRevision,IF(empMonthly=0,funBonus,empMonthly)+empSkill as empMonthly,funMobile,funFuel
+						,empTitle
+						,MAX(sklDateEnd) as empStartDate
+						,MIN(sklDateStart) as empEndDate
 					FROM treasury.tbl_sickleave
 					LEFT JOIN common_db.tbl_employee ON empID=sklEmployeeID
+					LEFT JOIN common_db.tbl_function ON funID=empFunctionGUID
 					WHERE DATEDIFF(sklDateEnd, sklDateStart)>=139 AND sklDateStart<'{$dateBudgetEnd}' AND sklDateEnd>'{$dateBudgetStart}'
 						AND empProfitID='{$this->pc->code}'";
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
-			$arrMaternity[] = $rw['empID'];
+			$arrMaternity[$rw['empID']] = $rw;
 			$this->comment .= "\r\n".$rw['empTitle']." on maternity leave till ".date('M Y',strtotime($rw['sklDateEnd']));
 		}
+		
+		// получить отпуска по уходу за ребенком
+		$sql = "SELECT empID, empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID, funFlagSGA, funFlagSGA,empSalary,empSalaryRevision,IF(empMonthly=0,funBonus,empMonthly)+empSkill as empMonthly,funMobile,funFuel
+						,empTitle
+						,MAX(vacDateEnd) as empStartDate
+						,MIN(vacDateStart) as empEndDate
+					FROM treasury.tbl_vacation 
+					LEFT JOIN common_db.tbl_employee ON empID=vacEmployeeID
+					LEFT JOIN common_db.tbl_function ON funID=empFunctionGUID
+					WHERE vacVactypeID IN (4,5) 
+						AND vacDateStart<'{$dateBudgetEnd}' AND vacDateEnd>'{$dateBudgetStart}'
+						AND empProfitID='{$this->pc->code}'
+					GROUP BY vacEmployeeID";
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			$arrMaternity[$rw['empID']] = array_merge($rw,Array('empStartDate'=>max($rw['empStartDate'],$arrMaternity[$rw['empID']]['empStartDate']),'empEndDate'=>min($rw['empEndDate'],$arrMaternity[$rw['empID']]['empEndDate'])));
+			$this->comment .= "\r\n".$rw['empTitle']." on maternity leave till ".date('M Y',strtotime($rw['vacDateEnd']));
+		}
+		
 		// if (is_array($arrMaternity)){
 			// $strMaternity = implode(',',$arrMaternity);
 		// } else {
 			// $strMaternity = 'NULL';
 		// }
 		
-		$sql = "SELECT empID, empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID,funMobile,funFuel,funFlagSGA, empStartDate,empEndDate,
-						empSalary
-						,empFTE
-						,empSalaryRevision
-						,IF(empMonthly=0,funBonus,empMonthly)+empSkill as empMonthly
+		$sql = "SELECT empID, empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID, funFlagSGA, funFlagSGA,empSalary,empSalaryRevision,IF(empMonthly=0,funBonus,empMonthly)+empSkill as empMonthly,funMobile,funFuel
+						,empStartDate						
+						,empFTE						
 						,(SELECT SUM(dmsPrice) FROM tbl_insurance WHERE dmsLocationID=empLocationID) as insurance
-					, (SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090 AND DATEDIFF(rsgDateEnd,'".date('Y-m-d',$this->budget->date_start)."')>0) as empEndDate
+						,(SELECT MAX(rsgDateEnd) FROM treasury.tbl_resignation WHERE rsgEmployeeID=empID AND rsgStateID<>1090 AND DATEDIFF(rsgDateEnd,'".date('Y-m-d',$this->budget->date_start)."')>0) as empEndDate
 					FROM vw_employee_select 
 					WHERE empProfitID={$this->pc->code}
-						AND empFlagDeleted=0 AND (empEndDate IS NULL OR DATEDIFF(empEndDate,'".date('Y-m-d',$this->budget->date_start)."')>=0)
+						AND empFlagDeleted=0 
+						AND (empEndDate IS NULL OR DATEDIFF(empEndDate,'".date('Y-m-d',$this->budget->date_start)."')>=0)
 					ORDER BY empSalary DESC, empFunctionGUID, empTitleLocal";//die($sql);
 		
 				
@@ -960,12 +972,12 @@ class Headcount extends Document{
 			$row->sga = $rw['funFlagSGA'];				
 			$row->location = $rw['empLocationID'];			
 			$row->activity = $rw['empProductTypeID'];//?$rw['empProductTypeID']:$this->pc->activity;			
-			$row->salary = in_array($rw['empID'],$arrMaternity)? 0 : $rw['empSalary'];
+			$row->salary = in_array($rw['empID'],array_keys($arrMaternity))? 0 : $rw['empSalary'];
 			$row->review_date = strtotime($rw['empSalaryRevision']);
-			$row->monthly_bonus = $rw['empMonthly'];
+			$row->monthly_bonus = in_array($rw['empID'],array_keys($arrMaternity))? 0 : $rw['empMonthly'];
 			$row->insurance = $rw['insurance'];
-			$row->mobile_limit = $rw['funMobile'];
-			$row->fuel = $rw['funFuel'];
+			$row->mobile_limit = in_array($rw['empID'],array_keys($arrMaternity))? 0 : $rw['funMobile'];
+			$row->fuel = in_array($rw['empID'],array_keys($arrMaternity))? 0 : $rw['funFuel'];
 			$row->start_date = strtotime($rw['empStartDate']);
 			$row->end_date = strtotime($rw['empEndDate']);
 			
@@ -973,7 +985,34 @@ class Headcount extends Document{
 				$month = $this->budget->arrPeriod[$m];
 				$row->{$month} = $rw['empFTE']*$row->getFTE($m, $oBudget->year);						
 			}
-		}	
+		}
+
+		if(count($arrMaternity)){
+			foreach($arrMaternity as $empID=>$rw){
+				$row = $this->add_record();
+				$row->flagUpdated = true;				
+				$row->profit = $this->pc->code;
+				$row->employee = $rw['empGUID1C'];				
+				$row->job = $rw['empFunctionGUID'];
+				$row->wc = $rw['funFlagWC'];				
+				$row->sga = $rw['funFlagSGA'];				
+				$row->location = $rw['empLocationID'];			
+				$row->activity = $rw['empProductTypeID'];//?$rw['empProductTypeID']:$this->pc->activity;			
+				$row->salary = $rw['empSalary'];
+				$row->review_date = strtotime($rw['empSalaryRevision']);
+				$row->monthly_bonus = $rw['empMonthly'];
+				$row->insurance = 0;
+				$row->mobile_limit = $rw['funMobile'];
+				$row->fuel = $rw['funFuel'];
+				$row->start_date = strtotime($rw['empStartDate']);
+				$row->end_date = strtotime($rw['empEndDate']);
+				
+				for ($m=$this->budget->nm;$m<=15;$m++){
+					$month = $this->budget->arrPeriod[$m];
+					$row->{$month} = $row->getFTE($m, $oBudget->year);						
+				}
+			}
+		}
 	}
 
 	private function _getSocialTaxYTD($salary, $period){
