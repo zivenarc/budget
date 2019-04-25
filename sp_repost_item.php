@@ -2,18 +2,19 @@
 // $flagNoAuth =true;
 require ('common/auth.php');
 require_once('classes/item.class.php');
+require ('classes/reports.class.php');
 
 $itmGUID = isset($_GET['itmGUID'])?$_GET['itmGUID']:$_COOKIE['itmGUID'];
 SetCookie('itmGUID',$itmGUID);
 
 if ($_GET['tab']){
-	
+	$oBudget = new Budget($_GET['tab']);
 	?>
 <button onclick="repost('<?php echo $_GET['tab']; ?>', event);">Repost documents</button>
 <div/>
 
 	<?php
-	require ('classes/reports.class.php');
+	
 	
 	$sql = "SELECT *,  edit_date as timestamp 
 		FROM vw_journal 			
@@ -34,9 +35,57 @@ if ($_GET['tab']){
 		Reports::getJournalEntries($data);
 		echo '</div>';
 		
+		$sql = "SELECT SUM(".$oBudget->getYTDSQL(4,15).") as FYE, Profit, prtGHQ 
+				FROM vw_master 
+				WHERE company='{$company}'
+				AND scenario='{$oBudget->id}'
+				AND item='{$itmGUID}'
+				GROUP BY Profit, prtGHQ
+				ORDER BY Profit, prtGHQ";
+				
+		//echo '<pre>',$sql,'</pre>';
+		$rs =$oSQL->q($sql);
+		while ($rw=$oSQL->f($rs)){
+			$arrReport[$rw['prtGHQ']][$rw['Profit']] = $rw['FYE'];
+			$arrTotal[$rw['Profit']] += $rw['FYE'];
+		}
+		$tableID='report_'.$itmGUID;
+		?>
+		<table id='<?php echo $tableID;?>' class='budget'>
+			<thead>
+				<tr>
+					<th>Product/BU</th>
+					<?php foreach($arrTotal as $profit=>$amount){
+						echo "<th>{$profit}</th>";
+					} ?>
+					<th class='budget-ytd'>Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach($arrReport as $product=>$data){
+				?><tr>
+					<td><?php echo $product;?></td>
+					<?php foreach($arrTotal as $profit=>$amount){
+						echo "<td class='budget-decimal'>",Reports::render($data[$profit]),"</td>";
+					} ?>
+					<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($data));?></td>
+				</tr><?php
+				}?>
+			</tbody>
+			<tfoot>
+				<tr class="budget-subtotal">
+					<td>Total</td>
+					<?php foreach($arrTotal as $profit=>$amount){
+						echo "<td class='budget-decimal'>",Reports::render($amount),"</td>";
+					} ?>
+					<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrTotal));?></td>
+				</tr>
+			</tfoot>
+		</table>
+		<button onclick="SelectContent('<?php echo $tableID;?>')">Copy table</button>
+		<?php
 	
-} else {
-	require ('classes/budget.class.php');
+} else {	
 	$arrJS[] = 'js/journal.js';		
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
