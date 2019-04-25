@@ -549,6 +549,8 @@ class Headcount extends Document{
 									AND bnsPeriodID=(SELECT MAX(bpdID) FROM treasury.tbl_bonus_period WHERE bpdDateEnd<'".date('Y-m-d',$this->budget->date_start)."' AND bpdFlagSalaryReview=1)";
 						$rs = $this->oSQL->q($sql);
 						$bnsReviewedSalary = $this->oSQL->get_data($rs);
+					} else {
+						$bnsReviewedSalary = null;
 					};
 					// echo '<pre>',$sql,'</pre>';die();
 					
