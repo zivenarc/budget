@@ -541,14 +541,15 @@ class Headcount extends Document{
 					$social_tax = Array();					
 					$salarySubtotal = 0;
 					
-					$sql = "SELECT IF(bnsStateID=2270,bnsApprovedSalary,bnsReviewedSalary) as bnsReviewedSalary
-							FROM treasury.tbl_bonus 
-							WHERE bnsEmployeeID=(SELECT empID FROM common_db.tbl_employee WHERE empGUID1C='{$record->employee}')
-								AND bnsStateID BETWEEN 2220 AND 2270
-								AND bnsPeriodID=(SELECT MAX(bpdID) FROM treasury.tbl_bonus_period WHERE bpdDateEnd<'".date('Y-m-d',$this->budget->date_start)."' AND bpdFlagSalaryReview=1)";
-					$rs = $this->oSQL->q($sql);
-					$bnsReviewedSalary = $this->oSQL->get_data($rs);
-					
+					if($record->salary!=0){
+						$sql = "SELECT IF(bnsStateID=2270,bnsApprovedSalary,bnsReviewedSalary) as bnsReviewedSalary
+								FROM treasury.tbl_bonus 
+								WHERE bnsEmployeeID=(SELECT empID FROM common_db.tbl_employee WHERE empGUID1C='{$record->employee}')
+									AND bnsStateID BETWEEN 2220 AND 2270
+									AND bnsPeriodID=(SELECT MAX(bpdID) FROM treasury.tbl_bonus_period WHERE bpdDateEnd<'".date('Y-m-d',$this->budget->date_start)."' AND bpdFlagSalaryReview=1)";
+						$rs = $this->oSQL->q($sql);
+						$bnsReviewedSalary = $this->oSQL->get_data($rs);
+					};
 					// echo '<pre>',$sql,'</pre>';die();
 					
 					for($m=1;$m<=15;$m++){
