@@ -909,7 +909,7 @@ class Headcount extends Document{
 						,MIN(sklDateStart) as empEndDate
 					FROM treasury.tbl_sickleave
 					LEFT JOIN common_db.tbl_employee ON empID=sklEmployeeID
-					LEFT JOIN common_db.tbl_function ON funID=empFunctionGUID
+					LEFT JOIN common_db.tbl_function ON funGUID=empFunctionGUID
 					WHERE DATEDIFF(sklDateEnd, sklDateStart)>=139 AND sklDateStart<'{$dateBudgetEnd}' AND sklDateEnd>'{$dateBudgetStart}'
 						AND empProfitID='{$this->pc->code}'";
 		$rs = $this->oSQL->q($sql);
@@ -925,7 +925,7 @@ class Headcount extends Document{
 						,MIN(vacDateStart) as empEndDate
 					FROM treasury.tbl_vacation 
 					LEFT JOIN common_db.tbl_employee ON empID=vacEmployeeID
-					LEFT JOIN common_db.tbl_function ON funID=empFunctionGUID
+					LEFT JOIN common_db.tbl_function ON funGUID=empFunctionGUID
 					WHERE vacVactypeID IN (4,5) 
 						AND vacDateStart<'{$dateBudgetEnd}' AND vacDateEnd>'{$dateBudgetStart}'
 						AND empProfitID='{$this->pc->code}'
