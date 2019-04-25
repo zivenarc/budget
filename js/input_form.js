@@ -428,8 +428,8 @@ function fillReviewedSalary(){
 				$bonus = $('td.headcount_monthly_bonus input',$tr);
 				if(data[guid]!=undefined){
 					if(parseFloat($salary.val())!=0){
-						$salary.val(format_number(parseFloat(data[guid].salary),2,'.',',')).css({color:'blue'});
-						$bonus.val(format_number(parseFloat(data[guid].bonus),2,'.',',')).css({color:'blue'});
+						$salary.val(number_format(parseFloat(data[guid].salary),2,'.',',')).css({color:'blue'});
+						$bonus.val(number_format(parseFloat(data[guid].bonus),2,'.',',')).css({color:'blue'});
 						$tr.find('input[name="review_date[]"]').val(data[guid].reviewDate).parent('td').text(data[guid].reviewDate).css({color:'blue'});
 						var $inpUpdated = $tr.find("input[name='inp_"+doc.gridName+"_updated[]']").val(1);
 					}
