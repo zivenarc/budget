@@ -395,7 +395,7 @@ class Headcount extends Document{
 								
 						// $start_date = strtotime($_POST['start_date'][$id]);
 								
-						for ($m=$this->oBudget->nm;$m<=15;$m++){
+						for ($m=$this->budget->nm;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
 							$current_month_start = mktime(0,0,0,$m,1,$this->budget->year);
 							$current_month_end = mktime(0,0,0,$m+1,0,$this->budget->year);
@@ -690,7 +690,7 @@ class Headcount extends Document{
 						
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
-							$next_month_start = mktime(0,0,0,$m+1,1,$this->oBudget->year);
+							$next_month_start = mktime(0,0,0,$m+1,1,$this->budget->year);
 							if(date('Ym',$start_date) < date('Ym',$next_month_start)){
 								$master_row->{$month} = - $record->{$month}*$this->settings['pc_profile_'.$record->pc_profile]*$this->settings['usd']/36;
 							}
@@ -768,7 +768,7 @@ class Headcount extends Document{
 					
 					for($m=1;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
-						$month_start = mktime(0,0,0,$m,1,$this->oBudget->year);
+						$month_start = mktime(0,0,0,$m,1,$this->budget->year);
 						if ($probation<$month_start){
 							if ($m == $ins_exp_month){
 								$master_row->{$month} = - $record->{$month}
@@ -803,7 +803,7 @@ class Headcount extends Document{
 						
 						for($m=1;$m<=15;$m++){
 							$month = $this->budget->arrPeriod[$m];
-							$month_start = mktime(0,0,0,$m,1,$this->oBudget->year);
+							$month_start = mktime(0,0,0,$m,1,$this->budget->year);
 							if (date('m.Y',$start_date)==date('m.Y',$month_start)){
 								$master_row->{$month} = - abs($record->new_fte) * $this->settings['hiring'] * $record->salary * 12;							
 							}						
