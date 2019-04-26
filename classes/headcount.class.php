@@ -939,7 +939,7 @@ class Headcount extends Document{
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
 			$arrMaternity[$rw['empID']] = array_merge($rw,Array('empStartDate'=>max($rw['empStartDate'],$arrMaternity[$rw['empID']]['empStartDate']),'empEndDate'=>min($rw['empEndDate'],$arrMaternity[$rw['empID']]['empEndDate'])));
-			$this->comment .= "\r\n".$rw['empTitle']." on maternity leave till ".$rw['vacDateEnd']);
+			$this->comment .= "\r\n".$rw['empTitle']." on maternity leave till ".$rw['vacDateEnd'];
 		}
 		
 		// if (is_array($arrMaternity)){
