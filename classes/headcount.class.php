@@ -908,22 +908,25 @@ class Headcount extends Document{
 		// получить БИР, приходящиеся на бюджетный период
 		$sql = "SELECT empID, empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID, funFlagSGA, funFlagSGA,empSalary,empSalaryRevision,IF(empMonthly=0,funBonus,empMonthly)+empSkill as empMonthly,funMobile,funFuel
 						,empTitle
+						,MAX(sklDateEnd) as sklDateEnd
 						,MAX(sklDateEnd) as empStartDate
 						,MIN(sklDateStart) as empEndDate
 					FROM treasury.tbl_sickleave
 					LEFT JOIN common_db.tbl_employee ON empID=sklEmployeeID
 					LEFT JOIN common_db.tbl_function ON funGUID=empFunctionGUID
 					WHERE DATEDIFF(sklDateEnd, sklDateStart)>=139 AND sklDateStart<'{$dateBudgetEnd}' AND sklDateEnd>'{$dateBudgetStart}'
-						AND empProfitID='{$this->pc->code}'";
+						AND empProfitID='{$this->pc->code}'
+					GROUP BY sklEmployeeID";
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
 			$arrMaternity[$rw['empID']] = $rw;
-			$this->comment .= "\r\n".$rw['empTitle']." on maternity leave till ".date('M Y',strtotime($rw['sklDateEnd']));
+			$this->comment .= "\r\n".$rw['empTitle']." on maternity leave till ".$rw['sklDateEnd'];
 		}
 		
 		// получить отпуска по уходу за ребенком
 		$sql = "SELECT empID, empGUID1C,empFunctionGUID,funFlagWC,empLocationID,empProductTypeID, funFlagSGA, funFlagSGA,empSalary,empSalaryRevision,IF(empMonthly=0,funBonus,empMonthly)+empSkill as empMonthly,funMobile,funFuel
 						,empTitle
+						,MAX(vacDateEnd) as vacDateEnd
 						,MAX(vacDateEnd) as empStartDate
 						,MIN(vacDateStart) as empEndDate
 					FROM treasury.tbl_vacation 
@@ -936,7 +939,7 @@ class Headcount extends Document{
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
 			$arrMaternity[$rw['empID']] = array_merge($rw,Array('empStartDate'=>max($rw['empStartDate'],$arrMaternity[$rw['empID']]['empStartDate']),'empEndDate'=>min($rw['empEndDate'],$arrMaternity[$rw['empID']]['empEndDate'])));
-			$this->comment .= "\r\n".$rw['empTitle']." on maternity leave till ".date('M Y',strtotime($rw['vacDateEnd']));
+			$this->comment .= "\r\n".$rw['empTitle']." on maternity leave till ".$rw['vacDateEnd']);
 		}
 		
 		// if (is_array($arrMaternity)){

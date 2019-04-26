@@ -16,7 +16,7 @@ if ($_GET['tab']){
 		FROM vw_journal 				
 		LEFT JOIN stbl_user ON usrID=vw_journal.edit_by	
 		LEFT JOIN reg_headcount ON source=vw_journal.guid
-		WHERE vw_journal.posted=1 AND vw_journal.scenario='{$_GET['tab']}' 
+		WHERE vw_journal.scenario='{$_GET['tab']}' 
 		AND prefix IN ('cem','nem')
 		GROUP BY vw_journal.guid
 		ORDER BY vw_journal.edit_date ASC";	
