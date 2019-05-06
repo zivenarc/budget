@@ -4,6 +4,46 @@ include ('classes/reports.class.php');
 $arrJS[] = 'js/journal.js';
 $arrJS[] = 'js/budget_setup.js';
 
+if ($_GET['DataAction']=='excel_msf'){
+	$oBudget = new Budget($_GET['budget_scenario']);
+	include_once ("../common/eiseList/inc_excelXML.php");
+	$xl = new excelXML();            
+	$arrHeader = Array('Организация','Подразделение','YACT','Наименование','Номенклатурная группа','GHQ Product','Сумма. руб.');	
+	$xl->addHeader($arrHeader);
+	
+	$sql = "SELECT comTitle, Profit, account, Title, Activity_title_local, prtGHQ, ".$oBudget->getMonthlySumSQL()."
+			FROM vw_master
+			LEFT JOIN common_db.tbl_company ON comID=company
+			WHERE scenario='{$_GET['budget_scenario']}'
+			".Reports::MSF_FILTER."
+			GROUP BY company, Profit, account, activity
+			ORDER BY company, Profit, account, activity";
+			
+			
+	// die($sql);
+	
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+	
+			$arrRow = Array();
+			$arrRow[] = $rw['comTitle'];	
+			$arrRow[] = $rw['Profit'];					
+			$arrRow[] = $rw['account'];					
+			$arrRow[] = $rw['Title'];					
+			$arrRow[] = $rw['Activity_title_local'];					
+			$arrRow[] = $rw['prtGHQ'];												
+			for($m=4;$m<=15;$m++){
+				$month = $oBudget->arrPeriod[$m];
+				$arrRow[] = number_format($rw[$month],0,'.','');
+			}			
+			$xl->addRow($arrRow);
+	}
+     
+	$xl->Output("MSF_".urlencode($oBudget->title)."_".date('Ymd'));
+	die();	
+}
+
+
 if ($_GET['DataAction']=='excel_gp'){
 	$oBudget = new Budget($_GET['budget_scenario']);
 	include_once ("../common/eiseList/inc_excelXML.php");
