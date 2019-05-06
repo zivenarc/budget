@@ -53,8 +53,11 @@ switch($_GET['DataAction']){
 							UNION ALL
 							SELECT 'CNT', cntGUID1C, TRIM(cntID) FROM vw_supplier) PART
 					on PART.guid=particulars
-			where `active` = 1 AND scenario=".$oSQL->e($scenario)." 
+			where 
+				`active` = 1 
+				AND scenario=".$oSQL->e($scenario)." 
 				AND source<>'estimate'
+				AND company='000000001'
 				 AND pccCode1C=".$oSQL->e($pccCode1C)."
 			GROUP BY activity, customer, account, item, particulars";
 			break;
