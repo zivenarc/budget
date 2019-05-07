@@ -368,7 +368,7 @@ class Distribution extends Document{
 						$master_row->{$month} = -$total[$month];
 					}
 				}
-				$oMaster->save();
+				$oMaster->save(true);//save to actual periods, too
 				
 				$this->doSQL("UPDATE `reg_master` SET `customer`=".self::EMPTY_CUSTOMER.", 
 											`customer_group_code`=".self::EMPTY_CUSTOMER."				
