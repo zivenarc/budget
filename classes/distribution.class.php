@@ -343,7 +343,7 @@ class Distribution extends Document{
 							$item = $Items->getById($total['item']);
 							$master_row->account = $total['account'];
 							$master_row->item = $total['item'];
-							for($m=$this->budget->nm;$m<=15;$m++){
+							for($m=4;$m<=15;$m++){
 								$month = $this->budget->arrPeriod[$m];
 								if ($this->subtotal[strtolower($month)]){
 									$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]*$total[$month];
@@ -363,7 +363,7 @@ class Distribution extends Document{
 					$item = $Items->getById($total['item']);
 					$master_row->account = $total['account'];
 					$master_row->item = $total['item'];
-					for($m=$this->budget->nm;$m<=15;$m++){
+					for($m=4;$m<=15;$m++){
 						$month = $this->budget->arrPeriod[$m];
 						$master_row->{$month} = -$total[$month];
 					}
