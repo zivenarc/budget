@@ -16,11 +16,11 @@ class Reports{
 	const OP_FILTER = "AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%') AND pccFlagProd=1 ";	
 	const SC_FILTER = "AND group_code=95";
 	const STAFF_COSTS_FULL = "AND group_code IN(95,136)";
-	const REVENUE_FILTER = "AND account IN ('J00400','J40010') ";
+	const REVENUE_FILTER = "AND account IN ('J00400','J40010','J40030','J40040') ";
 	const DIRECT_COST_FILTER = "AND account IN ('J00802','J45010','J45030') ";
-	const GP_FILTER = "AND account IN ('J00400', 'J00802','J45010','J40010','J45030') ";
+	const GP_FILTER = "AND account IN ('J00400', 'J00802','J45010','J40010','J45030','J40030','J40040') ";
 	const GOP_FILTER = "AND account LIKE 'J%' ";
-	const RFC_FILTER = "AND (account LIKE 'J%' AND account NOT IN ('J00400', 'J00802','J45010','J40010'))\r\n";
+	const RFC_FILTER = "AND (account LIKE 'J%' AND account NOT IN ('J00400', 'J00802','J45010','J40010','J45030','J40030','J40040'))\r\n";
 	const SGA_FILTER = "AND (account LIKE '5%' AND account NOT IN ('5999CO','5999BD','527000')) AND (pccFLagProd = 1 OR pc IN (9,130))\r\n";
 	const CORP_FILTER = "AND account IN ('5999CO')";
 	const MSF_FILTER = "AND account IN ('527000')";
