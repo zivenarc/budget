@@ -17,8 +17,8 @@ class Reports{
 	const SC_FILTER = "AND group_code=95";
 	const STAFF_COSTS_FULL = "AND group_code IN(95,136)";
 	const REVENUE_FILTER = "AND account IN ('J00400','J40010') ";
-	const DIRECT_COST_FILTER = "AND account IN ('J00802','J45010') ";
-	const GP_FILTER = "AND account IN ('J00400', 'J00802','J45010','J40010') ";
+	const DIRECT_COST_FILTER = "AND account IN ('J00802','J45010','J45030') ";
+	const GP_FILTER = "AND account IN ('J00400', 'J00802','J45010','J40010','J45030') ";
 	const GOP_FILTER = "AND account LIKE 'J%' ";
 	const RFC_FILTER = "AND (account LIKE 'J%' AND account NOT IN ('J00400', 'J00802','J45010','J40010'))\r\n";
 	const SGA_FILTER = "AND (account LIKE '5%' AND account NOT IN ('5999CO','5999BD','527000')) AND (pccFLagProd = 1 OR pc IN (9,130))\r\n";
@@ -4229,7 +4229,7 @@ class Reports{
 	
 	public function shortMonthlyReport($type='cm'){
 		
-		// $this->oSQL->startProfiling();
+		$this->oSQL->startProfiling();
 		
 		$sqlWhere = $this->sqlWhere;
 
@@ -4262,6 +4262,8 @@ class Reports{
 			FROM `reg_summary`				
 			{$sqlWhere} AND scenario='{$strFields['from_b']}' AND `item` IS NOT NULL			
 			";
+		
+		
 		
 		switch ($type){
 			case 'budget':
@@ -4583,7 +4585,7 @@ class Reports{
 		$this->_echoButtonCopyTable($this->ID.'_kpi');
 		
 
-		// $this->oSQL->showProfileInfo();
+		$this->oSQL->showProfileInfo();
 	}
 	
 	function getCustomerGroup($rw){
