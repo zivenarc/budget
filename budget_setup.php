@@ -11,7 +11,7 @@ if ($_GET['DataAction']=='excel_msf'){
 	$arrHeader = Array('Организация','Подразделение','YACT','Наименование','Номенклатурная группа','GHQ Product','Сумма. руб.');	
 	$xl->addHeader($arrHeader);
 	
-	$sql = "SELECT comTitle, Profit, account, Title, Activity_title_local, prtGHQ, ".$oBudget->getMonthlySumSQL()."
+	$sql = "SELECT comTitle, ProfitLocal, account, Title, Activity_title_local, prtGHQ, ".$oBudget->getMonthlySumSQL()."
 			FROM vw_master
 			LEFT JOIN common_db.tbl_company ON comID=company
 			WHERE scenario='{$_GET['budget_scenario']}'
@@ -27,7 +27,7 @@ if ($_GET['DataAction']=='excel_msf'){
 	
 			$arrRow = Array();
 			$arrRow[] = $rw['comTitle'];	
-			$arrRow[] = $rw['Profit'];					
+			$arrRow[] = $rw['ProfitLocal'];					
 			$arrRow[] = $rw['account'];					
 			$arrRow[] = $rw['Title'];					
 			$arrRow[] = $rw['Activity_title_local'];					

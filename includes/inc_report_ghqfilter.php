@@ -21,7 +21,7 @@ if ($_GET['prtGHQ']=='all'){
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){
 			$arrProducts['title'][] = $rw['prtTitle'];
-			$arrProducts['id'][] = $rw['prtID'];
+			$arrProducts['id'][] = (integer)$rw['prtID'];
 		}
 		
 		$sqlWhere = "WHERE activity IN (".implode(',',$arrProducts['id']).") AND company='$company'";

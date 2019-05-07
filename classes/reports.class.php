@@ -4229,7 +4229,7 @@ class Reports{
 	
 	public function shortMonthlyReport($type='cm'){
 		
-		$this->oSQL->startProfiling();
+		// $this->oSQL->startProfiling();
 		
 		$sqlWhere = $this->sqlWhere;
 
@@ -4585,7 +4585,7 @@ class Reports{
 		$this->_echoButtonCopyTable($this->ID.'_kpi');
 		
 
-		$this->oSQL->showProfileInfo();
+		// $this->oSQL->showProfileInfo();
 	}
 	
 	function getCustomerGroup($rw){
