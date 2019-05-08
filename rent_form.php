@@ -16,7 +16,7 @@ if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
 	
 	if(strpos($_POST['DataAction'],'fill_')!==false){
-		$oDocument->fill_general_costs($oBudget, str_replace('fill_','',$_POST['DataAction']));	
+		$oDocument->fill_distribution($oBudget, str_replace('fill_','',$_POST['DataAction']));	
 	}
 	
 	if ($oDocument->save($_POST['DataAction'])){
