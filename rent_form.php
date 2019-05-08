@@ -15,13 +15,8 @@ $oDocument->defineGrid();
 if ($_POST['DataAction']){
 	 // echo '<pre>'; print_r($_POST);	 echo '</pre>';
 	
-	switch ($_POST['DataAction']){
-		case 'fill_sqm':
-			$oDocument->fill_distribution($oBudget, 'sqm');
-			break;
-		case 'fill_kpi':
-			$oDocument->fill_distribution($oBudget, 'kpi');
-			break;				
+	if(strpos($_POST['DataAction'],'fill_')!==false){
+		$oDocument->fill_general_costs($oBudget, str_replace('fill_','',$_POST['DataAction']));	
 	}
 	
 	if ($oDocument->save($_POST['DataAction'])){
@@ -64,6 +59,8 @@ include ('includes/inc_document_menu.php');
 if ($oDocument->GUID && !$oDocument->flagPosted){
 	$arrActions[] = Array ('title'=>'SQM','action'=>'javascript:fillGrid(\'_sqm\');','class'=>'brick');	
 	$arrActions[] = Array ('title'=>'KPI','action'=>'javascript:fillGrid(\'_kpi\');','class'=>'brick');	
+	$arrActions[] = Array ('title'=>'TEU Import','action'=>'javascript:fillGrid(\'_teu_imp\');','class'=>'brick hidden');	
+	$arrActions[] = Array ('title'=>'TEU Export','action'=>'javascript:fillGrid(\'_teu_exp\');','class'=>'brick hidden');	
 }
 
 //============================== Main form definition ==============================

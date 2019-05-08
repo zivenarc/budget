@@ -262,6 +262,24 @@ class Distribution extends Document{
 						GROUP BY customer"; 
 
 				break;
+			case 'teu_imp':
+				$sql = "SELECT unit, customer, ".$this->budget->getMonthlySumSQL()." 
+						FROM reg_sales
+						WHERE scenario='".$this->budget->id."' 
+							AND active=1 AND kpi=1
+							AND pc='{$this->profit}'
+							AND activity IN (48)
+						GROUP BY customer";
+				break;
+			case 'teu_exp':
+				$sql = "SELECT unit, customer, ".$this->budget->getMonthlySumSQL()." 
+						FROM reg_sales
+						WHERE scenario='".$this->budget->id."' 
+							AND active=1 AND kpi=1
+							AND pc='{$this->profit}'
+							AND activity IN (63)
+						GROUP BY customer";
+				break;	
 			default:
 				return (false);
 			break;

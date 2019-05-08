@@ -16,40 +16,6 @@ if ($_POST['DataAction']){
 	if(strpos($_POST['DataAction'],'fill_')!==false){
 		$oDocument->fill_general_costs($oBudget, str_replace('fill_','',$_POST['DataAction']));	
 	}
-	/*
-	switch ($_POST['DataAction']){
-		case 'fill_hc':
-			$oDocument->fill_general_costs($oBudget);
-			break;
-		case 'fill_bc':
-			$oDocument->fill_general_costs($oBudget, 'bc');
-			break;
-		case 'fill_users':
-			$oDocument->fill_general_costs($oBudget, 'users');
-			break;
-		case 'fill_teu':
-			$oDocument->fill_general_costs($oBudget, 'teu');
-			break;			
-		case 'fill_revenue':
-			$oDocument->fill_general_costs($oBudget, 'revenue');
-			break;
-		case 'fill_payroll':
-			$oDocument->fill_general_costs($oBudget, 'payroll');
-			break;
-		case 'fill_ai':
-			$oDocument->fill_general_costs($oBudget, 'ai');
-			break;
-		case 'fill_ae':
-			$oDocument->fill_general_costs($oBudget, 'ae');
-			break;
-		case 'fill_oi':
-			$oDocument->fill_general_costs($oBudget, 'oi');
-			break;
-		case 'fill_oe':
-			$oDocument->fill_general_costs($oBudget, 'oe');
-			break;
-	}
-	*/
 	
 	if ($oDocument->save($_POST['DataAction'])){
 		$oDocument->refresh($oDocument->ID);
