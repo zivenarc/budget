@@ -1884,7 +1884,7 @@ class Reports{
 									Array('name'=>$this->oBudget->title,'data'=>$arrHSSeries[$arrChartType[$i]['id']][0],'color'=>'#3BACEE')
 									,Array('name'=>$this->oReference->title,'data'=>$arrHSSeries[$arrChartType[$i]['id']][1],'color'=>'#DDDDDD')									
 								);
-			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][1] = Array('title'=>'%','opposite'=>true);		
+			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][1] = Array('title'=>'%','opposite'=>true,'min'=>0);		
 			if($arrChartType[$i]['id']!='revenue'){					
 					$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'% to revenue','data'=>$arrHSSeries[$arrChartType[$i]['id']][2],'color'=>'#FF6D10','type'=>'spline','yAxis'=>1);						
 			}
