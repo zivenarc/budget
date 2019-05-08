@@ -29,6 +29,7 @@ $arrKPI[] = Array('prtID'=>6,'filter'=>Array(6),'ghq'=>'Delivery to plant','kpi'
 $arrKPI[] = Array('prtID'=>3,'filter'=>Array(3),'ghq'=>'Transportation','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>4,'filter'=>Array(4),'ghq'=>'Customs','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>13,'filter'=>Array(13),'ghq'=>'Int.trucking','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
+$arrKPI[] = Array('prtID'=>2,'filter'=>Array(2),'ghq'=>'Port forwarding','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'IFNULL(jobATAPort,jobETAPort)','output'=>true);
 $arrKPI[] = Array('prtID'=>50,'filter'=>Array(50),'ghq'=>'AFF c/c','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>69,'filter'=>Array(69),'ghq'=>'Rail','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobShipmentDate');
 $arrKPI[] = Array('prtID'=>61,'filter'=>Array(61),'ghq'=>'Rail, OFF','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobETAPort');
