@@ -10,7 +10,11 @@ if ($_GET['prtGHQ']=='all'){
 		} elseif ($_GET['prtGHQ']=='AFF') {
 			$sqlWhereP = " WHERE prtGHQ IN ('Air import','Air export')";
 			$filter = Array('prtGHQ'=>Array('Air import','Air export'));
-
+		
+		} elseif ($_GET['prtGHQ']=='CLT') {
+			$sqlWhereP = " WHERE prtGHQ IN ('Land transport','Warehouse')";
+			$filter = Array('prtGHQ'=>Array('Land transport','Warehouse'));
+		
 		} else {
 			$sqlWhereP = " WHERE prtGHQ=".$oSQL->e(urldecode($_GET['prtGHQ']));
 			$filter = Array('prtGHQ'=>urldecode($_GET['prtGHQ']));
