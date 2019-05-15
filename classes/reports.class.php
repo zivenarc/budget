@@ -1909,6 +1909,7 @@ class Reports{
 			if($this->oBudget->cm<15){
 				$arrHighCharts[$arrChartType[$i]['id']]['xAxis']['plotLines'][0] = Array('color'=>'#FF6D10','value'=>8.5+$this->oBudget->cm,'width'=>2);
 			}
+			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][0]['min'] = min(min($arrHSSeries[$arrChartType[$i]['id']][0]),min($arrHSSeries[$arrChartType[$i]['id']][1]));
 			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][0]['plotLines'][0] = Array('color'=>'#3BACEE','value'=>$sumAverage[$arrChartType[$i]['id']]/(9+$this->oBudget->cm),'width'=>2,'dashStyle'=>'dot');
 			$arrHighCharts[$arrChartType[$i]['id']]['series']=Array(									
 									Array('name'=>$this->oBudget->title,'data'=>$arrHSSeries[$arrChartType[$i]['id']][0],'color'=>'#3BACEE')
