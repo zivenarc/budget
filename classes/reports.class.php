@@ -1879,6 +1879,8 @@ class Reports{
 				$arrHighCharts[$arrChartType[$i]['id']]['profitability']['this_a'] = array_sum($rwData[$arrChartType[$i]['id']]['this_a'])/array_sum($rwData['revenue']['this_a']);
 				$arrHighCharts[$arrChartType[$i]['id']]['subtitle']['text'] .= "<br/>% to Revenue: <strong>".number_format($arrHighCharts[$arrChartType[$i]['id']]['profitability']['this_a']*100,1,'.',',')."</strong> vs last year ".number_format($arrHighCharts[$arrChartType[$i]['id']]['profitability']['last_a']*100,1,'.',',');
 			}
+			
+			
 
 
 			
@@ -1918,6 +1920,10 @@ class Reports{
 			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][1] = Array('title'=>'%','opposite'=>true,'min'=>0);		
 			if($arrChartType[$i]['id']!='revenue'){					
 					$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'% to revenue','data'=>$arrHSSeries[$arrChartType[$i]['id']][2],'color'=>'#FF6D10','type'=>'spline','yAxis'=>1);						
+			}
+			
+			if(isset($arrHSSeries[$arrChartType[$i]['id']][3][2])){
+				$arrHighCharts[$arrChartType[$i]['id']]['subtitle']['text'] .= "<br/>3M growth: <strong>".number_format($arrHSSeries[$arrChartType[$i]['id']][3][$this->oBudget->cm+8]/$arrHSSeries[$arrChartType[$i]['id']][3][2]*100-100,1,'.',',')."%</strong>";
 			}
 			$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'Sliding average 3M','data'=>$arrHSSeries[$arrChartType[$i]['id']][3],'color'=>'#39AAEC','type'=>'spline','yAxis'=>0);						
 		}
