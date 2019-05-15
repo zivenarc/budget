@@ -1,6 +1,6 @@
 <?php
-// $flagNoAuth = true;
-set_time_limit(60);
+$flagNoAuth = true;
+set_time_limit(360);
 require ('common/auth.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
@@ -44,15 +44,17 @@ if(!isset($_GET['prtGHQ'])){
 	<?php
 	}
 	
+
 	
 	$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
+	
 	if(strpos($oBudget->type,"Budget")!==false){
 		$oReport->shortMonthlyReport('budget');	
 	} else {	
 		$oReport->shortMonthlyReport('cm');
 		$oReport->shortMonthlyReport('fye');	
 	}
-	
+		
 	?>	
 	<div>
 	<?php

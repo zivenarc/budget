@@ -1,4 +1,5 @@
 <?php
+// $flagNoAuth = true;
 require ('common/auth.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');

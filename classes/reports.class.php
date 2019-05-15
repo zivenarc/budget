@@ -37,6 +37,8 @@ class Reports{
 		GLOBAL $oSQL;
 		GLOBAL $company;
 		
+		$this->startTime = new DateTime();
+		
 		$this->oSQL = $oSQL;
 		
 		$this->oBudget = new Budget($params['budget_scenario']);
@@ -69,27 +71,41 @@ class Reports{
 		$this->sqlWhere = "";
 		
 		if(is_array($this->filter)){
+			
+			$sql = "SHOW COLUMNS FROM reg_master";
+			$rs = $this->oSQL->q($sql);
+			while ($rw = $this->oSQL->f($rs)){
+				$columns[$rw['Field']] = $rw;
+			}
+			
 			foreach($this->filter as $key=>$value){
 				if (strpos($key,'no_')!==false){
 					$key = str_replace("no_","",$key);
-										if (is_array($value)){
-						$arrWhere[] = $key." NOT IN ('".implode("','",$value)."')";
-					} else {
-						$arrWhere[] = $key." <> '{$value}'";
-					}
+					$operand = " NOT IN ";
 				} else {
+					$operand = " IN ";
+				}
+				
+				if(strpos($columns[$key]['Type'],'int')!==false){
 					if (is_array($value)){
-						$arrWhere[] = $key." IN ('".implode("','",$value)."')";
+						$arrWhere[] = $key." {$operand} (".implode(",",$value).")";
+					} elseif ($value==''){
+							$arrWhere[] = "IFNULL({$key},0) {$operand} (0)";
 					} else {
-						if ($value==''){
-							$arrWhere[] = "IFNULL({$key},'')=''";
-						} else {
-							$arrWhere[] = $key." = '{$value}'";
-						}
+							$arrWhere[] = $key." {$operand} ({$value})";
+					}
+				} else {				
+					if (is_array($value)){
+						$arrWhere[] = $key." {$operand} ('".implode("','",$value)."')";
+					} elseif ($value==''){
+							$arrWhere[] = "IFNULL({$key},'') {$operand} ('')";
+					} else {
+							$arrWhere[] = $key." {$operand} ('{$value}')";
 					}
 				}
+				
 			}
-			$this->sqlWhere = "WHERE ".implode (" AND ",$arrWhere)." AND `company`='{$this->company}'";		
+			$this->sqlWhere = "WHERE ".implode ("\r\nAND ",$arrWhere)."\r\nAND `company`='{$this->company}'";		
 		} else {
 			$this->sqlWhere = "WHERE `company`='{$this->company}' ";
 		}
@@ -1686,6 +1702,9 @@ class Reports{
 	
 	public function periodicGraph($options = Array()){
 		
+		set_time_limit(60);
+		$this->oSQL->startProfiling();
+		
 		$settings = Array('table'=>true,'revenue'=>true,'gp'=>true,'gop'=>true,'oop'=>true);
 		$options = array_merge($settings,$options);
 		
@@ -1724,7 +1743,8 @@ class Reports{
 		for ($i = 0;$i<count($arrChartType);$i++){
 			foreach ($arrScenario as $key=>$value){
 				$sql = "SELECT {$sqlSelect}
-						FROM `vw_master`
+						FROM `reg_master`
+						LEFT JOIN common_db.tbl_profit ON pccID=pc
 						{$sqlWhere} 
 						{$arrChartType[$i]['filter']} 
 						AND scenario = '{$value}'";
@@ -1861,18 +1881,28 @@ class Reports{
 			}
 
 
-
+			
 			$s = count($arrHSSeries[$arrChartType[$i]['id']]);
-			foreach(range(0,11) as $m){
+			//------------Calculate 3-month sliding average ---------
+			foreach(range(0,1) as $m){
 				$arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
 			}
-			foreach(range(12,23) as $m){
-				if($arrHSSeries[$arrChartType[$i]['id']][0][$m-12]){
-					$arrHSSeries[$arrChartType[$i]['id']][$s][] = round($arrHSSeries[$arrChartType[$i]['id']][0][$m]/$arrHSSeries[$arrChartType[$i]['id']][0][$m-12]*100-100,1);
-				} else {
-					$arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
-				}
+			foreach(range(2,23) as $m){
+				$arrHSSeries[$arrChartType[$i]['id']][$s][] = round(($arrHSSeries[$arrChartType[$i]['id']][0][$m]
+																+$arrHSSeries[$arrChartType[$i]['id']][0][$m-1]
+																+$arrHSSeries[$arrChartType[$i]['id']][0][$m-2])/3);
 			}
+			//------------Calculate growth Year on Year as the last series ---------
+			// foreach(range(0,11) as $m){
+				// $arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
+			// }
+			// foreach(range(12,23) as $m){
+				// if($arrHSSeries[$arrChartType[$i]['id']][0][$m-12]){
+					// $arrHSSeries[$arrChartType[$i]['id']][$s][] = round($arrHSSeries[$arrChartType[$i]['id']][0][$m]/$arrHSSeries[$arrChartType[$i]['id']][0][$m-12]*100-100,1);
+				// } else {
+					// $arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
+				// }
+			// }
 		}
 		
 		for ($i = 0;$i<count($arrChartType);$i++){
@@ -1888,7 +1918,7 @@ class Reports{
 			if($arrChartType[$i]['id']!='revenue'){					
 					$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'% to revenue','data'=>$arrHSSeries[$arrChartType[$i]['id']][2],'color'=>'#FF6D10','type'=>'spline','yAxis'=>1);						
 			}
-			// $arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'Growth YoY','data'=>$arrHSSeries[$arrChartType[$i]['id']][3],'color'=>'#39AAEC','type'=>'spline','yAxis'=>1);						
+			$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'Sliding average 3M','data'=>$arrHSSeries[$arrChartType[$i]['id']][3],'color'=>'#39AAEC','type'=>'spline','yAxis'=>0);						
 		}
 		
 		$arrHighChartsAFF['series'] = Array(
@@ -2066,8 +2096,11 @@ class Reports{
 		</tr>
 		</table>
 		<?php	
+		$this->_echoExecutionTime();
 		$this->_echoButtonCopyTable($this->ID);
 		}
+		
+		$endTime = new DateTime();
 		?>
 		<div id='charts_<?php echo $this->ID;?>'></div>
 		<script type='text/javascript'>
@@ -2112,7 +2145,8 @@ class Reports{
 				$(targetRFF).highcharts(optionsRFF);
 			});
 		</script>
-		<?php			
+		<?php		
+		//$this->oSQL->showProfileInfo();
 		ob_flush();
 	}
 	
@@ -4221,6 +4255,7 @@ class Reports{
 		</tbody>
 		</table>
 		<?php
+		$this->_echoExecutionTime();
 		$this->_echoButtonCopyTable($this->ID);
 		
 
@@ -5149,6 +5184,14 @@ class Reports{
 			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$arrTotal['GOP'],0);?></td>
 		</tr>
 		<?php
+	}
+	
+	function _echoExecutionTime(){
+		
+		$endTime = new DateTime();
+		$duration = $endTime->diff($this->startTime);
+		echo "<div><small>Execution time ",$duration->s,"s</small></div>";
+	
 	}
 	
 }

@@ -1,10 +1,14 @@
 <?php
 //////////////////---------------PC filter----------------------
-if ($bu_group){
-	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
-} else {
-	$sql = "SELECT * FROM common_db.tbl_profit WHERE pccFlagFolder=0";
-}
+switch($bu_group){
+	case 'no_h':
+	case 0:	
+		$sql = "SELECT * FROM common_db.tbl_profit WHERE pccFlagFolder=0";
+		break;
+	default:
+		$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
+		break;
+};
 
 $rs = $oSQL->q($sql);
 while ($rw = $oSQL->f($rs)){

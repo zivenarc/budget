@@ -61,7 +61,7 @@ class Budget{
 		$this->checksum = $rw['scnChecksum'];
 		
 		$this->getSettings($this->oSQL, $this->id);
-		$this->rates = "<a href='?currency=840'>USD</a> = {$this->settings['usd']}, <a href='?currency=978'>EUR</a> = {$this->settings['eur']}";
+		$this->rates = "<a href='?currency=840'>USD</a> = ".number_format($this->settings['usd'],2,'.',',').", <a href='?currency=978'>EUR</a> = ".number_format($this->settings['eur'],0,'.',',');
 		
 		if ($rw['scnLastID']) {
 			if (!$from) {
@@ -397,13 +397,16 @@ class Budget{
 	
 	public function getProfitTabs($register='', $acl = false, $params = Array()){
 		GLOBAL $oSQL;
-		GLOBAL $arrUsrData, $flagNoAuth;
+		GLOBAL $arrUsrData;
 		GLOBAL $budget_scenario;
 		GLOBAL $bu_group;
 		
-		if ($acl && !$flagNoAuth){
+		if ($acl && $arrUsrData['usrID']){
 			$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-			$sqlWhere = "JOIN stbl_profit_role ON pccID=pcrProfitID WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1";
+			$sqlWhere = "JOIN stbl_profit_role 
+							ON pccID=pcrProfitID 
+							WHERE pcrRoleID IN ({$strRoles}) 
+							AND pcrFlagRead=1";
 		}
 		
 		foreach ($params as $key=>$value){
@@ -419,7 +422,7 @@ class Budget{
 		<div id='tabs' class='tabs'>
 			<ul>
 			<?php
-			if (!$bu_group){
+			if ($bu_group==0){
 				$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle as optText 
 						FROM vw_profit 
 						WHERE pccFlagFolder=1 AND pccFlagDeleted=0
@@ -433,13 +436,16 @@ class Budget{
 				$sqlWhere .= " AND pccID IN (".implode(',',$arrBus).")";
 				
 				if (!$register){
-					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText FROM vw_profit $sqlWhere ORDER BY pccParentCode1C, pccTitle";
+					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText 
+								FROM vw_profit 
+								{$sqlWhere} 
+								ORDER BY pccParentCode1C, pccTitle";
 				} else {
 					$sqlWhere .= " AND scenario='$budget_scenario'";
 					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText 
 							FROM `$register` 
 							JOIN vw_profit ON pccID=pc
-							 $sqlWhere
+							{$sqlWhere}
 							ORDER BY pccParentCode1C, pccTitle";
 					
 				}
@@ -453,13 +459,15 @@ class Budget{
 				$strCurrencyURL = "&currency=".$_GET['currency'];
 			}
 			
+			$arrGET['pccGUID'] = 'all';	
+			echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>All</a></li>\r\n";
+			
 			while ($rw=$oSQL->f($rs)){
 				$arrGET['pccGUID'] = $rw['optValue'];				
 				echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>",$rw['optText'],"</a></li>\r\n";
 				
 			}
-			$arrGET['pccGUID'] = 'all';	
-			echo "<li><a href='",$_SERVER['PHP_SELF'],"?",http_build_query($arrGET),"'>All</a></li>\r\n";
+
 			?>
 			</ul>
 		</div>
@@ -807,7 +815,8 @@ class Budget{
 		while ($rw = $this->oSQL->f($rs)){
 			$arrSelect[$rw['pccCode1C']] = $rw['pccTitle'];
 		}
-		$arrSelect[] = "--- All ---";
+		$arrSelect['0'] = "--- All ---";
+		$arrSelect['no_h'] = "--- No hierarchy ---";
 		?>
 		<select name='bu_group' id='bu_group'>
 			<?php 
