@@ -4705,7 +4705,7 @@ class Reports{
 			</caption>
 			<thead>
 				<tr>
-					<th>Customer</th>
+					<th colspan="2">Customer</th>
 					<?php
 					foreach ($arrAccount as $id=>$title){
 						?>
@@ -4720,6 +4720,7 @@ class Reports{
 				<?php foreach ($arrSort as $customer=>$GOP){
 					?>
 					<tr>
+						<td><?php echo $customer;?></td>
 						<td><?php echo $arrCustomer[$customer];?></td>
 						<?php
 						foreach ($arrAccount as $account=>$title){
@@ -4736,7 +4737,7 @@ class Reports{
 			</tbody>
 			<tfoot>
 				<tr class='budget-subtotal'>
-					<td>Total</td>
+					<td colspan="2">Total</td>
 					<?php
 						foreach ($arrAccount as $id=>$title){
 						?>
