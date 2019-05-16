@@ -9,7 +9,7 @@ if ($_GET['DataAction']=='excel_msf'){
 	include_once ("../common/eiseList/inc_excelXML.php");
 	$xl = new excelXML();            
 	$arrHeader = Array('Организация','Подразделение','YACT','Наименование','Номенклатурная группа','GHQ Product');	
-	$arrHeader = array_merge($arrHeader,$oBudget->arrPeriodTitle,3);	
+	$arrHeader = array_merge($arrHeader,array_slice($oBudget->arrPeriodTitle,3));	
 	$xl->addHeader($arrHeader);
 	
 	$sql = "SELECT comTitle, ProfitLocal, account, Title, Activity_title_local, prtGHQ, ".$oBudget->getMonthlySumSQL()."
@@ -50,7 +50,7 @@ if ($_GET['DataAction']=='excel_gp'){
 	include_once ("../common/eiseList/inc_excelXML.php");
 	$xl = new excelXML();            
 	$arrHeader = Array('Company','IV','Customer group','Customer','Account','Account Group','Activity','GHQ Product');	
-	$arrHeader = array_merge($arrHeader,$oBudget->arrPeriodTitle,3);	
+	$arrHeader = array_merge($arrHeader,array_slice($oBudget->arrPeriodTitle,3));	
 	$arrHeader[] = "Total";
 	$xl->addHeader($arrHeader);
 	
@@ -99,8 +99,7 @@ if ($_GET['DataAction']=='excel_nop'){
 	include_once ("../common/eiseList/inc_excelXML.php");
 	$xl = new excelXML();            
 	$arrHeader = Array('Company','Site','Customer','Industry','YACT','Account','Account Group','Activity','GHQ Product');
-	$arrHeader = array_merge($arrHeader,$oBudget->arrPeriodTitle,3);	
-	
+	$arrHeader = array_merge($arrHeader,array_slice($oBudget->arrPeriodTitle,3));	
 	$arrHeader[] = 'Total';
 	
 	$xl->addHeader($arrHeader);
