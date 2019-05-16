@@ -1086,7 +1086,7 @@ class Reports{
 		$denominator = 1000;
 		ob_start();
 					
-				$sqlSelect = "SELECT prtGHQ, Location, activity, funTitle, funTitleLocal, pc, pccTitle, pccTitleLocal , wc, prtTitleLocal,
+				$sqlSelect = "SELECT prtGHQ, Location, activity, funTitle, funTitleLocal, pc, pccTitle, pccTitleLocal , wc, prtTitle,
 				".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
 				SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(Q1) as Q1, SUM(Q2) as Q2, SUM(Q3) as Q3, SUM(Q4) as Q4, SUM(Q5) as Q5
 			FROM `vw_headcount`			
