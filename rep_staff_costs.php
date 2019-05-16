@@ -1,8 +1,8 @@
 <?php
-$flagNoAuth = true;
+$flagNoAuth = true; set_time_limit(60);
 require ('common/auth.php');
-require ('classes/budget.class.php');
 require ('classes/reports.class.php');
+require ('classes/profit.class.php');
 
 include ('includes/inc_report_settings.php');
 
@@ -13,6 +13,7 @@ $ytd = $oBudget->cm;echo $ytd;
 echo $oBudget->type;
 if (strpos($oBudget->type,'Budget')) die('Wrong budget type, cannot fill in the actuals');
 
+if($oBudget->flagReadOnly) die ('Budget scenario is locked for update');
 
 //------------------------------------Fill in the actual data-------------------
 $sql = Array();
@@ -37,7 +38,7 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 				SELECT empCompanyID
 					, IFNULL((SELECT ephProfitID FROM common_db.tbl_employee_profit WHERE ephEmployeeGUID1C=empGUID1C AND DATEDIFF(@repDateEnd, ephDate)>=0 ORDER BY ephDate DESC LIMIT 1),1)
 					, empLocationID
-					, IFNULL(empProductTypeID,(SELECT pccProductTypeID FROM common_db.tbl_profit WHERE pccID=empProfitID))
+					, IFNULL(empProductTypeID,0)
 					, IF (empStartDate BETWEEN @repDateStart AND @repDateEnd, 1 - DATEDIFF(empStartDate, @repDateStart)/DATEDIFF(@repDateEnd,@repDateStart),1)
 						- IF (empEndDate BETWEEN @repDateStart AND @repDateEnd, DATEDIFF(@repDateEnd, empEndDate )/DATEDIFF(@repDateEnd,@repDateStart),0) as FTE
 						, 'Actual', @scnID, empGUID1C, IFNULL(empYACT,@yact),@item, empFunctionGUID
@@ -82,13 +83,67 @@ for($m=1+$oBudget->offset;$m<=$ytd;$m++){
 	
 }
 
+
 $sql[] = "DELETE FROM reg_headcount WHERE scenario=@scnID AND source='Actual' AND ".$oBudget->getYTDSQL(1,$ytd)."=0;";
+$sql[] = "COMMIT";
+
+//echo '<pre>';print_r($sql);echo '</pre>';
+for ($i=0;$i<count($sql);$i++){
+	$oSQL->q($sql[$i]);
+}
+
+
+$ProfitCenters = new ProfitCenters();
+
+$sql = "SELECT * FROM reg_headcount 
+		WHERE activity=0 
+		AND scenario='{$budget_scenario}' 
+		AND source='Actual'";
+		
+$rs = $oSQL->q($sql);
+// echo '<hr/><pre>';print_r($sql);echo '</pre>';
+$sql = Array();
+
+while ($rw = $oSQL->f($rs)){
+	$oProfit = $ProfitCenters->getByCode($rw['pc']);
+	if (is_array($oProfit->activity)){
+		foreach($oProfit->activity as $activity=>$share){
+			
+			$strMth = Array();
+			for($m=1+$oBudget->offset;$m<=$ytd;$m++){
+				$strMth[] = "`{$oBudget->arrPeriod[$m]}` = {$rw[$oBudget->arrPeriod[$m]]}*{$share}";
+			}
+			$sql[] = "INSERT INTO reg_headcount 
+						SET 
+						company = '{$rw['company']}',
+						pc = {$rw['pc']},
+						location = {$rw['location']}, 
+						activity = {$activity},
+						source = 'Actual', 
+						scenario = '{$budget_scenario}', 
+						particulars = '{$rw['particulars']}', 
+						account = '{$rw['account']}',
+						item = '{$rw['item']}', 
+						`function` = '{$rw['function']}',
+						salary = {$rw['salary']}, 
+						wc = {$rw['wc']}, 
+						active = {$rw['active']}, 
+						posted = {$rw['posted']}, 
+						".implode(",",$strMth);
+						
+		};
+		$sql[] = "DELETE FROM reg_headcount WHERE id='{$rw['id']}' LIMIT 1";
+	} else {
+		$sql[] = "UPDATE reg_headcount SET activity = ".(integer)$oProfit->activity." WHERE id='{$rw['id']}'"; 
+	}
+}	
 $sql[] = "COMMIT";
 
 // echo '<pre>';print_r($sql);echo '</pre>';
 for ($i=0;$i<count($sql);$i++){
 	$oSQL->q($sql[$i]);
 }
+		
 include ('includes/inc-frame_top.php');		
 ?>
 <h1>Actual headcount, <?php echo $oBudget->title;?></h1>
@@ -105,7 +160,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 					WHERE scenario='{$budget_scenario}'
 					AND posted=1 AND active=1 AND salary>0";
 			
-			$sql = $sqlSelect."\r\n GROUP BY pc,location, `particulars`
+			$sql = $sqlSelect."\r\n GROUP BY pc,location, activity, `particulars`
 					ORDER BY pc,location, empSalary DESC, funGUID, empTitleLocal";
 			$rs = $oSQL->q($sql);			
 			if (!$oSQL->num_rows($rs)){
@@ -144,10 +199,10 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 						for ($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
 							// $month = date('M',mktime(0,0,0,$m,15));
 							$month = $oBudget->arrPeriod[$m];
-							echo "<td class='budget-decimal budget-$month'>",Reports::render($subtotal[$pcc][$month],1),'</td>';							
+							echo "<td class='budget-decimal budget-$month'>",Reports::render($subtotal[$pcc][$month],2),'</td>';							
 						}
 						?>
-						<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($subtotal[$pcc])/12,1);?></td>
+						<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($subtotal[$pcc])/12,2);?></td>
 					</tr>
 					<?php
 				}
@@ -168,7 +223,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 					// $month = date('M',mktime(0,0,0,$m,15));
 					$month = $oBudget->arrPeriod[$m];
 					?>
-					<td class='budget-decimal budget-<?php echo $month;?> <?php echo ($m==$oBudget->cm?'budget-current':'');?>'><?php Reports::render($rw[$month],1);?></td>
+					<td class='budget-decimal budget-<?php echo $month;?> <?php echo ($m==$oBudget->cm?'budget-current':'');?>'><?php Reports::render($rw[$month],2);?></td>
 					<?php
 					$total[$month] += $rw[$month];		
 					$subtotal[$rw['pccTitle']][$month] += $rw[$month];					
@@ -176,7 +231,7 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 				$totalPayroll += $rw['empSalary'];
 				$subtotalPayroll[$rw['pccTitle']] += $rw['empSalary'];
 				?>
-					<td class='budget-decimal budget-ytd'><?php echo Reports::render($rw['Total'],1);?></td>
+					<td class='budget-decimal budget-ytd'><?php echo Reports::render($rw['Total'],2);?></td>
 				</tr>
 			<?php
 				
@@ -193,10 +248,10 @@ $sqlSelect = "SELECT prtRHQ, empID, empGUID, empCode1C, pccTitle, empTitle, empT
 					for ($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
 						// $month = date('M',mktime(0,0,0,$m,15));
 						$month = $oBudget->arrPeriod[$m];
-						echo "<td class='budget-decimal budget-$month'>",Reports::render($total[$month],1),'</td>';					
+						echo "<td class='budget-decimal budget-$month'>",Reports::render($total[$month],2),'</td>';					
 					}
 				?>
-				<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($total)/12,1);?></td>
+				<td class='budget-decimal budget-ytd'><?php echo Reports::render(array_sum($total)/12,2);?></td>
 			</tr>
 			</tfoot>
 			</tbody>

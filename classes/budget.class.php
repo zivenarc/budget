@@ -55,6 +55,7 @@ class Budget{
 		$this->length = $rw['scnLength'];
 		
 		$this->flagUpdate = !$rw['scnFlagReadOnly'] && strtotime($rw['scnDeadline'])>time();
+		$this->flagReadOnly = $rw['scnFlagReadOnly'];
 		$this->flagArchive = (integer)$rw['scnFlagArchive'];
 		$this->flagPublic = (integer)$rw['scnFlagPublic'];
 		
