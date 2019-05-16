@@ -8,7 +8,8 @@ if ($_GET['DataAction']=='excel_msf'){
 	$oBudget = new Budget($_GET['budget_scenario']);
 	include_once ("../common/eiseList/inc_excelXML.php");
 	$xl = new excelXML();            
-	$arrHeader = Array('Организация','Подразделение','YACT','Наименование','Номенклатурная группа','GHQ Product','Сумма. руб.');	
+	$arrHeader = Array('Организация','Подразделение','YACT','Наименование','Номенклатурная группа','GHQ Product');	
+	$arrHeader += array_slice($oBudget->arrPeriodTitle,3);	
 	$xl->addHeader($arrHeader);
 	
 	$sql = "SELECT comTitle, ProfitLocal, account, Title, Activity_title_local, prtGHQ, ".$oBudget->getMonthlySumSQL()."
@@ -48,10 +49,12 @@ if ($_GET['DataAction']=='excel_gp'){
 	$oBudget = new Budget($_GET['budget_scenario']);
 	include_once ("../common/eiseList/inc_excelXML.php");
 	$xl = new excelXML();            
-	$arrHeader = Array('Company','IV','Customer group','Customer','Account','Account Group','Activity','GHQ Product','Amount');	
+	$arrHeader = Array('Company','IV','Customer group','Customer','Account','Account Group','Activity','GHQ Product');	
+	$arrHeader += array_slice($oBudget->arrPeriodTitle,3);	
+	$arrHeader[] = "Total";
 	$xl->addHeader($arrHeader);
 	
-	$sql = "SELECT comTitle, ivlGroup, customer_group_title, Customer_name, Title, yact_group, Activity_title, prtGHQ, SUM(".$oBudget->getThisYTDSQL('fye').") as Amount
+	$sql = "SELECT comTitle, ivlGroup, customer_group_title, Customer_name, Title, yact_group, Activity_title, prtGHQ, ".$oBudget->getMonthlySumSQL().", SUM(".$oBudget->getThisYTDSQL('fye').") as Total
 			FROM vw_master
 			LEFT JOIN common_db.tbl_company ON comID=company
 			WHERE scenario='{$_GET['budget_scenario']}'
@@ -73,8 +76,12 @@ if ($_GET['DataAction']=='excel_gp'){
 			$arrRow[] = $rw['Title'];					
 			$arrRow[] = $rw['yact_group'];					
 			$arrRow[] = $rw['Activity_title'];					
-			$arrRow[] = $rw['prtGHQ'];								
-			$arrRow[] = number_format($rw['Amount'],2,'.','');			
+			$arrRow[] = $rw['prtGHQ'];
+			for($m=4;$m<=15;$m++){
+				$month = $oBudget->arrPeriod[$m];
+				$arrRow[] = number_format($rw[$month],0,'.','');
+			}			
+			$arrRow[] = number_format($rw['Total'],2,'.','');			
 			$xl->addRow($arrRow);
 	}
      
