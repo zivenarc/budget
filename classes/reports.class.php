@@ -1135,9 +1135,9 @@ class Reports{
 			while ($rw=$oSQL->f($rs)){
 				?>
 				<tr>
-					<td><?php echo $rw['prtTitleLocal'];?></td>					
+				<td><?php echo $rw['activity'],"|",$rw['prtTitle'];?></td>					
 				<?php
-				self::_renderHeadcountArray($rw, Array('location'=>$rw['location']));
+				self::_renderHeadcountArray($rw, Array('activity'=>$rw['activity']));
 				
 			}
 			
