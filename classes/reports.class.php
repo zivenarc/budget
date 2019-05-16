@@ -1085,19 +1085,8 @@ class Reports{
 		GLOBAL $oSQL;
 		$denominator = 1000;
 		ob_start();
-			
-			// $sqlSelect = "SELECT prtGHQ, locTitle as 'Location', prtTitle as 'Activity', funTitle, funTitleLocal, pc, pccTitle,pccTitleLocal , wc,
-						// ".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
-						// SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
-					// FROM `vw_headcount`
-					// LEFT JOIN vw_function ON funGUID=function
-					// LEFT JOIN common_db.tbl_profit ON pccID=pc
-					// LEFT JOIN vw_product_type ON prtID=IFNULL(activity, pccProductTypeID)
-					// LEFT JOIN vw_location ON locID=location
-					// {$sqlWhere} 
-					// AND posted=1 AND active=1 AND salary>10000";
-			
-				$sqlSelect = "SELECT prtGHQ, Location, Activity, funTitle, funTitleLocal, pc, pccTitle, pccTitleLocal , wc,
+					
+				$sqlSelect = "SELECT prtGHQ, Location, activity, funTitle, funTitleLocal, pc, pccTitle, pccTitleLocal , wc, prtTitleLocal,
 				".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
 				SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(Q1) as Q1, SUM(Q2) as Q2, SUM(Q3) as Q3, SUM(Q4) as Q4, SUM(Q5) as Q5
 			FROM `vw_headcount`			
@@ -1115,7 +1104,6 @@ class Reports{
 				echo  "<div class='error'>SQL error</div>",'<pre>',$sql,'</pre>';
 			};
 			
-
 			
 			$tableID = md5($sql);
 			
@@ -1123,7 +1111,7 @@ class Reports{
 			<div style="display:none;"><pre><?php echo $sql;?></pre></div>
 			<table id='<?php echo $tableID;?>' class='budget'>
 			<thead>
-				<tr><th>Activity</th><?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?><th class='budget-ytd'>Average</th></tr>
+				<tr><th>Product</th><?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?><th class='budget-ytd'>Average</th></tr>
 			</thead>			
 			<tbody>
 			<?php
@@ -1137,6 +1125,20 @@ class Reports{
 					$headcount[$m] += $rw[$this->oBudget->arrPeriod[$m]];
 				}
 				$headcount['ytd'] += $rw['Total'];
+			}
+			
+			$sql = $sqlSelect." GROUP BY `activity` ORDER BY (Apr+May+Jun+Jul+Aug+Sep+Oct+Nov+`Dec`+Jan_1+Feb_1+Mar_1) DESC";
+			$rs = $oSQL->q($sql);			
+			?>
+			<tr><th>Activity</th><?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?><th class='budget-ytd'>Average</th></tr>
+			<?php
+			while ($rw=$oSQL->f($rs)){
+				?>
+				<tr>
+					<td><?php echo $rw['prtTitleLocal'];?></td>					
+				<?php
+				self::_renderHeadcountArray($rw, Array('location'=>$rw['location']));
+				
 			}
 			
 			$sql = $sqlSelect." GROUP BY `location`";
