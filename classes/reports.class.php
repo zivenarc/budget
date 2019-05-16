@@ -1127,7 +1127,7 @@ class Reports{
 				$headcount['ytd'] += $rw['Total'];
 			}
 			
-			$sql = $sqlSelect." GROUP BY `activity` ORDER BY (Apr+May+Jun+Jul+Aug+Sep+Oct+Nov+`Dec`+Jan_1+Feb_1+Mar_1) DESC";
+			$sql = $sqlSelect." GROUP BY `activity` ORDER BY SUM(Total_AM) DESC";
 			$rs = $oSQL->q($sql);			
 			?>
 			<tr><th>Activity</th><?php echo $this->oBudget->getTableHeader('monthly',1+$this->oBudget->offset, 12+$this->oBudget->offset); ?><th class='budget-ytd'>Average</th></tr>
