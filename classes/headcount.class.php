@@ -977,7 +977,7 @@ class Headcount extends Document{
 			$row->wc = $rw['funFlagWC'];				
 			$row->sga = $rw['funFlagSGA'];				
 			$row->location = $rw['empLocationID'];			
-			$row->activity = $rw['empProductTypeID'];//?$rw['empProductTypeID']:$this->pc->activity;			
+			$row->activity = $rw['empProductTypeID'] ? $rw['empProductTypeID'] : $this->pc->activity;			
 			$row->salary = in_array($rw['empID'],array_keys($arrMaternity))? 0 : $rw['empSalary'];
 			$row->review_date = strtotime($rw['empSalaryRevision']);
 			$row->monthly_bonus = in_array($rw['empID'],array_keys($arrMaternity))? 0 : $rw['empMonthly'];
@@ -991,6 +991,11 @@ class Headcount extends Document{
 				$month = $this->budget->arrPeriod[$m];
 				$row->{$month} = $rw['empFTE']*$row->getFTE($m, $oBudget->year);						
 			}
+			
+			if (is_array($row->activity)){
+				$this->_distribute_activity($row,$this->pc->activity);
+			}
+			
 		}
 
 		if(count($arrMaternity)){
@@ -1017,6 +1022,11 @@ class Headcount extends Document{
 					$month = $this->budget->arrPeriod[$m];
 					$row->{$month} = $row->getFTE($m, $oBudget->year);						
 				}
+				
+				if (is_array($row->activity)){
+					$this->_distribute_activity($row,$this->pc->activity);
+				}
+				
 			}
 		}
 	}
@@ -1043,6 +1053,26 @@ class Headcount extends Document{
 		if ($period>12) $period = $period - 12;
 		$res = $this->_getSocialTaxYTD($salary, $period) - $this->_getSocialTaxYTD($salary, $period-1);
 		return ($res);
+	}
+	
+	private function _distribute_activity(&$oRow, $arrActivity){
+		
+		if(is_array($arrActivity)){
+			foreach($arrActivity as $activity=>$ratio){
+				$newRow = $this->add_record();
+				foreach (get_object_vars($oRow) as $key => $value) {
+					$newRow->$key = $value;
+				}
+				$newRow->activity = $activity;
+				for($m=1;$m<=15;$m++){
+					$month = $this->budget->arrPeriod[$m];
+					$newRow->{$month} = $oRow->{$month}*$ratio;
+				}
+			}
+			$oRow->set_month_array(array_fill(0,15,0));
+		} else {
+			$oRow->activity = $arrActivity;
+		}
 	}
 	
 }

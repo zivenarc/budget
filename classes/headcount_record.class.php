@@ -65,7 +65,7 @@ class headcount_record extends table_record{
 			$arrRes[] = "`scenario`='".$this->scenario."'";
 			$arrRes[] = "`function`='".$this->job."'";
 			$arrRes[] = "`location`='".$this->location."'";
-			$arrRes[] = "`activity`=".($this->activity?(integer)$this->activity:'NULL');
+			$arrRes[] = "`activity`=".(integer)$this->activity;
 			$arrRes[] = "`pc_profile`=".(integer)$this->pc_profile;
 			$arrRes[] = "`salary`=".(double)$this->salary;
 			$arrRes[] = "`compensation`=".(double)$this->compensation;

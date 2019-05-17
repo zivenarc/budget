@@ -88,5 +88,15 @@ class table_record {
 		}
 		return ($arrRes);
 	}
+	
+	public function set_month_array($array=Array()){
+		//$month = date('M',time(0,0,0,(integer)$i,15));
+		for($m=1;$m<=15;$m++){
+			$month = $this->arrPeriod[$m];
+			$this->{$month} =(double)$value;
+		}
+		return(true);
+	}
+	
 }
 ?>
