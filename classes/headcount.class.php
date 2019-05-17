@@ -1008,7 +1008,7 @@ class Headcount extends Document{
 				$row->wc = $rw['funFlagWC'];				
 				$row->sga = $rw['funFlagSGA'];				
 				$row->location = $rw['empLocationID'];			
-				$row->activity = $rw['empProductTypeID'];//?$rw['empProductTypeID']:$this->pc->activity;			
+				$row->activity = $rw['empProductTypeID']?$rw['empProductTypeID']:$this->pc->activity;			
 				$row->salary = $rw['empSalary'];
 				$row->review_date = strtotime($rw['empSalaryRevision']);
 				$row->monthly_bonus = $rw['empMonthly'];
