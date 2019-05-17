@@ -1070,6 +1070,7 @@ class Headcount extends Document{
 				}
 			}
 			$oRow->set_month_array(array_fill(0,15,0));
+			$oRow->activity = 0;
 		} else {
 			$oRow->activity = $arrActivity;
 		}
