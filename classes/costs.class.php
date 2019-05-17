@@ -341,6 +341,7 @@ class Indirect_costs extends Document{
 		
 		switch ($type) {
 			case 'all':
+			case 'hc':
 				$sql = "SELECT pc, wc, activity, 'fte' as unit, ".$this->budget->getMonthlySumSQL(1,15)." FROM reg_headcount 
 						WHERE scenario='".$this->budget->id."' AND company='{$this->company}' AND posted=1 GROUP BY pc, activity";
 				break;
