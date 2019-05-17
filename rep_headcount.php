@@ -5,7 +5,6 @@ require ('classes/reports.class.php');
 
 include ('includes/inc_report_settings.php');
 
-$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator));
 $oBudget = new Budget($budget_scenario);
 
 if($_POST['pccGUID'] && $_POST['activity']){
@@ -28,30 +27,25 @@ if($_POST['pccGUID'] && $_POST['activity']){
 if(!isset($_GET['pccGUID'])){
 
 	$arrJS[]='js/rep_pnl.js';
-	//$arrJS[]='js/input_form.js';
+
 	include ('includes/inc-frame_top.php');
-	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,'</h1>';
+	echo '<h1>',$arrUsrData["pagTitle$strLocal"],': ',$oBudget->title,' vs ',$oReference->title,'</h1>';	
+	include ('includes/inc_report_selectors.php');
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
+	
+	$oBudget->getProfitTabs('reg_headcount', true);
+	
 	?>
-	<form>
-		<div class='f-row'><label for='budget_scenario'>Select scenario</label><?php echo $oBudget->getScenarioSelect();?><input type="submit" value="Change"/></div>
-	</form>
+	<script>
+		$('#currency_selector').find('input').attr('disabled',true);
+		$('#denominator_selector').find('input').attr('disabled',true);
+	</script>
 	<?php
-	$oBudget->getProfitTabs('reg_headcount');
 	include ('includes/inc-frame_bottom.php');
 } else {
 
-	if ($_GET['pccGUID']=='all') {
-		$sqlWhere = "WHERE scenario='$budget_scenario'";
-	} else {
-		
-		$sql = "SELECT pccID FROM common_db.tbl_profit WHERE pccGUID=".$oSQL->e($_GET['pccGUID'])." LIMIT 1";
-		$rs = $oSQL->q($sql);
-		$pccID = $oSQL->get_data($rs);
-		$filter['pc']=$pccID;
-	
-		$sqlWhere = "WHERE pc='{$pccID}' AND scenario='$budget_scenario'";
-	}
+	include ('includes/inc_report_pcfilter.php');
+	$oReport = new Reports(Array('budget_scenario'=>$oBudget->id, 'currency'=>$currency, 'denominator'=>$denominator, 'reference'=>$oReference->id, 'filter'=>$filter));
 	$oReport->headcountByJob($sqlWhere);
 }
 

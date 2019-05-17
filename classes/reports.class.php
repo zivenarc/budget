@@ -17,8 +17,10 @@ class Reports{
 	const SC_FILTER = "AND group_code=95";
 	const STAFF_COSTS_FULL = "AND group_code IN(95,136)";
 	const REVENUE_FILTER = "AND account IN ('J00400','J40010','J40030','J40040') ";
+	const NET_REVENUE_ITEMS = Array ('J00400','J40010','J40030','J40040');
 	const DIRECT_COST_FILTER = "AND account IN ('J00802','J45010','J45030') ";
 	const GP_FILTER = "AND account IN ('J00400', 'J00802','J45010','J40010','J45030','J40030','J40040') ";
+	const GROSS_PROFIT_ITEMS = Array ('J00400', 'J00802','J45010','J40010','J45030','J40030','J40040');
 	const GOP_FILTER = "AND account LIKE 'J%' ";
 	const RFC_FILTER = "AND (account LIKE 'J%' AND account NOT IN ('J00400', 'J00802','J45010','J40010','J45030','J40030','J40040'))\r\n";
 	const SGA_FILTER = "AND (account LIKE '5%' AND account NOT IN ('5999CO','5999BD','527000')) AND (pccFLagProd = 1 OR pc IN (9,130))\r\n";
@@ -1081,16 +1083,20 @@ class Reports{
 			ob_flush();
 	}
 	
-	public function headcountByJob($sqlWhere=''){
+	public function headcountByJob(){
 		GLOBAL $oSQL;
 		$denominator = 1000;
+		$sqlWhere = $this->sqlWhere;
 		ob_start();
 					
 				$sqlSelect = "SELECT prtGHQ, Location, activity, funTitle, funTitleLocal, pc, pccTitle, pccTitleLocal , wc, prtTitle,
 				".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
 				SUM(Total) as Total, SUM(Total_AM) as Total_AM, SUM(Q1) as Q1, SUM(Q2) as Q2, SUM(Q3) as Q3, SUM(Q4) as Q4, SUM(Q5) as Q5
 			FROM `vw_headcount`			
-			{$sqlWhere} AND `company`='{$this->company}' AND salary>10000";
+			{$sqlWhere} 
+			AND scenario = '{$this->oBudget->id}'
+			AND `company`='{$this->company}' 
+			AND salary>".self::SALARY_THRESHOLD;
 			
 			$sql = $sqlSelect." GROUP BY `prtGHQ`,wc
 					ORDER BY prtRHQ,wc";
@@ -1198,44 +1204,60 @@ class Reports{
 				$sql = "SELECT account, ".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
 							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
 						FROM `reg_master`
-						$sqlWhere
-						".self::GP_FILTER."
-						AND active=1 AND `company`='{$this->company}'
+						{$sqlWhere}
+						".self::GOP_FILTER."
+						AND scenario = '{$this->oBudget->id}'
+						AND active=1 
+						AND `company`='{$this->company}'
 						GROUP BY account";
 				$rs = $oSQL->q($sql);	
 				if ($oSQL->num_rows($rs)){
 					while ($rw = $oSQL->f($rs)){
-						if ($rw['account']=='J00400'){
-							?>
-							<tr><td>Revenue, RUBx1,000</td>
-								<?php
-								for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
-									$month = $this->oBudget->arrPeriod[$m];
-									echo '<td class="budget-decimal">',self::render($rw[$month]/$denominator),'</td>';
-									if ($headcount[$m]){
-										$arrRevenuePerFTE[$m] = $rw[$month]/$headcount[$m]/$denominator;									
-									}
-								}
-								?>
-								<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']/$denominator);?></td>
-							</tr>
-							<tr><td>Revenue per FTE</td>
-								<?php
-								for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){						
-									echo '<td class="budget-decimal">',self::render($arrRevenuePerFTE[$m]),'</td>';									
-								}
-								?>
-								<td class='budget-decimal budget-ytd'><?php self::render($rw['Total']/$headcount['ytd']/$denominator);?></td>
-							</tr>
-							<?php
-						}
+						
+						if (in_array($rw['account'], self::NET_REVENUE_ITEMS)){
+							for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+								$month = $this->oBudget->arrPeriod[$m];
+								$arrRevenue[$month] += $rw[$month];
+							}
+							$arrRevenue['Total'] += $rw['Total'];
+						} 
+						
+						if (in_array($rw['account'], self::GROSS_PROFIT_ITEMS)) {
+							for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+								$month = $this->oBudget->arrPeriod[$m];
+								$arrGP[$month] += $rw[$month];
+							}
+							$arrGP['Total'] += $rw['Total'];
+						} 
+						
 						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 							$month = $this->oBudget->arrPeriod[$m];
-							$arrGP[$month] += $rw[$month];
+							$arrGOP[$month] += $rw[$month];
 						}
-						$arrGP['Total'] += $rw['Total'];
+						$arrGOP['Total'] += $rw['Total'];
+						
 					}
 					?>
+					<tr><td>Revenue, RUBx1,000</td>
+							<?php
+							for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+								$month = $this->oBudget->arrPeriod[$m];
+								echo '<td class="budget-decimal">',self::render($arrRevenue[$month]/$denominator),'</td>';
+								if ($headcount[$m]){
+									$arrRevenuePerFTE[$m] = $arrRevenue[$month]/$headcount[$m]/$denominator;									
+								}
+							}
+							?>
+							<td class='budget-decimal budget-ytd'><?php self::render($arrRevenue['Total']/$denominator);?></td>
+						</tr>
+						<tr class="budget-subtotal"><td>Revenue per FTE</td>
+							<?php
+							for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){						
+								echo '<td class="budget-decimal">',self::render($arrRevenuePerFTE[$m]),'</td>';									
+							}
+							?>
+							<td class='budget-decimal budget-ytd'><?php self::render($arrRevenue['Total']/$headcount['ytd']/$denominator);?></td>
+					</tr>
 					<tr><td>Gross profit, RUBx1,000</td>
 						<?php
 						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
@@ -1259,6 +1281,29 @@ class Reports{
 						?>
 						<td class='budget-decimal budget-ytd'><?php self::render_ratio($arrGP['Total']/100/$denominator,$headcount['ytd'],0);?></td>
 					</tr>
+					<tr><td>Gross operating profit, RUBx1,000</td>
+						<?php
+						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+									$month = $this->oBudget->arrPeriod[$m];
+									echo '<td class="budget-decimal">',self::render($arrGOP[$month]/$denominator),'</td>';
+									if ($headcount[$m]){
+										$arrGOPPerFTE[$m] = $arrGOP[$month]/$headcount[$m]/$denominator;
+									}
+						}
+						?>
+						<td class='budget-decimal budget-ytd'><?php self::render($arrGOP['Total']/$denominator);?></td>
+					</tr>
+					<tr class='budget-subtotal'><td>GOP per FTE</td>
+						<?php
+						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+							$month = $this->oBudget->arrPeriod[$m];						
+							?>
+							<td class="budget-decimal"><?php self::render_ratio($arrGOP[$month]/100/$denominator,$headcount[$m],0);?></td>
+							<?php
+						}
+						?>
+						<td class='budget-decimal budget-ytd'><?php self::render_ratio($arrGOP['Total']/100/$denominator,$headcount['ytd'],0);?></td>
+					</tr>
 					<?php
 				}
 				
@@ -1266,8 +1311,10 @@ class Reports{
 				$sql = "SELECT account, ".$this->oBudget->getMonthlySumSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).", 
 							SUM(".$this->oBudget->getYTDSQL(1+$this->oBudget->offset, 12+$this->oBudget->offset).")/12 as Total 
 						FROM `vw_master`
-						$sqlWhere
-							AND Group_code IN (95) AND `company`='{$this->company}'
+						{$sqlWhere}
+						AND scenario = '{$this->oBudget->id}'
+						AND Group_code IN (95,136) 
+						AND `company`='{$this->company}'
 						";
 				$rs = $oSQL->q($sql);	
 				if ($oSQL->num_rows($rs)){
@@ -1288,7 +1335,7 @@ class Reports{
 							$arrSC['Total'] = -$rw['Total'];
 					}
 					?>
-					<tr>
+					<tr class="budget-ratio">
 						<td>Gross profit/Staff costs</td>
 						<?php
 						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
@@ -1299,6 +1346,18 @@ class Reports{
 						}
 						?>
 						<td class='budget-decimal budget-ytd'><?php self::render_ratio($arrGP['Total']/100,$arrSC['Total']);?></td>
+					</tr>
+					<tr class="budget-ratio">
+						<td>Gross operating profit/Staff costs</td>
+						<?php
+						for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
+									$month = $this->oBudget->arrPeriod[$m];
+									?>
+									<td class="budget-decimal"><?php self::render_ratio($arrGOP[$month]/100,$arrSC[$month],1);?></td>
+									<?php
+						}
+						?>
+						<td class='budget-decimal budget-ytd'><?php self::render_ratio($arrGOP['Total']/100,$arrSC['Total']);?></td>
 					</tr>
 					<tr class='budget-subtotal'>
 						<td>Cost per FTE</td>
