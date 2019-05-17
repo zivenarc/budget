@@ -239,3 +239,10 @@ a.budget-details:active{
 	color: blue;
 	text-decoration:none;
 }
+
+.green{
+	color:#45BD8C;
+}
+.red {
+	color:#F30F2F;
+}
