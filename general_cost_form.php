@@ -17,7 +17,7 @@ if ($_GET['DataAction']=='excel'){
 	$arrHeader = Array('Организация','Подразделение','Номенклатура','Номенклатурная группа','Содержание','Количество','Цена','Сумма');		
 	$xl->addHeader($arrHeader);
 	
-	$sql = "SELECT comID, comTitleLocal, pc, pccTitleLocal, product, prdTitleLocal,activity,prtTitleLocal, buying_rate, ".$oBudget->getThisYTDSQL('nm')." as nQuantity
+	$sql = "SELECT comID, comTitleLocal, pc, pccTitleLocal, product, prdTitleLocal,activity,prtTitleLocal, buying_rate, ".$oBudget->getThisYTDSQL('nm')." as nQuantity, period
 			FROM reg_costs	
 			LEFT JOIN common_db.tbl_company ON comID=company
 			LEFT JOIN common_db.tbl_profit ON pccID=pc
@@ -29,7 +29,11 @@ if ($_GET['DataAction']=='excel'){
 	
 	$rs = $oSQL->q($sql);
 	while ($rw = $oSQL->f($rs)){
-	
+			
+			if($rw['period']=='annual'){
+				$rw['buying_rate'] /= 12;
+			}
+			
 			$arrRow = Array();
 			$arrRow[] = $rw['comTitleLocal'];	
 			$arrRow[] = $rw['pccTitleLocal'];					
@@ -38,6 +42,7 @@ if ($_GET['DataAction']=='excel'){
 			$arrRow[] = $rw['comment'];					
 			$arrRow[] = number_format($rw['nQuantity'],3,'.','');	
 			$arrRow[] = number_format($rw['buying_rate'],3,'.','');					
+			$arrRow[] = number_format($rw['buying_rate']*$rw['nQuantity'],3,'.','');					
 			$xl->addRow($arrRow);
 	}
      
@@ -101,7 +106,7 @@ if ($oDocument->GUID){
 		$arrActions[] = Array ('title'=>'LT','action'=>'javascript:fillGrid(\'_lt\');','class'=>'hidden');
 		$arrActions[] = Array ('title'=>'CL','action'=>'javascript:fillGrid(\'_wh\');','class'=>'hidden');
 	}
-	$arrActions[] = Array ('title'=>'Excel','action'=>$_SERVER['REQUEST_URI'].'&DataAction=excel','class'=>'fa fa-excel hidden');
+	$arrActions[] = Array ('title'=>'Excel','action'=>$_SERVER['REQUEST_URI'].'&DataAction=excel','class'=>'excel');
 }
 
 //============================== Main form definition ==============================
