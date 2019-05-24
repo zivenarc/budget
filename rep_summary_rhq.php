@@ -1,5 +1,5 @@
 <?php
-$flagNoAuth = true;
+// $flagNoAuth = true;
 set_time_limit(160);
 require ('common/auth.php');
 require ('classes/reports.class.php');
@@ -262,165 +262,17 @@ if(!isset($_GET['prtGHQ'])){
 	?>
 	</div>
 	<?php
-	//==================== Top 10 customers ==========================/
-
+	//==================== Top 10 customers ==========================/	
 	
 	if(strpos($oBudget->type,'Budget')!==false){
 		$period_type = 'fye'; $period_title = "Full year";
 	} else {
 		$period_type = 'ytd'; $period_title = "YTD";
 	}
-	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
-	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	
-	$sql = "SELECT customer_group_code as optValue, 
-						customer_group_title as optText,  
-						ivlTitle,
-						{$sqlActual} as GOP
-				FROM vw_master 	
-				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' ".Reports::GOP_FILTER."
-					AND IFNULL(customer_group_code,0)<>0
-				GROUP BY customer_group_code				
-				ORDER BY GOP DESC
-				";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		$arrReport[$rw['optText']]['GOP'] = $rw['GOP'];
-		$arrReport[$rw['optText']]['ivlTitle'] = $rw['ivlTitle'];
-		$arrCGFilter[] = $rw['optValue'];	
-	}
+	$oReport->topCustomers(10,5,$period_type);
 	
-	$arrMeasure = Array(Array('id'=>'Revenue','title'=>'Net revenue','filter'=>Reports::REVENUE_FILTER),
-						Array('id'=>'GrossRevenue','title'=>'Gross revenue','filter'=>Reports::GROSS_REVENUE_FILTER),
-						Array('id'=>'GP','title'=>'Gross profit','filter'=>Reports::GP_FILTER),
-						Array('id'=>'GOP','title'=>'GOP','filter'=>Reports::GOP_FILTER)
-						);
-
-	for($i = 0;$i<count($arrMeasure);$i++){
-		
-		$sql = "SELECT customer_group_code as optValue, 
-						customer_group_title as optText,  
-						{$sqlActual} as {$arrMeasure[$i]['id']}
-				FROM vw_master 				
-				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' 
-					{$arrMeasure[$i]['filter']}
-					##AND  customer_group_code IN (".implode(',',$arrCGFilter).")
-				GROUP BY customer_group_code
-				";
-		
-		$rs = $oSQL->q($sql);
-		while ($rw = $oSQL->f($rs)){
-			$arrReport[$rw['optText']][$arrMeasure[$i]['id']] = $rw[$arrMeasure[$i]['id']];
-		}
-		
-		$sql = "SELECT {$sqlActual} as {$arrMeasure[$i]['id']} 
-				FROM vw_master 
-				{$sqlWhere}
-				AND  scenario='{$oBudget->id}' 
-				{$arrMeasure[$i]['filter']}";
-		$rs = $oSQL->q($sql);
-		$rw = $oSQL->f($rs);
-		$arrReportOther[$arrMeasure[$i]['id']] = $rw[$arrMeasure[$i]['id']];
-		$arrReportTotal[$arrMeasure[$i]['id']] = $rw[$arrMeasure[$i]['id']];
-		
-				
-	}
-	
-	$sql = "SELECT customer_group_code as optValue, 
-						customer_group_title as optText,  
-						SUM(".$oBudget->getThisYTDSQL($period_type).") as KPI,
-						unit
-				FROM vw_sales 				
-				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' AND unit IN ('Kgs','TEU','Trips')
-					##AND  customer_group_code IN (".implode(',',$arrCGFilter).")
-				GROUP BY customer_group_code
-				";
-	$rs = $oSQL->q($sql);
-	while ($rw = $oSQL->f($rs)){
-		$arrReport[$rw['optText']]['KPI'] = $rw['KPI'];
-	}
-	
-	$sql = "SELECT 	SUM(".$oBudget->getThisYTDSQL($period_type).") as KPI,
-						unit
-				FROM vw_sales 				
-				{$sqlWhere}
-					AND  scenario='{$oBudget->id}' AND unit IN ('Kgs','TEU','Trips')									
-				";
-	$rs = $oSQL->q($sql);
-	$rw = $oSQL->f($rs);
-	$arrReportOther['KPI'] = $rw['KPI'];
-	$arrReportTotal['KPI'] = $rw['KPI'];
-	
-
-	$tableID = "top_".md5(time());
-	?>
-	<table class="budget" id="<?php echo $tableID;?>">
-		<caption>Top and bottom customers, <?php echo urldecode($_GET['prtGHQ']), ", ", $period_title;?></caption>
-	<thead>	
-		<tr>
-			<th>Customer</th>
-			<th>Vertical</th>
-			<th>Gross Revenue</th>
-			<th>Net Revenue</th>
-			<th>GP</th>
-			<th>%</th>
-			<th>per unit</th>
-			<th class='budget-ytd'>GOP</th>
-			<th>Volume</th>
-			<th>%</th>
-			<th>per unit</th>
-			<th>% of total</th>
-		</tr>
-	</thead>
-	<tbody>
-	<?php
-	
-	foreach ($arrReport as $customer=>$values){
-		if($values['Revenue']>0 && $customer!=''){
-			$arrFilteredReport[$customer] = $values;
-		}
-	}
-	
-	$arrTop = array_slice($arrFilteredReport,0,11, true);
-	$arrBottom = array_slice($arrFilteredReport,-6,6, true);
-	// $arrBottom = array_slice($arrFilteredReport,-1,min(5,count($arrFilteredReport)-10), true);
-	
-	
-	
-	foreach ($arrTop as $customer=>$values){
-		Reports::_renderTopCustomerLine($values, $arrReportTotal, $customer);	
-		for($i = 0;$i<count($arrMeasure);$i++){
-			$arrReportOther[$arrMeasure[$i]['id']] -=  $values[$arrMeasure[$i]['id']];			
-		}
-		$arrReportOther['KPI'] -=  $values['KPI'];
-	}
-	
-	foreach ($arrBottom as $customer=>$values){
-		Reports::_renderTopCustomerLine($values, $arrReportTotal, $customer);	
-		for($i = 0;$i<count($arrMeasure);$i++){
-			$arrReportOther[$arrMeasure[$i]['id']] -=  $values[$arrMeasure[$i]['id']];			
-		}
-		$arrReportOther['KPI'] -=  $values['KPI'];
-	}
-	
-		Reports::_renderTopCustomerLine($arrReportOther, $arrReportTotal, "Others");
-	?>
-	</tbody>
-	<tfoot>
-	<?php
-		Reports::_renderTopCustomerLine($arrReportTotal, $arrReportTotal, "Total", "budget-subtotal");
-	?>	
-	</tfoot>
-	</table>
-	<button onclick="SelectContent('<?php echo $tableID;?>');">Copy table</button>
-	<?php
-	
-	
-	
-	//==================== Staff ==========================/
+		//==================== Staff ==========================/
 	
 	$sql = "SELECT pccTitle, 
 				".(in_array('HR',$arrUsrData['roleIDs'])?"salary, monthly_bonus,":"")." 

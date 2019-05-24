@@ -5248,6 +5248,7 @@ class Reports{
 	function _renderTopCustomerLine($data, $arrTotal, $strTitle, $strClass=""){
 		?>
 		<tr class="<?php echo $strClass;?>">
+			<td><?php echo $data['i'];?></td>
 			<td><?php echo $strTitle;?></td>
 			<td><?php echo $data['ivlTitle'];?></td>			
 			<td class="budget-decimal"><?php Reports::render($data['GrossRevenue'],0,'.',',');?></td>
@@ -5255,10 +5256,10 @@ class Reports{
 			<td class="budget-decimal"><?php Reports::render($data['GP'],0,'.',',');?></td>
 			<td class="budget-decimal"><?php Reports::render_ratio($data['GP'],$data['GrossRevenue'],1);?></td>
 			<td class="budget-decimal"><?php Reports::render_ratio($data['GP'],$data['KPI']*100,0);?></td>
-			<td class="budget-decimal budget-ytd"><?php Reports::render($data['GOP'],0,'.',',');?></td>
-			<td class="budget-decimal"><?php Reports::render($data['KPI'],0,'.',',');?></td>
-			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['GrossRevenue'],1);?></td>
+			<td class="budget-decimal budget-ytd"><?php Reports::render($data['GOP'],0,'.',',');?></td>			
+			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['GrossRevenue'],1);?></td>			
 			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$data['KPI']*100,0);?></td>
+			<td class="budget-decimal"><?php Reports::render($data['KPI'],0,'.',',');?></td>
 			<td class="budget-decimal"><?php Reports::render_ratio($data['GOP'],$arrTotal['GOP'],0);?></td>
 		</tr>
 		<?php
@@ -5272,5 +5273,169 @@ class Reports{
 	
 	}
 	
+	function topCustomers($top = 10, $bottom = 5, $period_type = "ytd", $title=""){
+		
+		$sqlActual = "SUM(".$this->oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
+		//$sqlBudget = "SUM(".$this->oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
+	
+		$sql = "SELECT customer_group_code as optValue, 
+							customer_group_title as optText,  
+							ivlTitle,
+							{$sqlActual} as GOP
+					FROM vw_master 	
+						{$this->sqlWhere}
+						AND  scenario='{$this->oBudget->id}' ".self::GOP_FILTER."
+						AND IFNULL(customer_group_code,0)<>0
+					GROUP BY customer_group_code				
+					ORDER BY GOP DESC
+				";
+		$rs = $this->oSQL->q($sql);
+		
+		$i = 1;
+		while ($rw = $this->oSQL->f($rs)){
+			$arrReport[$rw['optText']]['GOP'] = $rw['GOP'];
+			$arrReport[$rw['optText']]['ivlTitle'] = $rw['ivlTitle'];
+			$arrReport[$rw['optText']]['i'] = $i;
+			$arrCGFilter[] = $rw['optValue'];	
+			$i++;
+		}
+	
+		$arrMeasure = Array(Array('id'=>'Revenue','title'=>'Net revenue','filter'=>Reports::REVENUE_FILTER),
+						Array('id'=>'GrossRevenue','title'=>'Gross revenue','filter'=>Reports::GROSS_REVENUE_FILTER),
+						Array('id'=>'GP','title'=>'Gross profit','filter'=>Reports::GP_FILTER),
+						Array('id'=>'GOP','title'=>'GOP','filter'=>Reports::GOP_FILTER)
+						);
+
+		for($i = 0;$i<count($arrMeasure);$i++){
+			
+			$sql = "SELECT customer_group_code as optValue, 
+							customer_group_title as optText,  
+							{$sqlActual} as {$arrMeasure[$i]['id']}
+					FROM vw_master 				
+					{$this->sqlWhere}
+						AND  scenario='{$this->oBudget->id}' 
+						{$arrMeasure[$i]['filter']}
+						##AND  customer_group_code IN (".implode(',',$arrCGFilter).")
+					GROUP BY customer_group_code
+					";
+			
+			$rs = $this->oSQL->q($sql);
+			while ($rw = $this->oSQL->f($rs)){
+				$arrReport[$rw['optText']][$arrMeasure[$i]['id']] = $rw[$arrMeasure[$i]['id']];
+			}
+			
+			$sql = "SELECT {$sqlActual} as {$arrMeasure[$i]['id']} 
+					FROM vw_master 
+					{$this->sqlWhere}
+					AND  scenario='{$this->oBudget->id}' 
+					{$arrMeasure[$i]['filter']}";
+			$rs = $this->oSQL->q($sql);
+			$rw = $this->oSQL->f($rs);
+			$arrReportOther[$arrMeasure[$i]['id']] = $rw[$arrMeasure[$i]['id']];
+			$arrReportTotal[$arrMeasure[$i]['id']] = $rw[$arrMeasure[$i]['id']];
+			
+					
+		}
+	
+		$sql = "SELECT customer_group_code as optValue, 
+							customer_group_title as optText,  
+							SUM(".$this->oBudget->getThisYTDSQL($period_type).") as KPI,
+							unit
+					FROM vw_sales 				
+					{$this->sqlWhere}
+						AND  scenario='{$this->oBudget->id}' AND unit IN ('Kgs','TEU','Trips')
+						##AND  customer_group_code IN (".implode(',',$arrCGFilter).")
+					GROUP BY customer_group_code
+					";
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			$arrReport[$rw['optText']]['KPI'] = $rw['KPI'];
+		}
+	
+		$sql = "SELECT 	SUM(".$this->oBudget->getThisYTDSQL($period_type).") as KPI,
+							unit
+					FROM vw_sales 				
+					{$this->sqlWhere}
+						AND  scenario='{$this->oBudget->id}' AND unit IN ('Kgs','TEU','Trips')									
+					";
+		$rs = $this->oSQL->q($sql);
+		$rw = $this->oSQL->f($rs);
+		$arrReportOther['KPI'] = $rw['KPI'];
+		$arrReportTotal['KPI'] = $rw['KPI'];
+	
+
+		$tableID = "top_".md5(time());
+		?>
+		<table class="budget" id="<?php echo $tableID;?>">
+			<caption><?php echo "Top {$top} and bottom {$bottom} customers, {$title}"; ?></caption>
+		<thead>	
+			<tr>
+				<th rowspan="2">#</th>
+				<th rowspan="2">Customer</th>
+				<th rowspan="2">Vertical</th>
+				<th colspan="2">Revenue</th>
+				<th colspan="3">Gross Profit</th>
+				<th colspan="3">Gross Operating Profit</th>			
+				<th rowspan="2">Volume</th>			
+				<th rowspan="2">% of total GOP</th>
+			</tr>
+			<tr>
+				<th>Gross</th>
+				<th>Net</th>
+				<th>RUB</th>
+				<th>%</th>
+				<th>per unit</th>
+				<th class="budget-ytd">RUB</th>
+				<th>%</th>
+				<th>per unit</th>2
+			</tr>
+		</thead>
+		<tbody>
+		<?php
+	
+		foreach ($arrReport as $customer=>$values){
+			if($values['Revenue']>0 && $customer!=''){
+				$arrFilteredReport[$customer] = $values;
+			}
+		}
+	
+	$arrTop = array_slice($arrFilteredReport,0,$top, true);
+	$arrBottom = array_slice($arrFilteredReport,-$bottom, $bottom, true);
+	// $arrBottom = array_slice($arrFilteredReport,-1,min(5,count($arrFilteredReport)-10), true);
+	
+	
+	
+	foreach ($arrTop as $customer=>$values){
+		$this->_renderTopCustomerLine($values, $arrReportTotal, $customer);	
+		for($i = 0;$i<count($arrMeasure);$i++){
+			$arrReportOther[$arrMeasure[$i]['id']] -=  $values[$arrMeasure[$i]['id']];			
+		}
+		$arrReportOther['KPI'] -=  $values['KPI'];
+	}
+	
+	foreach ($arrBottom as $customer=>$values){
+		//$this->_renderTopCustomerLine($values, $arrReportTotal, $customer);	// skip, do not display yet
+		for($i = 0;$i<count($arrMeasure);$i++){
+			$arrReportOther[$arrMeasure[$i]['id']] -=  $values[$arrMeasure[$i]['id']];			
+		}
+		$arrReportOther['KPI'] -=  $values['KPI'];
+	}
+	
+	$this->_renderTopCustomerLine($arrReportOther, $arrReportTotal, "Others");
+		
+	foreach ($arrBottom as $customer=>$values){
+		$this->_renderTopCustomerLine($values, $arrReportTotal, $customer);			
+	}
+	?>
+	</tbody>
+	<tfoot>
+	<?php
+		$this->_renderTopCustomerLine($arrReportTotal, $arrReportTotal, "Total", "budget-subtotal");
+	?>	
+	</tfoot>
+	</table>
+	<button onclick="SelectContent('<?php echo $tableID;?>');">Copy table</button>
+	<?php
+	}
 }
 ?>

@@ -70,38 +70,6 @@ if(!isset($_GET['pccGUID'])){
 	$sqlActual = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 	$sqlBudget = "SUM(".$oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
 	
-	$settings['gpcus'] = Array('title'=>"{$strPCHeader} :: GP by customer",
-						'sqlBase' => "SELECT  customer_group_code as optValue, 
-											customer_group_title as optText,  
-											{$sqlActual} as Actual, 
-											0 as Budget, 
-											{$sqlActual} as Diff
-									FROM vw_master 
-									{$oReport->sqlWhere}
-										AND  scenario='{$oBudget->id}' 
-										".Reports::GP_FILTER."
-									GROUP BY customer_group_code
-									UNION ALL
-									SELECT  customer_group_code as optValue, 
-											customer_group_title as optText,  
-									0 as Actual, 
-									{$sqlBudget}  as Budget, 
-									-{$sqlBudget} as Diff
-									FROM vw_master 									
-									{$oReport->sqlWhere}
-										AND scenario='{$oReference->id}'
-										AND source<>'Estimate' 
-										".Reports::GP_FILTER."									
-									GROUP BY customer_group_code",
-							'denominator'=>$denominator,
-							'actual_title'=>$oBudget->title,
-							'budget_title'=>$oReference->title,
-							'tolerance'=>0.03,
-							'limit'=>10);	
-	
-	$oWF = new Waterfall($settings['gpcus']);
-	$oWF->draw();
-	
 	$settings['oop'] = Array('title'=>"{$strPCHeader} :: OOP by factors",
 						'sqlBase' => "SELECT IF(`Group_code` IN (108,110,96),item,Group_code)  as optValue, 
 											IF(`Group_code` IN (108,110,96),`Budget item`,`Group`) as optText, 
@@ -135,6 +103,37 @@ if(!isset($_GET['pccGUID'])){
 	$oWF = new Waterfall($settings['oop']);
 	$oWF->draw();
 	
+	$settings['gpcus'] = Array('title'=>"{$strPCHeader} :: GP by customer",
+						'sqlBase' => "SELECT  customer_group_code as optValue, 
+											customer_group_title as optText,  
+											{$sqlActual} as Actual, 
+											0 as Budget, 
+											{$sqlActual} as Diff
+									FROM vw_master 
+									{$oReport->sqlWhere}
+										AND  scenario='{$oBudget->id}' 
+										".Reports::GP_FILTER."
+									GROUP BY customer_group_code
+									UNION ALL
+									SELECT  customer_group_code as optValue, 
+											customer_group_title as optText,  
+									0 as Actual, 
+									{$sqlBudget}  as Budget, 
+									-{$sqlBudget} as Diff
+									FROM vw_master 									
+									{$oReport->sqlWhere}
+										AND scenario='{$oReference->id}'
+										AND source<>'Estimate' 
+										".Reports::GP_FILTER."									
+									GROUP BY customer_group_code",
+							'denominator'=>$denominator,
+							'actual_title'=>$oBudget->title,
+							'budget_title'=>$oReference->title,
+							'tolerance'=>0.03,
+							'limit'=>10);	
+	
+	$oWF = new Waterfall($settings['gpcus']);
+	$oWF->draw();
 	
 	if (strpos($oBudget->type,'Budget')===false){
 		$sqlActual = "SUM(".$oBudget->getThisYTDSQL('nm',$arrActualRates).")";
@@ -206,6 +205,17 @@ if(!isset($_GET['pccGUID'])){
 		
 
 	}
+	
+		//==================== Top 10 customers ==========================/	
+	
+	if(strpos($oBudget->type,'Budget')!==false){
+		$period_type = 'fye'; $period_title = "Full year";
+	} else {
+		$period_type = 'ytd'; $period_title = "YTD";
+	}
+	
+	$oReport->topCustomers(10,5,$period_type,$strPCHeader);
+	
 	?>
 	</div>
 	<?php
