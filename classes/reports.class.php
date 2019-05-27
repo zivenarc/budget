@@ -5277,16 +5277,22 @@ class Reports{
 		
 		$sqlActual = "SUM(".$this->oBudget->getThisYTDSQL($period_type,$arrActualRates).")";
 		//$sqlBudget = "SUM(".$this->oBudget->getThisYTDSQL($period_type,$arrBudgetRates).")";
-	
-		$sql = "SELECT customer_group_code as optValue, 
-							customer_group_title as optText,  
+		
+		// $optValue = '`customer_group_code`';
+		// $optText = '`customer_group_title`';
+		$optValue = '`customer`';
+		$optText = '`Customer_name`';
+		
+		
+		$sql = "SELECT {$optValue} as optValue, 
+						{$optText} as optText,  
 							ivlTitle,
 							{$sqlActual} as GOP
 					FROM vw_master 	
 						{$this->sqlWhere}
 						AND  scenario='{$this->oBudget->id}' ".self::GOP_FILTER."
-						AND IFNULL(customer_group_code,0)<>0
-					GROUP BY customer_group_code				
+						##-AND IFNULL(customer_group_code,0)<>0
+					GROUP BY {$optValue}				
 					ORDER BY GOP DESC
 				";
 		$rs = $this->oSQL->q($sql);
@@ -5308,15 +5314,15 @@ class Reports{
 
 		for($i = 0;$i<count($arrMeasure);$i++){
 			
-			$sql = "SELECT customer_group_code as optValue, 
-							customer_group_title as optText,  
+			$sql = "SELECT {$optValue} as optValue, 
+							{$optText} as optText,  
 							{$sqlActual} as {$arrMeasure[$i]['id']}
 					FROM vw_master 				
 					{$this->sqlWhere}
 						AND  scenario='{$this->oBudget->id}' 
 						{$arrMeasure[$i]['filter']}
 						##AND  customer_group_code IN (".implode(',',$arrCGFilter).")
-					GROUP BY customer_group_code
+					GROUP BY {$optValue}
 					";
 			
 			$rs = $this->oSQL->q($sql);
@@ -5337,15 +5343,15 @@ class Reports{
 					
 		}
 	
-		$sql = "SELECT customer_group_code as optValue, 
-							customer_group_title as optText,  
+		$sql = "SELECT {$optValue} as optValue, 
+							{$optText} as optText,  
 							SUM(".$this->oBudget->getThisYTDSQL($period_type).") as KPI,
 							unit
 					FROM vw_sales 				
 					{$this->sqlWhere}
 						AND  scenario='{$this->oBudget->id}' AND unit IN ('Kgs','TEU','Trips')
 						##AND  customer_group_code IN (".implode(',',$arrCGFilter).")
-					GROUP BY customer_group_code
+					GROUP BY {$optValue}
 					";
 		$rs = $this->oSQL->q($sql);
 		while ($rw = $this->oSQL->f($rs)){
