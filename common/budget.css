@@ -246,3 +246,7 @@ a.budget-details:active{
 .red {
 	color:#F30F2F;
 }
+
+.budget-gray td{
+	background-color: #CCC;
+}

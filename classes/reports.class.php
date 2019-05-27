@@ -5427,7 +5427,7 @@ class Reports{
 		$arrReportOther['KPI'] -=  $values['KPI'];
 	}
 	
-	$this->_renderTopCustomerLine($arrReportOther, $arrReportTotal, "Others");
+	$this->_renderTopCustomerLine($arrReportOther, $arrReportTotal, "Others",'budget-gray');
 		
 	foreach ($arrBottom as $customer=>$values){
 		$this->_renderTopCustomerLine($values, $arrReportTotal, $customer);			
