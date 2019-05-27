@@ -2042,11 +2042,11 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$period = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['this_a'][$period]);?></td>
+					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['this_a'][$period]/$this->Denominator);?></td>
 					<?php
 				}
 				?>
-				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['this_a']));?></td>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['this_a'])/$this->Denominator);?></td>
 			</tr>
 			<tr>
 				<td><?php echo $this->oReference->title;?></td>
@@ -2054,11 +2054,11 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$period = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['this_b'][$period]);?></td>
+					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['this_b'][$period]/$this->Denominator);?></td>
 					<?php
 				}
 				?>
-				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['this_b']));?></td>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['this_b'])/$this->Denominator);?></td>
 			</tr>
 			<tr class="budget-ratio">
 				<td>Ratio to <?php echo $this->oReference->title;?></td>
@@ -2090,11 +2090,11 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$period = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['last_a'][$period]);?></td>
+					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['last_a'][$period]/$this->Denominator);?></td>
 					<?php
 				}
 				?>
-				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['last_a']));?></td>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['last_a'])/$this->Denominator);?></td>
 			</tr>
 			<tr>
 				<td><?php echo $this->oLastYear->reference;?></td>
@@ -2102,11 +2102,11 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$period = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['last_b'][$period]);?></td>
+					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['last_b'][$period]/$this->Denominator);?></td>
 					<?php
 				}
 				?>
-				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['last_b']));?></td>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['last_b'])/$this->Denominator);?></td>
 			</tr>
 			<?php
 		}
