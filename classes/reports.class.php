@@ -1797,6 +1797,12 @@ class Reports{
 		}
 		
 		$arrScenario = Array('last_a'=>$this->oLastYear->id, 'last_b'=>$this->oLastYear->reference, 'this_a'=>$this->oBudget->id,'this_b'=>$this->oReference->id);
+		
+		// for periods less than June, read the 2 year ago
+		if($this->oBudget->cm<6){
+			$arrScenario['last_last_a'] = $this->oLastYear->lastyear;
+		}
+		
 		$arrChartType[] = Array('id'=>'revenue','title'=>'Revenue','filter'=>self::GROSS_REVENUE_FILTER);
 		$arrChartType[] = Array('id'=>'gp','title'=>'Gross profit','filter'=>self::GP_FILTER);
 		$arrChartType[] = Array('id'=>'gop','title'=>'Gross operating profit','filter'=>self::GOP_FILTER);
@@ -1809,7 +1815,7 @@ class Reports{
 				"SUM(".$this->oBudget->getYTDSQL(1,3,$arrRates_this).") as Q1, ".
 				"SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates_this).") as Total_AM";
 				
-
+		
 		for ($i = 0;$i<count($arrChartType);$i++){
 			foreach ($arrScenario as $key=>$value){
 				$sql = "SELECT {$sqlSelect}
@@ -1956,9 +1962,19 @@ class Reports{
 			
 			$s = count($arrHSSeries[$arrChartType[$i]['id']]);
 			//------------Calculate 3-month sliding average ---------
-			foreach(range(0,1) as $m){
-				$arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
+			if($this->oBudget->cm<6){
+				$arrHSSeries[$arrChartType[$i]['id']][$s][] = round(($rwData[$arrChartType[$i]['id']]['last_last_a']['feb_1']
+															+$rwData[$arrChartType[$i]['id']]['last_last_a']['mar_1']
+															+$rwData[$arrChartType[$i]['id']]['last_a']['apr'])/3);
+				$arrHSSeries[$arrChartType[$i]['id']][$s][] = round(($rwData[$arrChartType[$i]['id']]['last_last_a']['mar_1']
+															+$rwData[$arrChartType[$i]['id']]['last_a']['apr']
+															+$rwData[$arrChartType[$i]['id']]['last_a']['may'])/3);	
+			} else {
+				foreach(range(0,1) as $m){
+					$arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
+				}
 			}
+			
 			foreach(range(2,23) as $m){
 				$arrHSSeries[$arrChartType[$i]['id']][$s][] = round(($arrHSSeries[$arrChartType[$i]['id']][0][$m]
 																+$arrHSSeries[$arrChartType[$i]['id']][0][$m-1]
@@ -1993,7 +2009,7 @@ class Reports{
 			}
 			
 			if(isset($arrHSSeries[$arrChartType[$i]['id']][3][2])){
-				$arrHighCharts[$arrChartType[$i]['id']]['subtitle']['text'] .= "<br/>3M growth: <strong>".number_format($arrHSSeries[$arrChartType[$i]['id']][3][$this->oBudget->cm+8]/$arrHSSeries[$arrChartType[$i]['id']][3][2]*100-100,1,'.',',')."%</strong>";
+				$arrHighCharts[$arrChartType[$i]['id']]['subtitle']['text'] .= "<br/>Annual growth: <strong>".number_format($arrHSSeries[$arrChartType[$i]['id']][3][$this->oBudget->cm+8]/$arrHSSeries[$arrChartType[$i]['id']][3][max(0,$this->oBudget->cm-4)]*100-100,1,'.',',')."%</strong>, quarterly growth <strong>".number_format($arrHSSeries[$arrChartType[$i]['id']][3][$this->oBudget->cm+8]/$arrHSSeries[$arrChartType[$i]['id']][3][max(0,$this->oBudget->cm+5)]*100-100,1,'.',',')."%</strong>";
 			}
 			$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'Sliding average 3M','data'=>$arrHSSeries[$arrChartType[$i]['id']][3],'color'=>'#39AAEC','type'=>'spline','yAxis'=>0);						
 		}
