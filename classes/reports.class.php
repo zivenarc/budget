@@ -4262,7 +4262,7 @@ class Reports{
 				return (false);
 		};
 			?>
-			<table id='<?php echo $this->ID;?>' class='budget' style='font-size:1.2em;'>
+			<table id='<?php echo $this->ID;?>' class='budget' style=''>
 			<caption><?php echo $this->caption;?></caption>
 			<thead>				
 				<tr>					
@@ -4334,7 +4334,7 @@ class Reports{
 			$sql = self::_unionMRQueries($sql,"`prtTitle`, `activity`, `unit`",'', $arrUnion);
 			
 			?>
-			<table id='<?php echo $this->ID;?>_kpi' class='budget' style='font-size:1.2em;'>
+			<table id='<?php echo $this->ID;?>_kpi' class='budget' style=''>
 			<caption><?php echo "KPI: ",$this->caption;?></caption>
 			<thead>				
 				<tr>					
@@ -4376,6 +4376,7 @@ class Reports{
 		</tbody>
 		</table>
 		<?php
+		$this->_echoExecutionTime();
 		$this->_echoButtonCopyTable($this->ID.'_kpi');
 		
 

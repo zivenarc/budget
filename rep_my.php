@@ -3,11 +3,11 @@ require ('common/auth.php');
 require ('classes/reports.class.php');
 require ('classes/waterfall.class.php');
 
-$ownerID = isset($_GET['ownerID'])?$_GET['ownerID']:($_COOKIE['ownerID']?$_COOKIE['ownerID']:$arrUsrData['usrID']);
+$ownerID = isset($_GET['ownerID'])?$_GET['ownerID']:($_COOKIE['ownerID']?unserialize($_COOKIE['ownerID']):$arrUsrData['usrID']);
 if ($_GET['ownerID']=='MYSELF'){
 	$ownerID = $arrUsrData['usrID'];
 }
-SetCookie('ownerID',$ownerID,0);
+SetCookie('ownerID',serialize($ownerID),0);
 $filter['sales'] = $ownerID;
 
 include ('includes/inc_report_settings.php');
@@ -22,10 +22,14 @@ $arrJS[]='js/rep_pnl.js';
 
 include('includes/inc_group_buttons.php');
 
-$sql = "SELECT * FROM stbl_user WHERE usrID=".$oSQL->e($ownerID);
-$rs = $oSQL->q($sql);
-$rw = $oSQL->f($rs);
-$usrTitle = $rw['usrTitle']?$rw['usrTitle']:'<Unknown>';
+if(is_array($ownerID)){
+	$usrTitle = "multiple";
+} else {
+	$sql = "SELECT * FROM stbl_user WHERE usrID=".$oSQL->e($ownerID);
+	$rs = $oSQL->q($sql);
+	$rw = $oSQL->f($rs);
+	$usrTitle = $rw['usrTitle']?$rw['usrTitle']:'<Unknown>';
+}
 $arrUsrData["pagTitle$strLocal"] = 'Sales by '.$usrTitle;
 	
 	
