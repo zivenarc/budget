@@ -66,6 +66,9 @@ class Reports{
 		$this->_setWhere();
 		
 		$this->caption = ($params['title']?"{$params['title']} :: ":"").$this->oBudget->title.' vs '.$this->oReference->title.', '.$this->CurrencyTitle.($this->Denominator!=1?'x'.$this->Denominator:'');
+		
+		$this->all_columns = Array('CM_A','CM_B','YTD_A','YTD_B','Q_A','Q_B','NM_A','NM_B','FYE_A','FYE_B','ROY_A','ROY_B');
+		
 	}
 	
 	private function _setWhere(){
@@ -3945,7 +3948,7 @@ class Reports{
 		if ((integer)$n2==0 || ($n1*$n2<0)){
 			echo 'n/a';
 			return;			
-		} else {
+		} else {			
 			self::render($n1/$n2*100,$decimals);
 		}
 	}
@@ -4091,8 +4094,8 @@ class Reports{
 		}
 			
 		//-------- Echo lines from the dataset			
-		for($i=0;$i<count($arrReport);$i++){
-			$this->echoBudgetItemString($arrReport[$i]['data'],$arrReport[$i]['class']);
+		foreach($arrReport as $key=>$report_line){
+			$this->echoBudgetItemString($report_line['data'],$report_line['class']);
 		};
 		//=========================================================================
 		
@@ -4252,7 +4255,8 @@ class Reports{
 			$this->sqlSelect .= ($this->sqlSelect?",\r\n":"")."SUM(`{$field}`) as '{$field}'";
 		}
 		
-		$sql = self::_unionMRQueries($sql,'','', $this->columns);
+		// $sql = self::_unionMRQueries($sql,'','', $this->columns);
+		$sql = self::_unionMRQueries($sql,'','',$this->all_columns);
 		
 		//$tableID = "SUMMARY_".md5($sql);
 		// die( $sql);
@@ -4286,10 +4290,16 @@ class Reports{
 			file_put_contents($strCachename, json_encode($arrReport));
 		
 		}
-			
-		//-------- Echo lines from the dataset			
-		for($i=0;$i<count($arrReport);$i++){
-			$this->echoBudgetItemString($arrReport[$i]['data'],$arrReport[$i]['class']);
+		
+		
+		$arrReport['GP ratio'] = Array('data'=>$this->calculate_ratio($arrReport['Gross profit']['data'],$arrReport['Gross revenue']['data']),'class'=>'budget-ratio');
+		$arrReport['GOP ratio'] = Array('data'=>$this->calculate_ratio($arrReport['Gross operating profit']['data'],$arrReport['Gross revenue']['data']),'class'=>'budget-ratio');
+		$arrReport['PBT ratio'] = Array('data'=>$this->calculate_ratio($arrReport['Profit before tax']['data'],$arrReport['Gross revenue']['data']),'class'=>'budget-ratio');
+		
+		// var_export($arrReport);
+		//-------- Echo lines from the dataset					
+		foreach($arrReport as $key=>$report_line){
+			$this->echoBudgetItemString($report_line['data'],$report_line['class']);
 		};
 		//=========================================================================
 			
@@ -5136,7 +5146,7 @@ class Reports{
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Gross revenue";
-			$arrReport[] = Array('data'=>$rw, 'class'=>'budget-ratio');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'budget-ratio');
 		}
 		
 		
@@ -5146,7 +5156,7 @@ class Reports{
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Net revenue";
 			$rw['title'] = "Revenue less proceeds from import freight";
-			$arrReport[] = Array('data'=>$rw, 'class'=>'');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'');
 		}
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::DIRECT_COST_FILTER, $sql);
@@ -5156,7 +5166,7 @@ class Reports{
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Direct costs";
 			$rw['title'] = "Subcontractor costs, except import freight";
-			$arrReport[] = Array('data'=>$rw, 'class'=>'');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'');
 		}
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::GP_FILTER, $sql);
@@ -5164,7 +5174,7 @@ class Reports{
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Gross profit";
-			$arrReport[] = Array('data'=>$rw, 'class'=>'budget-subtotal');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'budget-subtotal');
 		}
 		
 		
@@ -5191,7 +5201,7 @@ class Reports{
 			$metadata['filter']['account'] = $arrYCT;
 			$metadata['title'] = $rw['Budget item'];
 			$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
-			$arrReport[] = Array('data'=>$rw, 'class'=>'');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'');
 		}
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::GOP_FILTER." AND pccFlagProd=1", $sql);
@@ -5199,7 +5209,7 @@ class Reports{
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Gross operating profit";
-			$arrReport[] = Array('data'=>$rw, 'class'=>'budget-subtotal');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'budget-subtotal');
 		}
 	
 		// if (!($this->filter['activity'])){
@@ -5220,7 +5230,7 @@ class Reports{
 			$metadata['filter']['pccFlagProd'] = 1;
 			$metadata['title'] = $rw['Budget item'];
 			$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
-			$arrReport[] = Array('data'=>$rw, 'class'=>'');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'');
 		}
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::CORP_FILTER, $sql);
@@ -5233,7 +5243,7 @@ class Reports{
 			$metadata['filter']['account'] = '5999CO';
 			$metadata['title'] = $rw['Budget item'];
 			$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
-			$arrReport[] = Array('data'=>$rw, 'class'=>'');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'');
 		}
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere.self::MSF_FILTER, $sql);
@@ -5246,7 +5256,7 @@ class Reports{
 			$metadata['filter']['account'] = '527000';
 			$metadata['title'] = $rw['Budget item'];
 			$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";
-			$arrReport[] = Array('data'=>$rw, 'class'=>'');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'');
 		}
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND pccFlagProd=1)", $sql);
@@ -5254,7 +5264,7 @@ class Reports{
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Operating profit";				
-			$arrReport[] = Array('data'=>$rw, 'class'=>'budget-subtotal');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'budget-subtotal');
 		}
 		
 		// $sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account NOT LIKE '6%' AND account NOT LIKE '7%' AND account NOT LIKE 'SZ%' AND account NOT LIKE '5999%' AND pccFlagProd=1)", $sql);
@@ -5264,7 +5274,7 @@ class Reports{
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Own operating profit";		
 			$rw['title'] = "Result of business unit without any corporate costs";								
-			$arrReport[] = Array('data'=>$rw, 'class'=>'budget-ratio');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'budget-ratio');
 		}
 		
 		$arrYCT = Array();
@@ -5281,7 +5291,7 @@ class Reports{
 			$metadata['filter']['account'] = $arrYCT;
 			$metadata['title'] = $rw['Budget item'];
 			$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";				
-			$arrReport[] = Array('data'=>$rw, 'class'=>'');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'');
 		}
 		
 		$arrYCT = Array();
@@ -5298,7 +5308,7 @@ class Reports{
 			$metadata['filter']['account'] = $arrYCT;
 			$metadata['title'] = $rw['Budget item'];
 			$rw['href'] = "javascript:getYACTDetails(".json_encode($metadata).");";				
-			$arrReport[] = Array('data'=>$rw, 'class'=>'');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'');
 		}
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND (account LIKE '7%')", $sql);
@@ -5306,7 +5316,7 @@ class Reports{
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Extraordinary";				
-			$arrReport[] = Array('data'=>$rw, 'class'=>'');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'');
 		}
 		
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND pccFlagProd=1", $sql);
@@ -5315,10 +5325,39 @@ class Reports{
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Profit before tax";				
-			$arrReport[] = Array('data'=>$rw, 'class'=>'budget-subtotal');
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'budget-subtotal');
 		}
 				
 		return ($arrReport);
 	}
+	
+	function calculate_ratio($array1, $array2, $percent = true, $strName = ''){
+			
+		if(is_array($array1) && is_array($array2)){
+			$res = Array();
+			foreach($array1 as $key=>$value){				
+				if(is_numeric($value)){					
+					if($array2[$key]!=0){
+						$res[$key] = $array1[$key]/$array2[$key]*($percent?100:1);
+					} else {
+						$res[$key] = "n/a";
+					}
+				} else {
+					$res[$key] = $array1[$key]."/".$array2[$key];
+				}
+			}
+			
+			if ($strName){
+				$res["Budget item"] = $strName;
+			}
+			
+			return ($res);
+			
+		} else {
+			return (false);
+		}
+		
+	}
+	
 }
 ?>
