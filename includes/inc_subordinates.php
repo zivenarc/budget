@@ -43,7 +43,7 @@ $id = 0;
 					$arrOwnerID[] = $data['empUserID'];
 				}
 			}
-			?><li><a href="?ownerID[]=<?php echo $arrUsrData['usrID'],implode("&ownerID[]=",$arrOwnerID); ?>">All subordinates</a><?php
+			?><li><a href="?ownerID[]=<?php echo $arrUsrData['usrID'],'&',implode("&ownerID[]=",$arrOwnerID); ?>">All subordinates</a><?php
 		}
 		?>
 	</ul>
