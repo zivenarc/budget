@@ -51,7 +51,8 @@ class Budget{
 		$this->title = $rw["scnTitle$strLocal"];
 		$this->total = $rw['scnTotal'];
 		$this->id = $scenario;
-		$this->timestamp = "Updated by ".$rw['usrTitle']." on ".date('d.m.Y H:i',strtotime($rw['scnEditDate'])).", <a href='{$rw['script']}?{$rw['prefix']}ID={$rw['id']}'>".$rw['title']." #".$rw['id']."</a>";
+		$this->editDate = strtotime($rw['scnEditDate']);
+		$this->timestamp = "Updated by ".$rw['usrTitle']." on ".date('d.m.Y H:i',$this->editDate).", <a href='{$rw['script']}?{$rw['prefix']}ID={$rw['id']}'>".$rw['title']." #".$rw['id']."</a>";
 		$this->length = $rw['scnLength'];
 		
 		$this->flagUpdate = !$rw['scnFlagReadOnly'] && strtotime($rw['scnDeadline'])>time();
