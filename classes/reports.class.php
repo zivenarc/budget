@@ -4080,7 +4080,7 @@ class Reports{
 		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
 		
 		//=================== Get financials from the cache =======================
-		$strCachename = 'cache/'.__function__.'_'.md5(implode('|',Array($this->sqlWhere,$this->oBudget->id,$this->oBudget->editDate,$this->oReference->id,$this->oReference->editDate))).'.txt';
+		$strCachename = 'cache/'.__function__.'_'.md5(implode('|',Array($this->sqlWhere,$this->Currency,$this->oBudget->id,$this->oBudget->editDate,$this->oReference->id,$this->oReference->editDate))).'.txt';
 		
 		if (file_exists($strCachename)){ // Check if the cache exists for this report
 		
@@ -4278,7 +4278,7 @@ class Reports{
 		echo '<tr class="sql" style="display:none;"><td><pre>',$sql,'</pre></td></tr>';
 		
 		//=================== Get financials from the cache =======================
-		$strCachename = 'cache/'.__function__.'_'.md5(implode('|',Array($this->sqlWhere,$this->oBudget->id,$this->oBudget->editDate,$this->oReference->id,$this->oReference->editDate))).'.txt';
+		$strCachename = 'cache/'.__function__.'_'.md5(implode('|',Array($this->sqlWhere,$this->Currency,$this->oBudget->id,$this->oBudget->editDate,$this->oReference->id,$this->oReference->editDate))).'.txt';
 		
 		if (file_exists($strCachename)){ // Check if the cache exists for this report
 		
@@ -5135,6 +5135,15 @@ class Reports{
 	</table>
 	<button onclick="SelectContent('<?php echo $tableID;?>');">Copy table</button>
 	<?php
+	}
+	
+	function _getSummary($sqlWhere){
+		$sql = "SELECT * 
+				FROM reg_master
+				{$sqlWhere}
+				GROUP BY account, item";
+		$rs = $this->oSQL->q($sqlOps);
+			
 	}
 	
 	function _getFinancialSummaryData($sql,$sqlWhere,$sqlGroup){
