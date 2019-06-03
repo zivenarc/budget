@@ -92,6 +92,7 @@ switch($repType){
 		break;
 }
 
+//============================= Main query for PnL ==================================
 $sql = "SELECT ITM.itmOrder, pccTitle as Profit, pccParentCode1C, pccFlagProd, {$sqlAccountString} , SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM reg_master
 		LEFT JOIN common_db.tbl_profit ON pc=pccID
@@ -389,6 +390,22 @@ foreach($arrReport['this'] as $group=>$arrItem){
 		<?php
 	}
 	
+	if ($group == '13.Corporate costs'){
+		?>
+		<tr class="budget-ratio">
+			<td>Corp. cost to GP, %</td>
+			<?php
+			foreach($arrProfit as $pc=>$flag){
+			?>
+			<td class='budget-decimal'><?php Reports::render_ratio(-$arrTotal['this'][$group][$pc],$arrTotal['this'][GROSS_PROFIT][$pc],1);?></td>
+			<?php
+		}
+		?>
+		<td class='budget-decimal budget-ytd'><?php if(is_array($arrTotal['this'][GROSS_PROFIT])) Reports::render_ratio(-array_sum($arrTotal['this'][$group]),array_sum($arrTotal['this'][GROSS_PROFIT]),1);?></td>
+		<td class='budget-decimal'><?php if(is_array($arrEstimate[GROSS_PROFIT])) Reports::render_ratio(-array_sum($arrEstimate[$group]),array_sum($arrEstimate[GROSS_PROFIT]),1);?></td>		
+		</tr>
+		<?php
+	}
 }
 ?>
 </tbody>
