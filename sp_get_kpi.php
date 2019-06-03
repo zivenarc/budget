@@ -19,6 +19,7 @@ $year = $oBudget->year;
 set_time_limit($ytd*60);
 
 $arrKPI[] = Array('prtID'=>48,'filter'=>Array(48,72), 'ghq'=>'Ocean import','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)",'output'=>true);
+$arrKPI[] = Array('prtID'=>97,'filter'=>Array(48,72,58), 'ghq'=>'Ocean import','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobInsertDate', 'sqlWhere'=>"",'output'=>false);
 $arrKPI[] = Array('prtID'=>58,'filter'=>Array(58),'ghq'=>'Ocean import, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)",'output'=>false );
 $arrKPI[] = Array('prtID'=>63,'filter'=>Array(63,91),'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate','output'=>true);
 $arrKPI[] = Array('prtID'=>52,'filter'=>Array(52),'ghq'=>'Ocean export, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate','output'=>false);
