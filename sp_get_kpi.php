@@ -23,6 +23,7 @@ $arrKPI[] = Array('prtID'=>97,'filter'=>Array(48,72,58), 'ghq'=>'Ocean import','
 $arrKPI[] = Array('prtID'=>58,'filter'=>Array(58),'ghq'=>'Ocean import, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'IFNULL(jobATAPort,jobETAPort)', 'sqlWhere'=>" AND jobBLTypeID IN (10157,10159)",'output'=>false );
 $arrKPI[] = Array('prtID'=>63,'filter'=>Array(63,91),'ghq'=>'Ocean export','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate','output'=>true);
 $arrKPI[] = Array('prtID'=>52,'filter'=>Array(52),'ghq'=>'Ocean export, non-DWE','kpi'=>'SUM(jobTEU)', 'date'=>'jobShipmentDate','output'=>false);
+$arrKPI[] = Array('prtID'=>45,'filter'=>Array(63,91,52),'ghq'=>'Ocean export','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'jobInsertDate','output'=>false);
 $arrKPI[] = Array('prtID'=>46,'filter'=>Array(46,92),'ghq'=>'Air import','kpi'=>'SUM(jobGrossWeight)', 'date'=>'IFNULL(jobATAPort,jobETAPort)','output'=>true);
 $arrKPI[] = Array('prtID'=>43,'filter'=>Array(46,92),'ghq'=>'Air import','kpi'=>'COUNT(DISTINCT jobID)', 'date'=>'IFNULL(jobATAPort,jobETAPort)','output'=>false);
 $arrKPI[] = Array('prtID'=>47,'filter'=>Array(47,93),'ghq'=>'Air export','kpi'=>'SUM(jobGrossWeight)', 'date'=>'jobShipmentDate','output'=>true);
