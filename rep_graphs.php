@@ -27,7 +27,7 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc_report_selectors.php');
 	echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';
 	
-	Budget::getProfitTabs('reg_master', !$flagNoAuth, Array('pccID'=>$arrBus));
+	Budget::getProfitTabs('reg_master', !$flagNoAuth);
 	
 	include ('includes/inc-frame_bottom.php');
 } else {

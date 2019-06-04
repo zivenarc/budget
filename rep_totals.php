@@ -25,6 +25,15 @@ $arrActions[] = Array('title'=>'YACT','action'=>'?repType=yact');
 
 switch ($bu_group){
 	case 'no_h':
+		$sql = "SELECT * FROM common_db.tbl_profit JOIN stbl_profit_role ON pccID LIKE pcrProfitID 
+				WHERE pccFlagFolder=0";
+		$rs = $oSQL->q($sql);
+		while ($rw = $oSQL->f($rs)){
+			$arrBus[] = $rw['pccID']; 
+		}
+		$strBUs = implode(',',$arrBus);
+		$sqlWherePC = " AND pc IN ({$strBUs})";
+		break;
 	case '0':
 	
 		break;
