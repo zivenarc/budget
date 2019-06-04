@@ -5151,7 +5151,7 @@ class Reports{
 		$arrReport = Array();
 	
 		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND item IN('".implode("','",self::GROSS_REVENUE_ITEMS)."') AND pccFlagProd=1", $sql);
-		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);		
 		$rs = $this->oSQL->q($sqlOps);
 		while ($rw = $this->oSQL->f($rs)){
 			$rw['Budget item'] = "Gross revenue";

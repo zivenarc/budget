@@ -54,7 +54,7 @@ switch ($_POST['DataAction']){
 			include ('includes/inc_report_selectors.php');
 			echo '<p>',$oBudget->timestamp,'; ',$oBudget->rates,'</p>';	
 			
-			$oBudget::getProfitTabs('reg_master', true, Array('pccID'=>$arrBus));
+			$oBudget::getProfitTabs('reg_master', true);
 			include ('includes/inc-frame_bottom.php');
 		} else {
 			if (strpos($oBudget->type,'Budget')!== false) {

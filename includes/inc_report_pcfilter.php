@@ -18,9 +18,18 @@ while ($rw = $oSQL->f($rs)){
 if ($_GET['pccGUID']=='all'){
 	
 	if(is_array($arrUsrData['roleIDs'])) $strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
+	$strBUs = implode(',',$arrBus);
 	
-	if ($bu_group){
-		$strBUs = implode(',',$arrBus);
+	if($bu_group=='no_h'){
+		$sql = "SELECT DISTINCT pccID 
+				FROM stbl_profit_role 
+				JOIN common_db.tbl_profit ON pccID LIKE pcrProfitID
+				WHERE pcrRoleID IN ({$strRoles}) 
+					AND pcrFlagRead=1 
+					AND pccFlagFolder=0";			
+	
+	} elseif ($bu_group){
+		
 		// $sql = "SELECT DISTINCT pcrProfitID FROM stbl_profit_role WHERE pcrRoleID IN ($strRoles) AND pcrFlagRead=1 AND pcrProfitID IN ({$strBUs})";
 		$sql = "SELECT DISTINCT pccID FROM common_db.tbl_profit WHERE pccID IN ({$strBUs})";
 	} else {		

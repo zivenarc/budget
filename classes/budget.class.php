@@ -404,13 +404,11 @@ class Budget{
 		GLOBAL $arrUsrData;
 		GLOBAL $budget_scenario;
 		GLOBAL $bu_group;
-		
+				
 		if ($acl && $arrUsrData['usrID']){
 			$strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
-			$sqlWhere = "JOIN stbl_profit_role 
-							ON pccID=pcrProfitID 
-							WHERE pcrRoleID IN ({$strRoles}) 
-							AND pcrFlagRead=1";
+			$sqlJoin = "JOIN stbl_profit_role 
+							ON pccID LIKE pcrProfitID AND pcrRoleID IN ({$strRoles}) AND pcrFlagRead=1";
 		}
 		
 		foreach ($params as $key=>$value){
@@ -426,7 +424,13 @@ class Budget{
 		<div id='tabs' class='tabs'>
 			<ul>
 			<?php
-			if ($bu_group==0){
+			if ($bu_group=='no_h'){
+				$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle as optText 
+						FROM vw_profit 
+						{$sqlJoin} 
+						WHERE pccFlagFolder=0 AND pccFlagDeleted=0
+						ORDER BY pccParentCode1C, pccTitle";
+			} elseif ($bu_group==0){
 				$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle as optText 
 						FROM vw_profit 
 						WHERE pccFlagFolder=1 AND pccFlagDeleted=0
@@ -442,6 +446,8 @@ class Budget{
 				if (!$register){
 					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText 
 								FROM vw_profit 
+								{$sqlJoin}
+								WHERE 
 								{$sqlWhere} 
 								ORDER BY pccParentCode1C, pccTitle";
 				} else {
@@ -449,6 +455,7 @@ class Budget{
 					$sql = "SELECT DISTINCT pccGUID as optValue, pccTitle$strLocal as optText 
 							FROM `$register` 
 							JOIN vw_profit ON pccID=pc
+							{$sqlJoin}
 							{$sqlWhere}
 							ORDER BY pccParentCode1C, pccTitle";
 					
