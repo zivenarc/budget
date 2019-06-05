@@ -25,25 +25,33 @@ $arrActions[] = Array('title'=>'YACT','action'=>'?repType=yact');
 
 switch ($bu_group){
 	case 'no_h':
-		$sql = "SELECT * FROM common_db.tbl_profit JOIN stbl_profit_role ON pccID LIKE pcrProfitID 
-				WHERE pccFlagFolder=0";
+		$sql = "SELECT * FROM common_db.tbl_profit 
+				JOIN stbl_profit_role ON pccID LIKE pcrProfitID AND pcrFlagRead=1
+				JOIN stbl_role_user ON rluRoleID=pcrRoleID AND rluUserID='{$arrUsrData['usrID']}'
+				WHERE pccFlagFolder=0
+				ORDER BY pccParentCode1C, pccTitle";
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){
 			$arrBus[] = $rw['pccID']; 
 		}
-		$strBUs = implode(',',$arrBus);
+		$strBUs = implode(',',array_unique($arrBus));
 		$sqlWherePC = " AND pc IN ({$strBUs})";
 		break;
 	case '0':
+	case '':
 	
 		break;
 	default:
-		$sql = "SELECT * FROM common_db.tbl_profit WHERE pccParentCode1C='{$bu_group}'";
+		$sql = "SELECT * FROM common_db.tbl_profit 
+				JOIN stbl_profit_role ON pccID LIKE pcrProfitID
+				JOIN stbl_role_user ON rluRoleID=pcrRoleID AND rluUserID='{$arrUsrData['usrID']}'
+				WHERE pccParentCode1C='{$bu_group}'
+				ORDER BY pccParentCode1C, pccTitle";
 		$rs = $oSQL->q($sql);
 		while ($rw = $oSQL->f($rs)){
 			$arrBus[] = $rw['pccID']; 
 		}
-		$strBUs = implode(',',$arrBus);
+		$strBUs = implode(',',array_unique($arrBus));
 		$sqlWherePC = " AND pc IN ({$strBUs})";
 		break;
 }
@@ -124,7 +132,7 @@ $sql = "SELECT ITM.itmOrder, pccTitle as Profit, pccParentCode1C, pccFlagProd, {
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
 	
-	if($bu_group=='0') {
+	if(!$bu_group) {
 		$keyProfit = $oBudget->getProfitAlias($rw);	
 	
 	} else {
@@ -161,7 +169,7 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthSt
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	if($bu_group=='0') {
+	if(!$bu_group) {
 		$keyProfit = $oBudget->getProfitAlias($rw);		
 	} else {
 		$keyProfit = $rw['Profit'];
@@ -185,7 +193,7 @@ $sql = "SELECT account,Customer_group_code, customer, Profit, pccFlagProd, bdv, 
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	if($bu_group=='0') {
+	if(!$bu_group) {
 		$keyProfit = $oBudget->getProfitAlias($rw);		
 	} else {
 		$keyProfit = $rw['Profit'];
@@ -232,7 +240,7 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthSt
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	if($bu_group=='0') {
+	if(!$bu_group) {
 		$keyProfit = $oBudget->getProfitAlias($rw);		
 	} else {
 		$keyProfit = $rw['Profit'];
@@ -257,7 +265,7 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthSt
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	if($bu_group=='0') {
+	if(!$bu_group) {
 		$keyProfit = $oBudget->getProfitAlias($rw);		
 	} else {
 		$keyProfit = $rw['Profit'];
@@ -283,7 +291,7 @@ $sql = "SELECT pccTitle as Profit, pccFlagProd, SUM(".$oBudget->getYTDSQL($mthSt
 		ORDER BY pccFlagProd,Profit";
 $rs = $oSQL->q($sql);
 while ($rw=$oSQL->f($rs)){
-	if($bu_group=='0') {
+	if(!$bu_group) {
 		$keyProfit = $oBudget->getProfitAlias($rw);		
 	} else {
 		$keyProfit = $rw['Profit'];
