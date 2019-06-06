@@ -1939,7 +1939,7 @@ class Reports{
 		for ($i = 0;$i<count($arrChartType);$i++){
 
 
-			if($arrChartType[$i]['id']!='revenue'){
+			if($arrChartType[$i]['id']!='revenue' && array_sum($rwData['revenue']['last_a']) && array_sum($rwData['revenue']['this_a'])){
 				$arrHighCharts[$arrChartType[$i]['id']]['profitability']['last_a'] = array_sum($rwData[$arrChartType[$i]['id']]['last_a'])/array_sum($rwData['revenue']['last_a']);
 				$arrHighCharts[$arrChartType[$i]['id']]['profitability']['this_a'] = array_sum($rwData[$arrChartType[$i]['id']]['this_a'])/array_sum($rwData['revenue']['this_a']);
 				$arrHighCharts[$arrChartType[$i]['id']]['subtitle']['text'] .= "<br/>% to Revenue: <strong>".number_format($arrHighCharts[$arrChartType[$i]['id']]['profitability']['this_a']*100,1,'.',',')."</strong> vs last year ".number_format($arrHighCharts[$arrChartType[$i]['id']]['profitability']['last_a']*100,1,'.',',');
