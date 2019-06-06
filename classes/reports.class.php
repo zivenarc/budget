@@ -1906,14 +1906,6 @@ class Reports{
 				$arrHSSeries[$arrChartType[$i]['id']][0][] = (integer)$rwData[$arrChartType[$i]['id']]['last_a'][$period];				
 				$arrHSSeries[$arrChartType[$i]['id']][1][] = (integer)$rwData[$arrChartType[$i]['id']]['last_b'][$period];
 				$sumAverage[$arrChartType[$i]['id']] += $rwData[$arrChartType[$i]['id']]['last_a'][$period];
-				if($arrChartType[$i]['id']!='revenue'){
-					if($rwData['revenue']['last_a'][$period]!=0){
-						$arrHSSeries[$arrChartType[$i]['id']][2][] = round($rwData[$arrChartType[$i]['id']]['last_a'][$period]/$rwData['revenue']['last_a'][$period]*100,1);
-					} else {
-						$arrHSSeries[$arrChartType[$i]['id']][2][] = null;
-					}
-				
-				}
 				
 			}
 			
@@ -1934,13 +1926,7 @@ class Reports{
 				if ($m<=$this->oBudget->cm){
 					$sumAverage[$arrChartType[$i]['id']] += $rwData[$arrChartType[$i]['id']]['this_a'][$period];
 				}
-				if($arrChartType[$i]['id']!='revenue'){
-					if($rwData['revenue']['this_a'][$period]!=0){
-						$arrHSSeries[$arrChartType[$i]['id']][2][] = round($rwData[$arrChartType[$i]['id']]['this_a'][$period]/$rwData['revenue']['this_a'][$period]*100,1);
-					} else {
-						$arrHSSeries[$arrChartType[$i]['id']][2][] = null;
-					}					
-				}
+								
 			}	
 			
 			
@@ -1958,12 +1944,8 @@ class Reports{
 				$arrHighCharts[$arrChartType[$i]['id']]['profitability']['this_a'] = array_sum($rwData[$arrChartType[$i]['id']]['this_a'])/array_sum($rwData['revenue']['this_a']);
 				$arrHighCharts[$arrChartType[$i]['id']]['subtitle']['text'] .= "<br/>% to Revenue: <strong>".number_format($arrHighCharts[$arrChartType[$i]['id']]['profitability']['this_a']*100,1,'.',',')."</strong> vs last year ".number_format($arrHighCharts[$arrChartType[$i]['id']]['profitability']['last_a']*100,1,'.',',');
 			}
-			
-			
-
-
-			
-			$s = count($arrHSSeries[$arrChartType[$i]['id']]);
+					
+			$s = count($arrHSSeries[$arrChartType[$i]['id']]);			
 			//------------Calculate 3-month sliding average ---------
 			if($this->oBudget->cm<6){
 				$arrHSSeries[$arrChartType[$i]['id']][$s][] = round(($rwData[$arrChartType[$i]['id']]['last_last_a']['feb_1']
@@ -1983,38 +1965,49 @@ class Reports{
 																+$arrHSSeries[$arrChartType[$i]['id']][0][$m-1]
 																+$arrHSSeries[$arrChartType[$i]['id']][0][$m-2])/3);
 			}
-			//------------Calculate growth Year on Year as the last series ---------
-			// foreach(range(0,11) as $m){
-				// $arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
-			// }
-			// foreach(range(12,23) as $m){
-				// if($arrHSSeries[$arrChartType[$i]['id']][0][$m-12]){
-					// $arrHSSeries[$arrChartType[$i]['id']][$s][] = round($arrHSSeries[$arrChartType[$i]['id']][0][$m]/$arrHSSeries[$arrChartType[$i]['id']][0][$m-12]*100-100,1);
-				// } else {
-					// $arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
-				// }
-			// }
+			
+			//-------- Calculate profitability, %
+			if($arrChartType[$i]['id']!='revenue'){
+				foreach(range(0,23) as $m){
+					if($arrHSSeries['revenue'][2][$m]!=0){
+						$arrHSSeries[$arrChartType[$i]['id']][$s+1][] = round($arrHSSeries[$arrChartType[$i]['id']][$s][$m]/$arrHSSeries['revenue'][2][$m]*100,1);
+					} else {
+						$arrHSSeries[$arrChartType[$i]['id']][$s+1][] = null;
+					}					
+				}
+			}		
 		}
 		
 		for ($i = 0;$i<count($arrChartType);$i++){
+			
+			//--- Current month divider
 			if($this->oBudget->cm<15){
 				$arrHighCharts[$arrChartType[$i]['id']]['xAxis']['plotLines'][0] = Array('color'=>'#FF6D10','value'=>8.5+$this->oBudget->cm,'width'=>2);
 			}
+			
+			//--- Set the minimum for main series
 			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][0]['min'] = min(min($arrHSSeries[$arrChartType[$i]['id']][0]),min($arrHSSeries[$arrChartType[$i]['id']][1]));
+			
+			//--- Show the average value for actual periods
 			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][0]['plotLines'][0] = Array('color'=>'#3BACEE','value'=>$sumAverage[$arrChartType[$i]['id']]/(9+$this->oBudget->cm),'width'=>2,'dashStyle'=>'dot');
 			$arrHighCharts[$arrChartType[$i]['id']]['series']=Array(									
 									Array('name'=>$this->oBudget->title,'data'=>$arrHSSeries[$arrChartType[$i]['id']][0],'color'=>'#3BACEE')
 									,Array('name'=>$this->oReference->title,'data'=>$arrHSSeries[$arrChartType[$i]['id']][1],'color'=>'#DDDDDD')									
 								);
+			
+			//-- Show sliding average
+			if(isset($arrHSSeries[$arrChartType[$i]['id']][2][2])){
+				$arrHighCharts[$arrChartType[$i]['id']]['subtitle']['text'] .= "<br/>Annual growth: <strong>".number_format($arrHSSeries[$arrChartType[$i]['id']][2][$this->oBudget->cm+8]/$arrHSSeries[$arrChartType[$i]['id']][2][max(0,$this->oBudget->cm-4)]*100-100,1,'.',',')."%</strong>, quarterly growth <strong>".number_format($arrHSSeries[$arrChartType[$i]['id']][2][$this->oBudget->cm+8]/$arrHSSeries[$arrChartType[$i]['id']][2][max(0,$this->oBudget->cm+5)]*100-100,1,'.',',')."%</strong>";
+			}
+			$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'Sliding average 3M','data'=>$arrHSSeries[$arrChartType[$i]['id']][2],'color'=>'#39AAEC','type'=>'spline','yAxis'=>0);	
+
+			//--- Show profitability %
 			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][1] = Array('title'=>'%','opposite'=>true,'min'=>0);		
 			if($arrChartType[$i]['id']!='revenue'){					
-					$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'% to revenue','data'=>$arrHSSeries[$arrChartType[$i]['id']][2],'color'=>'#FF6D10','type'=>'spline','yAxis'=>1);						
+					$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'% to revenue','data'=>$arrHSSeries[$arrChartType[$i]['id']][3],'color'=>'#FF6D10','type'=>'spline','yAxis'=>1);						
 			}
 			
-			if(isset($arrHSSeries[$arrChartType[$i]['id']][3][2])){
-				$arrHighCharts[$arrChartType[$i]['id']]['subtitle']['text'] .= "<br/>Annual growth: <strong>".number_format($arrHSSeries[$arrChartType[$i]['id']][3][$this->oBudget->cm+8]/$arrHSSeries[$arrChartType[$i]['id']][3][max(0,$this->oBudget->cm-4)]*100-100,1,'.',',')."%</strong>, quarterly growth <strong>".number_format($arrHSSeries[$arrChartType[$i]['id']][3][$this->oBudget->cm+8]/$arrHSSeries[$arrChartType[$i]['id']][3][max(0,$this->oBudget->cm+5)]*100-100,1,'.',',')."%</strong>";
-			}
-			$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'Sliding average 3M','data'=>$arrHSSeries[$arrChartType[$i]['id']][3],'color'=>'#39AAEC','type'=>'spline','yAxis'=>0);						
+					
 		}
 		
 		$arrHighChartsAFF['series'] = Array(
