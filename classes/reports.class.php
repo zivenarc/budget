@@ -1671,7 +1671,7 @@ class Reports{
 		
 	private function _documentPnL($sqlWhere, $params = Array('field_data','field_title','title')){
 		
-		for($m=$this->oBudget->nm;$m<=$this->oBudget->offset+12;$m++){
+		for($m=$this->oBudget->offset+1;$m<=$this->oBudget->offset+12;$m++){
 			$this->columns[] = $this->oBudget->arrPeriod[$m];
 		}
 		$this->columns[] = 'Q2';
@@ -1938,7 +1938,7 @@ class Reports{
 				
 		for ($i = 0;$i<count($arrChartType);$i++){
 
-
+			//--- Calculate profitability in this and previous periods
 			if($arrChartType[$i]['id']!='revenue' && array_sum($rwData['revenue']['last_a']) && array_sum($rwData['revenue']['this_a'])){
 				$arrHighCharts[$arrChartType[$i]['id']]['profitability']['last_a'] = array_sum($rwData[$arrChartType[$i]['id']]['last_a'])/array_sum($rwData['revenue']['last_a']);
 				$arrHighCharts[$arrChartType[$i]['id']]['profitability']['this_a'] = array_sum($rwData[$arrChartType[$i]['id']]['this_a'])/array_sum($rwData['revenue']['this_a']);
