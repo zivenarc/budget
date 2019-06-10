@@ -101,14 +101,12 @@ if(!isset($_GET['pccGUID'])){
 	?>
 	<h2>Documents related to this customer</h2>
 	<?php
-	$sql = "SELECT vw_journal.*, stbl_user.*, edit_date as timestamp 
-	FROM vw_journal 				
+	$sql = "SELECT vw_journal.*, stbl_user.*, edit_date as timestamp, SUM(".$oBudget->getYTDSQL().") as amount
+	FROM reg_master
+	LEFT JOIN vw_journal ON vw_journal.guid = source
 	LEFT JOIN stbl_user ON usrID=vw_journal.edit_by				
-	WHERE vw_journal.guid IN (SELECT source FROM reg_master 
-									WHERE
-										scenario IN ('{$budget_scenario}','{$reference}')
-										AND customer IN (".implode(',',$arrCounterparty['codes']).")
-									)		
+	WHERE reg_master.scenario IN ('{$budget_scenario}','{$reference}')
+		AND reg_master.customer IN (".implode(',',$arrCounterparty['codes']).")
 	GROUP BY vw_journal.guid
 	ORDER BY vw_journal.edit_date ASC";	
 
