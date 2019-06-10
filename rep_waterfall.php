@@ -253,6 +253,54 @@ $settings['pbt'] = Array('title'=>"PBT by factors",
 			'tolerance'=>0.03,
 			'limit'=>10);
 
+$settings['rfc'] = Array('title'=>"RFC by factors",
+'sqlBase' => "SELECT IF(`Group_code` IN (108,110,136,94,95),item,Group_code)  as optValue, 
+					IF(`Group_code` IN (108,110,136,94,95),`Budget item`,`Group`) as optText, 
+					{$sqlActual} as Actual, 
+					0 as Budget, 
+					{$sqlActual} as Diff
+			FROM vw_master 			
+			WHERE scenario='{$actual}' 
+			".Reports::RFC_FILTER." 
+			AND company='{$company}'
+			GROUP BY IF(`Group_code` IN (108,110,136,94,95),item,Group_code)
+			UNION ALL
+			SELECT IF(`Group_code` IN (108,110,136,94,95),item,Group_code), 
+				IF(`Group_code` IN (108,110,136,94,95),`Budget item`,`Group`), 
+				0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+			FROM vw_master 			
+			WHERE
+			scenario='{$budget}'  
+			".Reports::RFC_FILTER." 
+			AND company='{$company}'
+			GROUP BY IF(`Group_code` IN (108,110,136,94,95),item,Group_code)",
+			'tolerance'=>0.10,
+			'limit'=>8);			
+
+$settings['sga'] = Array('title'=>"SGA by factors",
+'sqlBase' => "SELECT IF(`Group_code` IN (108,110,136,94,95,96),item,Group_code)  as optValue, 
+					IF(`Group_code` IN (108,110,136,94,95,96),`Budget item`,`Group`) as optText, 
+					{$sqlActual} as Actual, 
+					0 as Budget, 
+					{$sqlActual} as Diff
+			FROM vw_master 			
+			WHERE scenario='{$actual}' 
+			".Reports::SGA_FILTER." 
+			AND company='{$company}'
+			GROUP BY IF(`Group_code` IN (108,110,136,94,95,96),item,Group_code)
+			UNION ALL
+			SELECT IF(`Group_code` IN (108,110,136,94,95,96),item,Group_code), 
+				IF(`Group_code` IN (108,110,136,94,95,96),`Budget item`,`Group`), 
+				0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+			FROM vw_master 			
+			WHERE
+			scenario='{$budget}'  
+			".Reports::SGA_FILTER." 
+			AND company='{$company}'
+			GROUP BY IF(`Group_code` IN (108,110,136,94,95,96),item,Group_code)",
+			'tolerance'=>0.10,
+			'limit'=>8);
+			
 $settings['bdcus'] = Array('title'=>"Bad debt by customer",
 					'sqlBase' => "SELECT customer as optValue, 
 											Customer_name as optText,
