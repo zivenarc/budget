@@ -7,7 +7,8 @@ $strRoles = "'".implode("','",$arrUsrData['roleIDs'])."'";
 if ($oDocument->GUID){
 	$sql = "SELECT MAX(pcrFlagRead) as pcrFlagRead, MAX(pcrFlagUpdate) as pcrFlagUpdate 
 			FROM stbl_profit_role 
-			WHERE pcrProfitID=".(integer)$oDocument->profit." AND pcrRoleID IN ($strRoles);";
+			WHERE {$oDocument->profit} LIKE pcrProfitID 
+			AND pcrRoleID IN ($strRoles);";
 	// echo '<pre>';print_r($sql);echo '</pre>';
 	$rs = $oSQL->q($sql);
 	$rw = $oSQL->f($rs);
