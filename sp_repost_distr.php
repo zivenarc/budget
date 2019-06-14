@@ -19,7 +19,7 @@ if ($_GET['tab']){
 			LEFT JOIN vw_product_type ON rntActivityID=prtID
 			LEFT JOIN vw_yact ON rntYact=yctID
 			LEFT JOIN vw_item ON rntItemGUID=itmID
-		WHERE vw_journal.posted=1 AND vw_journal.scenario='{$_GET['tab']}' 
+		WHERE vw_journal.scenario='{$_GET['tab']}' 
 		AND prefix IN ('rnt')
 		GROUP BY vw_journal.guid
 		ORDER BY vw_journal.edit_date ASC";	
