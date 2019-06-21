@@ -5366,6 +5366,11 @@ class Reports{
 		$sql = "SELECT cntTitle, 
 				SUM(".$this->oBudget->getThisYTDSQL('roy').") as ROY, 
 				SUM(".$this->oBudget->getThisYTDSQL('fye').") as FYE, 
+				AVG(IFNULL((SELECT MAX(agrCreditDays*(1+0.4*agrFlagBankingDays)) 
+						FROM common_db.tbl_agreement 
+						WHERE agrCounterpartyID=customer 
+							AND agr1CType IN (1) 
+						GROUP BY agrCounterpartyID),21)) as CreditDays,
 				".$this->oBudget->getMonthlySumSQL(4,15)."
 				FROM reg_master
 				LEFT JOIN vw_counterparty ON cntID=customer_group_code
@@ -5374,13 +5379,18 @@ class Reports{
 				".self::GROSS_REVENUE_FILTER."
 				GROUP BY customer_group_code
 				ORDER BY ROY DESC";
-		$rs = $this->oSQL->q($sql);
-		// echo '<pre>',$sql,'</pre>';
+		try {
+			$rs = $this->oSQL->q($sql);
+		} catch (Exception $e) {
+			echo '<pre>',$sql,'</pre>';
+		}
 		?>
 		<table id="<?php echo $this->ID;?>" class="budget">
 			<tr>
 				<th>Customer group</th>
 				<th class="budget-ytd">FYE</th>
+				<th>Credit days</th>
+				<th class="budget-quarterly">Notional WC</th>
 				<?php 
 				for ($m=4;$m<=15;$m++){					
 					?>
@@ -5394,6 +5404,8 @@ class Reports{
 			<tr>
 				<td><?php echo $rw['cntTitle'];?></td>
 				<td class="budget-ytd budget-decimal"><?php $this->render($rw['FYE']);?></td>
+				<td class="budget-decimal"><?php $this->render($rw['CreditDays']);?></td>
+				<td class="budget-quarterly budget-decimal"><?php $this->render(max(0,$rw['FYE']/365*$rw['CreditDays']));?></td>				
 				<?php 
 				for ($m=4;$m<=15;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
