@@ -5361,5 +5361,55 @@ class Reports{
 		
 	}
 	
+	function revenueByCustomer(){
+		
+		$sql = "SELECT cntTitle, 
+				SUM(".$this->oBudget->getThisYTDSQL('roy').") as ROY, 
+				SUM(".$this->oBudget->getThisYTDSQL('fye').") as FYE, 
+				".$this->oBudget->getMonthlySumSQL(4,15)."
+				FROM reg_master
+				LEFT JOIN vw_counterparty ON cntID=customer_group_code
+				{$this->sqlWhere}
+				AND scenario='{$this->oBudget->id}'
+				".self::GROSS_REVENUE_FILTER."
+				GROUP BY customer_group_code
+				ORDER BY ROY DESC";
+		$rs = $this->oSQL->q($sql);
+		// echo '<pre>',$sql,'</pre>';
+		?>
+		<table id="<?php echo $this->ID;?>" class="budget">
+			<tr>
+				<th>Customer group</th>
+				<th class="budget-ytd">FYE</th>
+				<?php 
+				for ($m=4;$m<=15;$m++){					
+					?>
+					<th><?php echo $this->oBudget->arrPeriodTitle[$m];?></td>
+					<?php
+				}
+				?>
+			</tr>
+		<?php while ($rw = $this->oSQL->f($rs)){
+			?>
+			<tr>
+				<td><?php echo $rw['cntTitle'];?></td>
+				<td class="budget-ytd budget-decimal"><?php $this->render($rw['FYE']);?></td>
+				<?php 
+				for ($m=4;$m<=15;$m++){
+					$month = $this->oBudget->arrPeriod[$m];
+					?>
+					<td class='budget-decimal'><?php $this->render($rw[$month]);?></td>
+					<?php
+				}
+				?>
+			</tr>
+			<?php
+		}
+		?>
+		</table>
+		<?php
+		$this->_echoButtonCopyTable($this->ID);
+	
+	}
 }
 ?>
