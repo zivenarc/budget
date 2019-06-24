@@ -43,7 +43,13 @@ if(!isset($_GET['pccGUID'])){
 	include ('includes/inc-frame_top.php');
 	echo '<h1>',$oBudget->title,' :: ',$arrUsrData["pagTitle$strLocal"],'</h1>';	
 	
-	if (count($arrCounterparty['codes']>1)){
+	if (count($arrCounterparty['codes']>1)){		
+		if (count($arrCounterparty['codes']>20)){		
+			?>
+			<details>
+				<summary>More than 20 customers found</summary>
+			<?php
+		}
 		foreach ($arrCounterparty['titles'] as $sales=>$customers){
 			//echo '<h4>',($sales?$sales:"Unassigned"),'</h4>';
 			//echo '<div>';
@@ -57,6 +63,11 @@ if(!isset($_GET['pccGUID'])){
 				echo "</span> | ";
 			}
 			//echo '</div>';
+		}
+		if (count($arrCounterparty['codes']>20)){		
+			?>
+			</details>			
+			<?php
 		}
 	}
 	
