@@ -60,24 +60,62 @@ if(!isset($_GET['pccGUID'])){
 			ORDER BY YTD DESC
 			";
 	$rs = $oSQL->q($sql);	
-	$runningTotal = 0;
+	$runningTotal = 0; $yOthers = Array(); $arrOthers=Array();
 	while ($rw = $oSQL->f($rs)){
 		if($runningTotal<0.8*$nTotalGP){
-			$arrHSSeries[] = Array('name'=>($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),'y'=>(integer)$rw['YTD']);
+			$arrHSSeries['GP'][] = Array('name'=>($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),'y'=>(integer)$rw['YTD']);
 		} elseif ($runningTotal<0.96*$nTotalGP) {
-			$yOthers['b'] += (integer)$rw['YTD'];
-			$arrOthers['b'][] = Array(($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),(integer)$rw['YTD']);
+			$yOthers['GP']['b'] += (integer)$rw['YTD'];
+			$arrOthers['GP']['b'][] = Array(($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),(integer)$rw['YTD']);
 		} else {
-			$yOthers['c'] += (integer)$rw['YTD'];
-			$arrOthers['c'][] = Array(($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),(integer)$rw['YTD']);
+			$yOthers['GP']['c'] += (integer)$rw['YTD'];
+			$arrOthers['GP']['c'][] = Array(($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),(integer)$rw['YTD']);
 		}
 		$runningTotal += $rw['YTD'];
 	}
-	if (is_array($yOthers)){
-		$arrHSSeries[] = Array('name'=>'B-Class ('.count($arrOthers['b']).')','y'=>$yOthers['b'], 'drilldown'=>'Others_B');
-		$arrHSSeries[] = Array('name'=>'C-Class ('.count($arrOthers['c']).')','y'=>$yOthers['c'], 'drilldown'=>'Others_C');
+	if (count($yOthers['GP'])){
+		$arrHSSeries['GP'][] = Array('name'=>'B-Class ('.count($arrOthers['GP']['b']).')','y'=>$yOthers['GP']['b'], 'drilldown'=>'Others_B');
+		$arrHSSeries['GP'][] = Array('name'=>'C-Class ('.count($arrOthers['GP']['c']).')','y'=>$yOthers['GP']['c'], 'drilldown'=>'Others_C');
 	}
-
+	
+	// -------------------------------- Pie by TEU ------------------------------------
+	$sql = "SELECT SUM(".$oReport->oBudget->getThisYTDSQL('fye').") as YTD 
+			FROM vw_sales 			
+			{$oReport->sqlWhere}
+			AND scenario ='{$oReport->oBudget->id}' 
+			AND unit='TEU'
+			";
+	$rs = $oSQL->q($sql);
+	$nTotalGP = $oSQL->get_data($rs);
+	
+	$sql = "SELECT customer_group_code, customer_group_title, SUM(".$oReport->oBudget->getThisYTDSQL('fye').") as YTD 
+			FROM vw_sales 			
+			{$oReport->sqlWhere}			
+			AND scenario ='{$oReport->oBudget->id}'
+			AND unit='TEU'
+			GROUP BY customer_group_code		
+			ORDER BY YTD DESC
+			";
+	$rs = $oSQL->q($sql);	
+	$runningTotal = 0; $yOthers = Array(); $arrOthers=Array();
+	while ($rw = $oSQL->f($rs)){
+		if($runningTotal<0.8*$nTotalGP){
+			$arrHSSeries['TEU'][] = Array('name'=>($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),'y'=>(integer)$rw['YTD']);
+		} elseif ($runningTotal<0.96*$nTotalGP) {
+			$yOthers['TEU']['b'] += (integer)$rw['YTD'];
+			$arrOthers['TEU']['b'][] = Array(($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),(integer)$rw['YTD']);
+		} else {
+			$yOthers['TEU']['c'] += (integer)$rw['YTD'];
+			$arrOthers['TEU']['c'][] = Array(($rw['customer_group_title']?$rw['customer_group_title']:'Unspecified'),(integer)$rw['YTD']);
+		}
+		$runningTotal += $rw['YTD'];
+	}
+	if (count($yOthers['TEU'])){
+		$arrHSSeries['TEU'][] = Array('name'=>'B-Class ('.count($arrOthers['TEU']['b']).')','y'=>$yOthers['TEU']['b'], 'drilldown'=>'Others_B');
+		$arrHSSeries['TEU'][] = Array('name'=>'C-Class ('.count($arrOthers['TEU']['c']).')','y'=>$yOthers['TEU']['c'], 'drilldown'=>'Others_C');
+	}
+	
+	//--------------------------------- Pie by Industry -------------------------------
 	$sql = "SELECT ivlGroup, SUM(".$oBudget->getThisYTDSQL('fye').") as YTD 
 			FROM vw_master 
 			{$oReport->sqlWhere}
@@ -92,9 +130,11 @@ if(!isset($_GET['pccGUID'])){
 	}
 
 	$customerPie = 'customer_'.$_GET['pccGUID'];
+	$customerPieTEU = 'customer_teu_'.$_GET['pccGUID'];
 	$industryPie = 'industry_'.$_GET['pccGUID'];
 	?>
 	<div id='<?php echo $customerPie;?>' style='width:100%; height:600px;'></div>
+	<div id='<?php echo $customerPieTEU;?>' style='width:100%; height:600px;'></div>
 	<div id='<?php echo $industryPie;?>' style='width:100%; height:600px;'></div>
 	<script>
 	$(document).ready(function(){
@@ -138,22 +178,79 @@ if(!isset($_GET['pccGUID'])){
 			"series": [{
 				name: 'A-Class customers',
 				colorByPoint: true,
-				data: <?php echo json_encode($arrHSSeries);?>
+				data: <?php echo json_encode($arrHSSeries['GP']);?>
 			}],
 			"drilldown": {
 				series: [
-					{name:'B-Class (<?php echo count($arrOthers['b']);?>)',
+					{name:'B-Class (<?php echo count($arrOthers['GP']['b']);?>)',
 						id:'Others_B',
-						data: <?php echo json_encode($arrOthers['b']); ?>
+						data: <?php echo json_encode($arrOthers['GP']['b']); ?>
 						
-					},{name:'C-Class (<?php echo count($arrOthers['c']);?>)',
+					},{name:'C-Class (<?php echo count($arrOthers['GP']['c']);?>)',
 						id:'Others_C',
-						data: <?php echo json_encode($arrOthers['c']); ?>
+						data: <?php echo json_encode($arrOthers['GP']['c']); ?>
 						
 					}
 				]
 			}
 		});
+		
+		Highcharts.chart('<?php echo $customerPieTEU;?>', {
+			chart: {
+				plotBackgroundColor: null,
+				plotBorderWidth: null,
+				plotShadow: false,
+				type: 'pie'
+			},
+			title: {
+				text: 'Customer share by TEU, <?php echo $oBudget->title;?>'
+			},
+			subtitle: {
+				text: 'with ABC-analysis'
+			},
+			tooltip: {
+				headerFormat: '<b>{point.key}</b><br>',
+				pointFormat: '{point.y:,.0f}: {point.percentage:.0f}%'
+			},
+			plotOptions: {
+				pie: {
+					allowPointSelect: true,
+					cursor: 'pointer',
+					dataLabels: {
+						enabled: true,
+						format: '<b>{point.name}</b><br>{point.y:,.0f} ({point.percentage:.0f}%)',
+						style: {
+							color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+						}
+						// ,
+						// filter: {
+							// property: 'percentage',
+							// operator: '>',
+							// value: 1
+						// }
+					}
+				}
+			},
+			"series": [{
+				name: 'A-Class customers',
+				colorByPoint: true,
+				data: <?php echo json_encode($arrHSSeries['TEU']);?>
+			}],
+			"drilldown": {
+				series: [
+					{name:'B-Class (<?php echo count($arrOthers['TEU']['b']);?>)',
+						id:'Others_B',
+						data: <?php echo json_encode($arrOthers['TEU']['b']); ?>
+						
+					},{name:'C-Class (<?php echo count($arrOthers['TEU']['c']);?>)',
+						id:'Others_C',
+						data: <?php echo json_encode($arrOthers['TEU']['c']); ?>
+						
+					}
+				]
+			}
+		});
+		
 		
 		Highcharts.chart('<?php echo $industryPie;?>', {
 			chart: {
