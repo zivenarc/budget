@@ -5329,7 +5329,16 @@ class Reports{
 			$rw['Budget item'] = "Profit before tax";				
 			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'budget-subtotal');
 		}
-				
+		
+		$sqlOps = str_replace($sqlWhere, $sqlWhere." AND pccFlagProd=0", $sql);
+		$sqlOps = str_replace($sqlGroup, '', $sqlOps);
+		$rs = $this->oSQL->q($sqlOps);
+		while ($rw = $this->oSQL->f($rs)){
+			$rw['Budget item'] = "Undistributed corporate costs";
+			$rw['title'] = "Costs of headquarters and BDV";						
+			$arrReport[$rw['Budget item']] = Array('data'=>$rw, 'class'=>'budget-small');
+		}
+		
 		return ($arrReport);
 	}
 	
