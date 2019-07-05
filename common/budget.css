@@ -250,3 +250,8 @@ a.budget-details:active{
 .budget-gray td{
 	background-color: #CCC;
 }
+
+.budget-small td{
+	font-size: 0.9em;
+	color: blue;
+}
