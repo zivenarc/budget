@@ -274,7 +274,7 @@ $settings['rfc'] = Array('title'=>"RFC by factors",
 			".Reports::RFC_FILTER." 
 			AND company='{$company}'
 			GROUP BY IF(`Group_code` IN (108,110,136,94,95),item,Group_code)",
-			'tolerance'=>0.5,
+			'tolerance'=>0.05,
 			'limit'=>8);			
 
 $settings['sga'] = Array('title'=>"SGA by factors",
@@ -298,7 +298,7 @@ $settings['sga'] = Array('title'=>"SGA by factors",
 			".Reports::SGA_FILTER." 
 			AND company='{$company}'
 			GROUP BY IF(`Group_code` IN (108,110,136,94,95,96),item,Group_code)",
-			'tolerance'=>0.5,
+			'tolerance'=>0.05,
 			'limit'=>8);
 			
 $settings['bdcus'] = Array('title'=>"Bad debt by customer",
