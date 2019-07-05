@@ -301,6 +301,32 @@ $settings['sga'] = Array('title'=>"SGA by factors",
 			'tolerance'=>0.05,
 			'limit'=>8);
 			
+
+$settings['corp'] = Array('title'=>"CORP by factors",
+'sqlBase' => "SELECT IF(`Group_code` IN (108,110,136,94,95,96),item,Group_code)  as optValue, 
+					IF(`Group_code` IN (108,110,136,94,95,96),`Budget item`,`Group`) as optText, 
+					{$sqlActual} as Actual, 
+					0 as Budget, 
+					{$sqlActual} as Diff
+			FROM vw_master 			
+			WHERE scenario='{$actual}' 
+			AND (account LIKE '5%' AND account NOT IN ('5999CO','5999BD','527000')) AND (pccFLagProd = 0 AND pc NOT IN (9,130)) 
+			AND company='{$company}'
+			GROUP BY IF(`Group_code` IN (108,110,136,94,95,96),item,Group_code)
+			UNION ALL
+			SELECT IF(`Group_code` IN (108,110,136,94,95,96),item,Group_code), 
+				IF(`Group_code` IN (108,110,136,94,95,96),`Budget item`,`Group`), 
+				0 as Actual, {$sqlBudget}  as Budget, -{$sqlBudget} as Diff
+			FROM vw_master 			
+			WHERE
+			scenario='{$budget}'  
+			AND (account LIKE '5%' AND account NOT IN ('5999CO','5999BD','527000')) AND (pccFLagProd = 0 AND pc NOT IN (9,130)) 
+			AND company='{$company}'
+			GROUP BY IF(`Group_code` IN (108,110,136,94,95,96),item,Group_code)",
+			'tolerance'=>0.05,
+			'limit'=>8);			
+			
+			
 $settings['bdcus'] = Array('title'=>"Bad debt by customer",
 					'sqlBase' => "SELECT customer as optValue, 
 											Customer_name as optText,
