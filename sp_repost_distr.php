@@ -21,7 +21,7 @@ if ($_GET['tab']){
 			LEFT JOIN stbl_user ON usrID=vw_journal.edit_by			
 			LEFT JOIN vw_product_type ON rntActivityID=prtID
 			LEFT JOIN vw_yact ON rntYact=yctID
-			LEFT JOIN vw_item ON rntItemGUID=itmID
+			LEFT JOIN vw_item ON rntItemGUID=itmGUID
 		WHERE vw_journal.scenario='{$_GET['tab']}' 
 		AND prefix IN ('rnt')
 		GROUP BY vw_journal.guid
