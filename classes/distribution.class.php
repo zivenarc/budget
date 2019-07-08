@@ -345,7 +345,8 @@ class Distribution extends Document{
 						WHERE scenario='{$this->scenario}'
 							AND pc='{$this->profit}'
 							{$sqlFilter}
-							AND (IFNULL(customer,".self::EMPTY_CUSTOMER.")=".self::EMPTY_CUSTOMER." OR customer=0)
+							--AND (IFNULL(customer,".self::EMPTY_CUSTOMER.")=".self::EMPTY_CUSTOMER." OR customer=0)
+							AND customer = 0
 							AND activity='{$this->activity}'
 						GROUP BY account, item, activity;"; 
 				$this->log($sql);
@@ -388,12 +389,12 @@ class Distribution extends Document{
 				}
 				$oMaster->save(true);//save to actual periods, too
 				
-				$this->doSQL("UPDATE `reg_master` SET `customer`=".self::EMPTY_CUSTOMER.", 
-											`customer_group_code`=".self::EMPTY_CUSTOMER."				
-								WHERE IFNULL(customer,0)=0 
-									AND item='".$Items::WH_RENT."' 
-									AND scenario='{$this->scenario}' 
-									AND source<>'Actual';");
+				// $this->doSQL("UPDATE `reg_master` SET `customer`=".self::EMPTY_CUSTOMER.", 
+											// `customer_group_code`=".self::EMPTY_CUSTOMER."				
+								// WHERE IFNULL(customer,0)=0 
+									// AND item='".$Items::WH_RENT."' 
+									// AND scenario='{$this->scenario}' 
+									// AND source<>'Actual';");
 				
 				$this->markPosted();
 			}
