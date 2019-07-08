@@ -219,6 +219,12 @@ $oBudget = new Budget($_GET['tab']);
 			case 'unarchive':
 				$oBudget->archive(false);
 				break;	
+			case 'publish':
+				$oBudget->publish(true);
+				break;
+			case 'unpublish':
+				$oBudget->publish(false);
+				break;	
 			case 'default':
 				$oBudget->setAsDefault(false);
 				break;	
@@ -242,46 +248,39 @@ $oBudget = new Budget($_GET['tab']);
 	?>
 	<div>
 	<h2><?php echo $oBudget->title;?></h2>
-	<p>Deadline for completion <?php echo $oBudget->deadline;?></p>
-	<pre>Checksum: <?php echo $oBudget->checksum; ?></pre>
-	<pre>Current:  <?php echo $oBudget->get_checksum(); ?></pre>
+	<p>Deadline for completion <?php echo $oBudget->deadline;?></p>	
 	<div id='controlPanel' style="display:inline-block;">
-	<table><tr>
-	<td>
-		<label for='scnLastID'>Default reference period</label>
-		<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->reference_scenario->id)); ?>
-	</td>
-	<td>
-		<label for='scnForecastID'>Forecast period</label>
-		<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->forecast)); ?>
-	</td>
-	<td>
-		<label for='scnForecastID'>Last year</label>
-		<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->lastyear)); ?>
-	</td>
-	<td>
-	<label for="scnFlagReadOnly|<?php echo $oBudget->id;?>">Read-only</label><input type='checkbox' <?php echo $oBudget->flagUpdate?"":"checked";?> class='scnFlagReadOnly' id='scnFlagReadOnly|<?php echo $oBudget->id;?>'>
-	<label for="scnFlagArchive|<?php echo $oBudget->id;?>">Archived</label><input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> class='scnFlagArchive' id='scnFlagArchive|<?php echo $oBudget->id;?>'>
-	<?php
-	if ($oBudget->id==$arrSetup['stpScenarioID']){
-	?>
-	<span class='info'>Default budget</span>
-	<?php
-	} elseif ($oBudget->id==$arrSetup['stpFYEID']){
-	?>
-	<span class='info'>Default actual scenario</span>
-	<?php
-	} else {
-	?>
-	<span><button class='default' id='default|<?php echo $oBudget->id;?>'>Set as default</button></span>
+		<p>
+			<label for='scnLastID'>Default reference period</label>
+			<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->reference_scenario->id)); ?>
+			<label for='scnForecastID'>Forecast period</label>
+			<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->forecast)); ?>
+			<label for='scnForecastID'>Last year</label>
+			<?php echo $oBudget->getScenarioSelect(Array('budget_scenario'=>$oBudget->lastyear)); ?>
+		</p>
+		<p>
+			<label for="scnFlagReadOnly|<?php echo $oBudget->id;?>">Read-only</label><input type='checkbox' <?php echo $oBudget->flagUpdate?"":"checked";?> class='scnFlagReadOnly' id='scnFlagReadOnly|<?php echo $oBudget->id;?>'>
+			<label for="scnFlagPublic|<?php echo $oBudget->id;?>">Public</label><input type='checkbox' <?php echo $oBudget->flagPublic?"checked":"";?> class='scnFlagPublic' id='scnFlagPublic|<?php echo $oBudget->id;?>'>
+			<label for="scnFlagArchive|<?php echo $oBudget->id;?>">Archived</label><input type='checkbox' <?php echo $oBudget->flagArchive?"checked":"";?> class='scnFlagArchive' id='scnFlagArchive|<?php echo $oBudget->id;?>'>
+			<?php
+			if ($oBudget->id==$arrSetup['stpScenarioID']){
+			?>
+			<span class='info'>Default budget</span>
+			<?php
+			} elseif ($oBudget->id==$arrSetup['stpFYEID']){
+			?>
+			<span class='info'>Default actual scenario</span>
+			<?php
+			} else {
+			?>
+			<span><button class='default' id='default|<?php echo $oBudget->id;?>'>Set as default</button></span>
 
-	<?php
-	}
-	?>
-	<span><button onclick="window.open('sp_get_kpi.php?budget_scenario=<?php echo $oBudget->id;?>','_blank');" id='kpis'>Get KPIs</button></span>
-	<span><button onclick="window.open('rep_staff_costs.php?budget_scenario=<?php echo $oBudget->id;?>','_blank');" id='headcount'>Get headcount</button></span>
-	</td>
-	</tr></table>
+			<?php
+			}
+			?>
+			<span><button onclick="window.open('sp_get_kpi.php?budget_scenario=<?php echo $oBudget->id;?>','_blank');" id='kpis'>Get KPIs</button></span>
+			<span><button onclick="window.open('rep_staff_costs.php?budget_scenario=<?php echo $oBudget->id;?>','_blank');" id='headcount'>Get headcount</button></span>
+		</p>
 	</div>
 	<nav><strong>Compare to <?php echo $oBudget->reference_scenario->title;?>:</strong>
 		<a href="rep_summary.php?<?php echo $strQuery;?>&budget_scenario=<?php echo $oBudget->id;?>&reference=<?php echo $oBudget->reference_scenario->id;?>">Summary</a>|
@@ -303,58 +302,66 @@ $oBudget = new Budget($_GET['tab']);
 		<a href='sp_repost_hq.php#<?php echo $_GET['tab'];?>'>HQ costs</a>
 	</nav>
 	</div>
-	<h2>Budget variables</h2>
-	<table class='log'>
-	<thead>
-		<tr><th>Title</th><th>Variable</th><th>Value</th></tr>
-	</thead>
-	<?php
-		if (count($arrData)){
-			foreach($arrData as $key=>$setting){
-				echo '<tr>';
-				echo '<td>',$setting['title'],'</td>';
-				echo '<td><tt>',$key,'</tt></td>';
-				echo '<td class="budget-decimal">',$setting['value'],'</td>';
-				echo '</tr>';
-			};
-		} else {
-			echo '<tr><td colspan="3">No settings defined for this scenario</td></tr>';
-		}
-	?>
-	</table>
-	<h2>Currency rates</h2>
-	<table class='log'>
+	<div>
+		<div style="float:left;">
+		<h2>Budget variables</h2>
+		<table class='log'>
 		<thead>
-			<tr>
-			<th>Currency</th>
-			<?php
-			echo $oBudget->getTableHeader('monthly', 1+$oBudget->offset, 12+$oBudget->offset);
-			?>
-			<th>YTD</th>
-			<th>FYE</th>
-			</tr>
+			<tr><th>Title</th><th>Variable</th><th>Value</th></tr>
 		</thead>
-		<tbody>
-			<?php
-			foreach ($arrRates as $cur=>$data){
-			?>
-			<tr>
-			<td><?php echo $cur;?></td>
-			<?php
-			for ($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
-				$month = $oBudget->arrPeriod[$m];		
-				//$month = $oBudget->arrPeriod[$m];
-				echo '<td class="budget-decimal">',number_format($data[$month],4,'.',','),'</td>';
+		<?php
+			if (count($arrData)){
+				foreach($arrData as $key=>$setting){
+					echo '<tr>';
+					echo '<td>',$setting['title'],'</td>';
+					echo '<td><tt>',$key,'</tt></td>';
+					echo '<td class="budget-decimal">',$setting['value'],'</td>';
+					echo '</tr>';
+				};
+			} else {
+				echo '<tr><td colspan="3">No settings defined for this scenario</td></tr>';
 			}
-			?>
-				<td class="budget-decimal budget-ytd"><?php echo number_format($data['YTD'],4,'.',',');?></td>
-				<td class="budget-decimal budget-quarterly"><?php echo number_format($data['Total'],4,'.',',');?></td>
-			</tr>
-			<?php
-			}
-			?>
-		</tbody>
-	</table>
+		?>
+		</table>
+		</div>
+		<div style="float:left; margin-left: 10px;">
+		<h2>Currency rates</h2>
+		<table class='log'>
+			<thead>
+				<tr>
+				<th>Currency</th>
+				<?php
+				echo $oBudget->getTableHeader('monthly', 1+$oBudget->offset, 12+$oBudget->offset);
+				?>
+				<th>YTD</th>
+				<th>FYE</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php
+				foreach ($arrRates as $cur=>$data){
+				?>
+				<tr>
+				<td><?php echo $cur;?></td>
+				<?php
+				for ($m=1+$oBudget->offset;$m<=12+$oBudget->offset;$m++){
+					$month = $oBudget->arrPeriod[$m];		
+					//$month = $oBudget->arrPeriod[$m];
+					echo '<td class="budget-decimal">',number_format($data[$month],4,'.',','),'</td>';
+				}
+				?>
+					<td class="budget-decimal budget-ytd"><?php echo number_format($data['YTD'],4,'.',',');?></td>
+					<td class="budget-decimal budget-quarterly"><?php echo number_format($data['Total'],4,'.',',');?></td>
+				</tr>
+				<?php
+				}
+				?>
+			</tbody>
+		</table>
+		<pre>Checksum: <?php echo $oBudget->checksum; ?>&nbspCurrent: <?php echo $oBudget->get_checksum(); ?></pre>
+		</div>
+		<div style="clear:both;"></div>
+	</div>
 	<?php
 	} else {
 		include ('includes/inc-frame_top.php');

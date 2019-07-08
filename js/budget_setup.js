@@ -36,6 +36,13 @@ var tabs_options = {beforeLoad: function( event, ui ) {
 						$.post(url,{DataAction:'unarchive'});
 					}
 				});
+				$('.scnFlagPublic',ui.panel).change(function(){					
+					if($(this).prop('checked')){
+						$.post(url,{DataAction:'publish'});
+					} else {
+						$.post(url,{DataAction:'unpublish'});
+					}
+				});
 				$('.default', ui.panel).click(function(){
 					$.post(url,{DataAction:'default'}, function (data){
 						console.log(data);
