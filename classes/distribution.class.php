@@ -345,7 +345,7 @@ class Distribution extends Document{
 						WHERE scenario='{$this->scenario}'
 							AND pc='{$this->profit}'
 							{$sqlFilter}
-							--AND (IFNULL(customer,".self::EMPTY_CUSTOMER.")=".self::EMPTY_CUSTOMER." OR customer=0)
+							##AND (IFNULL(customer,".self::EMPTY_CUSTOMER.")=".self::EMPTY_CUSTOMER." OR customer=0)
 							AND customer = 0
 							AND activity='{$this->activity}'
 						GROUP BY account, item, activity;"; 
