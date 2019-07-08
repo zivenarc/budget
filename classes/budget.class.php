@@ -733,7 +733,10 @@ class Budget{
 						$ytd_rate+=$rw['Rate'];
 						$i++;
 					}
-					$res['YTD'] = $ytd_rate/$i;
+					
+					if($i){
+						$res['YTD'] = $ytd_rate/$i;
+					}
 					
 					$sql = "SELECT scvValue as Rate FROM tbl_scenario_variable, vw_currency 
 								WHERE curTitle=scvVariableID AND scvScenarioID='{$this->id}'
@@ -794,6 +797,15 @@ class Budget{
 		GLOBAL $arrUsrData;
 		$this->flagUpdate = !$flag;
 		$sql = "UPDATE tbl_scenario SET scnFlagReadOnly=".(integer)$flag.", scnEditBy='{$arrUsrData['usrID']}', scnEditDate=NOW() WHERE scnID='{$this->id}'";
+		$this->oSQL->q($sql);
+	
+	}
+	
+	function publish($flag = true){
+		
+		GLOBAL $arrUsrData;
+		$this->flagUpdate = !$flag;
+		$sql = "UPDATE tbl_scenario SET scnFlagPublic=".(integer)$flag.", scnEditBy='{$arrUsrData['usrID']}', scnEditDate=NOW() WHERE scnID='{$this->id}'";
 		$this->oSQL->q($sql);
 	
 	}
