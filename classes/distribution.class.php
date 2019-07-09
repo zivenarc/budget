@@ -351,9 +351,29 @@ class Distribution extends Document{
 						GROUP BY account, item, activity;"; 
 				$this->log($sql);
 				$rs = $this->oSQL->q($sql);
-				while ($total = $this->oSQL->f($rs)){				
+				while ($total = $this->oSQL->f($rs)){
+					
+					//----- If exists a month without distribution base, create a line for "Empty customer"-----------
+					if(!array_product($this->subtotal)){ 
+						$master_row = $oMaster->add_master();
+						$master_row->profit = $this->profit;
+						$master_row->activity = $total['activity'];
+						$master_row->customer = self::EMPTY_CUSTOMER;					
+						$master_row->sales = $this->getSales(self::EMPTY_CUSTOMER);					
+						$item = $Items->getById($total['item']);
+						$master_row->account = $total['account'];
+						$master_row->item = $total['item'];
+						for($m=4;$m<=15;$m++){
+							$month = $this->budget->arrPeriod[$m];
+							if (!$this->subtotal[strtolower($month)]){
+								$master_row->{$month} = $total[$month];
+							} 
+						}
+					}
+					
+					//-------- Now go customer by customer and distribute the costs ------------------------------------
 					foreach($this->records[$this->gridName] as $id=>$record){
-
+													
 							$master_row = $oMaster->add_master();
 							$master_row->profit = $this->profit;
 							$master_row->activity = $total['activity'];
@@ -366,18 +386,20 @@ class Distribution extends Document{
 								$month = $this->budget->arrPeriod[$m];
 								if ($this->subtotal[strtolower($month)]){
 									$master_row->{$month} = $record->{$month}/$this->subtotal[strtolower($month)]*$total[$month];
+								} else {
+									// there has to be the distribution to Empty customer already
 								}
 							}				
 													
-							
-							//echo '<pre>';print_r($master_row);echo '</pre>';
+														
 		
 					}
 					
+					//---------------------- Reverse the costs for empty customer --------------------
 					$master_row = $oMaster->add_master();
 					$master_row->profit = $this->profit;
 					$master_row->activity = $total['activity'];
-					$master_row->customer = 0;// self::EMPTY_CUSTOMER;	
+					$master_row->customer = 0;
 					$master_row->sales = $this->getSales($master_row->customer);					
 					$item = $Items->getById($total['item']);
 					$master_row->account = $total['account'];
