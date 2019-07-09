@@ -1811,6 +1811,15 @@ class Reports{
 		$arrChartType[] = Array('id'=>'gop','title'=>'Gross operating profit','filter'=>self::GOP_FILTER);
 		$arrChartType[] = Array('id'=>'oop','title'=>'Own operating profit','filter'=>self::OWN_OPERATING_PROFIT);
 		
+		//------- Filter for regular SGA ----------//
+		$sql = "SELECT yctID FROM vw_yact WHERE yctID LIKE '5%' AND yctID NOT IN ('5999BD','5999BD','527000','510000','523000')";
+		$rs = $this->oSQL->q($sql);
+		while ($rw = $this->oSQL->f($rs)){
+			$arrSGA[] = $rw['yctID'];
+		}	
+		$arrChartType[] = Array('id'=>'sga','title'=>'SGA costs','filter'=>" AND account IN ('".implode("','",$arrSGA)."')");
+		$arrChartType[] = Array('id'=>'bd','title'=>'BD costs','filter'=>" AND account IN ('5999BD')");
+		
 		$arrRates_this = $this->oBudget->getMonthlyRates($this->Currency);
 		$arrRates_that = $this->oReference->getMonthlyRates($this->Currency);
 		
