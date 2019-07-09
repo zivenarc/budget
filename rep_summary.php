@@ -6,6 +6,7 @@ require ('classes/waterfall.class.php');
 include ('includes/inc_report_settings.php');
 
 $arrActions[] = Array('title'=>'Current month','action'=>'?period_type=cm');
+$arrActions[] = Array('title'=>'YTD','action'=>'?period_type=ytd');
 $arrActions[] = Array('title'=>'FYE','action'=>'?period_type=fye');
 
 if ($bu_group){
