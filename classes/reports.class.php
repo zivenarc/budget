@@ -5424,18 +5424,34 @@ class Reports{
 				<td class="budget-ytd budget-decimal"><?php $this->render($rw['FYE']);?></td>
 				<td class="budget-decimal"><?php $this->render($rw['CreditDays']);?></td>
 				<td class="budget-quarterly budget-decimal"><?php $this->render(max(0,$rw['FYE']/365*$rw['CreditDays']));?></td>				
-				<?php 
+				<?php
+				$totalWC += max(0,$rw['FYE']/365*$rw['CreditDays']);
 				for ($m=4;$m<=15;$m++){
 					$month = $this->oBudget->arrPeriod[$m];
+					$arrSubtotal[$month] += $rw[$month];
 					?>
 					<td class='budget-decimal'><?php $this->render($rw[$month]);?></td>
 					<?php
 				}
 				?>
-			</tr>
+			</tr>			
 			<?php
-		}
+		}		
 		?>
+			<tr class="budget-subtotal">
+				<td>Total revenue</td>
+				<td class="budget-ytd budget-decimal"><?php $this->render(array_sum($arrSubtotal));?></td>
+				<td class="budget-decimal"><?php $this->render($totalWC/array_sum($arrSubtotal)*365);?></td>
+				<td class="budget-quarterly budget-decimal"><?php $this->render($totalWC);?></td>				
+				<?php 
+				for ($m=4;$m<=15;$m++){
+					$month = $this->oBudget->arrPeriod[$m];
+					?>
+					<td class='budget-decimal'><?php $this->render($arrSubtotal[$month]);?></td>
+					<?php
+				}
+				?>
+			</tr>	
 		</table>
 		<?php
 		$this->_echoButtonCopyTable($this->ID);
