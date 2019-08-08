@@ -1,7 +1,6 @@
 <?php
 $flagNoAuth = true;
 require ('common/auth.php');
-require ('classes/budget.class.php');
 require ('classes/reports.class.php');
 
 include ('includes/inc_report_settings.php');
@@ -153,7 +152,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 						<td><a target='job' href="/nlogjc/job_form.php?jobID=<?php echo $rw['jobID'];?>"><?php echo $rw['jobID'];?></a></td>
 						<td><?php echo $rw['jobFlagSAP']?"&bull;":"";?></td>
 						<td><?php echo $rw['cntTitle'];?></td>
-						<td><?php echo $rw['TEU'];?></td>
+						<td class='budget-decimal'><?php Reports::render($rw['TEU']);?></td>
 						<td><?php echo $rw['jobPOL'];?></td>
 						<td><?php echo $rw['jobPOD'];?></td>
 						<td><?php echo $rw['pccTitle'];?></td>
@@ -174,6 +173,7 @@ for ($i=0; $i<count($arrKPI);$i++){
 				</tr>
 				</tfoot>
 				</table>
+				<button onclick="javascript:SelectContent('<?php echo $tableID;?>');">Copy table</button>
 				</div>
 				<?php
 		};
