@@ -110,6 +110,7 @@ function getCostTable($type, $arrProfit,$arrProduct, $arrReport){
 					echo "<td>{$arrProduct[$activity]}</td>";
 					foreach ($arrProfit as $pc=>$title){
 						echo "<td class='budget-decimal'>",Reports::render($pcData[$pc]),"</td>";
+						$arrSubtotal[$pc] += $pcData[$pc];
 					}
 					echo "<td class='budget-decimal budget-ytd'>",Reports::render(array_sum($pcData)),"</td>";
 					echo "</tr>";
