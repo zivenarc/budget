@@ -236,7 +236,7 @@ class Distribution extends Document{
 				
 	}
 	
-	public function fill_distribution($oBudget,$type='sqm',$params=Array()){
+	public function fill_distribution($oBudget,$type='kpi',$params=Array()){
 		
 		if (is_array($this->records[$this->gridName])){
 			foreach($this->records[$this->gridName] as $id=>$record){

@@ -37,7 +37,7 @@ if ($_GET['tab']){
 		case 'kpi':
 			require_once ('classes/reports.class.php');
 			$sqlWhere = "WHERE source='".$oDocument->GUID."'";
-			Reports::costsBySupplier($sqlWhere);
+			//Reports::costsBySupplier($sqlWhere);
 			die();
 			break;
 		case 'financials':
@@ -57,10 +57,10 @@ if ($_GET['tab']){
 
 include ('includes/inc_document_menu.php');
 if ($oDocument->GUID && !$oDocument->flagPosted){
-	$arrActions[] = Array ('title'=>'SQM','action'=>'javascript:fillGrid(\'_sqm\');','class'=>'brick');	
-	$arrActions[] = Array ('title'=>'KPI','action'=>'javascript:fillGrid(\'_kpi\');','class'=>'brick');	
-	$arrActions[] = Array ('title'=>'TEU Import','action'=>'javascript:fillGrid(\'_teu_imp\');','class'=>'brick hidden');	
-	$arrActions[] = Array ('title'=>'TEU Export','action'=>'javascript:fillGrid(\'_teu_exp\');','class'=>'brick hidden');	
+	// $arrActions[] = Array ('title'=>'SQM','action'=>'javascript:fillGrid(\'_sqm\');','class'=>'brick');	
+	$arrActions[] = Array ('title'=>'Fill KPI','action'=>'javascript:fillGrid(\'_kpi\');','class'=>'brick');	
+	// $arrActions[] = Array ('title'=>'TEU Import','action'=>'javascript:fillGrid(\'_teu_imp\');','class'=>'brick hidden');	
+	// $arrActions[] = Array ('title'=>'TEU Export','action'=>'javascript:fillGrid(\'_teu_exp\');','class'=>'brick hidden');	
 }
 
 //============================== Main form definition ==============================
