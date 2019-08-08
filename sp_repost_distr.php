@@ -1,5 +1,5 @@
 <?php
-$flagNoAuth=true;
+//$flagNoAuth=true;
 require ('common/auth.php');
 
 if ($_GET['tab']){
@@ -39,14 +39,15 @@ if ($_GET['tab']){
 		
 	//--------------------- Control report ----------------------
 	$sql = "SELECT account, pc, pccTitle, activity, prtTitle, 
-				SUM(".$oBudget->getThisYTDSQL('ytd').") as YTD, 
-				SUM(".$oBudget->getThisYTDSQL('fye').") as FYE
+				SUM(".$oBudget->getThisYTDSQL('ytd').") as ytd, 
+				SUM(".$oBudget->getThisYTDSQL('roy').") as roy
 			FROM reg_master
 			LEFT JOIN common_db.tbl_profit ON pccID=pc
 			LEFT JOIN common_db.tbl_product_type ON prtID=activity		
 			WHERE scenario='{$oBudget->id}' 
 				AND customer=0
 				AND account LIKE 'J%'
+				AND company='{$company}'
 			GROUP BY activity, pc, account
 			ORDER BY prtGHQ";		
 			
@@ -54,54 +55,27 @@ if ($_GET['tab']){
 	while ($rw = $oSQL->f($rs)){
 		$account = in_array($rw['account'],['J00802','J45010','J45030'])?'DC':'RFC';
 		// $arrReport[$account][$rw['activity']][$rw['pc']]['YTD'] += $rw['YTD'];
-		$arrReport[$account][$rw['activity']][$rw['pc']] += $rw['FYE'];
+		$arrReport['ytd'][$account][$rw['activity']][$rw['pc']] += $rw['ytd'];
+		$arrReport['roy'][$account][$rw['activity']][$rw['pc']] += $rw['roy'];
 		$arrProduct[$rw['activity']] = $rw['prtTitle'];
 		$arrProfit[$rw['pc']] = $rw['pccTitle'];
 	}
 	if (count($arrReport)){
 	?>
-	<div>
-	<table class="budget">	
-		<tr>
-			<th>Unit/Activity</th>
-			<?php foreach ($arrProfit as $pc=>$title){
-				echo "<th>{$title}</th>\r\n";
-			}?>
-			<th class="budget-ytd">Total</th>
-		</tr>
-		<tr><th colspan="<?php echo count($arrProfit)+2;?>">Direct costs</th></tr>
-		<?php foreach ($arrReport['DC'] as $activity=>$pcData){
-			echo "<tr>";
-			echo "<td>{$arrProduct[$activity]}</td>";
-			foreach ($arrProfit as $pc=>$title){
-				echo "<td class='budget-decimal'>",Reports::render($pcData[$pc]),"</td>";
-			}
-			echo "<td class='budget-decimal budget-ytd'>",Reports::render(array_sum($pcData)),"</td>";
-			echo "</tr>";
-		}
+	<h2>Undistributed costs</h2>
+	<div class='tabs'>
+	<ul>
+		<li><a href='#ytd_<?php echo $_GET['tab'];?>'>YTD</a></li>
+		<li><a href='#roy_<?php echo $_GET['tab'];?>'>ROY</a></li>
+	</ul>
+		<?php 
+			getCostTable('ytd', $arrProfit,$arrProduct, $arrReport);
+			getCostTable('roy', $arrProfit,$arrProduct, $arrReport);
 		?>
-		<tr class="budget-subtotal">
-			<td>Subtotal</td>
-		</tr>
-		<tr><th colspan="<?php echo count($arrProfit)+2;?>">RFC</th></tr>
-		<?php foreach ($arrReport['RFC'] as $activity=>$pcData){
-			echo "<tr>";
-			echo "<td>{$arrProduct[$activity]}</td>";
-			foreach ($arrProfit as $pc=>$title){
-				echo "<td class='budget-decimal'>",Reports::render($pcData[$pc]),"</td>";
-			}
-			echo "<td class='budget-decimal budget-ytd'>",Reports::render(array_sum($pcData)),"</td>";
-			echo "</tr>";
-		}
-		?>
-		<tr class="budget-subtotal">
-			<td>Subtotal</td>
-		</tr>		
-		<tr class="budget-total">
-			<td>Grand total</td>
-		</tr>
-	</table>
 	</div>
+	<script>
+		$('.tabs').tabs();
+	</script>
 	<?php
 	}
 	
@@ -112,5 +86,76 @@ if ($_GET['tab']){
 	echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
 	echo Budget::getScenarioTabs(true);
 	include ('includes/inc-frame_bottom.php');
+}
+
+
+function getCostTable($type, $arrProfit,$arrProduct, $arrReport){
+	?>
+	<div id='<?php echo $type,'_',$_GET['tab'];?>'>
+			<table class="budget">	
+				<tr>
+					<th>Unit/Activity</th>
+					<?php foreach ($arrProfit as $pc=>$title){
+						echo "<th>{$title}</th>\r\n";
+					}?>
+					<th class="budget-ytd">Total</th>
+				</tr>
+				<?php 
+				if(count($arrReport[$type]['DC'])){ 
+					$arrSubtotal = array();
+				?>
+				<tr><th colspan="<?php echo count($arrProfit)+2;?>">Direct costs</th></tr>
+				<?php foreach ($arrReport[$type]['DC'] as $activity=>$pcData){					
+					echo "<tr>";
+					echo "<td>{$arrProduct[$activity]}</td>";
+					foreach ($arrProfit as $pc=>$title){
+						echo "<td class='budget-decimal'>",Reports::render($pcData[$pc]),"</td>";
+					}
+					echo "<td class='budget-decimal budget-ytd'>",Reports::render(array_sum($pcData)),"</td>";
+					echo "</tr>";
+				}
+				?>
+				<tr class="budget-subtotal">
+					<td>Subtotal</td>
+					<?php
+					foreach ($arrProfit as $pc=>$title){
+						echo "<td class='budget-decimal'>",Reports::render($arrSubtotal[$pc]),"</td>";
+					}
+					?>
+					<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrSubtotal)); ?></td>					
+				</tr>
+				<?php 
+				}
+				
+				if(count($arrReport[$type]['RFC'])){ 
+				$arrSubtotal = array();
+				?>
+				<tr><th colspan="<?php echo count($arrProfit)+2;?>">RFC</th></tr>
+				<?php foreach ($arrReport[$type]['RFC'] as $activity=>$pcData){
+					echo "<tr>";
+					echo "<td>{$arrProduct[$activity]}</td>";
+					foreach ($arrProfit as $pc=>$title){
+						echo "<td class='budget-decimal'>",Reports::render($pcData[$pc]),"</td>";
+						$arrSubtotal[$pc] += $pcData[$pc];
+					}
+					echo "<td class='budget-decimal budget-ytd'>",Reports::render(array_sum($pcData)),"</td>";
+					echo "</tr>";
+				}
+				?>
+				<tr class="budget-subtotal">
+					<td>Subtotal</td>
+					<?php
+					foreach ($arrProfit as $pc=>$title){
+						echo "<td class='budget-decimal'>",Reports::render($arrSubtotal[$pc]),"</td>";
+					}
+					?>
+					<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrSubtotal)); ?></td>
+				</tr>
+				<?php 
+				}
+				?>				
+			</table>
+	</div>
+	<?php
 }
 ?>
