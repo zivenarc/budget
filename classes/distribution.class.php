@@ -40,6 +40,7 @@ class Distribution extends Document{
 		$this->total = $this->data[$this->prefix."Total"];
 		$this->item = $this->data[$this->prefix."ItemGUID"];
 		$this->activity = $this->data[$this->prefix."ActivityID"];
+		$this->KPIactivity = $this->data[$this->prefix."KPIActivityID"];
 				
 		if($this->GUID){
 			$this->subtotal = Array();
@@ -98,6 +99,16 @@ class Distribution extends Document{
 					, 'disabled'=>!$this->flagUpdate
 					// , 'defaultText'=>"[All]"
 				);
+		$this->Columns[] = Array(
+					'title'=>'Get volumes from'
+					,'field'=>$this->prefix.'KPIActivityID'
+					,'type'=>'combobox'
+					// ,'sql'=>"SELECT prtID as optValue, prtTitle as optText FROM vw_product_type"
+					,'sql'=>$Activities->getStructuredRef()
+					, 'mandatory' => false
+					, 'disabled'=>!$this->flagUpdate
+					, 'defaultText'=>"[Manual distribution]"
+		);
 		$this->Columns[] =Array(
 					'title'=>'Total'
 					,'field'=>$this->prefix."Total"
@@ -253,12 +264,16 @@ class Distribution extends Document{
 				$row->set_months($arrSum);
 				break;
 			case 'kpi':
+				
+				if(!$this->KPIactivity) return (false);
+				
 				$sql = "SELECT unit, customer, ".$this->budget->getMonthlySumSQL()." 
 						FROM reg_sales
 						WHERE scenario='".$this->budget->id."' 
 							AND active=1 AND kpi=1
 							AND pc='{$this->profit}'
-							AND activity='{$this->activity}'
+							AND activity='{$this->KPIactivity}'
+							AND company = '{$this->company}'
 						GROUP BY customer"; 
 
 				break;
