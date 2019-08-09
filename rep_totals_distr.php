@@ -154,10 +154,14 @@ while ($rw=$oSQL->f($rs)){
 	} else {
 		$keyProfit = $rw['Profit'];
 	}
-	$arrMSF['this'][$rw['itmTitle']][$keyProfit] += $rw['Total'];	
-	$arrMSF['last'][$rw['itmTitle']][$keyProfit] += $rw['Estimate'];	
-	$arrMSFKeys[$rw['itmTitle']] = $rw['unit'];
+	if($rw['itmTitle']){
+		$arrMSF['this'][$rw['itmTitle']][$keyProfit] += $rw['Total'];	
+		$arrMSF['last'][$rw['itmTitle']][$keyProfit] += $rw['Estimate'];	
+		$arrMSFKeys[$rw['itmTitle']] = $rw['unit'];
+	}
 }
+
+// echo '<pre>';print_r($arrMSF);echo '</pre>';
 
 ?>
 <table class='budget' id='report'>
@@ -192,12 +196,22 @@ foreach($arrReport['this'] as $group=>$arrItem){
 			?>
 			<td class='budget-decimal'><?php Reports::render($arrMSF['this'][$item][$pc],1);?></td>
 			<?php
-		}				
+		}
+
+		if(is_array($arrMSF['this'][$item]) && is_array($arrMSF['last'][$item])){
 		?>
 			<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrMSF['this'][$item]));?></td>		
-			<td class='budget-decimal'><?php Reports::render(array_sum($arrMSF['last'][$item]));?></td>
+			<?php
+			
+			?>
+			<td class='budget-decimal'><?php Reports::render(array_sum($arrMSF['last'][$item]));?></td>					
 			<td class='budget-decimal'><?php Reports::render(array_sum($arrMSF['this'][$item]) - array_sum($arrMSF['last'][$item]));?></td>
 			<td class='budget-decimal budget-ratio'><?php Reports::render_ratio(array_sum($arrMSF['this'][$item]) , array_sum($arrMSF['last'][$item]));?></td>
+			<?php 
+			} else {
+				echo str_repeat("<td>&nbsp;</td>",4);
+			}
+			?>
 		</tr>
 		<tr>
 			<td>Key, <?php echo $strLastTitle;?></td>
@@ -207,8 +221,15 @@ foreach($arrReport['this'] as $group=>$arrItem){
 			<td class='budget-decimal'><?php Reports::render($arrMSF['last'][$item][$pc],1);?></td>
 			<?php
 		}				
+		
+		if(is_array($arrMSF['last'][$item])){
 		?>
 			<td class='budget-decimal budget-ytd'><?php Reports::render(array_sum($arrMSF['last'][$item]));?></td>		
+		<?php
+		} else {
+				echo "<td>&nbsp;</td>";
+		}
+		?>
 			<td>&nbsp;</td>	
 			<td>&nbsp;</td>			
 			<td>&nbsp;</td>			
@@ -217,9 +238,13 @@ foreach($arrReport['this'] as $group=>$arrItem){
 			<td>Share, %</td>
 		<?php
 		foreach($arrProfit as $pc=>$flag){			
-			?>
-			<td class='budget-decimal'><?php Reports::render_ratio($arrMSF['this'][$item][$pc],array_sum($arrMSF['this'][$item]));?></td>
-			<?php
+			if(is_array($arrMSF['this'][$item])){
+				?>
+				<td class='budget-decimal'><?php Reports::render_ratio($arrMSF['this'][$item][$pc],array_sum($arrMSF['this'][$item]));?></td>
+				<?php
+			} else {
+				echo "<td>&nbsp;</td>";
+			}
 		}				
 		?>
 			<td>&nbsp;</td>
@@ -231,7 +256,9 @@ foreach($arrReport['this'] as $group=>$arrItem){
 			<td>Deviation, cost</td>
 		<?php
 		foreach($arrProfit as $pc=>$flag){			
-			$arrDeviationCost[$pc] = (array_sum($arrReport['this'][$group][$item])-array_sum($arrReport['last'][$group][$item]))*$arrMSF['last'][$item][$pc]/array_sum($arrMSF['last'][$item]);
+			if(is_array($arrMSF['last'][$item])){
+				$arrDeviationCost[$pc] = (array_sum($arrReport['this'][$group][$item])-array_sum($arrReport['last'][$group][$item]))*$arrMSF['last'][$item][$pc]/array_sum($arrMSF['last'][$item]);
+			}
 			?>
 			<td class='budget-decimal'><?php Reports::render($arrDeviationCost[$pc]);?></td>
 			<?php
