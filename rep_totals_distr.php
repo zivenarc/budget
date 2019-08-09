@@ -87,7 +87,9 @@ switch($repType){
 }
 
 // echo '<pre>';print_r($arrUsrData);echo '</pre>';
-$arrProfit[$arrUsrData['PCC']['pccTitle']] = $arrUsrData['PCC']['pccFlagProd'];
+if($arrUsrData['PCC']['pccFlagProd']){
+	$arrProfit[$arrUsrData['PCC']['pccTitle']] = $arrUsrData['PCC']['pccFlagProd'];
+}
 
 $sql = "SELECT Profit, pccFlagProd, {$sqlAccountString} , SUM(".$oBudget->getYTDSQL($mthStart,$mthEnd,$arrRates_this).")/$denominator as Total, 0 as Estimate
 		FROM vw_master
