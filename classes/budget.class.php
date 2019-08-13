@@ -941,6 +941,140 @@ class Budget{
 		return($res);
 	}
 	
+	function importActuals($scenario_old, $data){
+		
+		
+		if(strpos($this->type,'Budget')!==false){
+			return (false);
+		}
+		
+		$sql[] = "SET @scenario_old:='{$scenario_old}', @scenario_new:='{$this->id}'";
+		$sql[] = "DELETE FROM reg_master WHERE scenario=@scenario_new AND source IN('Actual','Correction')";
+		$sql[] = "UPDATE tbl_scenario SET scnFlagPublic=0, scnEditDate=NOW() WHERE scnID=@scenario_new";
+		$sql[] = "UPDATE tbl_scenario SET scnFlagReadOnly=1 WHERE scnID=@scenario_old";
+		
+		// Import of actual data
+		for ($i=0;$i<count($data);$i++){
+			$sql[] = "INSERT INTO `reg_master` SET `company`=".(integer)$data[$i]['company'].",
+													`pc`=".(integer)$data[$i]['pc'].",
+													`activity`=".(integer)$data[$i]['activity'].",
+													`customer`=".(integer)$data[$i]['customer'].",
+													`account`='{$data[$i]['account']}',
+													`item`='{$data[$i]['item']}',
+													`source`='Actual',
+													`scenario`='{$this->id}',
+													`particulars`='{$data[$i]['particulars']}',
+													`cf`=1,
+													`active`=1,
+													`".$this->getMonthlySQL($this->cm)."`=".round($data[$i]['value'],2); 						
+					
+		}
+		/////////////////////////
+	
+		//Compact data in the previous scenario
+		$sql[] = "CREATE TEMPORARY TABLE t_reg_master AS
+					SELECT company,pc,activity,customer,customer_group_code,account,item,sales,bdv,
+					".$this->getMonthlySumSQL(1,15)."
+					FROM reg_master 
+						WHERE source='Actual' and scenario=@scenario_old and active=1
+					GROUP BY company,pc,activity,customer,customer_group_code,account,item,sales,bdv
+					ORDER BY company,pc,activity,customer,customer_group_code,account,item,sales,bdv";
+		$sql[] = "DELETE FROM reg_master WHERE source='Actual' AND scenario=@scenario_old";
+		$sql[] = "INSERT INTO reg_master (company,pc,activity,customer,customer_group_code,account,item,sales,bdv,
+					".$this->getMonthlySQL(4, 15).",
+					source,scenario,active)
+					SELECT company,pc,activity,customer,customer_group_code,account,item,sales,bdv,
+					".$this->getMonthlySQL(4, 15).",
+					'Actual',@scenario_old, 1
+					FROM t_reg_master";
+
+		$sql[] = "DROP TABLE t_reg_master";
+
+		$sql[] = "UPDATE reg_master, common_db.tbl_counterparty, stbl_user 
+					SET bdv=usrProfitID, sales=cntUserID
+					WHERE cntID=customer 
+					AND usrID=cntUserID 
+					AND scenario=@scenario_new 
+					AND source='Actual'";
+
+		/*$sql[] = "UPDATE reg_master, stbl_user 
+				SET bdv=usrProfitID
+				WHERE usrID=sales AND scenario=@scenario_new";
+				
+		$sql[] = "UPDATE reg_sales, stbl_user 
+				SET bdv=usrProfitID
+				WHERE usrID=sales AND scenario=@scenario_new";*/
+
+
+		// Deduct last month data from YTD
+		$sql[] = "INSERT INTO reg_master (company,pc,activity,customer,customer_group_code,account,item,sales,bdv,
+				".$this->getMonthlySQL(4, $this->cm).",
+				source, scenario, active)
+				SELECT company,pc,activity,customer,customer_group_code,account,item,sales,bdv,
+				".$this->getMonthlySQL(4, $this->cm-1).",
+				-(".$this->getYTDSQL(4,$this->cm-1)."),
+				source, @scenario_new, active
+				FROM reg_master 
+				WHERE scenario=@scenario_old AND source='Actual'";
+
+		// Copy previous month corrections
+		$sql[] = "INSERT INTO reg_master (company,pc,activity,customer,customer_group_code,account,item,sales,bdv,
+					".$this->getMonthlySQL(4, 15).",
+					source, scenario, active)
+					SELECT company,pc,activity,customer,customer_group_code,account,item,sales,bdv,
+					".$this->getMonthlySQL(4, 15).",
+					source, @scenario_new, active
+				FROM reg_master 
+				WHERE scenario=@scenario_old 
+					AND source='Correction'";
+
+		// Update customer groups
+		$sql[] = "update reg_master, common_db.tbl_counterparty 
+					set customer_group_code=IFNULL(cntGroupID, customer)
+					where customer=cntID and scenario=@scenario_new";
+		$sql[] = "update reg_sales, common_db.tbl_counterparty 
+				set customer_group_code=IFNULL(cntGroupID, customer)
+				where customer=cntID and scenario=@scenario_new";
+		
+		// Update special RHQ table for revenue
+
+		$sql[] = "DELETE FROM reg_sales_rhq WHERE scenario=@scenario_new AND source='Actual'";
+
+		$sql[] = "INSERT INTO reg_sales_rhq (company,pc,ghq,customer,account,
+					".$this->getMonthlySQL(4,15).",
+					source,scenario)
+					SELECT company, pc, IFNULL(prtGHQ,'[None]'), customer, yctTitle, 
+					".$this->getMonthlySumSQL(4,15).",
+					source, scenario
+					FROM reg_master
+					LEFT JOIN common_db.tbl_product_type ON prtID=activity
+					LEFT JOIN common_db.tbl_yact ON yctID=account
+					WHERE scenario=@scenario_new 
+						AND source='Actual'
+						AND account IN ('J00400', 'J00802','J45010','J40010','J45030','J40030','J40040')
+					GROUP BY company, pc, prtGHQ, customer, yctTitle,source,scenario";
+	
+		//-----------YLRU Specific updates
+		// Reset warehouse rent distribution
+		$sql[] = "UPDATE reg_master SET customer=0 
+			WHERE customer=1894 
+			AND scenario=@scenario_new 
+			AND source='Actual' 
+			AND pc=5 
+			AND item='f0b14b32-f52b-11de-95b2-00188bc729d2'";
+
+		// Assign all RFC to Toyota in Toyota depts
+		$sql[] = "UPDATE `reg_master` SET customer=17218, customer_group_code = 31158
+					WHERE pc in (3,21,18) 
+						and ifnull(customer,0) = 0 
+						and scenario=@scenario_new
+						AND account LIKE 'J%' 
+							AND account NOT IN ('J00400', 'J00802','J45010','J40010','J45030','J40030','J40040');
+						}";
+	
+		echo '<pre>'; print_r($sql); echo '</pre>';
+		
+	}
 }
 
 ?>
