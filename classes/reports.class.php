@@ -1806,10 +1806,10 @@ class Reports{
 			$arrScenario['last_last_a'] = $this->oLastYear->lastyear;
 		}
 		
-		$arrChartType[] = Array('id'=>'revenue','title'=>'Revenue','filter'=>self::GROSS_REVENUE_FILTER);
-		$arrChartType[] = Array('id'=>'gp','title'=>'Gross profit','filter'=>self::GP_FILTER);
-		$arrChartType[] = Array('id'=>'gop','title'=>'Gross operating profit','filter'=>self::GOP_FILTER);
-		$arrChartType[] = Array('id'=>'oop','title'=>'Own operating profit','filter'=>self::OWN_OPERATING_PROFIT);
+		$arrChartType['revenue'] = Array('title'=>'Revenue','filter'=>self::GROSS_REVENUE_FILTER, 'denominator'=>1, 'ratio_to'=>null);
+		$arrChartType['gp'] = Array('title'=>'Gross profit','filter'=>self::GP_FILTER, 'denominator'=>1, 'ratio_to'=>'revenue');
+		$arrChartType['gop'] = Array('title'=>'Gross operating profit','filter'=>self::GOP_FILTER, 'denominator'=>1, 'ratio_to'=>'revenue');
+		$arrChartType['oop'] = Array('title'=>'Own operating profit','filter'=>self::OWN_OPERATING_PROFIT, 'denominator'=>1, 'ratio_to'=>'revenue');
 		
 		//------- Filter for regular SGA ----------//
 		$sql = "SELECT yctID FROM vw_yact WHERE yctID LIKE '5%' AND yctID NOT IN ('5999BD','5999BD','527000','510000','523000')";
@@ -1817,8 +1817,9 @@ class Reports{
 		while ($rw = $this->oSQL->f($rs)){
 			$arrSGA[] = $rw['yctID'];
 		}	
-		$arrChartType[] = Array('id'=>'sga','title'=>'SGA costs','filter'=>" AND account IN ('".implode("','",$arrSGA)."')");
-		$arrChartType[] = Array('id'=>'bd','title'=>'BD costs','filter'=>" AND account IN ('5999BD')");
+		$arrChartType['sc'] = Array('title'=>'Staff costs','filter'=>" AND account IN ('502000','505000','J00801','J45110')", 'denominator'=>-1, 'ratio_to'=>'gp');
+		$arrChartType['sga'] = Array('title'=>'SGA costs','filter'=>" AND account IN ('".implode("','",$arrSGA)."')", 'denominator'=>-1, 'ratio_to'=>'gp');
+		$arrChartType['bd'] = Array('title'=>'BD costs','filter'=>" AND account IN ('5999BD')", 'denominator'=>-1, 'ratio_to'=>'gp');
 		
 		$arrRates_this = $this->oBudget->getMonthlyRates($this->Currency);
 		$arrRates_that = $this->oReference->getMonthlyRates($this->Currency);
@@ -1828,13 +1829,13 @@ class Reports{
 				"SUM(".$this->oBudget->getYTDSQL(4,15,$arrRates_this).") as Total_AM";
 				
 		
-		for ($i = 0;$i<count($arrChartType);$i++){
+		foreach ($arrChartType as $id=>$chart){
 			foreach ($arrScenario as $key=>$value){
 				$sql = "SELECT {$sqlSelect}
 						FROM `reg_master`
 						LEFT JOIN common_db.tbl_profit ON pccID=pc
 						{$sqlWhere} 
-						{$arrChartType[$i]['filter']} 
+						{$chart['filter']} 
 						AND scenario = '{$value}'";
 				try{
 					$rs = $this->oSQL->q($sql);				
@@ -1843,11 +1844,11 @@ class Reports{
 				}
 				
 				// echo '<pre>',$sql,'</pre>';
-				$rwData[$arrChartType[$i]['id']][$key] = $this->oSQL->f($rs);
+				$rwData[$id][$key] = $this->oSQL->f($rs);
 			}
 			
-			$arrHighCharts[$arrChartType[$i]['id']] = Array(
-				'title'=>Array('text'=>($options['title']?"{$options['title']} :: ":'').$arrChartType[$i]['title'].' by month','x'=>-20),
+			$arrHighCharts[$id] = Array(
+				'title'=>Array('text'=>($options['title']?"{$options['title']} :: ":'').$chart['title'].' by month','x'=>-20),
 				'subtitle'=>Array('text'=>$this->oBudget->title." vs ".$this->oReference->title,'x'=>-20),
 				'chart'=>Array('type'=>'column', 'width'=>900, 'height'=>600)
 			);
@@ -1910,11 +1911,11 @@ class Reports{
 		for ($m=1+$this->oLastYear->offset;$m<=12+$this->oLastYear->offset;$m++){
 			$period = $this->oLastYear->arrPeriod[$m];
 			$periodTitle = $this->oLastYear->arrPeriodTitle[$m];			
-			for ($i = 0;$i<count($arrChartType);$i++){
-				$arrHighCharts[$arrChartType[$i]['id']]['xAxis']['categories'][] = $periodTitle;
-				$arrHSSeries[$arrChartType[$i]['id']][0][] = (integer)$rwData[$arrChartType[$i]['id']]['last_a'][$period];				
-				$arrHSSeries[$arrChartType[$i]['id']][1][] = (integer)$rwData[$arrChartType[$i]['id']]['last_b'][$period];
-				$sumAverage[$arrChartType[$i]['id']] += $rwData[$arrChartType[$i]['id']]['last_a'][$period];
+			foreach ($arrChartType as $id=>$chart){
+				$arrHighCharts[$id]['xAxis']['categories'][] = $periodTitle;
+				$arrHSSeries[$id][0][] = (integer)$rwData[$id]['last_a'][$period]*$chart['denominator'];				
+				$arrHSSeries[$id][1][] = (integer)$rwData[$id]['last_b'][$period]*$chart['denominator'];
+				$sumAverage[$id] += $rwData[$id]['last_a'][$period]*$chart['denominator'];
 				
 			}
 			
@@ -1928,12 +1929,12 @@ class Reports{
 			// $arrGraph[] = Array($period,(double)$rwGR[$period],(double)$rwGP[$period], (double)$rwBGP[$period], -(double)$rwSC[$period], (double)$rwOP[$period], (double)$rwBOP[$period]);
 			// $arrHighCharts['xAxis']['categories'][] = $periodTitle;
 			
-			for ($i = 0;$i<count($arrChartType);$i++){
-				$arrHighCharts[$arrChartType[$i]['id']]['xAxis']['categories'][] = $periodTitle;						
-				$arrHSSeries[$arrChartType[$i]['id']][0][] = (integer)$rwData[$arrChartType[$i]['id']]['this_a'][$period]; 
-				$arrHSSeries[$arrChartType[$i]['id']][1][] = (integer)$rwData[$arrChartType[$i]['id']]['this_b'][$period]; 
+			foreach ($arrChartType as $id=>$chart){
+				$arrHighCharts[$id]['xAxis']['categories'][] = $periodTitle;						
+				$arrHSSeries[$id][0][] = (integer)$rwData[$id]['this_a'][$period]*$chart['denominator']; 
+				$arrHSSeries[$id][1][] = (integer)$rwData[$id]['this_b'][$period]*$chart['denominator']; 
 				if ($m<=$this->oBudget->cm){
-					$sumAverage[$arrChartType[$i]['id']] += $rwData[$arrChartType[$i]['id']]['this_a'][$period];
+					$sumAverage[$id] += $rwData[$id]['this_a'][$period]*$chart['denominator'];
 				}
 								
 			}	
@@ -1945,75 +1946,75 @@ class Reports{
 								
 		}
 				
-		for ($i = 0;$i<count($arrChartType);$i++){
+		foreach ($arrChartType as $id=>$chart){
 
 			//--- Calculate profitability in this and previous periods
-			if($arrChartType[$i]['id']!='revenue' && array_sum($rwData['revenue']['last_a']) && array_sum($rwData['revenue']['this_a'])){
-				$arrHighCharts[$arrChartType[$i]['id']]['profitability']['last_a'] = array_sum($rwData[$arrChartType[$i]['id']]['last_a'])/array_sum($rwData['revenue']['last_a']);
-				$arrHighCharts[$arrChartType[$i]['id']]['profitability']['this_a'] = array_sum($rwData[$arrChartType[$i]['id']]['this_a'])/array_sum($rwData['revenue']['this_a']);
-				$arrHighCharts[$arrChartType[$i]['id']]['subtitle']['text'] .= "<br/>% to Revenue: <strong>".number_format($arrHighCharts[$arrChartType[$i]['id']]['profitability']['this_a']*100,1,'.',',')."</strong> vs last year ".number_format($arrHighCharts[$arrChartType[$i]['id']]['profitability']['last_a']*100,1,'.',',');
+			if($chart['ratio_to']!=null && array_sum($rwData[$chart['ratio_to']]['last_a']) && array_sum($rwData[$chart['ratio_to']]['this_a'])){
+				$arrHighCharts[$id]['profitability']['last_a'] = array_sum($rwData[$id]['last_a'])/array_sum($rwData[$chart['ratio_to']]['last_a']);
+				$arrHighCharts[$id]['profitability']['this_a'] = array_sum($rwData[$id]['this_a'])/array_sum($rwData[$chart['ratio_to']]['this_a']);
+				$arrHighCharts[$id]['subtitle']['text'] .= "<br/>% to ".$arrChartType[$chart['ratio_to']]['title'].": <strong>".number_format($arrHighCharts[$id]['profitability']['this_a']*100,1,'.',',')."</strong> vs last year ".number_format($arrHighCharts[$id]['profitability']['last_a']*100,1,'.',',');
 			}
 					
-			$s = count($arrHSSeries[$arrChartType[$i]['id']]);			
+			$s = count($arrHSSeries[$id]);			
 			//------------Calculate 3-month sliding average ---------
 			if($this->oBudget->cm<6){
-				$arrHSSeries[$arrChartType[$i]['id']][$s][] = round(($rwData[$arrChartType[$i]['id']]['last_last_a']['feb_1']
-															+$rwData[$arrChartType[$i]['id']]['last_last_a']['mar_1']
-															+$rwData[$arrChartType[$i]['id']]['last_a']['apr'])/3);
-				$arrHSSeries[$arrChartType[$i]['id']][$s][] = round(($rwData[$arrChartType[$i]['id']]['last_last_a']['mar_1']
-															+$rwData[$arrChartType[$i]['id']]['last_a']['apr']
-															+$rwData[$arrChartType[$i]['id']]['last_a']['may'])/3);	
+				$arrHSSeries[$id][$s][] = round(($rwData[$id]['last_last_a']['feb_1']
+															+$rwData[$id]['last_last_a']['mar_1']
+															+$rwData[$id]['last_a']['apr'])/3);
+				$arrHSSeries[$id][$s][] = round(($rwData[$id]['last_last_a']['mar_1']
+															+$rwData[$id]['last_a']['apr']
+															+$rwData[$id]['last_a']['may'])/3);	
 			} else {
 				foreach(range(0,1) as $m){
-					$arrHSSeries[$arrChartType[$i]['id']][$s][] = null;
+					$arrHSSeries[$id][$s][] = null;
 				}
 			}
 			
 			foreach(range(2,23) as $m){
-				$arrHSSeries[$arrChartType[$i]['id']][$s][] = round(($arrHSSeries[$arrChartType[$i]['id']][0][$m]
-																+$arrHSSeries[$arrChartType[$i]['id']][0][$m-1]
-																+$arrHSSeries[$arrChartType[$i]['id']][0][$m-2])/3);
+				$arrHSSeries[$id][$s][] = round(($arrHSSeries[$id][0][$m]
+																+$arrHSSeries[$id][0][$m-1]
+																+$arrHSSeries[$id][0][$m-2])/3);
 			}
 			
 			//-------- Calculate profitability, %
-			if($arrChartType[$i]['id']!='revenue'){
+			if($chart['ratio_to']!=null){
 				foreach(range(0,23) as $m){
-					if($arrHSSeries['revenue'][2][$m]!=0){
-						$arrHSSeries[$arrChartType[$i]['id']][$s+1][] = round($arrHSSeries[$arrChartType[$i]['id']][$s][$m]/$arrHSSeries['revenue'][2][$m]*100,1);
+					if($arrHSSeries[$chart['ratio_to']][2][$m]!=0){
+						$arrHSSeries[$id][$s+1][] = round($arrHSSeries[$id][$s][$m]/$arrHSSeries[$chart['ratio_to']][2][$m]*100,1);
 					} else {
-						$arrHSSeries[$arrChartType[$i]['id']][$s+1][] = null;
+						$arrHSSeries[$id][$s+1][] = null;
 					}					
 				}
 			}		
 		}
 		
-		for ($i = 0;$i<count($arrChartType);$i++){
+		foreach ($arrChartType as $id=>$chart){
 			
 			//--- Current month divider
 			if($this->oBudget->cm<15){
-				$arrHighCharts[$arrChartType[$i]['id']]['xAxis']['plotLines'][0] = Array('color'=>'#FF6D10','value'=>8.5+$this->oBudget->cm,'width'=>2);
+				$arrHighCharts[$id]['xAxis']['plotLines'][0] = Array('color'=>'#FF6D10','value'=>8.5+$this->oBudget->cm,'width'=>2);
 			}
 			
 			//--- Set the minimum for main series
-			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][0]['min'] = min(min($arrHSSeries[$arrChartType[$i]['id']][0]),min($arrHSSeries[$arrChartType[$i]['id']][1]));
+			$arrHighCharts[$id]['yAxis'][0]['min'] = min(min($arrHSSeries[$id][0]),min($arrHSSeries[$id][1]));
 			
 			//--- Show the average value for actual periods
-			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][0]['plotLines'][0] = Array('color'=>'#3BACEE','value'=>$sumAverage[$arrChartType[$i]['id']]/(9+$this->oBudget->cm),'width'=>2,'dashStyle'=>'dot');
-			$arrHighCharts[$arrChartType[$i]['id']]['series']=Array(									
-									Array('name'=>$this->oBudget->title,'data'=>$arrHSSeries[$arrChartType[$i]['id']][0],'color'=>'#3BACEE')
-									,Array('name'=>$this->oReference->title,'data'=>$arrHSSeries[$arrChartType[$i]['id']][1],'color'=>'#DDDDDD')									
+			$arrHighCharts[$id]['yAxis'][0]['plotLines'][0] = Array('color'=>'#3BACEE','value'=>$sumAverage[$id]/(9+$this->oBudget->cm),'width'=>2,'dashStyle'=>'dot');
+			$arrHighCharts[$id]['series']=Array(									
+									Array('name'=>$this->oBudget->title,'data'=>$arrHSSeries[$id][0],'color'=>'#3BACEE')
+									,Array('name'=>$this->oReference->title,'data'=>$arrHSSeries[$id][1],'color'=>'#DDDDDD')									
 								);
 			
 			//-- Show sliding average
-			if(isset($arrHSSeries[$arrChartType[$i]['id']][2][2])){
-				$arrHighCharts[$arrChartType[$i]['id']]['subtitle']['text'] .= "<br/>Annual growth: <strong>".number_format($arrHSSeries[$arrChartType[$i]['id']][2][$this->oBudget->cm+8]/$arrHSSeries[$arrChartType[$i]['id']][2][max(0,$this->oBudget->cm-4)]*100-100,1,'.',',')."%</strong>, quarterly growth <strong>".number_format($arrHSSeries[$arrChartType[$i]['id']][2][$this->oBudget->cm+8]/$arrHSSeries[$arrChartType[$i]['id']][2][max(0,$this->oBudget->cm+5)]*100-100,1,'.',',')."%</strong>";
+			if(isset($arrHSSeries[$id][2][2])){
+				$arrHighCharts[$id]['subtitle']['text'] .= "<br/>Annual growth: <strong>".number_format($arrHSSeries[$id][2][$this->oBudget->cm+8]/$arrHSSeries[$id][2][max(0,$this->oBudget->cm-4)]*100-100,1,'.',',')."%</strong>, quarterly growth <strong>".number_format($arrHSSeries[$id][2][$this->oBudget->cm+8]/$arrHSSeries[$id][2][max(0,$this->oBudget->cm+5)]*100-100,1,'.',',')."%</strong>";
 			}
-			$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'Sliding average 3M','data'=>$arrHSSeries[$arrChartType[$i]['id']][2],'color'=>'#39AAEC','type'=>'spline','yAxis'=>0);	
+			$arrHighCharts[$id]['series'][] = Array('name'=>'Sliding average 3M','data'=>$arrHSSeries[$id][2],'color'=>'#39AAEC','type'=>'spline','yAxis'=>0);	
 
 			//--- Show profitability %
-			$arrHighCharts[$arrChartType[$i]['id']]['yAxis'][1] = Array('title'=>'%','opposite'=>true,'min'=>0);		
-			if($arrChartType[$i]['id']!='revenue'){					
-					$arrHighCharts[$arrChartType[$i]['id']]['series'][] = Array('name'=>'% to revenue','data'=>$arrHSSeries[$arrChartType[$i]['id']][3],'color'=>'#FF6D10','type'=>'spline','yAxis'=>1);						
+			$arrHighCharts[$id]['yAxis'][1] = Array('title'=>'%','opposite'=>true,'min'=>0);		
+			if($id!='revenue'){					
+					$arrHighCharts[$id]['series'][] = Array('name'=>"% to ".$arrChartType[$chart['ratio_to']]['title'],'data'=>$arrHSSeries[$id][3],'color'=>'#FF6D10','type'=>'spline','yAxis'=>1);						
 			}
 			
 					
@@ -2054,20 +2055,20 @@ class Reports{
 		<th>Total</th>
 		</tr>
 		<?php
-		for ($i = 0;$i<count($arrChartType);$i++){
+		foreach ($arrChartType as $id=>$chart){
 			?>
 			<tr>
-				<td rowspan="6"><?php echo $arrChartType[$i]['title'];?></td>
+				<td rowspan="6"><?php echo $chart['title'];?></td>
 				<td><?php echo $this->oBudget->title;?></td>
 				<?php
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$period = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['this_a'][$period]/$this->Denominator);?></td>
+					<td class="budget-decimal"><?php $this->render($rwData[$id]['this_a'][$period]/$this->Denominator);?></td>
 					<?php
 				}
 				?>
-				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['this_a'])/$this->Denominator);?></td>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$id]['this_a'])/$this->Denominator);?></td>
 			</tr>
 			<tr>
 				<td><?php echo $this->oReference->title;?></td>
@@ -2075,11 +2076,11 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$period = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['this_b'][$period]/$this->Denominator);?></td>
+					<td class="budget-decimal"><?php $this->render($rwData[$id]['this_b'][$period]/$this->Denominator);?></td>
 					<?php
 				}
 				?>
-				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['this_b'])/$this->Denominator);?></td>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$id]['this_b'])/$this->Denominator);?></td>
 			</tr>
 			<tr class="budget-ratio">
 				<td>Ratio to <?php echo $this->oReference->title;?></td>
@@ -2087,11 +2088,11 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$period = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class="budget-decimal"><?php $this->render_ratio($rwData[$arrChartType[$i]['id']]['this_a'][$period],$rwData[$arrChartType[$i]['id']]['this_b'][$period]);?></td>
+					<td class="budget-decimal"><?php $this->render_ratio($rwData[$id]['this_a'][$period],$rwData[$id]['this_b'][$period]);?></td>
 					<?php
 				}
 				?>
-				<td class="budget-decimal budget-ytd"><?php $this->render_ratio(array_sum($rwData[$arrChartType[$i]['id']]['this_a']),array_sum($rwData[$arrChartType[$i]['id']]['this_b']));?></td>
+				<td class="budget-decimal budget-ytd"><?php $this->render_ratio(array_sum($rwData[$id]['this_a']),array_sum($rwData[$id]['this_b']));?></td>
 			</tr>
 			<tr class="budget-ratio">
 				<td>Yoy growth, %</td>
@@ -2099,11 +2100,11 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$period = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class="budget-decimal"><?php $this->render_ratio($rwData[$arrChartType[$i]['id']]['this_a'][$period],$rwData[$arrChartType[$i]['id']]['last_a'][$period]);?></td>
+					<td class="budget-decimal"><?php $this->render_ratio($rwData[$id]['this_a'][$period],$rwData[$id]['last_a'][$period]);?></td>
 					<?php
 				}
 				?>
-				<td class="budget-decimal budget-ytd"><?php $this->render_ratio(array_sum($rwData[$arrChartType[$i]['id']]['this_a']),array_sum($rwData[$arrChartType[$i]['id']]['last_a']));?></td>
+				<td class="budget-decimal budget-ytd"><?php $this->render_ratio(array_sum($rwData[$id]['this_a']),array_sum($rwData[$id]['last_a']));?></td>
 			</tr>
 			<tr>
 				<td><?php echo $this->oLastYear->title;?></td>
@@ -2111,11 +2112,11 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$period = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['last_a'][$period]/$this->Denominator);?></td>
+					<td class="budget-decimal"><?php $this->render($rwData[$id]['last_a'][$period]/$this->Denominator);?></td>
 					<?php
 				}
 				?>
-				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['last_a'])/$this->Denominator);?></td>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$id]['last_a'])/$this->Denominator);?></td>
 			</tr>
 			<tr>
 				<td><?php echo $this->oLastYear->reference;?></td>
@@ -2123,11 +2124,11 @@ class Reports{
 				for ($m=1+$this->oBudget->offset;$m<=12+$this->oBudget->offset;$m++){
 					$period = $this->oBudget->arrPeriod[$m];
 					?>
-					<td class="budget-decimal"><?php $this->render($rwData[$arrChartType[$i]['id']]['last_b'][$period]/$this->Denominator);?></td>
+					<td class="budget-decimal"><?php $this->render($rwData[$id]['last_b'][$period]/$this->Denominator);?></td>
 					<?php
 				}
 				?>
-				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$arrChartType[$i]['id']]['last_b'])/$this->Denominator);?></td>
+				<td class="budget-decimal budget-ytd"><?php $this->render(array_sum($rwData[$id]['last_b'])/$this->Denominator);?></td>
 			</tr>
 			<?php
 		}
@@ -2205,13 +2206,13 @@ class Reports{
 			$(document).ready(function(){	
 			
 				var arrCharts = [];
-				<?php 	for ($i = 0;$i<count($arrChartType);$i++){	
-							if($options[$arrChartType[$i]['id']]){
+				<?php 	foreach ($arrChartType as $id=>$chart){	
+							if($options[$id]){
 						?>
-							arrCharts.push({target:'#graph_<?php echo $arrChartType[$i]['id'].'_'.$this->ID;?>',
-										options:<?php echo json_encode($arrHighCharts[$arrChartType[$i]['id']]);?>});
-							$('#charts_<?php echo $this->ID;?>').append($('<div>',{id:'graph_<?php echo $arrChartType[$i]['id'].'_'.$this->ID;?>',
-										text:'<?php echo $arrChartType[$i]['title'];?>'}));
+							arrCharts.push({target:'#graph_<?php echo $id.'_'.$this->ID;?>',
+										options:<?php echo json_encode($arrHighCharts[$id]);?>});
+							$('#charts_<?php echo $this->ID;?>').append($('<div>',{id:'graph_<?php echo $id.'_'.$this->ID;?>',
+										text:'<?php echo $chart['title'];?>'}));
 						<?php 
 							}
 						} ?>
