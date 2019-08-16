@@ -36,7 +36,7 @@ if(!isset($_GET['pccGUID'])){
 	
 	$oReport = new Reports(Array('budget_scenario'=>$budget_scenario, 'currency'=>$currency, 'denominator'=>$denominator,'reference'=>$reference, 'filter'=>$filter));
 	
-	$oReport->periodicGraph(Array('title'=>$strPCHeader));
+	$oReport->periodicGraph(Array('title'=>$strPCHeader,'bd'=>true));
 
 }
 
