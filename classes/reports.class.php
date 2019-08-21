@@ -803,7 +803,11 @@ class Reports{
 	
 	public function masterDocument($source, $docClass=''){
 		
-		$sql = "SELECT * FROM vw_master WHERE `source`='{$source}' ORDER BY pc, customer, activity, account, item";
+		if($docClass=='scenario'){
+			$sqlWhere = " AND scenario='{$this->oBudget->id}' ";
+		}
+		
+		$sql = "SELECT * FROM vw_master WHERE `source`='{$source}' {$sqlWhere} ORDER BY pc, customer, activity, account, item";
 		$rs = $this->oSQL->q($sql);
 		$i = 1;
 		?>

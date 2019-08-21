@@ -277,9 +277,12 @@ $oBudget = new Budget($_GET['tab']);
 
 			<?php
 			}
-			?>
-			<span><button onclick="window.open('sp_get_kpi.php?budget_scenario=<?php echo $oBudget->id;?>','_blank');" id='kpis'>Get KPIs</button></span>
-			<span><button onclick="window.open('rep_staff_costs.php?budget_scenario=<?php echo $oBudget->id;?>','_blank');" id='headcount'>Get headcount</button></span>
+			?>						
+			<?php if (strpos($oBudget->type,'Budget')===false && $oBudget->flagUpdate){	?>
+				<span><button onclick="window.open('sp_get_kpi.php?budget_scenario=<?php echo $oBudget->id;?>','_blank');" id='kpis'>Get KPIs</button></span>
+				<span><button onclick="window.open('rep_staff_costs.php?budget_scenario=<?php echo $oBudget->id;?>','_blank');" id='headcount'>Get headcount</button></span>				
+				<span><button onclick="javascript:uploadActuals('<?php echo $oBudget->id;?>')" id='upload'>Upload data</button></span>				
+			<?php } ?>
 		</p>
 	</div>
 	<nav><strong>Compare to <?php echo $oBudget->reference_scenario->title;?>:</strong>
@@ -360,9 +363,18 @@ $oBudget = new Budget($_GET['tab']);
 		</table>
 		<pre>Checksum: <?php echo $oBudget->checksum; ?>&nbspCurrent: <?php echo $oBudget->get_checksum(); ?></pre>
 		</div>
-		<div style="clear:both;"></div>
+		<div style='float:left;'>
+			<h2>Manual corrections</h2>
+			<?php
+			$oReport = new Reports(Array('budget_scenario'=>$oDocument->id));
+			$oReport->masterDocument('Correction', 'scenario');
+			?>
+		</div>
+		<div style="clear:both;"></div>	
 	</div>
 	<?php
+		$oBudget->importActuals($oBudget->forecast);
+	
 	} else {
 		include ('includes/inc-frame_top.php');
 		echo '<h1>',$arrUsrData["pagTitle$strLocal"],'</h1>';
