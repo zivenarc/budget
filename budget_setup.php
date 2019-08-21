@@ -361,18 +361,20 @@ $oBudget = new Budget($_GET['tab']);
 				?>
 			</tbody>
 		</table>
-		<pre>Checksum: <?php echo $oBudget->checksum; ?>&nbspCurrent: <?php echo $oBudget->get_checksum(); ?></pre>
 		</div>
 		<div style='float:left;'>
 			<h2>Manual corrections</h2>
 			<?php
-			$oReport = new Reports(Array('budget_scenario'=>$oDocument->id));
+			$oReport = new Reports(Array('budget_scenario'=>$oBudget->id));
 			$oReport->masterDocument('Correction', 'scenario');
 			?>
 		</div>
-		<div style="clear:both;"></div>	
+		<div style="clear:both;"></div>
+		<pre>Checksum: <?php echo $oBudget->checksum; ?>&nbspCurrent: <?php echo $oBudget->get_checksum(); ?></pre>		
 	</div>
 	<?php
+			
+		// for debug
 		$oBudget->importActuals($oBudget->forecast);
 	
 	} else {
