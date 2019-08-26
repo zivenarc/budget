@@ -89,6 +89,50 @@ if ($_GET['DataAction']=='excel_gp'){
 	die();	
 }
 
+if ($_GET['DataAction']=='excel_gp_extended'){
+	$oBudget = new Budget($_GET['budget_scenario']);
+	include_once ("../common/eiseList/inc_excelXML.php");
+	$xl = new excelXML();            
+	$arrHeader = Array('Company','BU','Customer group','Customer','Account','Account Group','Activity','GHQ Product');	
+	$arrHeader = array_merge($arrHeader,array_slice($oBudget->arrPeriodTitle,3));	
+	$arrHeader[] = "Total";
+	$xl->addHeader($arrHeader);
+	
+	$sql = "SELECT comTitle, Profit, ivlGroup, customer_group_title, Customer_name, Title, yact_group, Activity_title, prtGHQ, ".$oBudget->getMonthlySumSQL().", SUM(".$oBudget->getThisYTDSQL('fye').") as Total
+			FROM vw_master
+			LEFT JOIN common_db.tbl_company ON comID=company
+			WHERE scenario='{$_GET['budget_scenario']}'
+			".Reports::GP_FILTER."
+			GROUP BY company, pc, ivlGroup, customer_group_code, customer, account, activity
+			ORDER BY company, pc, ivlGroup, customer_group_code, customer, account, activity";
+			
+			
+	// die($sql);
+	
+	$rs = $oSQL->q($sql);
+	while ($rw = $oSQL->f($rs)){
+	
+			$arrRow = Array();
+			$arrRow[] = $rw['comTitle'];	
+			$arrRow[] = $rw['Profit'];					
+			$arrRow[] = $rw['customer_group_title'];					
+			$arrRow[] = $rw['Customer_name'];					
+			$arrRow[] = $rw['Title'];					
+			$arrRow[] = $rw['yact_group'];					
+			$arrRow[] = $rw['Activity_title'];					
+			$arrRow[] = $rw['prtGHQ'];
+			for($m=4;$m<=15;$m++){
+				$month = $oBudget->arrPeriod[$m];
+				$arrRow[] = number_format($rw[$month],0,'.','');
+			}			
+			$arrRow[] = number_format($rw['Total'],2,'.','');			
+			$xl->addRow($arrRow);
+	}
+     
+	$xl->Output("GP_Extended_".urlencode($oBudget->title)."_".date('Ymd'));
+	die();	
+}
+
 if ($_GET['DataAction']=='excel_nop'){
 	$oBudget = new Budget($_GET['budget_scenario']);
 	
