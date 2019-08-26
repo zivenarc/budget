@@ -102,7 +102,7 @@ if ($_GET['DataAction']=='excel_gp_extended'){
 			FROM vw_master
 			LEFT JOIN common_db.tbl_company ON comID=company
 			WHERE scenario='{$_GET['budget_scenario']}'
-			".Reports::GP_FILTER."
+			AND Group_code=94
 			GROUP BY company, pc, ivlGroup, customer_group_code, customer, account, activity
 			ORDER BY company, pc, ivlGroup, customer_group_code, customer, account, activity";
 			
