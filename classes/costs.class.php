@@ -511,9 +511,9 @@ class Indirect_costs extends Document{
 					
 					
 					
-					if ($record->item == Items::WH_RENT) {
-						$record->customer = self::EMPTY_CUSTOMER;
-					}
+					// if ($record->item == Items::WH_RENT) {
+						// $record->customer = self::EMPTY_CUSTOMER;
+					// }
 					
 					$nCount = $record->count();
 					
